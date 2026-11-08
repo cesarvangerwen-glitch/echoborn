@@ -28,11 +28,11 @@ Taken met een **T-nummer** zijn nieuw of expliciet gemaakt in dit kader; de Prod
 | T6 | **CI met headless tests** (gecachete download, SHA-512-check) en een Windows-run van de echo-tests | tools-programmer of engine-platform-programmer | F5, R1, R18 |
 | T7 | Eerste build op Steam Deck-specificaties; lichtbudget uit #21 toegepast | engine-platform-programmer, technical-artist | F5, R17 |
 | T8 | Slice bouwen: één gebied, één boss, solo + co-op (inhoud volgens T3) | gameplay-programmer, world-level-designer, 2D-art- en audiorollen | F3 |
-| T9 | Narratief: wereld, toon (PEGI 12), verhaalboog op hoofdlijnen | narrative-designer | F3 |
+| T9 | Narratief: wereld (setting uit T13), toon **duister maar niet gruwelijk, melancholisch, PEGI 12**, verhaalboog op hoofdlijnen | narrative-designer | F3 |
 | T10 | UX: HUD, menu's, drop-in/drop-out | ux-designer, ui-artist | F3 |
 | T11 | QA-testplan; elke slice-puzzel in solo én co-op getest (R10, R16) | qa-lead | F4 |
 | T12 | Vindbaarheidstoets *Wraithstep* (#44), vóór de betaalde merkcheck (volgorde §7) | marketing-community-manager (met creative-director) | R24, R15 |
-| T13 | VAF-dossier voor **productiesteun fase 3** voorbereiden (route c, `subsidies.md` §5), **zonder indienen**; met het **tweede criterium uit categorie I** van de culturele test (voorstel CD) en de VAF-deadlines 2027 ingepland (A16). Alleen als de CEO de VAF-route openhoudt (#51, vraag 4–6) | business-legal-advisor (met creative-director, executive-producer, marketing-community-manager); planning: producer | R6, R23 |
+| T13 | VAF-dossier voor **productiesteun fase 3** voorbereiden (route c, `subsidies.md` §5), **zonder indienen**; met het **tweede criterium uit categorie I** van de culturele test. Voorstel CD: een verzonken stad in de Lage Landen (polders, dijken, belforten, begijnhof; licht naar de Vlaamse Primitieven; het carillon als echo-ritme). Dat raakt de pillars niet en is dus geen aparte CEO-vraag en de VAF-deadlines 2027 ingepland (A16). Alleen als de CEO de VAF-route openhoudt (#51, vraag 4–6) | business-legal-advisor (met creative-director, executive-producer, marketing-community-manager); planning: producer | R6, R23 |
 | T14 | **Lokalisatie inbouwen** (vertaalbestanden, geen tekst in code), ≈ 1 run. Alleen als de CEO de Nederlandse versie in principe toestaat (#51, vraag 5) | engine-platform-programmer | fasekader fase 1 §6.2 |
 | T15 | Productieraming per gebied, voorstel releasevenster, statusrapport en gate-voorstel fase 2 | executive-producer | F6, F8, R20 |
 
@@ -50,17 +50,18 @@ Alle CEO-besluiten in `docs/beslissingen.md` gelden onveranderd (o.a. #2, #18, #
 
 ## 3. Exit-criteria
 
-Fase 2 sluit pas als **alle** criteria F1–F8 gehaald zijn; "bijna" telt niet. "Gemergd" betekent als in fase 1: Lead-review akkoord, bij SM-plichtig werk `status:goedgekeurd` met alle rubricscores ≥ 7, daarna gemergd.
+Fase 2 sluit pas als **alle** criteria F1–F8 (inclusief F4b) gehaald zijn; "bijna" telt niet. "Gemergd" betekent als in fase 1: Lead-review akkoord, bij SM-plichtig werk `status:goedgekeurd` met alle rubricscores ≥ 7, daarna gemergd.
 
 | # | Exit-criterium | Toets | Bewijs |
 |---|---|---|---|
 | F1 | **Art op eindkwaliteit bewezen** | De scène uit T1 scoort met de SM-rubric **Kwaliteit ≥ 7** én krijgt een **`Visie-review: past` van de CD op de leesbaarheid van pillar 2**: de laag is zichtbaar zonder icoon of uitleg, "vol = levend, hol = echo" (A9). Beide **vóórdat** het slice-art-werk start. Daarna haalt de slice-art zelf ook Kwaliteit ≥ 7. | gemergde PR + SM-score + visie-review |
 | F2 | **Audio op eindkwaliteit bewezen** | Het referentiefragment uit T2 scoort **Kwaliteit ≥ 7** vóór het slice-audiowerk; daarna haalt de slice-audio ook ≥ 7. De eis is concept tot de Audio Director hem bevestigt (A10); wijzigt die hem, dan past de EP dit kader aan. | gemergde PR + SM-score + akkoord AD |
 | F3 | **Verticale slice speelbaar** | Eén gebied met één boss, van begin tot eind speelbaar solo én in lokale co-op met drop-in/drop-out, op de inhoud uit GDD v1 (T3). | gemergde PR in `game/` + SM-review |
-| F4 | **Playtestvragen beantwoord** | De 3 playtestvragen (gdd §5) zijn gemeten, met de grenzen uit de gdd: echo-duur getest met 6, 10 en 14 s (R9); echo ≤ 40 % van de tijd Leeg (R12); co-op ≤ 2× zo snel als solo (R10). Elke slice-puzzel solo en co-op getest (T11). Wijkt de beste duur af van 10 s: `ceo-beslissing`, voorbereid door de CD. | testrapport QA in een gemergde PR |
+| F4 | **Playtestvragen beantwoord** | De 3 playtestvragen (gdd §5) zijn gemeten, met de grenzen uit de gdd: echo-duur getest met 6, 10 en 14 s (R9); echo ≤ 40 % van de tijd Leeg (R12); co-op ≤ 2× zo snel als solo (R10). Elke slice-puzzel solo en co-op getest (T11). **Wie**: de QA Lead plant en rapporteert; spelers zijn de CEO (F4b) en scripted runs voor de meetbare grenzen; een externe playtest is een apart CEO-besluit. Wijkt de beste duur af van 10 s: `ceo-beslissing`, voorbereid door de CD. | testrapport QA in een gemergde PR |
 | F5 | **Techniek houdt** | Headless tests draaien in CI en zijn groen, ook op Windows (T6); A2 is beslist en getest (T4); een build draait op Deck-specificaties binnen het lichtbudget (T7). | gemergde PR's + CI-uitvoer |
 | F6 | **Raming en releasevenster** | Productieraming per gebied (regie-runs, rollen, externe kosten), getoetst aan wat de slice werkelijk kostte, plus een voorstel releasevenster (besluit #2). | gemergde PR (EP) |
-| F7 | **Visie-review slice** | De CD zet op de slice-PR `Visie-review: past` op alle 3 pillars. | visie-review |
+| F4b | **De slice is leuk** | (a) De CEO speelt de slice solo én co-op (± 1 uur) en vult een korte kaart in: klikmoment van de kernfantasie (ja/nee, waar), wil doorspelen (ja/nee), de echo voelt als bondgenoot of als trucje. (b) Een gedragsmaat voor R3: de echo wordt ook buiten verplichte puzzels gebruikt (bv. aandeel van de boss-schade via de echo); de grens legt de LGD vast in T3. Beide positief, anders geen gate maar een herzien voorstel. | ingevulde kaart (comment CEO) + meting in het QA-testrapport |
+| F7 | **Visie-review slice** | De CD zet op de slice-PR `Visie-review: past` op alle 3 pillars **en op de toon** (duister maar niet gruwelijk, melancholisch, PEGI 12). | visie-review |
 | F8 | **Gate-besluit CEO** | `docs/productie/fase-2-status.md` toetst F1–F7 met bewijs; een `ceo-beslissing`-issue vraagt productie-scope, releasevenster, budget fase 3 en eventueel indienen bij het VAF. | `Besluit:` van de CEO |
 
 ## 4. Startvoorwaarden en volgorde
@@ -123,13 +124,14 @@ Zelfde procedure als in fase 1 (`fase-1-kader.md` §6): een issue voor de EP met
 | A2 en A3 als expliciete taken (T4, T3) | Open punten zonder issue (risico.md §6) | ≈ 1 run TD/GPM + ≈ 1 run LGD, binnen T3/T4 |
 | Vindbaarheidstoets #44 (T12) | R24; vóór de betaalde merkcheck | ≈ 1 run Marketing, € 0 |
 | Lokalisatie inbouwen (T14), alleen na CEO-besluit | VAF-eis Nederlandse versie | ≈ 1 run; totaal NL-versie ≈ 4–7 runs + mogelijke externe post over fase 2–4 |
+| F4b: CEO speelt de slice + gedragsmaat R3 | Fase 2 toetste nergens of de slice leuk is (Lead-review CD op PR #50) | ± 1 uur CEO-tijd, ≈ 0 runs (grens binnen T3, meting binnen T11) |
 | VAF-dossier (T13), alleen als de VAF-route openblijft | Route (c) | ≈ 2 runs BLA + bijdragen CD, EP, Marketing; € 0 |
 
 **Open punten** (één regel per punt, de volgende versie neemt ze mee):
-- Het CD-oordeel over het tweede criterium uit categorie I (input Producer in #10) is nog niet gegeven; het komt in T13.
+- T1 en T9 werken de setting uit; de BLA toetst de formulering aan art. 4 in T13.
 - De VAF-deadlines 2027 (A16) volgen van de CEO; de Producer plant T13 daarop.
 
 ### Logboek
 | Versie | Datum | Wijziging | Kost |
 |---|---|---|---|
-| 0.1 | 2026-11-08 | Concept, bijlage bij het gate-voorstel fase 1 (#10) | n.v.t. |
+| 0.1 | 2026-11-08 | Concept, bijlage bij het gate-voorstel fase 1 (#10); Lead-review CD op PR #50: F4b (is de slice leuk), wie test (F4), toon in T9 en F7, setting-voorstel in T13 | F4b: ± 1 uur CEO-tijd, ≈ 0 runs |
