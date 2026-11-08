@@ -1,6 +1,6 @@
 # Stijltests: 2D vs 2.5D
 
-Eigenaar: Art Director · Versie 0.1 · Issue: #7 · Status: ter review (Executive Producer)
+Eigenaar: Art Director · Versie 0.2 · Issue: #7 · Status: Lead-review akkoord onder voorwaarde, punten verwerkt (Executive Producer, PR #17)
 Gebaseerd op `docs/beslissingen.md` (stand 2026-11-08: "Stijl: 2D of 2.5D, keuze na stijltests van de Art Director"), `docs/concept/pitch.md` v0.1 en `docs/tech/ontwerp.md` v0.
 
 ---
@@ -9,7 +9,7 @@ Gebaseerd op `docs/beslissingen.md` (stand 2026-11-08: "Stijl: 2D of 2.5D, keuze
 
 - Ik heb **dezelfde scène twee keer** gemaakt: in 2D (pixel art) en in 2.5D (3D-look). Beide tonen speler 1, speler 2, de echo, een vijand, en de overgang tussen licht- en schaduwlaag.
 - **Aanbeveling: 2D**, pixel art op 640×360 (op de Steam Deck 640×400), met dynamisch 2D-licht in drie banden.
-- Waarom: de grens tussen licht en schaduw is in 2D ±45% scherper (ΔL* 40,5 tegen 27,7). Speler 2 en een echo zijn in 2D duidelijk uit elkaar te houden. De stijl past bij de 2D-physics van de echo-spike, bij de Compatibility-renderer en bij een team dat in 2D is samengesteld (2D Environment Artist, Animator, Concept Artist; geen 3D-modelleur of rigger).
+- Waarom: 2D geeft een **harde, eenduidige rand** tussen licht en schaduw, zodat de speler op de pixel ziet waar de schaduwbrug ophoudt. En de regel **vol = levend, hol = echo** werkt in 2D op elke achtergrond, waardoor speler 2 en een echo duidelijk uit elkaar te houden zijn. De metingen in §4 wijzen dezelfde kant op, maar zijn alleen een indicatie bij deze afstelling, geen hard bewijs. De stijl past bij de 2D-physics van de echo-spike, bij de Compatibility-renderer en bij een team dat in 2D is samengesteld (2D Environment Artist, Animator, Concept Artist; geen 3D-modelleur of rigger).
 - De keuze is een CEO-besluit. De vraag staat in §8, in het format van `ceo-beslissing`, zodat de Producer er na de interne review een issue van kan maken.
 
 Alle beelden zijn **placeholder**: ze testen leesbaarheid en richting, niet eindkwaliteit. Ze zijn volledig met code gemaakt (Python, numpy, scipy, Pillow), zonder externe assets of fonts. De labels gebruiken een eigen pixelfont, zie §9.
@@ -87,6 +87,8 @@ Gemeten op 1280×720 met het script: het verschil in lichtheid (CIELAB ΔL*, 0�
 | Speler 2 | 2,5 | **70,6** | 9,5 | **64,9** |
 | Vijand | 36,8 | 47,1 | 33,5 | **32,6** |
 
+**Let op bij het lezen van deze getallen:** de belichting is per stijl anders afgesteld. In 2D tillen de banden de middentonen op, en de lichtfactor is 1,25 tegen 1,6. In 2.5D komen daar tonemapping, vignet en gedimde emissie bij. De meetband van 16 px valt in 2.5D deels in de halfschaduw. De 2D-figuren zijn bovendien bewust onbelicht en de 2.5D-figuren Lambert-belicht. Het getal over de laaggrens mengt dus helderheid met randscherpte. Het is een indicatie bij deze afstelling, geen maat voor de stijl zelf. Het hoofdargument is kwalitatief: harde tegenover zachte rand, en vol tegenover hol (§4.2).
+
 | Laaggrens (muur vlak bij de grens, 16 px aan beide kanten) | 2D | 2.5D |
 |---|---|---|
 | Mediaan L* lichtkant | 45,5 | 32,9 |
@@ -103,8 +105,8 @@ Kleurverschil (ΔE76) tussen sleutelkleuren, normaal → bij deuteranopie:
 
 ### 4.2 Wat ik zie
 
-1. **De laaggrens (pillar 2) is in 2D duidelijk beter.** Harde banden plus een stippellijn laten op de pixel zien waar de schaduw ophoudt. Dat is gameplay-informatie: waar stopt de schaduwbrug? In 2.5D is de halfschaduw 10–20 px breed. Dat is mooi, maar dan moet de speler gokken. Je kunt dat in 2.5D oplossen met een randshader, maar dan maak je de 3D-look juist weer grafisch.
-2. **Speler 1 is in beide stijlen sterk.** In 2D blijft hij ook in schaduw licht (de figuren zijn bewust onbelicht). In 2.5D wordt hij in schaduw grauw (zie de personagekaart).
+1. **De laaggrens (pillar 2) is in 2D duidelijk beter, door de harde rand.** Harde banden plus een stippellijn laten op de pixel zien waar de schaduw ophoudt. Dat is gameplay-informatie: waar stopt de schaduwbrug? In 2.5D is de halfschaduw 10–20 px breed. Dat is mooi, maar dan moet de speler gokken. Je kunt dat in 2.5D oplossen met een randshader, maar dan maak je de 3D-look juist weer grafisch.
+2. **Speler 1 is in beide stijlen sterk.** In 2D blijft hij ook in schaduw licht (de figuren zijn bewust onbelicht). In 2.5D wordt hij in schaduw grauw (zie de personagekaart). Dat is deels een afstelkeuze en hoort niet vast bij 2.5D: ook daar kun je figuren minder belichten, maar dan verlies je een deel van de 3D-look.
 3. **Echo en speler 2 lezen in beide stijlen vooral op hun contour.** Dat is zo bedoeld: het zijn schaduwwezens in een donkere laag. In 2D is het verschil tussen speler 2 (vol zwart) en een echo (gerasterd) direct te zien. In 2.5D hangt dat verschil alleen af van doorschijnendheid. Op de personagekaart lijken "speler 2" en "echo s2" in 2.5D op elkaar. **Dit is het zwaarste leesbaarheidsprobleem van 2.5D**, omdat het de rolregel raakt: "beide spelers en hun echo's zijn direct van elkaar te onderscheiden".
 4. **Het spoor van de echo** is in 2D een stippel-nabeeld en leest als beweging. In 2.5D lezen de nabeelden op Deck-formaat als *vier* figuren. Dat is op te lossen (minder nabeelden, vervagen), maar het is een extra risico.
 5. **De vijand** leest in 2D op elke achtergrond door de rode bovenrand en de stekels. In 2.5D verdwijnt het lijf in schaduw bijna; alleen de kern blijft zichtbaar (personagekaart, onderste rij). Ook dat vraagt in 2.5D een extra rimshader.
@@ -135,15 +137,15 @@ Dit is mijn inschatting als Art Director. De technische bevestiging en de presta
 
 | Criterium | 2D | 2.5D |
 |---|---|---|
-| Laaggrens leesbaar (pillar 2) | **Sterk** (ΔL* 40,5, harde rand) | Matig (ΔL* 27,7, zachte rand) |
-| Speler / echo / speler 2 / vijand uit elkaar houden | **Sterk** (vol tegen gerasterd, contourkleuren) | Matig (speler 2 en echo lijken op elkaar; vijand verdwijnt in schaduw) |
+| Laaggrens leesbaar (pillar 2) | **Sterk** (harde rand, op de pixel af te lezen) | Matig (zachte halfschaduw van 10–20 px; een randshader is nodig) |
+| Speler / echo / speler 2 / vijand uit elkaar houden | **Sterk** (vol tegen hol/gerasterd, contourkleuren) | Matig (speler 2 en echo lijken op elkaar; vijand verdwijnt in schaduw) |
 | Sfeer, "duister maar niet gruwelijk", melancholie | Goed (dithering, warm tegen koud) | **Sterk** (volumetrisch licht, diepte) |
 | Herkenbaar in één screenshot | Goed; pixel-metroidvania's zijn een drukke markt, dus het licht-schaduw-motief moet het onderscheid maken | Goed; valt meer op tussen pixel-art-titels |
 | Haalbaar in Godot 4.6 met de huidige spike | **Sterk** | Route 1 zwak, route 2 matig |
 | Steam Deck | **Sterk** (integer 1280×800) | Matig (duurdere effecten, details vervagen) |
 | Productie met dit team en deze scope | **Sterk** | Zwak (route 1) tot matig (route 2) |
 
-**Aanbeveling: 2D**, pixel art op 640×360 (Deck 640×400), met dynamisch 2D-licht in banden. De sterke kanten van 2.5D (zachte lichtval, diepte) nemen we gericht mee waar ze de leesbaarheid niet raken: volumetrische lichtbundels alleen in de achtergrond, en parallax-lagen voor diepte. Speelvlak en figuren blijven strak en hard belicht.
+**Aanbeveling: 2D**, pixel art op 640×360 (Deck 640×400), met dynamisch 2D-licht in banden. De doorslag geven de harde laaggrens en het onderscheid tussen vol en hol. Die twee dragen pillar 2 en de rolregel "beide spelers en hun echo's zijn direct van elkaar te onderscheiden". De sterke kanten van 2.5D (zachte lichtval, diepte) nemen we gericht mee waar ze de leesbaarheid niet raken: volumetrische lichtbundels alleen in de achtergrond, en parallax-lagen voor diepte. Speelvlak en figuren blijven strak en hard belicht.
 
 Resolutie, palet en lijnwerk binnen 2D bepaal ik zelf in de art bible. Daar is geen CEO-besluit voor nodig.
 
@@ -160,22 +162,27 @@ Het beslissingslog laat de stijl open ("2D of 2.5D, keuze na stijltests"). De st
 
 **1. In welke stijl maken we Echoborn?**
 - **A. 2D: pixel art (640×360, Deck 640×400) met dynamisch 2D-licht** ⭐ Aanbevolen: scherpste licht-schaduwgrens en figuren, past op de spike en de Deck; geen extra rollen of tools nodig.
-- **B. 2.5D: 3D-look (3D-scène of 2D met normal maps)**: meer sfeer en diepte, maar zwakkere laaggrens en echo-leesbaarheid; 3D-rol en extra tools of ±1,5–2× tekenwerk nodig, en mogelijk een andere renderer.
+- **B. 2.5D als 2D met normal maps**: meer diepte en zachter licht, maar een zachtere laaggrens en een zwakker verschil tussen echo en speler 2; kost ±1,5–2× tekenwerk (elke sprite ook een normal map); risico midden, spike en renderer blijven.
+- **C. 2.5D als echte 3D-scène**: de meeste sfeer en diepte, met dezelfde leesbaarheidsnadelen als B; kost een 3D-rol (modelleren, riggen, 3D-animatie), het deels herschrijven van de echo-spike en mogelijk een andere renderer; risico hoog.
 
 ### Waarom deze aanbeveling
-Licht en schaduw zijn de kaart (pillar 2), dus de grens tussen de lagen en het verschil tussen speler, echo en vijand moeten in één oogopslag te lezen zijn. Dat lukt in 2D op elke achtergrond en op Deck-formaat het best (ΔL* over de laaggrens 40,5 tegen 27,7). 2D sluit ook aan op de bestaande 2D-echo-spike en op een team zonder 3D-rollen, en past dus binnen scope en budget per fase.
+Licht en schaduw zijn de kaart (pillar 2), dus de grens tussen de lagen en het verschil tussen speler, echo en vijand moeten in één oogopslag te lezen zijn. In 2D ligt die grens hard en eenduidig, en "vol = levend, hol = echo" werkt op elke achtergrond en op Deck-formaat. In beide 2.5D-varianten is de rand zacht en lijken speler 2 en een echo op elkaar. 2D sluit ook aan op de bestaande 2D-echo-spike en op een team zonder 3D-rollen, en past dus binnen scope en budget per fase. De prestaties op de Steam Deck zijn nog niet gemeten; na het besluit volgt een meting op de Deck (Technical Artist en Engine & Platform Programmer).
 
 ### Wat wacht hierop
-- `docs/art/bible.md` (Art Director)
-- `docs/art/assetlijst.md` (Art Director en Producer)
-- Technische art-pipeline en lichtmeting op de Steam Deck (Technical Artist)
-- Werk van Concept Artist, 2D Environment Artist en Animator in fase 2
+- #7 Stijltests: afronding na het besluit
+- `docs/art/bible.md` (Art Director) (nog geen issue)
+- `docs/art/assetlijst.md` (Art Director en Producer) (nog geen issue)
+- Technische art-pipeline en lichtmeting op de Steam Deck, ontwerp.md C7 (Technical Artist, Engine & Platform Programmer) (nog geen issue)
+- Werk van Concept Artist, 2D Environment Artist en Animator in fase 2 (nog geen issue)
+- #10 Fase-1-statusrapport en gate-voorstel (Executive Producer): de stijlkeuze hoort bij de fase-1-gate
 
 ---
 *CEO: antwoord kort met een comment die begint met `Besluit:`, bijvoorbeeld:*
 - *`Besluit: 1A`*
 - *`Besluit: akkoord` (alle aanbevelingen)*
 - *Een eigen antwoord mag ook: `Besluit: 1 = <tekst>`*
+
+*Of vraag in een Claude-chat: "behandel mijn openstaande CEO-vragen". Dan krijg je de vragen als klikbare meerkeuze.*
 
 ## 9. Licenties en bronnen
 
@@ -192,3 +199,5 @@ Licht en schaduw zijn de kaart (pillar 2), dus de grens tussen de lagen en het v
 | Art bible v1 (paletten per gebied, schaal, lijnwerk, belichting, spelers en echo, do's en don'ts) | Art Director | Na het CEO-besluit |
 | Hoe zichtbaar mogen vijanden zijn die alleen in de schaduwlaag bestaan (pitch, pillar 2)? | Art Director met Combat Designer | Art bible |
 | Kleurenblind-modus (alternatieve accentkleuren) | UX Designer met Art Director | Preproductie |
+| Speler 2 naast echo s2 in schaduw op ware Deck-grootte, ook in beweging (flikkert of loopt het raster dicht op ±7 mm?) | Art Director | Art bible (EP-review punt 5) |
+| Tegen generieke pixel art: volumetrische bundels in de achtergrond en het licht-schaduwmotief als handtekening, als expliciete eis | Art Director | Art bible (EP-review punt 6) |
