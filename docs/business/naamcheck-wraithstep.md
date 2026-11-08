@@ -81,7 +81,7 @@ Wat dit concreet betekent:
 3. **Goedkope tussenstap (€ 0, ± 15 minuten in een gewone browser)**: zoek "wraithstep" en "wraith step" handmatig in **TMview** (`https://www.tmdn.org/tmview/`) en de **WIPO Global Brand Database** (`https://branddb.wipo.int/`), in klasse 9, 28, 41 en 42. Vindt dat niets, dan stijgt het vertrouwen; het vervangt de specialist niet.
    - **Eigenaar:** de **CEO** (de agents bereiken TMview en EUIPO niet vanuit hun werkomgeving, M5). De EP zet de stap als optionele actie in #10.
    - **Moment:** na de vindbaarheidstoets van Marketing (#44) en vóór de opdracht aan de specialist. Adviseert #44 een nieuwe naam (optie c), dan vervalt de stap voor *Wraithstep* en zoeken we de nieuwe naam.
-   - **Daarna:** de CEO zet de uitkomst (treffers of "0", met datum) in #35 of het issue van de merkcheck; de BLA verwerkt die in dit document.
+   - **Daarna:** de CEO zet de uitkomst (treffers of "0", met datum) in #10 (gate-voorstel), zodat er één contactmoment met de CEO is; de BLA verwerkt die in dit document.
 
 ## 4. Richtprijs formele merkcheck door een specialist
 
@@ -139,7 +139,7 @@ Geldt voor de **eerste publieke uiting met de naam**: Steam-pagina, trailer, soc
 |---|---|---|---|
 | 1 | Vindbaarheidstoets (#44) en de formele check door de specialist zijn af; uitkomst niet rood | Marketing, CD, specialist via CEO | Vóór stap 2 |
 | 2 | Opnieuw zoeken: Steam, itch.io, websearch (games met dezelfde of gelijkende naam) | BLA | ≤ 2 weken vóór publicatie |
-| 3 | Registers: USPTO (agent); TMview, EUIPO, BOIP en WIPO (CEO in een gewone browser, zie §3 punt 3), klassen 9/28/41/42; alleen nieuwe aanvragen sinds het rapport van de specialist | BLA, CEO | Idem |
+| 3 | Registers, klassen 9/28/41/42, alleen nieuwe aanvragen sinds het rapport van de specialist: USPTO (agent); TMview, EUIPO, BOIP en WIPO bij voorkeur door de **specialist** als update-zoekactie (meevragen in de offerte, §4), anders door de **CEO** in een gewone browser, als onderdeel van het CEO-besluit over de eerste publicatie | BLA, specialist of CEO | Idem |
 | 4 | Domeinen (.com, .net, .org, .io, .games, .nl, **.gg**) en handles (**X, Instagram, TikTok, Reddit, Twitch**, YouTube) | Marketing (handmatig) | Idem |
 | 5 | Uitkomst met datum in het publicatie-issue; bij een nieuwe treffer: geen publicatie, eerst de EP en zo nodig de CEO | BLA | Vóór de publicatie |
 
@@ -157,4 +157,4 @@ Registreren of reserveren van domeinen en handles is geen deel van deze check; d
 | Versie | Datum | Wijziging |
 |---|---|---|
 | 1.0 | 2026-11-08 | Eerste versie (PR #33, issue #29) |
-| 1.1 | 2026-11-08 | Niet-blokkerende reviewpunten PR #33 (EP en SM, issue #35): §4.2 bandbreedte en rekenadvies gelijkgetrokken met de eigen rekenwijze (≈ € 1.400 – 3.750, advies € 3.750, zoals de EP in #10); klasse 28 in de scope van de specialist, gelijk aan het criterium voor "rood" in §3, met uitleg en de vraag of prijzen per klasse of samen gelden (§4); tussenstap TMview/WIPO met eigenaar (CEO) en moment (na #44, vóór de specialist) in §3; herhaalcheck vóór de eerste publicatie als vaste stap (§5.1), op te nemen in het latere Steam-/marketingissue. Geen nieuw onderzoek. |
+| 1.1 | 2026-11-08 | Niet-blokkerende reviewpunten PR #33 (EP en SM, issue #35): §4.2 bandbreedte en rekenadvies gelijkgetrokken met de eigen rekenwijze (≈ € 1.400 – 3.750, advies € 3.750, zoals de EP in #10); klasse 28 in de scope van de specialist, gelijk aan het criterium voor "rood" in §3, met uitleg en de vraag of prijzen per klasse of samen gelden (§4); tussenstap TMview/WIPO met eigenaar (CEO) en moment (na #44, vóór de specialist) in §3; herhaalcheck vóór de eerste publicatie als vaste stap (§5.1), op te nemen in het latere Steam-/marketingissue. Na Lead-review EP (PR #48): uitkomst van de tussenstap in #10; de tweede registercheck door de specialist of bij het CEO-besluit over de eerste publicatie. Geen nieuw onderzoek. |
