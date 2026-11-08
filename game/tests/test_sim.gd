@@ -45,18 +45,23 @@ func test_tick_order_shadow_before_p1(t) -> void:
 	echo.name = "Echo1"
 	sim.add_echo(echo)
 	echo.start(p1.recorder.snapshot(), EchoActor.Mode.STATE)
-	sim.log_steps = true
+	# Array, geen PackedStringArray: een lambda vangt packed arrays als kopie.
+	var log_lines: Array[String] = []
+	var log_step := func(tick: int, phase: String, actor: Node) -> void:
+		log_lines.append("%d:%s:%s" % [tick, phase, actor.name])
+	sim.actor_stepping.connect(log_step)
 	var first: int = sim.tick
 	await t.run_ticks(sim, 10)
-	sim.log_steps = false
+	sim.actor_stepping.disconnect(log_step)
+	var step_log := PackedStringArray(log_lines)
 	var expected := PackedStringArray()
 	for tick in range(first, first + 10):
 		expected.append("%d:1:Echo1" % tick)
 		expected.append("%d:1:%s" % [tick, p2.name])
 		expected.append("%d:2+3:%s" % [tick, p1.name])
-	t.check(sim.step_log == expected, "volgorde %s, verwacht %s" % [
-		str(sim.step_log.slice(0, 3)), str(expected.slice(0, 3))])
-	t.note("tick %d: %s" % [first, ", ".join(sim.step_log.slice(0, 3))])
+	t.check(step_log == expected, "volgorde %s, verwacht %s" % [
+		str(step_log.slice(0, 3)), str(expected.slice(0, 3))])
+	t.note("tick %d: %s" % [first, ", ".join(step_log.slice(0, 3))])
 
 
 ## Gevolg van E-07b (nodig voor E-07a): als P1 op tick t stapt, staat de echo

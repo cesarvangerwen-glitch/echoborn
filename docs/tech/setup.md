@@ -54,6 +54,7 @@ godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd
 ```
 
 - Exitcode `0` = alle tests geslaagd, `1` = minstens één test mislukt.
+- Een test is ook FAIL bij 0 checks, bij een `SCRIPT ERROR` of enginefout tijdens de test, of als hij niet binnen 7200 frames klaar is. Een testscript dat niet laadt of geen `test_*`-methoden heeft, telt als mislukt (#30). De runner vangt fouten op met een `Logger` (`tests/error_log.gd`, Godot 4.5+).
 - `--fixed-fps 60` laat elke frame precies 1/60 s duren, los van de echte tijd. Daardoor draaien 10 s spel in minder dan een seconde, en is er per frame precies één physics-tick. Zonder deze vlag slagen de tests ook, maar duren ze ongeveer twee minuten (echte tijd).
 - Een verse clone heeft geen `game/.godot/`-cache nodig: de code gebruikt `preload()` in plaats van `class_name` (zie `standaarden.md`). Wil je de cache toch opbouwen (bv. na het toevoegen van assets): `godot --headless --path game --import`.
 
@@ -61,6 +62,13 @@ Verwachte uitvoer (verkort):
 
 ```
 Echoborn tests - Godot 4.6.3-stable (official), physics 60 Hz
+
+res://tests/test_runner.gd
+  PASS test_zero_checks_is_fail (1 checks)
+  PASS test_script_error_is_fail_even_with_passing_checks (1 checks)
+  PASS test_unfinished_test_is_fail (1 checks)
+  PASS test_clean_test_with_checks_is_pass (1 checks)
+  PASS test_failed_check_is_reported (1 checks)
 
 res://tests/test_echo.gd
   PASS test_state_echo_reaches_same_position (5 checks)
@@ -78,7 +86,7 @@ res://tests/test_sim.gd
 res://tests/test_input.gd
   PASS test_p2_action_only_on_right_ctrl (4 checks)
 
-Resultaat: 10 geslaagd, 0 mislukt (0.63 s)
+Resultaat: 15 geslaagd, 0 mislukt (0.61 s)
 ```
 
 ## 4. De spike spelen
@@ -97,4 +105,5 @@ Besturing: P1 A/D + spatie, E = echo. P2 pijltjes + Enter, rechter Ctrl = echo. 
 | `sha512sum: WARNING: 1 computed checksum did NOT match` | Download onvolledig of afgebroken door de proxy (gezien in #14: eerste poging gaf een zip van 23 bytes). Zip verwijderen en opnieuw downloaden. |
 | `gh api repos/godotengine/godot/...` geeft 403 | Verwacht in de agent-omgeving. Gebruik de `curl`-URL's hierboven. |
 | Tests hangen | `--fixed-fps` vergeten en wachten op echte tijd (±2 min), of een test wacht op een tick die nooit komt. Draai met `--fixed-fps 60`. |
+| Test FAIL met `fout tijdens de test: ...` | De test crashte of de engine gaf een fout. Het bericht noemt bestand en regel. |
 | `Parse Error` op een script | Draai `godot --headless --path game --check-only -s <script>` voor het precieze bericht. |
