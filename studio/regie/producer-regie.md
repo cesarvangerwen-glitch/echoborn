@@ -12,9 +12,9 @@ Bepaal eerst welke run dit is, op basis van de lokale tijd (Europe/Brussels): **
 |---|---|---|
 | Stappen | 0, 1, 2, 3 (alleen Lead-reviews en herstel), 4 | 0, 1, 2, 3 (SM-reviews, Lead-reviews op open PR's), 4 (alleen klein werk), 5 |
 | Maak-agents | max. 3 | max. 1, alleen klein werk |
-| Dagrapport | Geen. Alleen als er iets op de CEO wacht: één comment met de vraag | Het dagrapport (één per dag) |
+| Dagrapport | Eén regel in #1: `[Producer → Producer]: Ochtendrun <datum>: makers <n>, PR's <links>, tokens <per sub-agent>`. Wacht er iets op de CEO, dan staat ook de vraag erbij | Het dagrapport over de hele dag (één per dag). Neem de ochtendregel uit #1 erin mee |
 
-- Max. **4 maak-agents per dag**. Reviews: per PR max. één Lead-review (plus de her-review bij herstel) en één SM-review per run.
+- Max. **4 maak-agents per dag**. De avondrun telt de makers uit de ochtendregel mee. **Klein werk** in de avond is reviewpunten verwerken of één sectie van een bestaand document, geen nieuw deliverable. Een PR van de avondmaker krijgt zijn Lead-review in de volgende ochtendrun. Reviews: per PR max. één Lead-review (plus de her-review bij herstel) en één SM-review per run.
 - **Model**: maak-agents, Lead-reviews en de regisseur draaien op het huidige model. De SM-review en administratief werk (een naam doorvoeren, labels, boekhouding van issues) mogen op een kleiner model: geef dan `model: "sonnet"` mee aan de Agent-tool.
 - Geen werk na stap 0? Stop meteen. Een korte run is een goede run.
 
@@ -49,6 +49,7 @@ Bepaal eerst welke run dit is, op basis van de lokale tijd (Europe/Brussels): **
 **4. Nieuw werk verdelen**
 - Kies issues binnen het budget van deze run (ochtend 3, avond 1 klein) met `status:todo` die niet wachten op een `ceo-beslissing` of op ander open werk. Voorrang: blokkeert ander werk > ouder > kleiner.
 - Per issue: zet `status:bezig` en start een sub-agent met de prompt hieronder.
+- In de ochtendrun: laat daarna stap 3 (Lead-review en herstel) opnieuw lopen voor de nieuwe PR's.
 
 **5. Rapporteren**
 - Alleen in de avondrun: zet een comment in het vaste issue **"Dagrapport"** over de hele dag (beide runs):
@@ -108,12 +109,13 @@ Comment op de PR, max. ± 250 woorden, in dit format:
   Klein (verwerk in deze PR, geen nieuwe review): …
   Open punten (één regel in het document, geen issue): …
 Geen samenvatting van wat in orde is.
+Studio Manager: zet zelf het label `status:goedgekeurd` of `status:afgekeurd` op de PR.
 Lever terug: je oordeel en de link naar je comment.
 ```
 
 ## Harde regels
 
-- Merge nooit zonder `status:goedgekeurd`. Dat label zet de Studio Manager bij een SM-plichtige PR, en anders jij na `Lead-review: akkoord` (besluit #47).
+- Merge nooit zonder `status:goedgekeurd`. Dat label zet de SM-agent zelf bij een SM-plichtige PR, en anders jij na `Lead-review: akkoord` (besluit #47).
 - Wijzig `docs/beslissingen.md` alleen met een `Besluit:` van de CEO.
 - Publiceer niets buiten deze repo (geen posts, geen accounts, geen betalingen).
 - Laat een agent nooit zijn eigen werk reviewen.

@@ -1,14 +1,14 @@
 # Procesrapport week 1 (regie-runs 1–6, 2026-11-08)
 
-Versie 1.0.1 · Workflow & Process Optimization Lead · issue #45 · peildatum 2026-11-08 16:30 UTC
+Versie 1.0.2 · Workflow & Process Optimization Lead · issue #45 · peildatum 2026-11-08 16:30 UTC
 
 ## 1. Samenvatting
 
 - Week 1 bestond uit **één dag met 6 regie-runs**. Resultaat: **13 PR's gemerged**, 1 PR open (#42), 3 CEO-besluiten verwerkt. Fase 1 ligt op koers. Wat nog openstaat voor de gate: #32, daarna #10.
-- **Reviews kosten meer dan het maakwerk.** In run 6 ging 43 % van de gemeten tokens naar reviews. Over de hele dag schat ik dat aandeel op ≈ 55 %. De Studio Manager keurde **0 van 13** PR's af. Alle 4 afkeuringen kwamen van de Lead.
+- **Reviews kosten meer dan het maakwerk.** In run 6 ging 59 % van de gemeten tokens naar reviews (inclusief de Visie-review van de CD). Over de hele dag schat ik dat aandeel op ≈ 55 %. De Studio Manager keurde **0 van 13** PR's af. Alle 4 afkeuringen kwamen van de Lead.
 - **Polish wordt opnieuw gepland als nieuw werk.** Niet-blokkerende reviewpunten worden een eigen issue, en elk zo'n issue kost weer een volledige ronde maken + Lead + SM (≈ 330k tokens). Er staan er nu 3 open of lopend (#32, #35, #43). Samen is dat ≈ 1 M tokens aan polish.
 - **Kleine afkeuringen kosten een hele run.** Twee keer werd een fix binnen dezelfde run gedaan (#17, #27): dat kostte 2 minuten. Drie keer niet (#16, #28, #42): dat kostte telkens een nieuwe agent en een hele run wachttijd.
-- **Grootste hefboom**: minder dubbele reviews, geen vervolgissues voor polish en herstel in dezelfde run. Mijn verwachting is **−45 tot −55 % tokens per opgeleverd werkstuk**, zonder dat er minder wordt opgeleverd (§4). Drie punten vragen een CEO-besluit (§6). De rest staat al in deze PR als wijziging van de regie-instructie (§5).
+- **Grootste hefboom**: minder dubbele reviews, geen vervolgissues voor polish en herstel in dezelfde run. Mijn verwachting is **−40 tot −50 % tokens per opgeleverd werkstuk** (nulmeting 420k, §4), zonder dat er minder wordt opgeleverd (§4). Drie punten vragen een CEO-besluit (§6). De rest staat al in deze PR als wijziging van de regie-instructie (§5).
 
 ## 2. Cijfers
 
@@ -77,7 +77,7 @@ Drie van de vier afkeuringen waren dus **klein of over de vorm**. Alleen #12 gin
 | SM-review PR #41 | 96k | 11 | 8,7k |
 | **Totaal** | **716k** | 108 | 6,6k |
 
-Reviews: 311k (43 %). De regisseur zelf is niet gemeten.
+Reviews: 421k (59 %): de Lead- en SM-reviews (311k) plus de Visie-review van de CD (110k), die als maak-agent werd ingezet. De regisseur zelf is niet gemeten.
 
 **Geschat voor de hele dag**, met de gemiddelden van run 6 (maker ≈ 135k, Lead ≈ 105k, SM ≈ 96k):
 
@@ -88,7 +88,7 @@ Reviews: 311k (43 %). De regisseur zelf is niet gemeten.
 | SM-reviews | 13 | ≈ 1,25 M |
 | **Sub-agents samen** | 48 | **≈ 5,5 M** |
 
-Dat komt neer op ≈ **420k tokens per gemerged werkstuk**. Reviews zijn ≈ 55 % van het totaal. De SM-reviews alleen zijn ≈ 23 %, en daar kwam geen enkele afkeuring uit.
+Dat komt neer op ≈ **420k tokens per gemerged werkstuk**. Dat is de **nulmeting**: wat week 1 echt kostte (5,5 M / 13). Reviews zijn ≈ 55 % van het totaal. De SM-reviews alleen zijn ≈ 23 %, en daar kwam geen enkele afkeuring uit.
 
 Wat de cijfers laten zien: het aantal tokens groeit ongeveer **lineair met het aantal tool-calls** (≈ 7k per call). Het basispakket dat elke agent opnieuw leest (README, WERKWIJZE, beslissingen en het rolbestand, samen ≈ 12.000 tekens ≈ 3,5k tokens) is zelf klein. Maar dat pakket gaat bij elke volgende call opnieuw mee, net als alles wat de agent daarna leest. **Het grootste deel van de kosten zit dus in hoeveel calls een agent doet en hoeveel grote documenten hij vroeg in de run leest.** De grote documenten zijn `gdd.md` (40k tekens), `subsidies.md` (33k), `fase-1-kader.md` (26k), `naamcheck.md` (26k), `pitch.md` (24k) en `risico.md` (23k). Een voorbeeld: de Lead-review van PR #27 las 10 documenten en de reviews van 6 PR's ([lijst](https://github.com/cesarvangerwen-glitch/echoborn/pull/27#issuecomment-6722012935)).
 
@@ -180,6 +180,8 @@ Er komt geen vervolgissue alleen voor niet-blokkerende punten. Een document houd
 
 Het model per gemerged werkstuk is gekalibreerd op run 6. Een cyclus is maker + Lead + SM ≈ 336k.
 
+**Nulmeting = 420k** (§2.4, wat week 1 echt kostte). Het model hieronder komt uit op ≈ 520k, omdat het ook de polish-cycli meetelt die al gepland staan maar nog niet gedraaid zijn (#32 ronde 2, #35, #43). Dat is ≈ 1,3 M, of ≈ +100k per werkstuk. Ik vergelijk met 420k. Zo is de winst niet te rooskleurig, en de polish in de wachtrij is extra winst bovenop.
+
 | Post | Nu | Na K1–K5 (CEO: 1A) |
 |---|---|---|
 | Maker | 135k | 100k |
@@ -187,19 +189,19 @@ Het model per gemerged werkstuk is gekalibreerd op run 6. Een cyclus is maker + 
 | SM-review | 96k (elke PR) | ≈ 30k (≈ 50 % van de PR's, ≈ 60k per review) |
 | Herstelronde (29 % van de PR's) | ≈ 97k | ≈ 25k (fix in dezelfde run) |
 | Polish-vervolgissue (≈ 0,25–0,3 per PR) | ≈ 90k | ≈ 0 (open punt in het document) |
-| **Per werkstuk** | **≈ 520k** | **≈ 220–260k (−50 %)** |
+| **Per werkstuk** | **≈ 520k (model) · 420k (nulmeting)** | **≈ 220–260k (−40 tot −50 % op de nulmeting)** |
 
-- **Per dag, bij 2 runs en ≈ 5 werkstukken**: van ≈ 2,6 M naar ≈ 1,2–1,3 M tokens.
+- **Per dag, bij 2 runs en ≈ 5 werkstukken**: van ≈ 2,1 M (nulmeting) naar ≈ 1,2–1,3 M tokens.
 - **Reviewrondes per gemerged werkstuk**: van 1,23 Lead + 1 SM naar ≈ 1,1 Lead + 0,5 SM.
 - **Runs per werkstuk**: van 1,2 naar ≈ 1,05, omdat kleine fixes in dezelfde run vallen.
 
 **Hoe we dit meten**: met de tokenregel in het dagrapport. Na 4 runs (2 dagen) zet ik de voor/na-cijfers in een v1.1 van dit rapport. Gaat een schatting niet op, dan draaien we die maatregel terug.
 
-## 5. Wat deze PR al wijzigt (geen §5-wijziging)
+## 5. Wat deze PR wijzigt
 
 Elke wijziging staat in een eigen commit.
 
-1. **`studio/regie/producer-regie.md` v1.2**
+1. **`studio/regie/producer-regie.md` v1.2** (zonder §5-wijziging)
    - Herstel in dezelfde run bij "niet akkoord, klein" (K3).
    - Indeling van reviewpunten en geen vervolgissue voor polish (K2).
    - Geen relay-comments meer (K5).
@@ -209,7 +211,12 @@ Elke wijziging staat in een eigen commit.
    Eigenaar van dit bestand is de Producer. Ik vraag zijn akkoord in #45.
 2. **`.github/ISSUE_TEMPLATE/taak.md`**: bij Input staan pad + sectie, zodat de agent alleen leest wat nodig is (K4).
 
-`WERKWIJZE.md` en `docs/beslissingen.md` blijven ongewijzigd.
+3. **Na besluit #47** (1A, 2A, 3A):
+   - `WERKWIJZE.md` §4, §5 en §7: SM-review alleen bij werk voor de CEO of een gate, code en een steekproef.
+   - `README.md`.
+   - `producer-regie.md` v1.3: ochtend- en avondrun, en een kleiner model voor de SM-review en administratief werk.
+
+`docs/beslissingen.md` heeft de Producer bijgewerkt (commit 28964e5); deze PR verandert het niet.
 
 ## 6. Voorstellen voor de CEO (ceo-beslissing)
 
