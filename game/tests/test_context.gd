@@ -55,3 +55,18 @@ func cleanup() -> void:
 		_root.queue_free()
 		_root = null
 	await tree.process_frame
+
+
+## Waarom deze test FAIL is; leeg = PASS. Een test zonder checks, met een
+## scriptfout of enginefout, of die niet binnen de tijd klaar was, faalt
+## altijd (#30), ook als geen enkele check mislukte.
+func verdict(errors: PackedStringArray, finished: bool) -> PackedStringArray:
+	var reasons := failures.duplicate()
+	if not finished:
+		reasons.append("test niet afgerond binnen de tijdslimiet (hangt of wacht op een tick die niet komt)")
+	for error in errors:
+		reasons.append("fout tijdens de test: %s" % error)
+	# Alleen als er nog geen andere reden is: na een crash zegt 0 checks niets nieuws.
+	if checks == 0 and reasons.is_empty():
+		reasons.append("0 checks: de test controleerde niets (gecrasht vóór de eerste check?)")
+	return reasons

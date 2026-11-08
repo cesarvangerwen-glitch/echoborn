@@ -8,14 +8,15 @@ extends Node2D
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 const EchoActor = preload("res://scripts/echo/echo_actor.gd")
 
+## Vlak vóór elke stap van een actor. `phase` volgt E-07b: "1" = schaduw,
+## "2+3" = P1 stapt en wordt opgenomen. Bedoeld voor tests en debug-overlays;
+## zonder verbinding kost het uitzenden vrijwel niets.
+signal actor_stepping(tick: int, phase: String, actor: Node)
+
 ## Aantal verwerkte ticks sinds de start.
 var tick := 0
 var players: Array[PlayerActor] = []
 var echoes: Array[EchoActor] = []
-## Alleen voor tests: als true, schrijft elke stap "<tick>:<fase>:<node>" in
-## `step_log`. Fase "1" = schaduw, "2+3" = P1 stapt en wordt opgenomen.
-var log_steps := false
-var step_log := PackedStringArray()
 
 
 func add_player(player: PlayerActor) -> void:
@@ -39,21 +40,16 @@ func _physics_process(delta: float) -> void:
 	# E-07b (1): de schaduw. Echo's zetten hun frame; P2 stapt. In de spike
 	# kunnen echo en P2 nog naast elkaar bestaan (C-01 is nog niet gebouwd).
 	for echo in echoes:
-		_log("1", echo)
+		actor_stepping.emit(tick, "1", echo)
 		echo.sim_step(tick, delta)
 	for player in players:
 		if player.player_index != 1:
-			_log("1", player)
+			actor_stepping.emit(tick, "1", player)
 			player.sim_step(tick, delta)
 	# E-07b (2) + (3): P1 stapt en wordt opgenomen (PlayerActor.sim_step).
 	for player in players:
 		if player.player_index == 1:
-			_log("2+3", player)
+			actor_stepping.emit(tick, "2+3", player)
 			player.sim_step(tick, delta)
 	# E-07b (4) events en (5) objecten bestaan nog niet in de spike (R5).
 	tick += 1
-
-
-func _log(phase: String, actor: Node) -> void:
-	if log_steps:
-		step_log.append("%d:%s:%s" % [tick, phase, actor.name])

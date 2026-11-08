@@ -166,6 +166,10 @@ Spelers maskeren 1 + 4, echo's 1 + 5. Zo kan een echo door een lichtmuur heen en
 
 - Minimale eigen testrunner (`game/tests/run_tests.gd`), geen plug-in nodig. Elke `test_*`-methode krijgt een context met `make_sim()`, `run_ticks()`, `check()` en `note()`.
 - Commando: `godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd` (exitcode 0/1). Details in `setup.md`.
+- FAIL is ook: 0 checks, een scriptfout of enginefout tijdens de test (opgevangen met een `Logger`), of een test die niet binnen de tijdslimiet klaar is (#30).
+- Geen testhaken in gameplaycode. Tests luisteren naar signalen, zoals `Sim.actor_stepping(tick, phase, actor)` (#30).
+- Open punt: een fout in een signaalhandler (bv. een test die naar `actor_stepping` luistert) geeft één foutregel per tick. De test wordt terecht FAIL, maar de uitvoer is lang; ontdubbelen in de runner kan later.
+- Schuld: geen test bewaakt de runner zelf. Verdwijnt `OS.add_logger()` of de time-out-lus uit `run_tests.gd`, dan blijft de suite groen. Plan: bij de overstap op GUT (R2) of de CI-workflow (R6) een meta-run toevoegen die een kapotte test draait en exit 1 verwacht.
 - Huidige tests:
 
 | Test | Bewijst |
@@ -177,6 +181,7 @@ Spelers maskeren 1 + 4, echo's 1 + 5. Zo kan een echo door een lichtmuur heen en
 | `test_world_change_breaks_input_echo_not_state_echo` | Legt het risico van input-opname vast |
 | `test_hidden_state_breaks_input_echo_at_clip_start` | Legt het risico van verborgen toestand vast |
 | `test_recorder_snapshot_is_independent_copy` | Een clip verandert niet als de recorder doorschrijft |
+| `test_zero_checks_is_fail` e.a. (`test_runner.gd`, 6 tests) | Runner-oordeel: 0 checks, scriptfout of niet afgerond = FAIL; schone test met checks = PASS |
 | `test_tick_order_shadow_before_p1` (`test_sim.gd`) | Logtest E-07b: per tick echo → P2 → P1, ongeacht de volgorde van toevoegen |
 | `test_p1_sees_shadow_of_same_tick_and_is_recorded_after_step` (`test_sim.gd`) | Als P1 stapt, staat de echo al op zijn frame van dezelfde tick; P1 wordt na zijn stap opgenomen |
 | `test_p2_action_only_on_right_ctrl` (`test_input.gd`) | P2-echo alleen op rechter Ctrl, niet op linker |
