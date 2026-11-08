@@ -8,13 +8,13 @@ Een 2D-metroidvania in pixel art voor pc (Steam, Steam Deck als doel), singlepla
 
 ## Hoe deze studio werkt
 
-Deze repo is tegelijk de game én de studio. Elke functie is een rolbestand in `studio/roles/`. Een geplande taak die twee keer per dag draait (de **Producer als regisseur**: 's ochtends maken, 's avonds afronden) zet per taak een agent in met het juiste rolbestand. Die agents communiceren via issues en pull requests. De Team Lead reviewt elk werkstuk; de Studio Manager beoordeelt met een frisse blik het werk voor de CEO of een gate, code en een steekproef (zie `studio/WERKWIJZE.md` §5).
+Deze repo is tegelijk de game én de studio. Elke functie is een rolbestand in `studio/roles/`. Een geplande taak die vijf keer per dag draait en zijn tempo afstemt op het weekbudget aan credits (de **Producer als regisseur**, besluit #52) zet per taak een agent in met het juiste rolbestand. Die agents communiceren via issues en pull requests. De Team Lead reviewt elk werkstuk; de Studio Manager beoordeelt met een frisse blik het werk voor de CEO of een gate, code en een steekproef (zie `studio/WERKWIJZE.md` §5).
 
 | Map | Inhoud |
 |---|---|
 | `studio/WERKWIJZE.md` | Werkstroom, communicatie via GitHub, labels, rubric. **Lees dit eerst.** |
 | `studio/roles/` | Eén rolbestand per functie (26) |
-| `studio/regie/producer-regie.md` | Instructie voor de regie-runs (ochtend en avond) |
+| `studio/regie/producer-regie.md` | Instructie voor de regie-runs (5 per dag) |
 | `docs/beslissingen.md` | Log van alle CEO-beslissingen |
 | `docs/` | Ontwerpdocumenten (pitch, GDD, art bible, technisch ontwerp, …) |
 | `game/` | Het Godot-project |
