@@ -32,7 +32,7 @@ Taken met een **T-nummer** zijn nieuw of expliciet gemaakt in dit kader; de Prod
 | T10 | UX: HUD, menu's, drop-in/drop-out | ux-designer, ui-artist | F3 |
 | T11 | QA-testplan; elke slice-puzzel in solo én co-op getest (R10, R16) | qa-lead | F4 |
 | T12 | Vindbaarheidstoets *Wraithstep* (#44), vóór de betaalde merkcheck (volgorde §7) | marketing-community-manager (met creative-director) | R24, R15 |
-| T13 | VAF-dossier voor **productiesteun fase 3** voorbereiden (route c, `subsidies.md` §5), **zonder indienen**; met het **tweede criterium uit categorie I** van de culturele test. Voorstel CD: een verzonken stad in de Lage Landen (polders, dijken, belforten, begijnhof; licht naar de Vlaamse Primitieven; het carillon als echo-ritme). Dat raakt de pillars niet en is dus geen aparte CEO-vraag en de VAF-deadlines 2027 ingepland (A16). Alleen als de CEO de VAF-route openhoudt (#51, vraag 4–6) | business-legal-advisor (met creative-director, executive-producer, marketing-community-manager); planning: producer | R6, R23 |
+| T13 | VAF-dossier voor **productiesteun fase 3** voorbereiden (route c, `subsidies.md` §5), **zonder indienen**; met het **tweede criterium uit categorie I** van de culturele test. Voorstel CD: een verzonken stad in de Lage Landen (polders, dijken, belforten, begijnhof; licht naar de Vlaamse Primitieven; het carillon als echo-ritme). Dat raakt de pillars niet en is dus geen aparte CEO-vraag. De VAF-deadlines 2027 worden ingepland (A16). Alleen als de CEO de VAF-route openhoudt (#51, vraag 4–6) | business-legal-advisor (met creative-director, executive-producer, marketing-community-manager); planning: producer | R6, R23 |
 | T14 | **Lokalisatie inbouwen** (vertaalbestanden, geen tekst in code), ≈ 1 run. Alleen als de CEO de Nederlandse versie in principe toestaat (#51, vraag 5) | engine-platform-programmer | fasekader fase 1 §6.2 |
 | T15 | Productieraming per gebied, voorstel releasevenster, statusrapport en gate-voorstel fase 2 | executive-producer | F6, F8, R20 |
 
@@ -62,7 +62,7 @@ Fase 2 sluit pas als **alle** criteria F1–F8 (inclusief F4b) gehaald zijn; "bi
 | F6 | **Raming en releasevenster** | Productieraming per gebied (regie-runs, rollen, externe kosten), getoetst aan wat de slice werkelijk kostte, plus een voorstel releasevenster (besluit #2). | gemergde PR (EP) |
 | F4b | **De slice is leuk** | (a) De CEO speelt de slice solo én co-op (± 1 uur) en vult een korte kaart in: klikmoment van de kernfantasie (ja/nee, waar), wil doorspelen (ja/nee), de echo voelt als bondgenoot of als trucje. (b) Een gedragsmaat voor R3: de echo wordt ook buiten verplichte puzzels gebruikt (bv. aandeel van de boss-schade via de echo); de grens legt de LGD vast in T3. Beide positief, anders geen gate maar een herzien voorstel. | ingevulde kaart (comment CEO) + meting in het QA-testrapport |
 | F7 | **Visie-review slice** | De CD zet op de slice-PR `Visie-review: past` op alle 3 pillars **en op de toon** (duister maar niet gruwelijk, melancholisch, PEGI 12). | visie-review |
-| F8 | **Gate-besluit CEO** | `docs/productie/fase-2-status.md` toetst F1–F7 met bewijs; een `ceo-beslissing`-issue vraagt productie-scope, releasevenster, budget fase 3 en eventueel indienen bij het VAF. | `Besluit:` van de CEO |
+| F8 | **Gate-besluit CEO** | `docs/productie/fase-2-status.md` toetst F1–F7 en F4b met bewijs; een `ceo-beslissing`-issue vraagt productie-scope, releasevenster, budget fase 3 en eventueel indienen bij het VAF. | `Besluit:` van de CEO |
 
 ## 4. Startvoorwaarden en volgorde
 
