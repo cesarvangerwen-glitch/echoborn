@@ -12,11 +12,13 @@ Basis: `docs/concept/pitch.md` v0.4 (§3, §4, §5, §10 R-V9, §12 E-02/E-14) e
 | # | Mechaniek (v0.4) | Naaste bestaande games | Juridisch | Onderscheid | Oordeel |
 |---|---|---|---|---|---|
 | M1 | **Schaduwmerk**: treffer = merk, meer merken = grotere ontploffing, de echo laat het knallen; **merksprong** (echo schiet naar het merk) | *Nine Sols*: pareren geeft Qi; met Qi doe je een uitval die een **talisman** op de vijand plakt; treffers stapelen **interne schade** (paars); de talisman **ontploft** als je de knop vasthoudt en zet alle interne schade om in echte schade [1][2][3][4]. *Anthem* (2019): primer + detonator, in co-op mag de een primen en de ander laten ontploffen [5] | Groen | **Oranje** | **Oranje** |
-| M2 | **Echo als springplank** (± 2 s staart), bounce op je echo | *AfterImage* (2026): een "past self" dat je inputs herhaalt "and that you can stand on" [6]; *Me and My Shadow*: op het hoofd van je schaduw-opname staan (naamcheck §3.1) | Groen | Oranje-licht | **Groen**, mits de positionering klopt (§2) |
-| M3 | **Korte vertraagde kopie** van jezelf in een gevechtsgame | *Echo Shift*: tot drie opnames van je **15 s**, "no combat, no enemies", first-person puzzel, early access [7]. *Super Time Force*, *Echo Sequence* (naamcheck §3.1). Octrooi Nintendo US 9,616,342: ghost die de opgeslagen beweging van een **eerdere speelsessie** volgt in een 3D-wereld, status volgens Google actief tot ± 2035 [8] | Groen-oranje (zie §3) | Groen | **Groen** |
+| M2 | **Echo als springplank** (± 2 s staart), bounce op je echo | *AfterImage* (2026): een "past self" dat je inputs herhaalt "and that you can stand on" [6]; *Me and My Shadow*: op het hoofd van je schaduw-opname staan (naamcheck §3.1) | Groen | Groen¹ | **Groen** |
+| M3 | **Korte vertraagde kopie** van jezelf in een gevechtsgame | *Echo Shift*: tot drie opnames van je **15 s**, "no combat, no enemies", first-person puzzel, aangekondigd voor early access [7]. *Super Time Force*, *Echo Sequence* (naamcheck §3.1). Octrooi Nintendo US 9,616,342: ghost die de opgeslagen beweging van een **eerdere speelsessie** volgt in een 3D-wereld, status volgens Google actief tot ± 2035 [8] | Oranje (octrooiscan, §3) | Groen | **Oranje** |
 | M4 | **Licht oppompen**: meter vullen door flow, bij een gemaal de stad in pompen, water zakt; wereld en echo eerst grijs | *Hollow Knight*: SOUL vullen door te slaan, uitgeven aan genezen en spreuken [9]; *Gris*: de wereld verliest kleur en krijgt die terug bij elke stap voortgang [10] | Groen | Groen | **Groen** |
 | M5 | **Co-op "samen bewegen"**: bounce, lancering, merk-combo, vangen; solo dezelfde vier acties via de echo | Op het hoofd van je partner springen in de metroidvania's *Castlevania: Portrait of Ruin* en *Harmony of Despair* [11]; prime/detonate in co-op in *Anthem* [5]; afzetten van vijanden en projectielen (*Ori*, Bash) [12] | Groen | Groen (de solo-via-echo-spiegel vonden we nergens) | **Groen** |
-| M6 | *AfterImage* als **naam** (Aurogon, 2023) | 2D-metroidvania zonder echo- of kloonmechaniek [13]; de puzzelgame *AfterImage* (2026) zie M2 | n.v.t. | Groen | **Groen**: gebruik "afterimage" niet als feature- of marketingwoord |
+| M6 | *Afterimage* als **naam** (Aurogon, 2023) | 2D-metroidvania zonder echo- of kloonmechaniek [13]; de puzzelgame *AfterImage* (2026) zie M2 | n.v.t. | Groen | **Groen**: gebruik "afterimage" niet als feature- of marketingwoord |
+
+¹ Groen op voorwaarde dat de positionering klopt; zie §2, alinea M2.
 
 ## 2. Waarom M1 oranje is, en hoe we afwijken (voor Combat Designer en LGD, T3)
 
@@ -35,11 +37,13 @@ Met 1–3 gaat M1 naar **groen**; 4–6 houden het daar. Toets in de flow-kamer:
 
 ## 3. Octrooien
 
-Het Nintendo-octrooi US 9,616,342 [8] beschrijft (claim 1) een ghost die bewegingsdata uit een **eerdere speelsessie** volgt en pas later in de sessie verschijnt, in een 3D-wereld met virtuele camera's. Onze echo is een **live vertraging van ± 2 s in dezelfde sessie, in 2D**. Dat lijkt op het eerste gezicht anders, maar een octrooi lees je op de volledige claims, en dat kan ik niet betrouwbaar. Voorstel: **neem een korte octrooiscan op "vertraagde kopie van de spelerfiguur" mee in de offerte voor de betaalde merkcheck** (besluit #51 deel 1, 3A), vóór de eerste publicatie. Geen blokkade voor T3 of de flow-kamer. Voor *Nine Sols* (Red Candle Games) vond ik geen octrooi; dat is geen bewijs dat er geen is.
+Het Nintendo-octrooi US 9,616,342 [8] beschrijft (claim 1) een ghost die bewegingsdata uit een **eerdere speelsessie** volgt en pas later in de sessie verschijnt, in een 3D-wereld met virtuele camera's. Onze echo is een **live vertraging van ± 2 s in dezelfde sessie, in 2D**. Dat lijkt op het eerste gezicht anders, maar een octrooi lees je op de volledige claims, en dat kan ik niet betrouwbaar. Voorstel: **neem een korte octrooiscan op "vertraagde kopie van de spelerfiguur" mee in de offerte voor de betaalde merkcheck** (besluit #51 deel 1, 3A), vóór de eerste publicatie. Geen blokkade voor T3 of de flow-kamer; met die scan gaat M3 naar groen.
+
+**Open punt:** de octrooiscan bovenop de merkcheck kan de raming uit besluit #51 deel 1 (€ 3.750, worstcase ≈ € 4.800 excl. btw) overschrijden; de offerte prijst de scan apart, en een eventuele meerkost legt de EP voor vóór de opdracht. Voor *Nine Sols* (Red Candle Games) vond ik geen octrooi; dat is geen bewijs dat er geen is.
 
 ## 4. Conclusie
 
-USP 1 blijft overeind en staat in v0.4 verder van *Echo Shift* en de puzzelgames af dan v0.3. Het enige echte aandachtspunt is het **schaduwmerk naast *Nine Sols***: oranje, op te lossen in de uitwerking (§2, punt 1–3) voordat T3 E-14 en de merksprong vastlegt. Al het andere is groen.
+USP 1 blijft overeind en staat in v0.4 verder van *Echo Shift* en de puzzelgames af dan v0.3. Het enige echte aandachtspunt is het **schaduwmerk naast *Nine Sols***: oranje, op te lossen in de uitwerking (§2, punt 1–3) voordat T3 E-14 en de merksprong vastlegt. M3 is oranje alleen om de octrooiscan (§3), die niet blokkeert voor T3. Al het andere is groen.
 
 ## Bronnen (geraadpleegd 2026-11-08)
 
@@ -49,7 +53,7 @@ USP 1 blijft overeind en staat in v0.4 verder van *Echo Shift* en de puzzelgames
 4. Steam, *Nine Sols* (RedCandleGames, 2024-05-28; "blow them up with the Taoist talisman"): https://store.steampowered.com/app/1809540
 5. Anthem Wiki, *Detonators* ("A target primed by one lancer can be detonated by another"): https://anthem.fandom.com/wiki/Detonators
 6. Steam, *AfterImage* (Wolf Studios, 2026-08-28): https://store.steampowered.com/app/5055440
-7. Steam, *Echo Shift* (SnailReaper, early access): https://store.steampowered.com/app/4199420
+7. Steam, *Echo Shift* (SnailReaper, aangekondigd voor early access: "Coming Soon To Early Access"): https://store.steampowered.com/app/4199420
 8. Google Patents, US 9,616,342 B2 (Nintendo, ingediend 2014-05-23): https://patents.google.com/patent/US9616342
 9. Hollow Knight Wiki, *Soul*: https://hollowknight.wiki/w/Soul
 10. Thumbsticks, *Gris review*: https://www.thumbsticks.com/gris-review/
