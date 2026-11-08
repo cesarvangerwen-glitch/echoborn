@@ -1,6 +1,8 @@
-# Echoborn (werktitel)
+# Wraithstep (werktitel)
 
-Een 2D/2.5D-metroidvania voor pc (Steam, Steam Deck als doel), singleplayer en lokale co-op, voor spelers van 18–30 jaar. Gebouwd in **Godot 4.6**.
+> Werktitel *Wraithstep* (CEO-besluit #24, voorheen *Echoborn*). Nog niet publiek gebruiken (Steam-pagina, trailer, socials, logo) vóór de formele merkcheck door een specialist. De repo en de mappen heten voorlopig nog `echoborn`.
+
+Een 2D-metroidvania in pixel art voor pc (Steam, Steam Deck als doel), singleplayer en lokale co-op, voor spelers van 18–30 jaar. Gebouwd in **Godot 4.6**.
 
 **Kernidee:** je schaduw herhaalt je laatste 10 seconden. Solo gebruik je die echo als tweede speler; in co-op bestuurt speler 2 de schaduw live. De wereld heeft een lichtlaag en een schaduwlaag, en dat is ook de basis van de gating.
 
