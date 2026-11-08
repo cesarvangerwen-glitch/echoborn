@@ -1,7 +1,8 @@
-# Pitch: *Echoborn* (werktitel)
+# Pitch: *Wraithstep* (werktitel)
 
-Versie 0.2 · Eigenaar: Creative Director · Issue: #15 (v0.1: #4, PR #11) · Status: v0.1 goedgekeurd (fase 1), bevestiging door de CEO in het gate-besluit (#10); v0.2 ter review (Executive Producer)
-Gebaseerd op `docs/beslissingen.md` (stand 2026-11-08: randvoorwaarden #2, stijl 2D #18). Waar dit document iets aanneemt dat nog geen CEO-besluit is, staat dat erbij.
+Versie 0.3 · Eigenaar: Creative Director · Issue: #25 (v0.2: #15, PR #22; v0.1: #4, PR #11) · Status: v0.2 goedgekeurd (PR #22), bevestiging door de CEO in het gate-besluit (#10); v0.3 ter review (Executive Producer)
+Werktitel ***Wraithstep*** (besluit #24, voorheen *Echoborn*). Nog niet publiek gebruiken vóór de formele merkcheck door een specialist (besluit #24, 3A). Repo- en mapnamen blijven voorlopig "echoborn".
+Gebaseerd op `docs/beslissingen.md` (stand 2026-11-08: randvoorwaarden #2, stijl 2D #18, werktitel #24). Waar dit document iets aanneemt dat nog geen CEO-besluit is, staat dat erbij.
 
 ---
 
@@ -13,7 +14,9 @@ Dat is de hele game. Alles hieronder is een uitwerking van die zin.
 
 ## 2. Logline
 
-*Echoborn* is een duistere 2D-metroidvania waarin je schaduw je laatste 10 seconden naspeelt, zodat je alleen samenwerkt met je eigen verleden en samen op de bank een vriend die schaduw live bestuurt.
+*Wraithstep* is een melancholische 2D-metroidvania waarin je schaduw je laatste 10 seconden naspeelt: solo werk je samen met je eigen verleden, op de bank bestuurt een vriend die schaduw live.
+
+*"Melancholisch" in plaats van "duister" is bewust: de naam draagt het duister al, de logline zet de schaduw neer als bondgenoot (zie §6, "Naam en toon").*
 
 **Engelse variant (voor store en pitchdeck, nog af te stemmen met Marketing; de game verschijnt bij launch alleen in het Engels):**
 *Your shadow replays your last ten seconds: alone, you team up with your past; together, a friend becomes the shadow.*
@@ -30,12 +33,12 @@ In co-op verschuift de fantasie naar **"wij zijn één wezen in twee lagen"**: d
 
 | Moment | Solo | Co-op |
 |---|---|---|
-| Verkennen | Je route van zonet wordt een pad: de echo loopt over schaduwbruggen, activeert schaduwschakelaars, draagt licht naar plekken waar jij net was. | Speler 2 loopt als schaduw vooruit in de schaduwlaag en opent de weg; speler 1 houdt hem in leven door het licht te sturen. |
+| Verkennen | Je route van zonet wordt een pad: de echo loopt over schaduwbruggen, activeert schaduwschakelaars, draagt licht naar plekken waar jij net was. | Speler 2 loopt als schaduw vooruit in de schaduwlaag en opent de weg; speler 1 stuurt het licht zo dat de schaduw niet in fel licht oplost. |
 | Puzzels | Plannen: je voert een reeks uit die pas in de herhaling klopt. Opnieuw proberen is goedkoop: laat de echo los of wacht 10 seconden en je schaduw is "leeg". | Afstemmen: dezelfde kamer, maar nu live overleggen in plaats van vooruit plannen. |
 | Gevechten | Je legt aanvallen klaar voor straks: een slag nu is een tweede slag over 10 seconden. Bosses lezen ook je echo. | Twee aanvallers in twee lagen; sommige vijanden zijn alleen in de schaduw te raken. |
 | Groei (metroidvania-abilities) | Nieuwe vaardigheden zijn vooral nieuwe dingen die de echo kan: dragen, licht dempen, de herhaling "ankeren". | Dezelfde vaardigheden; de schaduwspeler krijgt ze tegelijk. |
 
-De precieze regels (wat wordt opgenomen, wanneer de opname start en stopt, wat de echo wel en niet kan) zijn van de Lead Game Designer: `docs/design/gdd.md` en `docs/design/kernloop.md` (#6, PR #16). De voorbeelden hierboven zijn richting, geen specificatie.
+De precieze regels (wat wordt opgenomen, wanneer de opname start en stopt, wat de echo wel en niet kan) zijn van de Lead Game Designer: `docs/design/gdd.md` en `docs/design/kernloop.md` (#6, PR #16, gemergd). De voorbeelden hierboven zijn richting, geen specificatie.
 
 ## 4. Drie design pillars
 
@@ -45,7 +48,9 @@ Elke pillar heeft **één toetsvraag**. Een feature die op een pillar "nee" scoo
 
 De echo is geen effect, geen herinnering en geen spoor, maar een volwaardig tweede lichaam met gewicht in de wereld. De kritieke route (gates, bosses, verplichte puzzels) leunt op de echo.
 
-**Toetsvraag:** *Gebruikt of versterkt deze feature wat de echo kan, of maakt hij de echo overbodig?*
+**Toetsvraag:** *Gebruikt of versterkt deze feature wat de echo kan?*
+
+Een feature die de echo overbodig maakt, scoort dus "nee" (zie de kolom "past niet").
 
 | Past | Past niet |
 |---|---|
@@ -105,8 +110,13 @@ Solo en co-op zijn dezelfde game in dezelfde kamers met dezelfde regels. Solo is
 
 **Beeld: 2D** (CEO-besluit #18). Pixel art op 640×360 (op de Steam Deck 640×400), met dynamisch 2D-licht in harde banden. Waarom dat bij de visie past:
 - **De laaggrens is gameplay.** Een harde rand laat op de pixel zien waar de schaduwbrug ophoudt (pillar 2).
-- **Vol = levend, hol = echo.** Speler 1, speler 2 en de echo zijn op elke achtergrond uit elkaar te houden (pillar 1 en 3).
+- **Vol = levend, hol = echo.** Speler 1, speler 2 en de echo zijn in de stijltests (placeholder) op elke achtergrond uit elkaar te houden; de art bible moet dat in de eind-art waarmaken (pillar 1 en 3).
 - **Sfeer zonder de leesbaarheid te raken:** volumetrisch licht en diepte alleen in de achtergrond en de parallax-lagen; het speelvlak blijft strak.
+
+**Naam en toon.** De werktitel *Wraithstep* klinkt duisterder dan de game (risico R15 in `docs/productie/risico.md`). Wij lezen *wraith* als **schim**: een spookachtige voetstap die de jouwe herhaalt, niet een wraakgeest of monster. Zo houden we de naam binnen "duister maar niet gruwelijk":
+- **De wraith is jouw schaduw, en die is je bondgenoot.** Waar de naam staat, staat de schaduw als helper (de deur die hij openhoudt, de hand bij het checkpoint), niet als dreiging. Richting voor de Narrative Designer: gebruik "wraith" in de game niet als naam voor vijanden.
+- **Geen horrorbeeld bij de naam.** Logo, key art en storetekst: geen schedels, bloed, kettingen of krijsende gezichten; wel stilte, harde lichtbanden en het holle silhouet van de echo. Toon van de copy: melancholisch en een beetje warm, niet dreigend.
+- **Toets voor elke uiting met de naam** (Marketing, Art, Narrative): *Leest dit, met de naam erbij, als PEGI 12, duister maar niet gruwelijk?* Bij "nee" past de uiting zich aan, niet de toon van de game. Raakt de naam bij een publieke uiting toch de toon, dan volgt een nieuwe naamvraag aan de CEO, vóór de betaalde merkcheck (R15).
 
 De verhaal-invulling (wie ben je, waarom heb je een echo, wat gebeurde er met de wereld) is aan de Narrative Designer; die werkt binnen dit thema en wordt door mij gereviewd. Alle tekst in de game is bij launch Engels (besluit #2); schrijf zuinig, zodat de wereld meer vertelt dan de tekst.
 
@@ -122,21 +132,22 @@ De verhaal-invulling (wie ben je, waarom heb je een echo, wat gebeurde er met de
 | *Contrast* (2013) | Schaduwen als speelbare laag naast de "echte" wereld | Een lineaire structuur zonder terugkeren |
 | *Limbo* / *Inside* | Leesbaar silhouet, duistere maar ingetogen toon | Gruwelijke sterfscènes |
 | *It Takes Two* / *Unravel Two* | Co-op op de bank waarin beide spelers een eigen, onmisbare rol hebben | Losse minigames, co-op-only ontwerp |
+| *Outland* (2011) | Licht/donker-polariteit als kern van navigatie en gevecht in een metroidvania; co-op door de hele game | Polariteit als schakelaar op één lichaam en online co-op; bij ons twee lichamen (jij en je echo) en lokale co-op op de bank |
 | *Celeste* (2018) | Strakke 2D-controls in pixel art, toegankelijkheidsopties die de uitdaging niet verraden, snel opnieuw proberen | De lineaire hoofdstukstructuur en precisie-platforming als hoofdzaak; bij ons draagt het plannen met de echo, niet de millimetersprong |
 
 ## 8. USP's
 
-1. **Een metroidvania met een tweede lichaam.** Je echo is je partner, puzzelstuk en wapen tegelijk. *Aanname, te verifiëren door Business/Legal (#8):* we kennen geen metroidvania die een tijdvertraagde kopie van de speler als kern van verkenning, gevechten én gating gebruikt; wel puzzelgames en kortere titels met opnames van jezelf.
+1. **Een metroidvania met een tweede lichaam.** Je echo is je partner, puzzelstuk en wapen tegelijk. Samenwerken met een opname van jezelf kennen spelers al uit puzzelgames (sinds *Chronotron* en *Braid*, 2008). Het onderscheid zit in de **combinatie**: we vonden geen metroidvania die een vertraagde kopie van de speler als kern van verkenning, gevechten én gating gebruikt, en geen game waarin speler 2 die kopie in lokale co-op live overneemt (`docs/business/naamcheck.md` §3, peildatum 2026-11-08). We claimen daarom nergens "de eerste".
 2. **Solo en co-op op precies dezelfde mechaniek.** Geen aparte modus: solo speel je met je verleden, samen speelt een vriend dat verleden live.
-3. **Licht en schaduw als kaart.** De wereld laat zelf zien waar je heen kunt; gating zonder sleutels.
-4. **Bank-co-op in een genre dat vooral solo is.** *Aanname:* lokale co-op is zeldzaam in metroidvania's van dit niveau, terwijl de doelgroep (koppels, vrienden) er wel om vraagt. Marktonderbouwing volgt van Marketing.
+3. **Licht en schaduw als kaart, gelezen door twee lichamen.** De wereld laat zelf zien waar je heen kunt; gating zonder sleutels. Niet nieuw op zich (*Outland*, 2011, gebruikt licht/donker al als kern van een metroidvania); onderscheidend omdat jij in het licht leeft en je echo in de schaduw.
+4. **Lokale bank-co-op waarin speler 2 de echo is.** Co-op in een metroidvania bestaat (*Outland*, online); lokaal, op één gedeelde camera, met de minder ervaren speler in een eigen, onmisbare rol, is zeldzaam. *Aanname:* de doelgroep (koppels, vrienden) vraagt erom; marktonderbouwing volgt van Marketing.
 5. **Behapbaar en vriendelijk:** 5–7 uur, 3–4 gebieden, 4–5 bosses, ongeveer €20 eenmalig zonder microtransacties (CEO-besluit #2). Uit te spelen in een paar avonden met z'n tweeën, toegankelijk voor een minder ervaren co-op-partner.
 
 ## 9. Doelgroep en bereik
 
 Leeftijd 18–30, pc via Steam, Steam Deck verified als doel. Alleen Engels bij launch (CEO-besluit #2). Twee kernspelers:
 
-| Speler | Wie | Wat ze zoeken | Wat ze in *Echoborn* vinden |
+| Speler | Wie | Wat ze zoeken | Wat ze in *Wraithstep* vinden |
 |---|---|---|---|
 | **De genrefan** | Speelde *Hollow Knight*, *Ori*, *Dead Cells*; speelt vooral solo, kijkt naar sfeer en controls | Een metroidvania met een eigen idee, strak gevoel, sterke bosses | Een draai die het genre echt verandert, in een kortere game dan de grote titels; solo ook op de Steam Deck |
 | **Het bankduo** | Koppel of vrienden, vaak één ervaren en één minder ervaren speler | Iets dat ze samen kunnen spelen waarin allebei iets te doen hebben | De schaduwrol: onmisbaar, maar vergevingsgezinder; drop-in/drop-out op **pc aan de tv** met twee controllers |
@@ -155,20 +166,22 @@ Leeftijd 18–30, pc via Steam, Steam Deck verified als doel. Alleen Engels bij 
 | Lagen en objectsoorten zijn niet leesbaar | Pillar 2 valt dan om | Art Director | 2D is gekozen vanwege de harde laaggrens (#18). Nog open: hoe gedeelde, licht- en schaduwobjecten in één oogopslag te onderscheiden zijn (art bible), en de prestaties op de Steam Deck (Technical Artist, Engine & Platform Programmer) |
 | Te veel denkwerk, te weinig flow | Een metroidvania moet ook lekker lopen | Lead Game Designer, Combat Designer | Echo moet ook "gratis" helpen tijdens normaal spel, niet alleen in puzzelkamers |
 | 5–7 uur is kort voor een metroidvania | De echo moet binnen minuten dragen; er is geen ruimte voor een lange opbouw | Lead Game Designer, World & Level Designer | De echo zit vanaf de proloog in de kern; elke vaardigheid voegt iets toe aan wat de echo kan |
-| Het idee lijkt sterk op een bestaande game | Raakt USP 1 | Business/Legal (#8) | Uitkomst naam- en ideecheck afwachten; zo nodig USP-tekst aanpassen |
+| Het idee lijkt sterk op een bestaande game | Raakt USP 1 | Business/Legal (#8) | Ideecheck gedaan (`naamcheck.md` §3): USP 1 blijft overeind in combinatie; USP-tekst is daarop aangepast (§8). Herhalen vóór launch, het genre "opname van jezelf" groeit |
+| De naam leest duisterder dan de game (R15) | Een titel met *wraith* kan horror beloven die we niet leveren (PEGI 12) | Creative Director, Marketing | Regels en toets in §6 "Naam en toon"; bij een publieke uiting die de toon toch raakt: nieuwe naamvraag aan de CEO vóór de betaalde merkcheck |
+| De naam is slecht vindbaar | "Wraithstep" is al een uniek item (laarzen) in *Diablo II: Resurrected*, in hetzelfde donkere-fantasypubliek; zoekresultaten tonen eerst dat item (`naamcheck-wraithstep.md` G4) | Marketing, Creative Director | Zie §11 vraag 4: vóór de betaalde merkcheck kiezen tussen houden, een onderscheidende toevoeging, of een nieuwe naamvraag |
 
 ## 11. Open vragen
 
 | # | Vraag | Richting CD | Eigenaar | Stand |
 |---|---|---|---|---|
-| 1 | Wat gebeurt er met de echo als speler 2 meedoet? | Speler 2 *wordt* de echo (geen derde lichaam). | Lead Game Designer (#6) | Uitgewerkt in `gdd.md` C-01–C-05 (PR #16, nog niet gemergd); past binnen de pillars |
+| 1 | Wat gebeurt er met de echo als speler 2 meedoet? | Speler 2 *wordt* de echo (geen derde lichaam). | Lead Game Designer (#6) | **Gesloten:** vastgelegd in `gdd.md` C-01–C-05 (PR #16, gemergd); past binnen de pillars |
 | 2 | **Ankeren:** mag de speler later de herhaling vastzetten? | Ja, als vaardigheid, maar het mag de 10-secondenregel niet uithollen en moet ook in co-op werken (pillar 3). | Lead Game Designer, Systems Designer | Richting in `gdd.md` §3; co-op nog open (O-3) |
-| 3 | **Falen in co-op:** kan de schaduwspeler doodgaan? | Nee, hij lost op en keert terug; vergevingsgezinder dan het lichtpersonage. | Lead Game Designer, UX Designer | Uitgewerkt in `gdd.md` C-06 |
-| 4 | **Titel:** blijft *Echoborn*? | Werktitel tot de naamcheck. | Business/Legal (#8) | Open |
-| 5 | **Opnamemodel en de echo tussen de lagen:** herhaalt de echo je posities of je inputs? En hoe raakt een echo die in de schaduw leeft hendels en vijanden die jij in het licht raakte? | De echo is er altijd (geen opnameknop) en blijft in de schaduwlaag; wat hij in de wereld raakt, moet leesbaar per laag zijn. | Lead Game Designer (#6), Technical Director (#5) | Voorstel in `gdd.md` §2.2–2.5 (toestand opnemen, acties als events tegen de huidige wereld, objecten gedeeld/licht/schaduw), PR #16, nog niet gemergd |
-| 6 | **Drop-out zonder 10 s buffer:** wat doet de echo als speler 2 stopt en er nog geen 10 s van speler 1 is opgenomen? | Niets verzinnen: liever even een lege schaduw dan een echo die iets doet wat jij niet deed. | Lead Game Designer (#6) | Voorstel in `gdd.md` C-05 |
+| 3 | **Falen in co-op:** kan de schaduwspeler doodgaan? | Nee, hij lost op en keert terug; vergevingsgezinder dan het lichtpersonage. | Lead Game Designer, UX Designer | **Gesloten:** vastgelegd in `gdd.md` C-02 (geen schade) en C-06 (oplossen en terugkeer) |
+| 4 | **Titel:** is *Wraithstep* ook de definitieve naam? | Als werktitel goed: kort, uit te spreken, vertelt de schaduw die jouw stap herhaalt. Als definitieve naam twee zorgen: de toon (§6, R15) en de vindbaarheid naast het *Diablo II*-item. Voorstel: Marketing toetst vóór de betaalde merkcheck hoe "Wraithstep game" in zoekmachines en op Steam uitkomt; daarna kies ik met Marketing tussen (a) houden, (b) houden met een onderscheidende toevoeging, (c) een nieuwe naamvraag aan de CEO. (c) is een CEO-besluit; (a) en (b) gaan mee in het gate-voorstel (#10). | Creative Director, Marketing, Business/Legal | Werktitel besloten (#24). Korte merkcheck: **oranje** (`naamcheck-wraithstep.md`): geen game of US-merk, EU/Benelux nog niet doorzocht, *Diablo II*-item, YouTube-handle bezet. Formele check vóór de eerste publicatie (3A) |
+| 5 | **Opnamemodel en de echo tussen de lagen:** herhaalt de echo je posities of je inputs? En hoe raakt een echo die in de schaduw leeft hendels en vijanden die jij in het licht raakte? | De echo is er altijd (geen opnameknop) en blijft in de schaduwlaag; wat hij in de wereld raakt, moet leesbaar per laag zijn. | Lead Game Designer (#6), Technical Director (#5) | **Gesloten:** vastgelegd in `gdd.md` §2.2–2.5 (toestand opnemen, acties als events tegen de huidige wereld, objecten gedeeld/licht/schaduw), PR #16, gemergd |
+| 6 | **Drop-out zonder 10 s buffer:** wat doet de echo als speler 2 stopt en er nog geen 10 s van speler 1 is opgenomen? | Niets verzinnen: liever even een lege schaduw dan een echo die iets doet wat jij niet deed. | Lead Game Designer (#6) | **Gesloten:** vastgelegd in `gdd.md` C-05 |
 
-Geen van deze vragen raakt de pillars of de kernfantasie; ik beslis ze binnen de pillars samen met de vakrollen. Als een uitkomst een pillar zou veranderen, gaat het als `ceo-beslissing` naar de CEO. Vragen 1, 3, 5 en 6 sluit ik zodra PR #16 gemergd is.
+Geen van deze vragen raakt de pillars of de kernfantasie; ik beslis ze binnen de pillars samen met de vakrollen. Als een uitkomst een pillar zou veranderen, gaat het als `ceo-beslissing` naar de CEO. Vragen 1, 3, 5 en 6 zijn gesloten nu PR #16 gemergd is; open blijven vraag 2 (ankeren in co-op, `gdd.md` O-3) en vraag 4 (definitieve naam).
 
 ## 12. Definition of Done
 
@@ -187,9 +200,17 @@ Geen van deze vragen raakt de pillars of de kernfantasie; ik beslis ze binnen de
 - [x] In lijn met CEO-besluit #2: 5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12, alleen Engels (§6, §8, §9)
 - [x] In lijn met CEO-besluit #18: 2D (§2, §6, §10)
 
+**#25 (v0.3)**
+- [x] Werktitel *Wraithstep* doorgevoerd: titel, logline, doelgroeptabel, §11 vraag 4 (en `README.md`)
+- [x] Toon bewaakt: logline "melancholisch", §6 "Naam en toon" met regels en toetsvraag, risico R15 in §10
+- [x] Reviewpunten PR #22: logline loopt (§2), §3 tegen §5/C-06 recht (§3), toetsvraag pillar 1 enkelvoudig (§4), leesbaarheidsclaim afgezwakt (§6), *Outland* in §7, USP 1/3/4 genuanceerd naar `naamcheck.md` (§8), §11 vraag 4 met naamadvies en merkcheck, gdd-ID's nagelopen en vragen 1, 3, 5, 6 gesloten
+- [x] Vindbaarheid naast het *Diablo II*-item als risico en als vervolgstap (§10, §11 vraag 4)
+- [x] Pillars en kernfantasie inhoudelijk ongewijzigd (geen CEO-besluit nodig)
+
 ## 13. Wijzigingen
 
 | Versie | Wat |
 |---|---|
+| 0.3 | Werktitel *Wraithstep* (#24) doorgevoerd. Toon bij de naam: logline "melancholisch", nieuw blok "Naam en toon" in §6, twee nieuwe risico's (toon R15, vindbaarheid naast het *Diablo II*-item). Open reviewpunten PR #22 verwerkt: logline-zin, §3 co-op in lijn met C-06, toetsvraag pillar 1 enkelvoudig (de pillar zelf is ongewijzigd), leesbaarheidsclaim §6 afgezwakt, *Outland* als referentie, USP 1/3/4 op de combinatie gezet met verwijzing naar `naamcheck.md`. §11: vraag 4 bijgewerkt, vragen 1, 3, 5, 6 gesloten (PR #16 gemergd). |
 | 0.2 | Reviewpunten PR #11 verwerkt (logline één zin, pillar 2 enkelvoudig, open vragen 5–6, co-op op pc aan de tv, Celeste, status). Randvoorwaarden #2 doorgevoerd (5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12, alleen Engels). Stijl 2D (#18) doorgevoerd, met "beeld" in §6. Open vragen als tabel met de stand van de uitwerking door de LGD (PR #16). Twee nieuwe visierisico's: echo te vaak leeg, korte speelduur. In pillar 2 is de past-niet-cel over het kaart-icoon vervangen door een gating-voorbeeld (het icoon valt nu onder de leesbaarheidseis). Pillars en kernfantasie zijn inhoudelijk ongewijzigd. |
 | 0.1 | Eerste versie (#4, PR #11). |
