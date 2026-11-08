@@ -3,7 +3,7 @@ extends RefCounted
 ##
 ## Een echte crashende test kan hier niet staan: die maakt de suite rood.
 ## Daarom testen we het oordeel (`TestContext.verdict`) met nagemaakte
-## uitkomsten. Een echte crash is aangetoond met een tijdelijke test (PR #30).
+## uitkomsten. Een echte crash is aangetoond met een tijdelijke test (zie #30).
 
 const TestContext = preload("res://tests/test_context.gd")
 
