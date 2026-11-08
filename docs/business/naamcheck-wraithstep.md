@@ -1,6 +1,6 @@
 # Korte merkcheck: *Wraithstep* (werktitel)
 
-Versie 1.0 · 2026-11-08 · Eigenaar: Business/Legal Advisor · Issue: #29 · Lead-review: Executive Producer
+Versie 1.1 · 2026-11-08 · Eigenaar: Business/Legal Advisor · Issues: #29, #35 · Lead-review: Executive Producer
 Hoort bij: besluit #24 (werktitel *Wraithstep*, formele merkcheck vóór de eerste publicatie) · Risico's: R4, R15, R6 · Acties: A1, A4 (`docs/productie/risico.md` §5) · Input voor: #10 (budgetaanvraag, actie A8)
 Methode: dezelfde als `docs/business/naamcheck.md` (Echoborn), aangevuld met een directe zoekactie in het USPTO-register.
 
@@ -14,7 +14,7 @@ Methode: dezelfde als `docs/business/naamcheck.md` (Echoborn), aangevuld met een
 | **Waarom niet rood** | Geen game met deze naam (Steam, itch.io, websearch), geen merk WRAITHSTEP in het USPTO-register (alle klassen), geen levend merk "WRAITH" voor games in klasse 9 of 41 in de VS, en de domeinen .com/.net/.org/.io/.games/.nl zijn niet geregistreerd. |
 | **Waarom niet groen** | (1) **"Wraithstep" is al de naam van een uniek item in *Diablo II: Resurrected*** (Blizzard, uitbreiding *Reign of the Warlock*, 2026): wie de naam zoekt, vindt eerst dat item (§2.1, G4). (2) De **EU- en Benelux-registers zijn niet doorzocht**: TMview, EUIPO eSearch en BOIP waren vanuit onze werkomgeving niet bereikbaar (§2.2, M5). (3) De **YouTube-handle @wraithstep is bezet** (§2.3). (4) "Wraith" is een druk woord in games en merken (§2.4). |
 | **Wat het betekent** | Werktitel houden kan; niets blokkeert het interne werk. De naam **niet publiek gebruiken** (Steam-pagina, trailer, socials, logo) vóór de formele check door een specialist. Punt (1) is vooral een **vindbaarheids- en positioneringsvraag** (Marketing, Creative Director), punt (2) moet de specialist dichten. |
-| **Richtprijs specialist** | **≈ € 1.500 – € 3.500 excl. btw** voor één naam, Benelux + EU + VS, klassen 9 en 41 (en 42), met schriftelijk advies. Rekenadvies voor #10: **€ 3.500 excl. btw** (§4). |
+| **Richtprijs specialist** | **≈ € 1.400 – € 3.750 excl. btw** voor één naam, Benelux + EU + VS, gelijkenisonderzoek in klassen 9, 28, 41 en 42, met schriftelijk advies. Rekenadvies voor #10: **€ 3.750 excl. btw** (§4), gelijk aan wat de EP in #10 gebruikt. |
 | **CEO-besluit nodig?** | Nee, nu niet. Besluit #24 dekt dit al (3A). De EP neemt de richtprijs op in de budgetaanvraag (#10, A8). Zie §5 voor wat er wél een CEO-vraag kan worden. |
 
 Alle checks zijn gedaan op **2026-11-08** (peildatum), tenzij anders vermeld. Registers en webpagina's veranderen; herhaal de check vóór een publicatie.
@@ -73,16 +73,22 @@ Alle checks zijn gedaan op **2026-11-08** (peildatum), tenzij anders vermeld. Re
 
 ## 3. Conclusie: 🟠 oranje
 
-*Wraithstep* is **goed genoeg als werktitel** en er is geen blokkade gevonden: geen game en geen merk met deze naam in de VS, en de domeinen zijn vrij. **Groen** wordt het pas als een specialist ook de EU- en Benelux-registers heeft gecheckt (M5) en de studio bewust kiest hoe ze omgaat met het Diablo II-item (G4). **Rood** zou het worden bij een levend EU- of Benelux-merk WRAITHSTEP (of sterk gelijkend) in klasse 9, 28 of 41.
+*Wraithstep* is **goed genoeg als werktitel** en er is geen blokkade gevonden: geen game en geen merk met deze naam in de VS, en de domeinen zijn vrij. **Groen** wordt het pas als een specialist ook de EU- en Benelux-registers heeft gecheckt (M5) en de studio bewust kiest hoe ze omgaat met het Diablo II-item (G4). **Rood** zou het worden bij een levend EU- of Benelux-merk WRAITHSTEP (of sterk gelijkend) in klasse 9, 28, 41 of 42 (dezelfde klassen als de scope van de specialist, §4).
 
 Wat dit concreet betekent:
 1. **Intern**: werktitel *Wraithstep* gewoon gebruiken (doorvoeren loopt in #25).
 2. **Extern**: niets publiceren met de naam (Steam-pagina, trailer, socials, logo) vóór de formele check (besluit #24, 3A). Geen domeinen of handles registreren tot dan.
-3. **Goedkope tussenstap (€ 0, voor wie in een gewone browser werkt)**: iemand van de studio of de CEO zoekt "wraithstep" en "wraith step" handmatig in **TMview** (`https://www.tmdn.org/tmview/`) en de **WIPO Global Brand Database** (`https://branddb.wipo.int/`). Vindt dat niets, dan stijgt het vertrouwen; het vervangt de specialist niet.
+3. **Goedkope tussenstap (€ 0, ± 15 minuten in een gewone browser)**: zoek "wraithstep" en "wraith step" handmatig in **TMview** (`https://www.tmdn.org/tmview/`) en de **WIPO Global Brand Database** (`https://branddb.wipo.int/`), in klasse 9, 28, 41 en 42. Vindt dat niets, dan stijgt het vertrouwen; het vervangt de specialist niet.
+   - **Eigenaar:** de **CEO** (de agents bereiken TMview en EUIPO niet vanuit hun werkomgeving, M5). De EP zet de stap als optionele actie in #10.
+   - **Moment:** na de vindbaarheidstoets van Marketing (#44) en vóór de opdracht aan de specialist. Adviseert #44 een nieuwe naam (optie c), dan vervalt de stap voor *Wraithstep* en zoeken we de nieuwe naam.
+   - **Daarna:** de CEO zet de uitkomst (treffers of "0", met datum) in #35 of het issue van de merkcheck; de BLA verwerkt die in dit document.
 
 ## 4. Richtprijs formele merkcheck door een specialist
 
-**Wat de check moet dekken** (voorstel, de specialist kan dit bijstellen): één naam (*Wraithstep*), woordmerk, **Benelux + EU + VS**, klassen **9** (games en software), **41** (entertainment, online games) en **42** (software als dienst), gelijkenisonderzoek (niet alleen identiek), plus een korte schriftelijke beoordeling.
+**Wat de check moet dekken** (voorstel, de specialist kan dit bijstellen): één naam (*Wraithstep*), woordmerk, **Benelux + EU + VS**, klassen **9** (games en software), **28** (spellen en speelgoed, ook handheld-spelapparaten), **41** (entertainment, online games) en **42** (software als dienst), gelijkenisonderzoek (niet alleen identiek), plus een korte schriftelijke beoordeling.
+
+- **Waarom klasse 28 erbij:** we zouden er zelf waarschijnlijk niet in registreren (een pc-game valt in 9 en 41), maar een ouder merk in klasse 28 kan wel botsen (verwante waren, zelfde publiek). Daarom telt 28 mee bij "rood" (§3) en hoort het in het **onderzoek**. In welke klassen we later **registreren**, is een apart CEO-besluit op advies van de specialist.
+- **Per klasse of samen?** De bronnen in §4.1 verschillen. Gleanmark rekent **per klasse** (USD 495). Bij de andere tarieven staat niet dat ze per klasse gelden; ik lees ze als één prijs per onderzoek. De bandbreedte in §4.2 rekent met **één prijs per onderzoek voor alle vier klassen samen**. Rekent een kantoor per klasse, dan kan het VS-deel met 4 klassen oplopen tot ≈ USD 2.000 en valt de offerte mogelijk boven de bovenkant. **Vraag offertes daarom expliciet voor alle vier klassen samen** en vraag na of de prijs per klasse is.
 
 ### 4.1 Gepubliceerde tarieven (geen offertes)
 
@@ -105,12 +111,12 @@ Wat dit concreet betekent:
 | Scenario | Inhoud | Richtprijs (excl. btw) |
 |---|---|---|
 | Minimaal | Alleen onderzoeksrapporten (EU-gelijkenis + VS), zonder advies | ≈ € 1.000 – 1.500 |
-| **Aanbevolen** | Gelijkenisonderzoek Benelux/EU + VS, klassen 9/41/42, met schriftelijke beoordeling door een merkengemachtigde of IE-advocaat | **≈ € 1.500 – 3.500** |
+| **Aanbevolen** | Gelijkenisonderzoek Benelux/EU + VS, klassen 9/28/41/42, met schriftelijke beoordeling door een merkengemachtigde of IE-advocaat | **≈ € 1.400 – 3.750** |
 | Niet nodig nu | Volledig in-use-onderzoek in alle EU-landen | € 15.000+ |
 
-Rekenwijze: onderkant ≈ EU-gelijkenis € 700 + VS-onderzoek USD 300 + advies USD 500; bovenkant ≈ Benelux+EU € 1.495 + VS USD 850 + advies USD 1.500. Omrekening **aanname** 1 USD ≈ € 0,85 – 0,95 (koers niet nagekeken), afgerond.
+Rekenwijze: onderkant ≈ EU-gelijkenis € 700 + VS-onderzoek USD 300 + advies USD 500; bovenkant ≈ Benelux+EU € 1.495 + VS USD 850 + advies USD 1.500. Omrekening **aanname** 1 USD ≈ € 0,85 – 0,95 (koers niet nagekeken). Uitkomst: onderkant € 700 + USD 800 ≈ € 1.380 – 1.460; bovenkant € 1.495 + USD 2.350 ≈ € 3.490 – 3.730. Afgerond: **≈ € 1.400 – 3.750**. (In v1.0 stond € 1.500 – 3.500; de bovenkant lag daarmee onder de eigen rekenwijze.)
 
-**Advies voor de budgetaanvraag (#10, A8):** reken met **€ 3.500 excl. btw** (bovenkant van "aanbevolen"), in de fasebegroting waarin de eerste publicatie met de naam valt. Btw (21 %) komt erbij als de studio die niet kan terugvorderen.
+**Advies voor de budgetaanvraag (#10, A8):** reken met **€ 3.750 excl. btw** (bovenkant van "aanbevolen", gelijk aan het bedrag dat de EP in #10 gebruikt), in de fasebegroting waarin de eerste publicatie met de naam valt. Btw (21 %) komt erbij als de studio die niet kan terugvorderen.
 
 **Niet in deze prijs** (ter info, als de CEO later ook wil registreren): de officiële depottaksen. EUIPO € 850 voor 1 klasse, € 900 voor 2, € 1.050 voor 3 (online, 2026, volgens `https://tmarkmetric.com/insights/eu-trademark-cost`); USPTO USD 350 per klasse (volgens `https://tmexpress.com/trademark-express-services/`). Beide uit secundaire bronnen; **vóór een registratiebesluit nakijken op euipo.europa.eu en uspto.gov.** Registreren is een apart CEO-besluit.
 
@@ -120,14 +126,35 @@ Rekenwijze: onderkant ≈ EU-gelijkenis € 700 + VS-onderzoek USD 300 + advies 
 
 - **Geen formele merkcheck**; EUIPO/BOIP/WIPO niet doorzocht (M5). Grootste open punt; de goedkope tussenstap staat in §3.
 - **Diablo II-item (G4)**: geen juridische blokkade gevonden, wel een vindbaarheidsvraag. Voorstel: de Executive Producer legt dit bij de Creative Director en Marketing. Vinden zij dat de naam daardoor niet werkt als definitieve titel, dan volgt een nieuwe naamvraag aan de CEO **vóór** de betaalde check (zelfde route als R15), zodat we niet betalen voor een naam die toch wijzigt.
-- **Socials** (X, Instagram, TikTok, Reddit, Twitch) en **wraithstep.gg** niet gecontroleerd.
+- **Socials** (X, Instagram, TikTok, Reddit, Twitch) en **wraithstep.gg** niet gecontroleerd. Dat gebeurt in de herhaalcheck (§5.1).
 - USPTO-query `*wraith*` is afgekapt op 100 treffers; `wraith*` (96) en de exacte zoekopdracht (0) zijn volledig.
 - **Niets geregistreerd, gereserveerd, aangevraagd, gekocht of gepubliceerd.** Geen specialist benaderd.
-- Herhaal de check (vooral Steam, itch.io en USPTO) vlak vóór de eerste publicatie.
+- Herhaal de check vlak vóór de eerste publicatie: zie de vaste stap in §5.1.
+
+### 5.1 Vaste stap: herhaalcheck vóór de eerste publicatie
+
+Geldt voor de **eerste publieke uiting met de naam**: Steam-pagina, trailer, socials, logo, website of persbericht (besluit #24, 3A). Wie het issue voor die uiting opent (verwacht: Marketing & Community Manager of EP, bij de Steam-pagina in fase 2–3), neemt deze stap op als **DoD-punt dat de publicatie blokkeert**: "Herhaalcheck naam volgens `naamcheck-wraithstep.md` §5.1 gedaan, uitkomst niet rood".
+
+| # | Wat | Wie | Wanneer |
+|---|---|---|---|
+| 1 | Vindbaarheidstoets (#44) en de formele check door de specialist zijn af; uitkomst niet rood | Marketing, CD, specialist via CEO | Vóór stap 2 |
+| 2 | Opnieuw zoeken: Steam, itch.io, websearch (games met dezelfde of gelijkende naam) | BLA | ≤ 2 weken vóór publicatie |
+| 3 | Registers: USPTO (agent); TMview, EUIPO, BOIP en WIPO (CEO in een gewone browser, zie §3 punt 3), klassen 9/28/41/42; alleen nieuwe aanvragen sinds het rapport van de specialist | BLA, CEO | Idem |
+| 4 | Domeinen (.com, .net, .org, .io, .games, .nl, **.gg**) en handles (**X, Instagram, TikTok, Reddit, Twitch**, YouTube) | Marketing (handmatig) | Idem |
+| 5 | Uitkomst met datum in het publicatie-issue; bij een nieuwe treffer: geen publicatie, eerst de EP en zo nodig de CEO | BLA | Vóór de publicatie |
+
+Registreren of reserveren van domeinen en handles is geen deel van deze check; dat is een aparte beslissing (geld, accounts).
 
 ## 6. Definition of Done (#29)
 
 - [x] Elke bron met URL en raadpleegdatum (§2, §4)
 - [x] Conclusie groen/oranje/rood met reden: **oranje** (§1, §3)
-- [x] Richtprijs met bron: ≈ € 1.500 – 3.500 excl. btw, rekenadvies € 3.500 (§4); niets aangevraagd, geregistreerd of gepubliceerd (§5)
+- [x] Richtprijs met bron: ≈ € 1.400 – 3.750 excl. btw, rekenadvies € 3.750 (§4; v1.0: € 1.500 – 3.500); niets aangevraagd, geregistreerd of gepubliceerd (§5)
 - [x] A4 meegenomen: NoA bevestigd en klasse 9 vermeld in `naamcheck.md` M1 (§2.2)
+
+## 7. Logboek wijzigingen
+
+| Versie | Datum | Wijziging |
+|---|---|---|
+| 1.0 | 2026-11-08 | Eerste versie (PR #33, issue #29) |
+| 1.1 | 2026-11-08 | Niet-blokkerende reviewpunten PR #33 (EP en SM, issue #35): §4.2 bandbreedte en rekenadvies gelijkgetrokken met de eigen rekenwijze (≈ € 1.400 – 3.750, advies € 3.750, zoals de EP in #10); klasse 28 in de scope van de specialist, gelijk aan het criterium voor "rood" in §3, met uitleg en de vraag of prijzen per klasse of samen gelden (§4); tussenstap TMview/WIPO met eigenaar (CEO) en moment (na #44, vóór de specialist) in §3; herhaalcheck vóór de eerste publicatie als vaste stap (§5.1), op te nemen in het latere Steam-/marketingissue. Geen nieuw onderzoek. |
