@@ -1,8 +1,8 @@
 extends Node2D
 ## De simulatieklok: één vaste tick per _physics_process (60 Hz).
 ##
-## Alle gameplay-actors worden hier in een vaste volgorde gestapt:
-## eerst spelers (op player_index), dan echo's (in spawnvolgorde).
+## Volgorde per tick volgens E-07b (docs/design/gdd.md): eerst de schaduw
+## (echo's in spawnvolgorde, daarna P2 en hoger), dan P1 (stap + opname).
 ## Zo hangt het resultaat niet af van de volgorde van nodes in de boom.
 
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
@@ -12,6 +12,10 @@ const EchoActor = preload("res://scripts/echo/echo_actor.gd")
 var tick := 0
 var players: Array[PlayerActor] = []
 var echoes: Array[EchoActor] = []
+## Alleen voor tests: als true, schrijft elke stap "<tick>:<fase>:<node>" in
+## `step_log`. Fase "1" = schaduw, "2+3" = P1 stapt en wordt opgenomen.
+var log_steps := false
+var step_log := PackedStringArray()
 
 
 func add_player(player: PlayerActor) -> void:
@@ -32,8 +36,24 @@ func remove_echo(echo: EchoActor) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	for player in players:
-		player.sim_step(tick, delta)
+	# E-07b (1): de schaduw. Echo's zetten hun frame; P2 stapt. In de spike
+	# kunnen echo en P2 nog naast elkaar bestaan (C-01 is nog niet gebouwd).
 	for echo in echoes:
+		_log("1", echo)
 		echo.sim_step(tick, delta)
+	for player in players:
+		if player.player_index != 1:
+			_log("1", player)
+			player.sim_step(tick, delta)
+	# E-07b (2) + (3): P1 stapt en wordt opgenomen (PlayerActor.sim_step).
+	for player in players:
+		if player.player_index == 1:
+			_log("2+3", player)
+			player.sim_step(tick, delta)
+	# E-07b (4) events en (5) objecten bestaan nog niet in de spike (R5).
 	tick += 1
+
+
+func _log(phase: String, actor: Node) -> void:
+	if log_steps:
+		step_log.append("%d:%s:%s" % [tick, phase, actor.name])

@@ -2,7 +2,7 @@ extends CharacterBody2D
 ## Een speler: leest zijn inputbron, beweegt via Motor en neemt elke tick op.
 ##
 ## Heeft geen eigen _physics_process: de Sim roept `sim_step` aan, zodat de
-## volgorde van alle actors per tick vastligt (P1, P2, daarna echo's).
+## volgorde van alle actors per tick vastligt (E-07b: schaduw, dan P1).
 
 const Motor = preload("res://scripts/echo/motor.gd")
 const EchoRecorder = preload("res://scripts/echo/echo_recorder.gd")

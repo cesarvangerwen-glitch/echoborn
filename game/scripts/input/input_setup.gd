@@ -11,6 +11,12 @@ const KEYS := {
 	1: {"left": KEY_A, "right": KEY_D, "jump": KEY_SPACE, "action": KEY_E},
 	2: {"left": KEY_LEFT, "right": KEY_RIGHT, "jump": KEY_ENTER, "action": KEY_CTRL},
 }
+## Toetsen waarvan alleen de linker- of rechtervariant telt. Zonder `location`
+## matcht KEY_CTRL beide Ctrl-toetsen, en dan start linker Ctrl ook de echo
+## van P2 (#14).
+const KEY_LOCATIONS := {
+	"p2_action": KEY_LOCATION_RIGHT,
+}
 
 
 static func ensure_actions() -> void:
@@ -25,6 +31,7 @@ static func ensure_actions() -> void:
 			var key := InputEventKey.new()
 			key.device = ALL_DEVICES
 			key.physical_keycode = keys[action_name]
+			key.location = KEY_LOCATIONS.get(action, KEY_LOCATION_UNSPECIFIED)
 			InputMap.action_add_event(action, key)
 			InputMap.action_add_event(action, _joy_event(action_name, device))
 
