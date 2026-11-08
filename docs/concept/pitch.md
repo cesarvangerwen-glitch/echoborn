@@ -31,8 +31,8 @@ Dit zijn de twee zinnen die de CEO van spelers wil horen (#54): *"het was heel s
 
 | Moment | Solo | Co-op (aanbeveling, zie §5 en CEO-vraag 7) |
 |---|---|---|
-| **Bewegen** | **Echo als springplank.** De echo loopt je route van zonet. Land je op hem of zet je je van hem af, dan houd je je snelheid en krijg je je dash terug. Een goede run is een ketting: sprong, dash, afzetten van je schaduw, verder. | Beide spelers zijn live en zijn elkaars springplank. De schaduwspeler blijft binnen de gedeelde camera (leiband, `gdd.md` C-07). |
-| **Vechten** | **Schaduwmerk.** Elke treffer zet een merk op de vijand. Komt de echo bij die treffer aan, dan schiet hij naar het merk en laat het ontploffen. Meer merken betekent een grotere ontploffing. Pareren en ontwijken zijn van jou; de echo maakt je combo af. | Beide spelers zetten merken. De gedeelde echo laat alle merken van allebei in één finisher ontploffen. |
+| **Bewegen** | **Echo als springplank.** De echo loopt je route van zonet. Land je op hem of zet je je van hem af, dan houd je je snelheid en krijg je je dash terug (**bounce**). Mis je een sprong, dan **vangt** hij je op je plek van ± 2 s geleden. Een goede run is een ketting: sprong, dash, afzetten van je schaduw, verder. | **Samen bewegen = sterker bewegen.** **Bounce** op het hoofd van je partner geeft een hoge sprong en een dash-reset. Bij een **lancering** houdt de een een aanval vast, en de ander stapt erop en wordt weggeslingerd. Bij **vangen** val je bij de ander, die je opvangt en omhoog zwiept. |
+| **Vechten** | **Schaduwmerk.** Elke treffer zet een merk op de vijand. Komt de echo bij die treffer aan, dan schiet hij naar het merk en laat het ontploffen. Meer merken betekent een grotere ontploffing. Pareren en ontwijken zijn van jou; de echo maakt je combo af. Een **opgeladen slag** van je echo werkt als lancering. | **Merk-combo:** de een zet het merk, de ander laat het knallen (extra schade en licht). De gedeelde echo verschijnt alleen als **finisher**. |
 | **Licht oppompen** (kernloop) | Flow vult je **lichtmeter**: treffers, ontploffingen en sprongketens zonder de grond te raken. Bij een **gemaal** pomp je dat licht de stad in. Het water zakt, een wijk gaat aan, nieuwe routes gaan open. | Eén gedeelde meter die door allebei gevuld wordt. Oppompen doe je samen. |
 | **Groei** (metroidvania-vaardigheden) | Elke vaardigheid is beweging of gevecht die de echo versterkt, bijvoorbeeld een dash die de echo herhaalt als snijlijn. Uitwerking door de LGD en de Systems Designer. | Dezelfde vaardigheden voor beide spelers. |
 
@@ -50,13 +50,13 @@ De echo is een volwaardig tweede lichaam, maar hij werkt mee in je ritme en niet
 
 **Toetsvraag:** *Maakt de echo deze actie vloeiender of krachtiger, zonder dat de speler ervoor moet stilstaan?*
 
-**Is de echo verplicht op de kritieke route? Ja.** De springplank is verplicht zoals een dash in *Celeste* verplicht is: sommige afgronden en schachten haal je alleen door van je echo af te zetten, vanaf gebied 1. Het merk is verplicht in gevechten waar alleen een ontploffing een pantser breekt (bosses, zware vijanden). Dit is **geen puzzel** volgens de definitie hierboven: je doet het in beweging, zonder stil te staan om een volgorde te bedenken. Het is een moeilijke sprong of een gevecht. **Toets voor de LGD:** elke verplichte springplank- of merkplek haalt norm (1) hieronder (≤ ± 5 s stilstand). Een plek die daar niet aan voldoet, gaat van de kritieke route af of wordt herontworpen. Omdat de echo verplicht is, kan hij niet wegzakken tot een passieve buff (R-V2).
+**Is de echo verplicht? Op de route niet, bij bosses wel** (keuze van de CEO, #54). Op de route maken springplank, lancering, vangen en merk je **sneller, hoger en sterker**, maar ze zijn **nooit een slot**: elke weg op de kritieke route is ook zonder te halen, alleen langzamer. **Bosses** zijn gebouwd om samen, of met je echo, te winnen: een pantser breekt alleen door een merk-ontploffing, en een hoge zwakke plek haal je alleen met een bounce of een lancering. Ook dat is **geen puzzel** volgens de definitie hierboven, want je doet het in beweging tijdens het gevecht. **Toets voor de LGD:** elke verplichte boss-actie haalt norm (1) (≤ ± 5 s stilstand), met ruime timingvensters (≥ 10 frames) en duidelijke feedback (geluid, schermschok, licht). **Tegenmaatregel tegen een passieve echo op de route (R-V2):** de echo moet lonen. Bounce- en lanceerketens vullen de lichtmeter sneller (dus eerder oppompen), kortere wegen en verzamelobjecten liggen hoog of ver (te halen met een bounce of lancering), en norm (2) wordt gemeten.
 
 **Meetbaar in de slice** (normen, waarden stelt de LGD vast): (1) op de kritieke route staat een geoefende speler nergens langer dan ± 5 s stil om iets uit te zoeken; (2) de speler gebruikt de echo als springplank of merk-afmaker minstens ± 1× per 20 s gewoon spel; (3) playtest-score "voelde het vloeiend/satisfying?" gemiddeld ≥ 4 op 5.
 
 | Past | Past niet |
 |---|---|
-| Afzetten van je echo houdt je vaart en geeft je dash terug | Een kamer waarin je een reeks schakelaars in de juiste volgorde moet zetten (puzzel op de kritieke route) |
+| Afzetten van je echo (of je partner) houdt je vaart en geeft je dash terug | Een kamer waarin je een reeks schakelaars in de juiste volgorde moet zetten (puzzel op de kritieke route) |
 | Een treffer zet een schaduwmerk; de echo laat het ontploffen | Een vijand die je alleen raakt als jij en je echo hem binnen 15 ticks tegelijk raken (dwingt wachten; was v0.3-voorbeeld) |
 | Een boss die je dwingt je route zo te kiezen dat je schaduw straks onder je staat | Een boss die je wint door stil te staan tot de echo iets doet |
 | Een dash die de echo een tel later herhaalt als snijlijn | Een standaard dubbele sprong die de echo als springplank overbodig maakt |
@@ -79,18 +79,27 @@ De wereld heeft nog steeds twee lagen: jij leeft in het licht, de echo in de sch
 
 Gevolg voor Art en Audio: leesbaarheid van de lagen en het water gaat vóór sfeer.
 
-### Pillar 3: Eén stad, twee manieren van samenspelen
+### Pillar 3: Samen bewegen = sterker bewegen
 
-Solo en co-op zijn dezelfde game in dezelfde kamers met dezelfde regels. Solo is samen bewegen met je verleden; co-op is samen bewegen met een vriend, met een echo die van jullie allebei is. Er is geen aparte co-op-campagne, geen co-op-only content op de kritieke route en geen solo-versie van een kamer. **De vorm van co-op is een open CEO-keuze** (§5, vraag 7); de aanbeveling is de **gedeelde echo**.
+Solo en co-op zijn dezelfde game in dezelfde kamers met dezelfde regels. Er is **één rol**, en die speelt in co-op je **partner** en solo je **echo** (± 2 s staart). Elke samenwerkingsactie bestaat dus in beide vormen:
 
-**Toetsvraag:** *Werkt dit solo met de echo én in co-op in dezelfde kamer, zonder aparte versie?*
+| Actie | Co-op (partner) | Solo (echo) |
+|---|---|---|
+| **Bounce** | Spring op het hoofd van de ander: een hoge sprong + dash-reset | Spring op je echo |
+| **Lancering** | De een houdt een aanval vast, de ander stapt erop en wordt weggeslingerd (lichtgat, kloof) | Een opgeladen slag van je echo slingert je weg |
+| **Merk-combo** | De een zet het merk, de ander laat het knallen (extra schade + licht) | Je echo laat je merk knallen |
+| **Vangen** | Val bij de ander, die vangt je en zwiept je omhoog (afgronden, boss-slagen ontwijken) | Je echo vangt je op je plek van 2 s geleden |
+
+Samenwerken is **optioneel op de route** (sneller, hoger, sterker; nooit een slot) en **verplicht bij bosses**. In co-op heeft **niemand een eigen echo**: de partner ís de echo. Er zijn dus nooit meer dan twee lichamen, plus de **gedeelde echo als finisher** (§5). Er is geen aparte co-op-campagne, geen co-op-only content op de kritieke route en geen solo-versie van een kamer. Deze vorm is een open CEO-keuze (§5, vraag 7) en de aanbeveling.
+
+**Toetsvraag:** *Werkt deze actie zowel met een partner (co-op) als met je echo (solo), in dezelfde kamer zonder aparte versie?*
 
 | Past | Past niet |
 |---|---|
-| Een sprongketen die solo over je echo loopt en in co-op over je medespeler | Een plek die alleen met twee echte spelers te halen is (op de kritieke route) |
+| Een hoge richel die je haalt met een bounce, op je partner of op je echo | Een plek die alleen met twee echte spelers te halen is (op de kritieke route) |
 | Drop-in/drop-out zonder kamer-reset | Een co-op-modus met een eigen wereld, eigen levels of eigen progressie |
 | Een gedeelde camera die beide spelers in beeld houdt | Split-screen (botst met gedeelde camera en lokale co-op) |
-| Een boss die in co-op anders voelt (twee spelers zetten merken, één finisher) maar dezelfde regels volgt | Content achter een co-op-only gate |
+| Een boss met een pantser dat alleen een merk-combo breekt, solo én samen | Een co-op-actie zonder solo-vorm, of content achter een co-op-only gate |
 
 ## 5. Solo en co-op, uitgeschreven
 
@@ -106,18 +115,17 @@ Met de korte staart gebeurt dit allemaal binnen een tel of twee, dus binnen norm
 
 Wat de flow niet mag breken (richting voor de LGD): de echo **volgt je door een deur** in plaats van na elke kamerwissel even weg te zijn (was `gdd.md` O-5), en op je echo staan laat hem **niet** breken (§12).
 
-**Co-op (lokaal, gedeelde camera, drop-in/drop-out).** De CEO wil co-op, maar is niet overtuigd van "speler 2 = de echo" (v0.3), van "co-op als bonus" en van "speler 2 draagt het licht" (#54). De richting die hij verder uitgewerkt wil zien, is de **gedeelde echo**.
+**Co-op (lokaal, gedeelde camera, drop-in/drop-out).** De CEO wil co-op, maar is niet overtuigd van "speler 2 = de echo" (v0.3), van "co-op als bonus" en van "speler 2 draagt het licht". Zijn voorkeur, uitgewerkt door de LGD (#54, ronde 3), is **"samen bewegen = sterker bewegen"** (pillar 3).
 
-- **A. Gedeelde echo (aanbeveling).** Beide spelers spelen live. Speler 1 is de machinist in het licht. Speler 2 is de **sluiswachter die weer uit zichzelf beweegt**, in de schaduwlaag, met dezelfde besturing en de schaduwregels van de echo: hij lost op in fel licht, kan geen lichtobjecten bedienen en moet in beeld blijven (C-06, C-07). Ze zijn elkaars springplank. Er is **één gedeelde echo**, die niet de hele tijd meeloopt. Hij verzamelt de merken van beide spelers en verschijnt als **finisher**: is de gedeelde lichtmeter vol, dan roept een van beiden hem op. De echo speelt dan de samengevoegde treffers van de laatste 10 s van allebei af, in ± 2 s, en laat alle merken ontploffen. Zo hebben op elk moment hooguit drie figuren een lichaam, en de derde maar kort. **Wie is de gedeelde echo?** Geen derde persoon, maar het **gemaal dat herinnert**: een schim van machinist en sluiswachter samen, half licht en half schaduw, die jullie laatste tien seconden in één keer terugspeelt.
-  *Waarom aanbevolen:* het is het enige model waarin beide spelers volledig vrij spelen én de echo, de kern van de game, in co-op blijft. Speler 2 krijgt een eigen rol in het verhaal (§6), en de finisher is een gezamenlijk hoogtepunt: "dat deden wíj".
-  *Kost:* C-01 (max. twee lichamen) verandert. Er komen nieuwe regels voor de gedeelde meter en de finisher (LGD ± 1 run, Combat Designer ± 0,5, TD prestaties ± 0,5, UX camera en leesbaarheid ± 0,5): **± 2,5 run**. In de slice ± 1–2 runs extra code ten opzichte van v0.3, waar P2 de bestaande echo-positie overnam.
-- **B. Ieder een eigen echo (alternatief).** Beide spelers spelen live en hebben elk een eigen echo die altijd met dezelfde staart achter hen loopt. Co-op is dan letterlijk twee keer de solo-game naast elkaar.
-  *Voordeel:* volledige gelijkheid met solo, en geen nieuw finisher-systeem.
-  *Kost:* tot **vier lichamen** in beeld (twee vol, twee hol), zwaar voor de leesbaarheid (pillar 2), de camera en de Steam Deck, en meer art (twee echo-varianten). LGD ± 1, TD ± 1, UX ± 0,5, Art ± 0,5: **± 3 runs**, met een groter leesbaarheidsrisico (R2).
+- **A. Samen bewegen = sterker bewegen (aanbeveling).** Beide spelers spelen live. Speler 1 is de machinist; speler 2 is de **sluiswachter die weer uit zichzelf beweegt**. Ze doen elkaar wat solo de echo doet: bounce, lancering, merk-combo en vangen (pillar 3). **Niemand heeft een eigen echo**: de partner ís de echo. Er zijn dus max. **twee lichamen**, plus de **gedeelde echo als finisher**: een echo van jullie samen speelt jullie laatste combo terug, in ± 2 s. **Wie is de gedeelde echo?** Geen derde persoon, maar het **gemaal dat herinnert**: een schim van machinist en sluiswachter samen, half licht en half schaduw. Iedereen kan alles ook alleen, alleen langzamer. Zo hoeft de een niet op de ander te wachten.
+  *Waarom aanbevolen:* het is de voorkeur van de CEO. Solo en co-op delen letterlijk dezelfde vier acties. Het blijft bij twee lichamen (het best leesbaar en het lichtst voor de Steam Deck). De minder ervaren speler heeft altijd iets te doen: opvangen, lanceren, merken.
+  *Kost:* C-01 blijft in de kern (twee lichamen), maar P2 neemt niet meer de rol van de echo over. Nieuwe regels voor de vier acties in beide vormen, de finisher en de feedback: LGD ± 1 (vier acties, solo-vormen, vensters ≥ 10 frames), Combat Designer ± 0,5 (merk-combo, bosses), UX ± 0,5 (feedback, camera), TD ± 0,5 (finisher, drop-in/out): **± 2,5 run**; code in de slice ± 1–2 runs. Volgens de LGD eerst bounce en lancering prototypen.
+- **B. Gedeelde echo als kern (alternatief; de aanbeveling uit de vorige ronde).** Beide spelers spelen live en zijn elkaars springplank. Eén gedeelde echo verzamelt de merken van allebei en laat ze bij een volle gedeelde lichtmeter in een finisher van ± 2 s ontploffen, met de samengevoegde treffers van jullie laatste 10 s. Er zijn geen aparte samenwerkingsacties.
+  *Kost:* ± 2,5 run regels + ± 1–2 runs code, dus vergelijkbaar. Maar er zijn kort drie figuren in beeld (leesbaarheid, R-V6). Solo en co-op delen minder: de finisher is het enige gezamenlijke moment, en de route kent geen echte samenwerking.
 
-Wat in beide varianten blijft: drop-in/drop-out zonder kamer-reset (C-03, C-05, met de nieuwe vorm aangepast), de schaduwspeler die niet doodgaat maar oplost en terugkomt (C-06), de leiband van de gedeelde camera (C-07), en geen co-op-only content (L-02).
+Wat in beide varianten blijft: drop-in/drop-out zonder kamer-reset (C-03, C-05, aangepast aan de vorm), de schaduwspeler die niet doodgaat maar oplost en terugkomt (C-06), een gedeelde camera, en geen co-op-only content (L-02). Of de leiband van C-07 blijft, beslissen de LGD en de UX Designer in T3. Omdat iedereen alles alleen kan, is die minder nodig.
 
-**Waarom dit werkt voor de doelgroep:** de solo-speler krijgt een vloeiende actie-metroidvania met een eigen idee. Het bankduo krijgt een spel waarin de minder ervaren speler live meedoet, vergevingsgezind faalt, en met de gezamenlijke finisher een groot moment mee kan maken.
+**Waarom dit werkt voor de doelgroep:** de solo-speler krijgt een vloeiende actie-metroidvania met een eigen idee. Het bankduo krijgt een spel waarin de minder ervaren speler live meedoet, vergevingsgezind faalt, zijn partner opvangt en lanceert, en met de gezamenlijke finisher een groot moment mee kan maken.
 
 ## 6. Toon, setting en verhaal
 
@@ -128,12 +136,13 @@ Wat in beide varianten blijft: drop-in/drop-out zonder kamer-reset (C-03, C-05, 
 Een stad in de **Lage Landen** die in een droom onder water is gelopen, gecombineerd met de **verlaten poldermachine** die haar droog moet houden (#54).
 - **Stad:** belforten die half onder water staan, grachten, een begijnhof, dijken. Het licht verwijst naar de **Vlaamse Primitieven**: helder, warm, gedetailleerd licht dat schaars is in het donker. Het **carillon** is het ritme van de echo, en kan in de muziek de maat van de staart en van de tien seconden slaan (richting voor de Audio Director).
 - **Machine:** gemalen, sluizen, schoepenraderen en pompen. Hier pomp je licht in en zakt het water (pillar 2). Bossidee van de Combat Designer: **de Gemaalmeester**, een levende poldermachine.
+- **Van grijs naar kleur** (idee van de CEO, #54): in het begin is de wereld donker en zijn alle kamers grijs. Pomp je licht terug, dan komt er een kleurrijke, levende stad terug, wijk voor wijk. **Ook je echo is eerst grijs en somber** en leeft mee op naarmate het licht terugkomt. Dat is de sluiswachter die weer tot leven komt (V2). Eis voor de Art Director: een grijze echo in een grijze wereld blijft scherp leesbaar door silhouet, contour en beweging, ook op de Steam Deck (R-V6).
 - **De bevroren echo's:** overal in de stad staan de laatste 10 seconden van de bewoners, stilgezet in schaduw: een bakker die een brood aanreikt, kinderen die naar het carillon kijken. Dit is **sfeer en verhaal, geen puzzel**. Hooguit dient een bevroren echo als springplank of oriëntatiepunt.
 - Dit is ook het **tweede culturele criterium** voor het VAF (#51, 5A; `subsidies.md`), zonder dat het de pillars raakt.
 
 ### Verhaalpremisse V2: "Het gemaal van herinneringen"
 
-Je bent de **jonge machinist** van de poldermachine. Je schaduw ís de **sluiswachter**: de man die ooit het water binnenliet en die nu alleen nog kan herhalen wat een ander doet. Gaandeweg ontdek je wie hij was en waarom het water kwam. Aan het einde krijgt hij zijn eigen tien seconden terug en laat hij los. De mechaniek is het thema: de echo kan alleen herhalen, en het verhaal gaat over het moment waarop dat niet meer hoeft. In co-op (variant A) is speler 2 de sluiswachter die weer uit zichzelf beweegt. Dat is de droom die het einde al even laat voelen. De uitwerking is van de Narrative Designer (T9); ik review haar.
+Je bent de **jonge machinist** van de poldermachine. Je schaduw ís de **sluiswachter**: de man die ooit het water binnenliet en die nu alleen nog kan herhalen wat een ander doet. Gaandeweg ontdek je wie hij was en waarom het water kwam. Aan het einde krijgt hij zijn eigen tien seconden terug en laat hij los. De mechaniek is het thema: de echo kan alleen herhalen, en het verhaal gaat over het moment waarop dat niet meer hoeft. In co-op (variant A) is speler 2 de sluiswachter die weer uit zichzelf beweegt en de machinist opvangt en lanceert. Dat is de droom die het einde al even laat voelen. De uitwerking is van de Narrative Designer (T9); ik review haar.
 
 ### Toonregels
 
@@ -149,7 +158,7 @@ Je bent de **jonge machinist** van de poldermachine. Je schaduw ís de **sluiswa
 Pixel art op 640×360 (op de Steam Deck 640×400), met dynamisch 2D-licht in harde banden.
 - **De laaggrens is gameplay.** Een harde rand laat op de pixel zien waar licht ophoudt en de schaduw van je echo begint (pillar 2).
 - **Vol = levend, hol = echo.** Speler 1, speler 2 en de echo zijn in de stijltests (placeholder) op elke achtergrond uit elkaar te houden; de art bible moet dat in de eind-art waarmaken, ook met de finisher-echo uit §5 als derde figuur.
-- **Combat leesbaar:** merk, ontploffing en parade lezen in één frame, ook als er drie figuren in beeld zijn (Art Director, Combat Designer).
+- **Combat leesbaar:** merk, ontploffing en parade lezen in één frame, ook met twee spelers en de finisher in beeld (Art Director, Combat Designer).
 - **Sfeer zonder de leesbaarheid te raken:** volumetrisch licht, water en diepte alleen in de achtergrond en de parallax-lagen; het speelvlak blijft strak.
 
 ### Naam en toon
@@ -179,7 +188,7 @@ De werktitel *Wraithstep* klinkt duisterder dan de game (risico R15 in `docs/pro
 1. **Een metroidvania waarin je schaduw je bondgenoot in beweging is.** Je echo is je springplank en je tweede slag. Samenwerken met een opname van jezelf bestaat in puzzelgames (sinds *Chronotron* en *Braid*, 2008) en in een run-and-gun (*Super Time Force*). Het onderscheid zit in de **combinatie**: we vonden geen metroidvania die een vertraagde kopie van de speler als kern van beweging, gevecht én voortgang gebruikt (`docs/business/naamcheck.md` §3, peildatum 2026-11-08). Het dichtst bij de regel ligt *Echo Shift* (echo's van je laatste 15 s), maar dat is een first-person puzzelgame zonder gevecht. v0.4 staat daar verder van af: geen puzzels, een gevechts-metroidvania, en een korte staart (vraag 8A). We claimen daarom nergens "de eerste". De ideecheck moet opnieuw voor de nieuwe vorm (R-V9).
 2. **Licht terugwinnen als motor van de wereld.** Goed spelen vult je lichtmeter; bij een gemaal pomp je licht de stad in en zie je de wereld veranderen: het water zakt, wijken gaan aan. Elke voortgang voel je in de stad zelf.
 3. **Een eigen, Laag-Landse wereld.** Een gedroomde verzonken stad met belforten, polders en gemalen, en licht naar de Vlaamse Primitieven. Dat zie je zelden in het genre.
-4. **Lokale bank-co-op met een gedeelde echo** (vorm onder voorbehoud van CEO-vraag 7). Beide spelers spelen live, en de echo is van allebei. *Aanname:* de doelgroep (koppels, vrienden) vraagt erom; marktonderbouwing volgt van Marketing.
+4. **Lokale bank-co-op: samen bewegen = sterker bewegen** (vorm onder voorbehoud van CEO-vraag 7). Beide spelers spelen live en doen elkaar wat solo de echo doet: bounce, lancering, merk-combo, vangen. *Aanname:* de doelgroep (koppels, vrienden) vraagt erom; marktonderbouwing volgt van Marketing.
 5. **Behapbaar en vriendelijk:** 5–7 uur, 3–4 gebieden, 4–5 bosses, ongeveer €20 eenmalig zonder microtransacties (CEO-besluit #2). Uit te spelen in een paar avonden, toegankelijk voor een minder ervaren co-op-partner.
 
 ## 9. Doelgroep en bereik
@@ -202,11 +211,11 @@ Nummering: R-V = visierisico in dit document; de R-nummers uit `docs/productie/r
 | # | Risico | Waarom het de visie raakt | Wie | Voorstel |
 |---|---|---|---|---|
 | R-V1 (R9) | **De echo-duur klopt niet.** Bij 10 s voelt een merk dat pas later ontploft los van je slag, en ligt de springplank te vaak achter je; bij een te korte staart lijkt de echo een nabeeld in plaats van een tweede lichaam | De draai hangt aan die ene waarde | LGD, Combat Designer | **CEO-vraag 8.** Bij 8A prototypen met 1,5, 2 en 3 s, bij 8B met 6, 10 en 14 s (zoals gepland). Het merk toont zijn aftelling in beeld en geluid (het carillon). |
-| R-V2 | **Zonder puzzels wordt de echo passief**, een automatische buff waar je niet over nadenkt | Pillar 1: dan is het geen tweede lichaam meer | LGD, World & Level Designer | **Springplank en merk zijn verplicht op de kritieke route** (pillar 1), getoetst tegen de puzzeldefinitie en norm (1). Meten met norm (2) van pillar 1. Bosses en routes die het keren, klimmen en opvangen afdwingen. |
+| R-V2 | **Zonder puzzels wordt de echo passief**, een automatische buff waar je niet over nadenkt, zeker nu samenwerken op de route optioneel is | Pillar 1: dan is het geen tweede lichaam meer | LGD, World & Level Designer | Verplicht bij bosses, getoetst tegen de puzzeldefinitie en norm (1). Op de route moet de echo lonen: bounce- en lanceerketens vullen de lichtmeter sneller, en kortere wegen en verzamelobjecten liggen hoog of ver. Meten met norm (2) van pillar 1 in de flow-kamer. |
 | R-V3 (R12) | **De echo is te vaak "leeg"** | Elke lege seconde is een gebroken ketting | LGD, TD | De echo volgt je door deuren (O-5 wordt de regel, §12). Op je echo staan breekt hem niet meer. |
 | R-V4 (R20) | **Combat-zwaar is duurder dan puzzels.** Meer vijandtypes, animatie, hitfeedback en bosses om *Hollow Knight*-gevoel te halen | Scope binnen 5–7 uur en het budget per fase | EP, Combat Designer, Art Director | **Scopeplafond voor F6:** max. **4 nieuwe vijandtypes per gebied** (max. 14 in totaal, inclusief varianten), max. **1 minibaas per gebied**, en 4–5 bosses (besluit #2). De slice meet de kost per vijandtype en per boss (F6) tegen dit plafond. Weinig types die veel kunnen (merk, parade). Reken erop dat fase 3–4 duurder worden dan bij een puzzelgame. |
-| R-V5 (R10, herzien) | **Co-op wordt chaos of te makkelijk.** Twee live spelers plus een finisher kunnen elk gevecht platslaan | Pillar 3 | LGD, Combat Designer | Co-op ≤ 2× zo snel als solo blijft de grens. Finisher alleen bij een volle gedeelde meter. Testen in beide modi vanaf het eerste prototype. |
-| R-V6 (R2) | **Drie figuren plus water, merken en ontploffingen zijn niet leesbaar** | Pillar 2 valt dan om | Art Director | Art bible met de finisher-echo en het merk als eis. Prestaties op de Steam Deck (Technical Artist, Engine & Platform Programmer). |
+| R-V5 (R10, herzien) | **Co-op wordt chaos, te makkelijk, of de een wacht op de ander.** Solo kan de balans scheef lopen tegenover een live partner | Pillar 3 | LGD, Combat Designer | Co-op ≤ 2× zo snel als solo blijft de grens. Iedereen kan alles alleen, alleen langzamer, dus niemand wacht. De staartlengte (1,5–3 s) is de knop voor de solo-balans. Ruime vensters (≥ 10 frames). Testen in beide modi vanaf het eerste prototype, bounce en lancering eerst. |
+| R-V6 (R2) | **Twee figuren plus finisher, water, merken en ontploffingen zijn niet leesbaar**, zeker een grijze echo in een grijze wereld (§6) | Pillar 2 valt dan om | Art Director | Art bible met de finisher-echo, het merk en de grijze beginstaat als eis. Prestaties op de Steam Deck (Technical Artist, Engine & Platform Programmer). |
 | R-V7 | **Verdrinken raakt PEGI 12 of het publiek** | Een verzonken stad kan als ramp of dood lezen | Narrative Designer, Art Director, CD | Toonregels in §6 (droom, geen lichamen, geen echte watersnood). Elke scène met water langs de toets "duister maar niet gruwelijk". |
 | R-V8 | **5–7 uur is kort voor een metroidvania** | De echo moet binnen minuten dragen | LGD, World & Level Designer | Springplank en merk zitten vanaf de proloog in de kern; elk gemaal verandert de stad zichtbaar. |
 | R-V9 | **Het idee lijkt sterk op een bestaande game.** Het schaduwmerk ligt dicht bij de lading-en-ontploffing in *Nine Sols*. *Echo Shift* ("laatste 15 seconden") ligt dicht bij de regel. | USP 1 | Business/Legal (#8) | Ideecheck herhalen voor de nieuwe vorm (springplank, merk, oppompen) **vóór T3 het schaduwmerk (E-14) en de merksprong vastlegt, en vóór de flow-kamer**: dan is bijsturen nog goedkoop. Verschil met *Nine Sols*: de echo zelf brengt het merk tot ontploffing, op jouw route van zonet. Verschil met *Echo Shift* (first-person puzzel, geen gevecht): v0.4 staat er verder van af dan v0.3, want er zijn geen puzzels, het is een gevechts-metroidvania, en bij 8A geldt een korte staart in plaats van een lange opname. |
@@ -218,7 +227,7 @@ Nummering: R-V = visierisico in dit document; de R-nummers uit `docs/productie/r
 
 | # | Vraag | Richting CD | Eigenaar | Stand |
 |---|---|---|---|---|
-| 1 | Wat gebeurt er met de echo als speler 2 meedoet? | v0.3: speler 2 *wordt* de echo (C-01–C-05). v0.4: **gedeelde echo** (aanbeveling), alternatief: ieder een eigen echo (§5). | **CEO** (vraag 7), daarna LGD | **Heropend** door #54 |
+| 1 | Wat gebeurt er met de echo als speler 2 meedoet? | v0.3: speler 2 *wordt* de echo. v0.4: **samen bewegen = sterker bewegen**; niemand heeft een eigen echo, de gedeelde echo is alleen de finisher (aanbeveling). Alternatief: gedeelde echo als kern (§5). | **CEO** (vraag 7), daarna LGD | **Heropend** door #54 |
 | 2 | **Ankeren:** mag de speler later de herhaling vastzetten? | Alleen als het de flow helpt (bv. een vaste springplank in een lange schacht), niet als puzzelgereedschap. | LGD, Systems Designer | Open (O-3), herzien bij §3 van de gdd |
 | 3 | **Falen in co-op:** kan de schaduwspeler doodgaan? | Nee, hij lost op en keert terug (C-02, C-06). Geldt in beide co-op-varianten. | LGD, UX Designer | Gesloten |
 | 4 | **Titel:** is *Wraithstep* ook de definitieve naam? | Als werktitel goed, en V2 versterkt de lezing "schim". Twee zorgen blijven: de toon (§6, R15) en de vindbaarheid naast het *Diablo II*-item. Marketing toetst eerst de vindbaarheid (#44). **Daarna, en vóór de opdracht aan de specialist voor de formele merkcheck**, kies ik met Marketing tussen (a) houden, (b) houden met een onderscheidende toevoeging, of (c) een nieuwe naamvraag aan de CEO. Zo betalen we de merkcheck alleen voor de naam die we echt houden. (c) is een CEO-besluit. | CD, Marketing, Business/Legal | Werktitel besloten (#24); korte merkcheck oranje; volgorde #44 → TMview/WIPO → keuze a/b/c → offertes → betaalde merkcheck |
@@ -239,7 +248,7 @@ Kost in **runs** (één maak-taak van een rol). "In T3" betekent: past in GDD v1
 |---|---|---|---|
 | **P1** | *De echo is je tweede lichaam*; het slimme gevoel komt uit plannen; puzzels op de kritieke route (max. 10 per gebied, `kernloop.md` §5) | *De echo houdt je in beweging*; springplank en schaduwmerk; **0 puzzels op de kritieke route**; toetsbaar met een toetsvraag en drie normen | Kernloop, testkamers en vaardigheden herzien |
 | **P2** | *Licht en schaduw zijn de kaart*; gating via licht/schaduw/echo, ook als raadsel (lampbrug) | *Licht terugwinnen opent de stad*; lichtmeter, gemalen, waterstand; gating via vaardigheden en routes, geen raadsels | Nieuw systeem: lichtmeter + gemaal + waterstand |
-| **P3** | Speler 2 *is* de echo; solo plannen vs. co-op afstemmen | Eén stad, twee manieren; co-op als **gedeelde echo** (aanbeveling, CEO-vraag 7) | C-01 en de co-op-regels herzien |
+| **P3** | Speler 2 *is* de echo; solo plannen vs. co-op afstemmen | *Samen bewegen = sterker bewegen*: één rol (partner in co-op, echo solo), vier acties (bounce, lancering, merk-combo, vangen); optioneel op de route, verplicht bij bosses; gedeelde echo alleen als finisher (aanbeveling, CEO-vraag 7) | C-01 en de co-op-regels herzien |
 
 ### Per gdd-regel (`docs/design/gdd.md` v0.2)
 
@@ -251,7 +260,7 @@ Kost in **runs** (één maak-taak van een rol). "In T3" betekent: past in GDD v1
 | **E-14** | Echo-treffer doet 100 % van de treffer van P1 | **Schaduwmerk:** een treffer van P1 zet een merk; de echo-treffer laat merken ontploffen (schade en stapelen: Combat Designer). De echo blijft onkwetsbaar | Combat Designer 1 (in T3) |
 | **E-02** (duur, bij vraag 8A) | D = 600 ticks (10 s) | **Korte staart:** D ± 120 ticks (2 s; bereik 90–180), parameter zoals nu. De playtest test 1,5, 2 en 3 s | LGD 0,25 (in T3) + GP 0,25 |
 | **E-02** (nieuwe uitzondering) | De echo staat altijd op de opgenomen positie | **Merksprong:** op het moment van een opgenomen treffer mag de echo binnen een straal naar het dichtstbijzijnde merk schieten. Dit is de enige afwijking van het pad, en daarna keert hij terug op zijn opname | LGD + Combat 0,5 (in T3) + GP 0,5 |
-| **C-01** | Max. twee lichamen; P2 vervangt de echo | Variant A: P1 + P2 live, plus de gedeelde echo alleen als finisher (± 2 s, max. drie figuren). Variant B: vier lichamen | A ± 2,5 / B ± 3 (§5) |
+| **C-01** | Max. twee lichamen; P2 vervangt de echo | Variant A: max. twee lichamen (P1 + P2, geen eigen echo), plus de gedeelde echo alleen als finisher; nieuwe regels voor bounce, lancering, merk-combo en vangen in beide vormen. Variant B: gedeelde echo als kern, kort drie figuren | A ± 2,5 / B ± 2,5 (§5) |
 | **C-02–C-05** | P2 neemt de echo over bij drop-in, de echo neemt over bij drop-out | Aanpassen aan de gekozen variant; C-06 en C-07 blijven | In de kost van C-01 |
 | **Tweeslagschild** (testkamer T5, venster in §2.9) | Vijand met een venster van 15 ticks voor jou + echo | **Vervalt** (dwingt wachten); vervangen door merk-vijanden | In T3 |
 | **L-01, L-04, L-05, L-06** | Regels voor echo-puzzelkamers | **Herzien of vervallen**; nieuwe levelregels voor sprongketens, merk-arena's en gemaal-wijken | World & Level Designer 1 (in T3) |
@@ -274,7 +283,7 @@ Kost in **runs** (één maak-taak van een rol). "In T3" betekent: past in GDD v1
 
 | Post | Runs |
 |---|---|
-| Documenten binnen T3 (E-04a 0,5 · E-07a 0,5 · E-08b 0,25 · E-14 1 · E-02 duur 0,25 · E-02 merksprong 0,5 · L-regels 1 · §3 1 · testkamers 0,5 · lichtmeter 1 · kernloop 1) | ± 7,5 |
+| Documenten binnen T3 (E-04a 0,5 · E-07a 0,5, incl. bounce · E-08b 0,25 · E-14 1 · E-02 duur 0,25 · E-02 merksprong 0,5 · L-regels 1 · §3 1 · testkamers 0,5 · lichtmeter 1 · kernloop 1) | ± 7,5 |
 | Documenten buiten de planning (C-01 2,5 · fasekader 0,5 · risico 0,25 · art bible 0,5 · ideecheck 0,5) | ± 4,25 |
 | **Documenten samen** | **± 11,75** |
 | Code (E-04a 1 · E-07a 0,5 · E-08b 0,25 · E-02 duur 0,25 · E-02 merksprong 0,5 · lichtmeter 1–2 · C-01 1–2) | ± 4,5–6,5 |
@@ -305,7 +314,7 @@ We rekenen conservatief: het ontwerpwerk voor echo-puzzels dat in T3 en T8 verva
 
 | Versie | Wat |
 |---|---|
-| 0.4 | Live brainstorm met de CEO (#54) verwerkt. Draai en kernfantasie in beweging ("springplank en tweede slag"); P1 *De echo houdt je in beweging* (geen puzzels op de kritieke route, toetsbare flownormen); P2 *Licht terugwinnen opent de stad* (lichtmeter, gemaal, waterstand; gating via vaardigheden en routes); P3 met co-op als gedeelde echo (CEO-vraag 7, alternatief: ieder een eigen echo). Setting (gedroomde verzonken stad + poldermachine) en verhaalpremisse V2 in §6, met toonregels voor water (PEGI 12). Referenties: *Hollow Knight* en *Nine Sols* als hoofdreferentie. USP's, doelgroep en risico's herzien; nieuwe sectie §12 "Wat er verandert t.o.v. v0.3". Reviewpunten #43 verwerkt. Lead-review EP (PR #56): totalen §12 herrekend (documenten ± 11,5, code ± 4,25–6,25, samen ± 16–18), puzzelplekken in het fasekader benoemd, ideecheck R-V9 vóór T3, kost fase 3–4 bij R-V4, water als speellaag expliciet als afwijking van #54, open punt herraming volgens #52. SM-review (PR #56): korte staart van ± 2 s met de 10 s in verhaal en finisher (CEO-vraag 8), waar de echo vóór je uitkomt (§5) en R-V12 met een meetpunt; verlicht ≠ FelLicht (P2); springplank en merk verplicht op de kritieke route en getoetst tegen de puzzeldefinitie (P1, R-V2); *Echo Shift* in USP 1 en R-V9; wie de gedeelde echo is (§5A); scopeplafond combat (R-V4). **Interne noot (was onder de logline, #43.3):** "melancholisch" in plaats van "duister" is bewust: de naam draagt het duister al, en de logline zet de schaduw neer als bondgenoot. |
+| 0.4 | Live brainstorm met de CEO (#54) verwerkt. Draai en kernfantasie in beweging ("springplank en tweede slag"); P1 *De echo houdt je in beweging* (geen puzzels op de kritieke route, toetsbare flownormen); P2 *Licht terugwinnen opent de stad* (lichtmeter, gemaal, waterstand; gating via vaardigheden en routes); P3 met co-op als gedeelde echo (CEO-vraag 7, alternatief: ieder een eigen echo). Setting (gedroomde verzonken stad + poldermachine) en verhaalpremisse V2 in §6, met toonregels voor water (PEGI 12). Referenties: *Hollow Knight* en *Nine Sols* als hoofdreferentie. USP's, doelgroep en risico's herzien; nieuwe sectie §12 "Wat er verandert t.o.v. v0.3". Reviewpunten #43 verwerkt. Lead-review EP (PR #56): totalen §12 herrekend (documenten ± 11,5, code ± 4,25–6,25, samen ± 16–18), puzzelplekken in het fasekader benoemd, ideecheck R-V9 vóór T3, kost fase 3–4 bij R-V4, water als speellaag expliciet als afwijking van #54, open punt herraming volgens #52. Co-op ronde 3 (#54): P3 en §5 op "samen bewegen = sterker bewegen" (vraag 7A; de gedeelde echo als kern wordt 7B), samenwerken optioneel op de route en verplicht bij bosses (P1, R-V2), van grijs naar kleur voor wereld en echo (§6); kost §12 onveranderd. SM-review (PR #56): korte staart van ± 2 s met de 10 s in verhaal en finisher (CEO-vraag 8), waar de echo vóór je uitkomt (§5) en R-V12 met een meetpunt; verlicht ≠ FelLicht (P2); springplank en merk verplicht op de kritieke route en getoetst tegen de puzzeldefinitie (P1, R-V2); *Echo Shift* in USP 1 en R-V9; wie de gedeelde echo is (§5A); scopeplafond combat (R-V4). **Interne noot (was onder de logline, #43.3):** "melancholisch" in plaats van "duister" is bewust: de naam draagt het duister al, en de logline zet de schaduw neer als bondgenoot. |
 | 0.3 | Werktitel *Wraithstep* (#24) doorgevoerd. Toon bij de naam: logline "melancholisch", blok "Naam en toon" in §6, twee risico's (toon R15, vindbaarheid). Reviewpunten PR #22 verwerkt. |
 | 0.2 | Reviewpunten PR #11 verwerkt; randvoorwaarden #2 en stijl 2D (#18) doorgevoerd; open vragen als tabel. |
 | 0.1 | Eerste versie (#4, PR #11). |
