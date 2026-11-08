@@ -1,6 +1,6 @@
 # Subsidieonderzoek: *Wraithstep* (werktitel)
 
-Versie 1.0 · 2026-11-08 · Eigenaar: Business/Legal Advisor · Issue: #19 · Lead-review: Executive Producer
+Versie 1.1 · 2026-11-08 · Eigenaar: Business/Legal Advisor · Issue: #19 · Lead-review: Executive Producer
 Voedt: gate-vraag 3 "Budget fase 2" (#10, `docs/productie/fase-1-kader.md` §3) · Risico: R6 · Besluit: Randvoorwaarden #2 ("zelf financieren + subsidies uitzoeken")
 
 > **Geen juridisch of fiscaal advies.** Dit is een verkenning door de studio op basis van openbare bronnen. Vóór een aanvraag, de oprichting van een vennootschap of een tax-shelterconstructie moet de CEO een **boekhouder/accountant** en zo nodig een **advocaat** raadplegen. Er is niets aangevraagd, ingediend of geregistreerd, en er zijn geen accounts gemaakt (ook niet in MyVAF).
@@ -9,11 +9,11 @@ Voedt: gate-vraag 3 "Budget fase 2" (#10, `docs/productie/fase-1-kader.md` §3) 
 
 | Vraag | Antwoord |
 |---|---|
-| **Beste kandidaat** | **VAF Gamefonds**, steunvorm **prototype** (max. € 25.000, tot 80% van het budget voor een eerste game) en later **vertical slice** en **productie** (samen max. € 400.000). Mits we de toegangsvoorwaarden halen (§3). |
+| **Beste kandidaat** | **VAF Gamefonds**, steunvorm **productie** voor fase 3 (binnen het creatieplafond van € 400.000; steunintensiteit standaard max. 50%, voor een eerste of tweede game **tot 80% mogelijk**, art. 9). Prototype- en slice-steun bestaan ook, maar zouden fase 2 maanden laten wachten (§5). Mits we de toegangsvoorwaarden halen (§3). |
 | **Halen we die voorwaarden nu?** | **Nee, nog niet.** Drie harde drempels: (1) de aanvrager moet een **vennootschap** met zetel in Vlaanderen of Brussel zijn (geen eenmanszaak, geen natuurlijke persoon); (2) de culturele test eist dat de game **minstens ook in het Nederlands verschijnt**, terwijl besluit #2 zegt "alleen Engels bij launch"; (3) de test en de beoordeling kijken naar het **(Vlaamse) kernteam** en vorig werk, en onze studio bestaat uit één mens plus AI-rollen. |
-| **Aanbeveling fase 2** | **Een VAF-aanvraag voorbereiden, niet indienen zonder CEO-besluit**, en de budgetaanvraag fase 2 rekenen met **€ 0 subsidie**. Eerst drie CEO-vragen beantwoorden (§6), dan een intakegesprek bij het VAF (verplicht vóór indiening). Doel: een prototype- of vertical-slice-aanvraag op een deadline in 2027. |
+| **Aanbeveling fase 2** | **Fase 2 bouwen zonder VAF-geld, en in fase 2 een aanvraag voor productiesteun (fase 3) voorbereiden**; niet indienen zonder CEO-besluit. De budgetaanvraag fase 2 rekent met **€ 0 subsidie**. Zo blijft fase 2 op 6–10 weken (§5). Eerst één bevestiging (vestiging) en drie CEO-vragen (vraag 1, 2 en 3, §6), dan een intakegesprek bij het VAF (verplicht vóór indiening). |
 | **Andere regelingen** | Belgische **tax shelter voor games**: pas relevant in productie (fase 3) en onzeker in tijd (looptijd mogelijk tot eind 2027). **Creative Europe MEDIA**: nu niet ontvankelijk (geen eerder commercieel uitgebrachte game). **Wallimage**, **Nederlandse fondsen**, **kmo-portefeuille**: passen niet of alleen bij een andere vestiging (§4). |
-| **Grootste timingrisico (R6)** | Een fase waarvoor we VAF-steun vragen mag al gestart zijn, maar **mag bij de ondertekening van het contract niet af zijn** (art. 14.9); anders kan het VAF weigeren. Bouwen we de vertical slice in fase 2 helemaal af en vragen we pas daarna aan, dan valt die slice buiten de steun. |
+| **Grootste timingrisico (R6)** | Een fase waarvoor we VAF-steun vragen mag al gestart zijn, maar **mag bij de ondertekening van het contract niet af zijn** (art. 14.9). Een VAF-traject (vennootschap, intake, deadline, hearing, contract) duurt vermoedelijk **3 tot 10 maanden** (raming, §5.1), langer dan fase 2 (6–10 weken). Daarom vragen we steun voor fase 3 (4–8 maanden), niet voor de slice. |
 | **Niet geverifieerd** | De concrete **VAF-deadlines 2027** (de deadlinepagina laadt dynamisch en was niet leesbaar), de einddatum van de tax shelter op een officiële bron, en het standpunt van het VAF over **AI-gemaakte content**. Zie §7. |
 
 Alle bronnen geraadpleegd op **2026-11-08**, tenzij anders vermeld.
@@ -24,8 +24,8 @@ Deze aannames bepalen welke regelingen openstaan. Ze staan **niet vast** in `doc
 
 | # | Aanname | Waarom het ertoe doet | Status |
 |---|---|---|---|
-| A1 | De CEO woont of werkt **in België, vermoedelijk Vlaanderen**. | VAF vraagt een zetel in het Vlaams of Brussels Gewest; de tax shelter een Belgische vennootschap; Nederlandse fondsen een inschrijving bij de KvK. | **Aanname**, niet bevestigd. CEO-vraag 1 (§6). |
-| A2 | Er bestaat **nog geen vennootschap** voor de studio (rechtsvorm onbekend). | VAF-creatiesteun en de tax shelter gaan alleen naar een vennootschap. | **Aanname**, niet bevestigd. CEO-vraag 1. |
+| A1 | De CEO woont of werkt **in België, vermoedelijk Vlaanderen**. | VAF vraagt een zetel in het Vlaams of Brussels Gewest; de tax shelter een Belgische vennootschap; Nederlandse fondsen een inschrijving bij de KvK. | **Aanname**, niet bevestigd. Bevestiging V (§6). |
+| A2 | Er bestaat **nog geen vennootschap** voor de studio (rechtsvorm onbekend). | VAF-creatiesteun en de tax shelter gaan alleen naar een vennootschap. | **Aanname**, niet bevestigd. Bevestiging V en vraag 1 (§6). |
 | A3 | De studio is **één mens (CEO) plus AI-rollen**; er zijn geen loontrekkenden of freelancers. | VAF beoordeelt team, CV's en "vorig werk"; de culturele test vraagt een Vlaams kernteam of een stimulerend effect op de Vlaamse sector. | Volgt uit `studio/WERKWIJZE.md` §1. |
 | A4 | *Wraithstep* is de **eerste game** van de studio, en er is geen eerder commercieel uitgebrachte game. | Eerste game = "moeilijk werk" bij het VAF (hogere steunintensiteit); geen referentiewerk = geen Creative Europe. | Aanname (geen tegenbewijs in de repo). |
 | A5 | Budget fase 1 is **€ 0 extern**. | Een intake of oprichting kost geld of tijd van de CEO. | Werkaanname EP (`fase-1-kader.md` §2). |
@@ -46,15 +46,15 @@ Deze aannames bepalen welke regelingen openstaan. Ze staan **niet vast** in `doc
 
 | Steunvorm | Wat | Max. bedrag | Fase bij ons | Bron |
 |---|---|---|---|---|
-| **Prototype** | Proof of concept, gameplay en USP's testen ("finding the fun") | **€ 25.000** per project, max. 2× per jaar per studio | Begin fase 2 | art. 6, 8 |
-| **Vertical slice** | Speelbaar, afgewerkt level met de core loop; vraagt aantoonbaar potentieel uit prototypes | Binnen het creatieplafond | Fase 2 (onze slice) | art. 6 |
-| **Productie** | Definitieve versie; voor games **met tractie** (wishlists, interesse publishers) | Binnen het creatieplafond | Fase 3 | art. 6; pagina productiesteun |
+| **Prototype** | Proof of concept, gameplay en USP's testen ("finding the fun") | **€ 25.000** per project, max. 2× per jaar per studio | Begin fase 2; **niet gekozen** (§5.1, route a) | art. 6, 8 |
+| **Vertical slice** | Speelbaar, afgewerkt level met de core loop; vraagt aantoonbaar potentieel uit prototypes | Binnen het creatieplafond | Fase 2 (onze slice); **niet gekozen** (§5.1, route b) | art. 6 |
+| **Productie** | Definitieve versie; voor games **met tractie** (wishlists, interesse publishers) | Binnen het creatieplafond | Fase 3; **gekozen route** (§5.1, route c) | art. 6; pagina productiesteun |
 | Creatieplafond | Vertical slice + productie + post-release, inclusief eerdere prototypesteun | **€ 400.000** totaal | | art. 8 |
 | **Promotie** | Marketing, events, community | **€ 75.000**, los van het creatieplafond | Fase 4–5 | art. 8 |
 | Post-release | Porting, lokalisatie, DLC | Binnen het creatieplafond | Na launch | art. 6 |
 | Absoluut maximum | | **€ 475.000** | | art. 8 |
 
-- **Steunintensiteit:** standaard max. **50%** van het creatiebudget; voor een **"moeilijk werk"** max. **80%**. Een eerste of tweede game van een studio telt als moeilijk werk (art. 9, criterium 1). Innovatieve USP's (criterium 4) ook.
+- **Steunintensiteit:** standaard max. **50%** van het creatiebudget. Voor een **"moeilijk werk"** kan het percentage **oplopen tot 80%**; dat is een maximum, geen vast gegeven. Als moeilijk werk telt onder meer "de eerste of tweede game waarvoor een studio steun krijgt" (art. 9, criterium 1), en een game met innovatieve USP's (criterium 4). *Wraithstep* zou de eerste game zijn waarvoor wij steun krijgen (A4), dus **tot 80% is mogelijk**; het VAF bepaalt het percentage per dossier.
 - **Vorm:** een **renteloze voorwaardelijke lening**. Terugbetaling alleen uit netto-ontvangsten, naar verhouding van het VAF-aandeel, en nooit meer dan de steun. Prototype- en slice-steun voor een project dat niet wordt afgemaakt, is in principe niet terugbetaalbaar (art. 18).
 - **Binnen prototype/slice/productie** mag max. € 25.000 cumulatief naar promotie (art. 6.1, versie 2026; in de versie van 2024 was dat € 15.000).
 - **Eigen inbreng** kan ook uit uitgestelde vergoedingen van oprichters ("participaties") bestaan, met een getekende verklaring vóór het contract. Overhead max. 15% forfaitair. Andere overheidssteun (bv. tax shelter, VLAIO) telt mee voor de steunintensiteit; Creative Europe niet (financiële gids).
@@ -64,16 +64,16 @@ Deze aannames bepalen welke regelingen openstaan. Ze staan **niet vast** in `doc
 
 | Voorwaarde | Bron | Wraithstep nu | Wat nodig is |
 |---|---|---|---|
-| **Aanvrager is een rechtspersoon** met maatschappelijke zetel of permanent agentschap in het **Vlaams of Brussels Gewest** (bij uitbetaling) | art. 2, 16.1; pagina productiesteun: "een eenmanszaak volstaat niet" | **Niet voldaan** (A2) | Vennootschap oprichten, of een bestaande gebruiken. CEO-vraag 1. Laat kosten en vorm ramen door een boekhouder. |
+| **Aanvrager is een rechtspersoon** met maatschappelijke zetel of permanent agentschap in het **Vlaams of Brussels Gewest** (bij uitbetaling) | art. 2, 16.1; pagina productiesteun: "een eenmanszaak volstaat niet" | **Niet voldaan** (A2) | Vennootschap oprichten, of een bestaande gebruiken: bevestiging V en vraag 1 (§6). Richtprijs oprichting en kosten: zie vraag 1. |
 | Gamestudio (bedrijf dat games ontwikkelt en produceert), met aantoonbare technische en financiële competentie; geen onderneming in moeilijkheden | art. 2, 14 | Deels: de repo toont technisch werk (spike), maar geen financieel trackrecord | Business- en financieringsplan (budget, fasering). |
 | Type game: **entertainmentgame** op een commercieel platform | art. 3 | **Voldaan** (pc/Steam) | — |
-| **Culturele test, categorie I** (min. 2 criteria, **verplicht criterium 1: "De game verschijnt minstens ook in het Nederlands."**) | art. 4 | **Niet voldaan**: besluit #2 zegt "alleen Engels bij launch" | Nederlandse versie toezeggen (= wijziging van besluit #2, CEO-vraag 2), plus nog één criterium uit categorie I (bv. setting, worldbuilding of vormgeving met regionale of Europese verwijzingen). De Creative Director moet zeggen of dat bij de wereld past. |
+| **Culturele test, categorie I** (min. 2 criteria, **verplicht criterium 1: "De game verschijnt minstens ook in het Nederlands."**) | art. 4 | **Niet voldaan**: besluit #2 zegt "alleen Engels bij launch" | Nederlandse versie toezeggen (= wijziging van besluit #2, vraag 2 in §6), plus nog één criterium uit categorie I (bv. setting, worldbuilding of vormgeving met regionale of Europese verwijzingen). De Creative Director moet zeggen of dat bij de wereld past. |
 | **Culturele test, categorie II** (min. 2 criteria, verplicht 1 of 2: ≥ 50% van het kernteam uit het Vlaamse gamelandschap, of een sterk stimulerend effect op de Vlaamse creatieve economie) | art. 4 | **Onzeker**: het kernteam is één mens + AI-rollen | Vragen in het intakegesprek hoe het VAF een team met AI-rollen ziet; eventueel Vlaamse freelancers (bv. muziek, art-review, QA) in het kernteam opnemen. Budgetimpact. |
 | **Culturele test, categorie III** (min. 1: innovatie in gameplay, art, verhaal, technologie of muziek) | art. 4 | **Waarschijnlijk voldaan**: de echo-mechaniek is de USP (`docs/business/naamcheck.md` §1: USP 1 blijft overeind) | Onderbouwen met de pitch en de spike. |
 | **Majoritair Vlaams** (vereist voor prototype en vertical slice): IP in Vlaamse handen + 2 van 3 (Vlaams bedacht/grootste financier; ≥ 50% Vlaams kernteam; stimulerend effect) | art. 5 | Waarschijnlijk, als A1 klopt (CEO bedenkt en financiert) | Hangt af van A1. |
-| Een fase mag gestart zijn vóór het contract, maar **niet afgerond bij ondertekening**; afgewerkte games krijgen geen prototype-, slice- of productiesteun meer. Eerder gedaan werk telt alleen als erkende "pre-investering" met waardering, en **niet bij prototypesteun** (financiële gids). De versie 2024 (art. 6.1) zei nog dat kosten pas subsidiabel zijn vanaf de ontvangst van de aanvraag; die zin vond ik niet terug in de versie 2026. | art. 6, 14.9; financiële gids | **Timingrisico** voor fase 2 | Zie §5. Bij het intakegesprek navragen welke regel geldt. |
+| Een fase mag gestart zijn vóór het contract, maar **niet afgerond bij ondertekening**; afgewerkte games krijgen geen prototype-, slice- of productiesteun meer. Eerder gedaan werk telt alleen als erkende "pre-investering" met waardering, en **niet bij prototypesteun** (financiële gids). De versie 2024 (art. 6.1) zei nog dat kosten pas subsidiabel zijn vanaf de ontvangst van de aanvraag; die zin vond ik niet terug in de versie 2026. | art. 6, 14.9; financiële gids | **Timingrisico** voor fase 2 | Zie §5 (gekozen route: productiesteun voor fase 3). Bij het intakegesprek navragen welke regel geldt, en of de slice als pre-investering telt. |
 | Dossier in principe in het **Nederlands** (Engels mag voor elementen die al Engels zijn); statuten in het Nederlands; budget in euro | art. 12 | Onze docs zijn Nederlands; de game is Engels | Haalbaar. |
-| **Intakegesprek** online vóór indiening (boeken via MyVAF), **pitchvideo** van max. 2 minuten, **hearing** bij de commissie | pagina productiesteun; art. 13.8 | Niet gedaan | MyVAF-account nodig = actie buiten de repo, dus CEO-besluit (CEO-vraag 3). |
+| **Intakegesprek** online vóór indiening (boeken via MyVAF), **pitchvideo** van max. 2 minuten, **hearing** bij de commissie | pagina productiesteun; art. 13.8 | Niet gedaan | MyVAF-account nodig = actie buiten de repo, dus CEO-besluit (vraag 3 in §6). |
 | Voor prototype: **marktonderzoek**; voor vertical slice: nauw omschreven doelgroep en hoe die te bereiken; voor productie: tractie en "performing targets" | prioriteitennota | Nog niet | Marketing & Community Manager (doelgroep, vergelijkbare titels) en EP (raming). |
 | Commissie kijkt naar **team, CV's en vorig werk**; bij een eerste game kan het VAF **coaching** aanbieden | prioriteitennota | Zwak punt (A3, A4) | Eerlijk benoemen in het dossier; coaching aanvaarden. |
 | Vermelding van VAF-steun op de game en het promotiemateriaal | art. 20; pagina productiesteun | — | Pas bij toekenning. |
@@ -109,38 +109,94 @@ Deze aannames bepalen welke regelingen openstaan. Ze staan **niet vast** in `doc
 
 ## 5. Aanbeveling voor fase 2
 
-1. **Reken de budgetaanvraag fase 2 met € 0 subsidie.** Geen enkele regeling kan vóór het einde van fase 2 geld opleveren: we halen de VAF-voorwaarden nog niet, er is een verplicht intakegesprek, en na een deadline duurt de procedure maanden. Subsidie is een mogelijke meevaller voor fase 2 of 3, geen dekking.
-2. **Kies het VAF Gamefonds als enige regeling om voor te bereiden**, met **prototypesteun** als eerste stap (max. € 25.000, tot 80% omdat het onze eerste game is). Vertical-slice-steun vraagt een speelbaar prototype en is de logische tweede stap.
-3. **Los de timing op vóór fase 2 start** (R6). Een fase mag bij het VAF-contract niet al af zijn, en eerder werk telt hooguit beperkt (§3.2). Twee opties voor de EP en de CEO:
-   - **(a)** fase 2 opsplitsen: eerst een klein prototype bouwen, dan bij de eerstvolgende VAF-deadline vertical-slice-steun aanvragen en de slice pas daarna afbouwen; of
-   - **(b)** fase 2 zonder VAF doen en pas bij productie (fase 3) aanvragen, met de slice en wishlists als tractie. Eenvoudiger, maar dan valt de slice buiten de steun.
-   Mijn voorkeur: **(a)**, als de CEO vraag 1 en 2 hieronder met A beantwoordt; anders **(b)**.
-4. **Voorbereiden in fase 2 (zonder indienen):** de BLA maakt een conceptdossier en een check op de culturele test; de Creative Director zegt welk tweede criterium uit categorie I bij de wereld past; de EP maakt een VAF-conform budget (eigen inbreng, participaties, overhead ≤ 15%); de Marketing & Community Manager levert het marktonderzoek. Indienen blijft een CEO-besluit.
-5. **Tax shelter:** de boekhouder laat in fase 2 nagaan of de regeling na 2027 doorloopt. Pas daarna plannen.
+**Kort:** fase 2 bouwen we zonder VAF-geld en op het geplande tempo (6–10 weken). In fase 2 bereiden we een aanvraag voor **productiesteun voor fase 3** voor. De budgetaanvraag fase 2 rekent met **€ 0 subsidie**.
+
+### 5.1 Drie routes en wat ze kosten in tijd
+
+Fase 2 is geraamd op **6–10 weken** (roadmap). Elk VAF-traject loopt langs dezelfde stappen: vennootschap, intake, wachten op een deadline, procedure, contract. Een fase mag bij de ondertekening van het contract **niet af** zijn (art. 14.9), en bij prototypesteun telt eerder werk niet mee (§3.2).
+
+**Doorlooptijd van een VAF-traject (raming BLA):**
+
+| Stap | Duur | Bron of status |
+|---|---|---|
+| Vennootschap oprichten | enkele weken, parallel mogelijk | Raming; de boekhouder bevestigt |
+| Intakegesprek (MyVAF) | een paar weken, parallel mogelijk | Raming; verplicht vóór indiening (pagina productiesteun) |
+| Wachten op de eerstvolgende deadline | **0 tot ± 6 maanden** | 2 tot 3 deadlines per jaar (pagina productiesteun); de datums 2027 zijn nog niet gelezen |
+| Formele controle, hearing, commissie, Raad van Bestuur, contract | **vermoedelijk 2 tot 4 maanden** | Raming; de stappen staan in art. 12–13, de totale duur niet. Navragen bij de intake |
+| **Totaal tot het contract** | **± 3 tot 10 maanden** | Raming |
+
+| Route | Wat | Tijdskost voor fase 2 | Wat het oplevert | Oordeel |
+|---|---|---|---|---|
+| **(a) Prototypesteun eerst** | Eerst steun aanvragen, dan het prototype bouwen, daarna de slice | Het prototype mag niet af zijn bij het contract, en eerder werk telt niet mee. Fase 2 wacht dus **± 3 tot 10 maanden** vóór prototype en slice af kunnen. Fase 2 duurt dan ± 4 tot 12 maanden in plaats van 6–10 weken. | Max. € 25.000; tot 80% mogelijk van een klein prototypebudget | Niet aanbevolen: veel wachttijd voor weinig geld, en de slice (de toets van R3) schuift maanden op |
+| **(b) Zelf prototype, dan slice-steun** | Het prototype zelf bouwen in fase 2, slice-steun aanvragen, de slice afbouwen na het contract | Het prototype past in fase 2. De **slice wacht ± 3 tot 10 maanden** op het contract; fase 2 duurt dan ± 4 tot 11 maanden | Deel van het creatieplafond (€ 400.000) voor het slicebudget; tot 80% mogelijk | Niet aanbevolen: dezelfde vertraging van de slice |
+| **(c) Fase 2 zelf, productiesteun voor fase 3** ⭐ | Fase 2 zonder VAF; tijdens fase 2 het dossier voorbereiden; aanvragen voor de productie | **0 weken.** Fase 2 blijft 6–10 weken. Het traject loopt parallel. Fase 3 (4–8 maanden) mag al gestart zijn bij het contract | Grootste bedrag (creatieplafond € 400.000, tot 80% mogelijk) voor de duurste fase. De slice is dan ons beste bewijs voor de commissie (team, vorig werk, A3/A4) | **Aanbevolen** |
+
+**Kanttekeningen bij route (c):**
+- De slice zelf valt buiten de steun. Of slicewerk als erkende pre-investering mag meetellen, vragen we bij de intake (§3.2).
+- Productiesteun vraagt **tractie**: wishlists en interesse van publishers (pagina productiesteun). Wishlists vragen een openbare Steam-pagina, en die publiceren is een **apart CEO-besluit** (roadmap, fase 2–3). Zonder tractie is de kans kleiner. Dat besluit komt na de slice; nu hoeft het nog niet.
+- Duurt het traject langer dan fase 3, dan is fase 3 af bij het contract en vervalt de steun. Daarom: de eerste deadline plannen die vóór de verwachte helft van fase 3 een beslissing geeft. De Producer plant dat zodra de deadlines 2027 bekend zijn (R6).
+- Hoeveel de steun echt oplevert, hangt af van het creatiebudget van fase 3. Met € 0 externe kosten is ook de steun klein. Uitgestelde vergoedingen van de oprichter ("participaties") tellen wel als eigen inbreng (financiële gids). De EP raamt het budget.
+
+### 5.2 Stappenplan route (c)
+
+| # | Stap | Wie | Wanneer | Buiten de repo? |
+|---|---|---|---|---|
+| 1 | Bevestiging V en vragen 1–3 beantwoorden (§6) | CEO | Bij de gate (#10) | Nee |
+| 2 | VAF-deadlines 2027 lezen op https://www.vaf.be/deadlines en in #19 zetten; de Producer plant de deadline in | CEO, Producer | Begin fase 2 | Nee (alleen lezen) |
+| 3 | Kosten van de vennootschap laten ramen (oprichting, jaarlijkse boekhouding, rechtsvorm) | CEO met eigen boekhouder | Fase 2, vóór de intake | Ja: gesprek met een professional (CEO) |
+| 4 | 2-pager en conceptdossier, check op de culturele test | BLA, met CD (criterium categorie I), EP (budget), Marketing (markt) | Fase 2 | Nee |
+| 5 | Intakegesprek; vragen: AI-rollen en kernteam, timing van de Nederlandse versie, pre-investering slice, deadlines | CEO (BLA bereidt voor) | Fase 2, na vraag 3A | Ja (MyVAF-account) |
+| 6 | Vennootschap oprichten | CEO, notaris, boekhouder | Na de intake, vóór het indienen, alleen bij vraag 1A | Ja |
+| 7 | Indienen productiesteun, met slice en tractie | CEO | Eerste geschikte deadline na de slice | Ja: **apart CEO-besluit** |
+| 8 | Formele controle, hearing, advies, beslissing, contract | VAF, CEO | ± 2 tot 4 maanden na de deadline (raming) | Ja |
+| 9 | Productie afbouwen; technisch dossier binnen 12 maanden, oplevering binnen 18 maanden na ondertekening (art. 13.12, 19) | Team | Fase 3 | Nee |
+
+### 5.3 Overige aanbevelingen
+
+1. **Reken de budgetaanvraag fase 2 met € 0 subsidie.** Geen regeling levert geld op vóór het einde van fase 2. Subsidie is een mogelijke meevaller voor fase 3, geen dekking.
+2. **Voorbereiden in fase 2 (zonder indienen):** de BLA maakt het conceptdossier en de check op de culturele test. De Creative Director zegt welk tweede criterium uit categorie I bij de wereld past. De EP maakt een VAF-conform budget (eigen inbreng, participaties, overhead ≤ 15%). De Marketing & Community Manager levert het marktonderzoek.
+3. **Tax shelter:** de boekhouder laat in fase 2 nagaan of de regeling na 2027 doorloopt. Pas daarna plannen.
 
 ## 6. Input voor gate-vraag 3 (#10)
 
-Voorstel aan de EP: neem gate-vraag 3 op zoals hieronder, of laat de vragen 1–3 als aparte vragen in het gate-issue staan (format `.github/ISSUE_TEMPLATE/ceo-beslissing.md`).
+Voorstel aan de EP: neem dit over in het gate-issue (format `.github/ISSUE_TEMPLATE/ceo-beslissing.md`). De vragen zijn genummerd 1–3; de EP mag ze in #10 hernummeren. Vóór de vragen staat één **bevestiging**: dat is een feit, geen keuze.
 
 ```markdown
-**3. Budget fase 2, met wat het subsidieonderzoek opleverde** (`docs/business/subsidies.md`)
-Kort: alleen het VAF Gamefonds past (prototype tot € 25.000, eerste game tot 80%), maar we halen de toegangsvoorwaarden nog niet. Rekenen met € 0 subsidie in fase 2.
+**Budget fase 2, met wat het subsidieonderzoek opleverde** (`docs/business/subsidies.md`)
+Kort: alleen het VAF Gamefonds past. We halen de toegangsvoorwaarden nog niet. Fase 2 rekent met € 0 subsidie; in fase 2 bereiden we productiesteun voor fase 3 voor (§5).
 
-**3a. Waar is de studio gevestigd, en richten we een vennootschap op als we bij het VAF willen aanvragen?**
-- **A. België (Vlaanderen of Brussel); vennootschap pas oprichten als we werkelijk gaan indienen, na advies van een boekhouder** ⭐ Aanbevolen: houdt de VAF-route open; kosten nu € 0, later oprichtingskosten (laten ramen).
-- **B. Ergens anders (bv. Nederland)**: het VAF valt af; de BLA onderzoekt de regelingen van dat land.
-- **C. Geen subsidie aanvragen**: volledig zelf financieren; geen oprichting nodig voor subsidie.
+**Bevestiging V (geen keuze). Is de studio gevestigd in Vlaanderen of Brussel?** Antwoord: ja of nee (zo nee: waar).
+Bij "nee" valt het VAF af en vervallen vraag 1–3; de BLA onderzoekt dan de regelingen van die plek.
 
-**3b. Mag de game minstens ook in het Nederlands verschijnen (verplicht voor het VAF)?**
-- **A. Ja, Nederlands naast Engels bij launch** ⭐ Aanbevolen (alleen als 3a = A): wijzigt besluit #2 "alleen Engels"; extra kosten voor vertaling en QA van alle teksten (te ramen door de EP).
-- **B. Nee, alleen Engels**: het VAF valt af (culturele test, art. 4, categorie I criterium 1).
+**1. Richten we een vennootschap op als we bij het VAF gaan indienen?**
+- **A. Ja, pas na de intake en vlak vóór het indienen, na advies van een boekhouder** ⭐ Aanbevolen: houdt de VAF-route open; nu € 0. Later een oprichting van ± € 1.200–2.000 (richtprijs 2026) plus jaarlijkse boekhoudkosten; de CEO laat dat in fase 2 ramen door een boekhouder, vóór de intake.
+- **B. Ja, nu al (begin fase 2)**: dezelfde kost, maar meteen, nog zonder signaal van het VAF.
+- **C. Nee**: geen VAF en geen tax shelter; volledig zelf financieren. Nu en later € 0, maar ook geen steun.
 
-**3c. Mag de studio een intakegesprek bij het VAF aanvragen (MyVAF-account, buiten de repo)?**
-- **A. Ja, in fase 2, alleen als 3a en 3b = A; de CEO voert het gesprek, de BLA bereidt de 2-pager voor** ⭐ Aanbevolen: daar vragen we hoe het VAF een studio met AI-rollen beoordeelt (kernteam, categorie II) en wat de deadlines 2027 zijn.
+**2. Mag de game bij release minstens ook in het Nederlands verschijnen (verplicht voor het VAF)?**
+- **A. Ja, in principe; de EP raamt de kost vóór het definitieve besluit, ten laatste vóór het indienen** ⭐ Aanbevolen: wijzigt besluit #2 "alleen Engels", de buiten-scope-lijst (`fase-1-kader.md` §2) en de roadmap ("geen vertaling"). Nodig bij release, niet in fase 2. Grove raming: ± 1 run (lokalisatie inbouwen, fase 2–3), 2–4 runs vertaling, 1–2 runs QA; mogelijk een externe NL-reviewer (geld, offerte via de EP).
+- **B. Nee, alleen Engels**: het VAF valt af (culturele test, art. 4, categorie I criterium 1). Geen extra kost.
+
+**3. Mag de studio in fase 2 een intakegesprek bij het VAF aanvragen (MyVAF-account, buiten de repo)?**
+- **A. Ja, alleen als V = ja en 1 en 2 = A; de CEO voert het gesprek, de BLA bereidt de 2-pager voor** ⭐ Aanbevolen: daar horen we hoe het VAF een studio met AI-rollen beoordeelt, of de slice als pre-investering telt, en wat de deadlines 2027 zijn. Kost: CEO-tijd, € 0.
 - **B. Nog niet**: we bereiden alleen voor; het eerste mogelijke VAF-geld schuift op.
+
+*Antwoord bijvoorbeeld: `Besluit: V = ja, 1A, 2A, 3A`.*
 ```
 
-**Waarom deze aanbeveling:** het VAF is de enige regeling die bij onze fase en vestiging (aanname) past, en de eerste-game-regel maakt het relatief gunstig. Maar de drie drempels (vennootschap, Nederlands, kernteam) zijn CEO-afwegingen, en de kans op toekenning is onzeker, dus het fase-2-budget mag er niet van afhangen.
+**Grove raming Nederlandse versie (vraag 2)**, van de BLA, ter controle door de EP. Het woordaantal van de game is nog onbekend, dus dit is een orde van grootte:
+
+| Wat | Rol | Wanneer | Raming |
+|---|---|---|---|
+| Lokalisatie inbouwen (vertaalbestanden, geen tekst in code) | Engine & Platform Programmer | Fase 2–3; goedkoop als het vanaf het begin gebeurt | ± 1 run |
+| UI die langere Nederlandse tekst aankan; font met de nodige tekens (licentie in `docs/licenties.md`) | UX Designer, UI Artist, BLA | Fase 3 | binnen bestaande runs |
+| Vertaling van alle teksten (dialoog, UI, Steam-pagina) | Narrative Designer, Marketing & Community Manager | Fase 4 | ± 2–4 runs |
+| Lokalisatietest | QA Lead | Fase 4 | ± 1–2 runs |
+| Controle door een moedertaalspreker | CEO (€ 0, als de CEO Nederlandstalig is) of een externe reviewer | Fase 4 | Extern = geld; bedrag via offerte (EP) |
+
+Of een Nederlandse versie kort ná de launch ook volstaat, staat niet in art. 4. Dat vragen we bij de intake.
+
+**Waarom deze aanbeveling:** het VAF is de enige regeling die bij onze fase en vestiging (aanname) past, en de regel voor een eerste game maakt tot 80% steun mogelijk. Route (c) houdt fase 2 op tempo en richt de steun op de duurste fase. De drempels (vennootschap, Nederlands, kernteam) blijven CEO-afwegingen, en de kans op toekenning is onzeker. Het fase-2-budget mag er dus niet van afhangen.
 
 ## 7. Wat dit document niet doet en wat openstaat
 
@@ -150,7 +206,8 @@ Kort: alleen het VAF Gamefonds past (prototype tot € 25.000, eerste game tot 8
   - De **Creative Europe-call 2027**: alleen via een aggregator gezien, niet op het officiële portaal (voor ons nu toch niet ontvankelijk).
   - De **precieze bijlagenlijst** van een VAF-dossier (staat alleen in MyVAF).
   - Het standpunt van het VAF over **door AI gemaakte content en een team met AI-rollen**: het reglement, de prioriteitennota en de financiële gids zeggen er niets over. Dat is een vraag voor het intakegesprek.
-  - De kosten en de vorm van een **vennootschap** (bv. BV): niet onderzocht, voor de boekhouder.
+  - De kosten en de vorm van een **vennootschap** (bv. BV). Enige gevonden richtprijs: "ongeveer 1.200 tot 2.000 euro" oprichtingskosten, "richtprijs voor 2026", alle rechtsvormen samen (https://www.bobex.be/nl-be/sociaal-secretariaat/vennootschap-oprichten/, offerteplatform, geen officiële bron, geraadpleegd 2026-11-08). Jaarlijkse kosten (boekhouding, jaarrekening) niet onderzocht. De boekhouder van de CEO raamt dit in fase 2 (vraag 1).
+  - De **doorlooptijd** van een VAF-traject (§5.1): de stappen staan in het reglement, de totale duur niet. De 3 tot 10 maanden is een raming van de BLA.
 - **Niets aangevraagd, ingediend of geregistreerd**; geen account gemaakt; geen contact met het VAF of andere fondsen.
 - **Bestandsnaam:** het issue noemde `docs/zakelijk/subsidies.md`; dit document staat in `docs/business/` voor consistentie met de andere business-docs. Mijn rolbestand noemt ook `docs/business/financiering.md`; dit document kan later in dat financieringsoverzicht opgaan.
 - Bedragen en voorwaarden kunnen wijzigen (het VAF-reglement wijzigde in 2024 en 2026). **Herhaal de check vóór elke aanvraag.**
@@ -158,6 +215,13 @@ Kort: alleen het VAF Gamefonds past (prototype tot € 25.000, eerste game tot 8
 ## 8. Definition of Done (#19)
 
 - [x] Overzicht per regeling met voorwaarden, bedragen, deadlines, aanlevering en fase, met bron en datum (§3, §4)
-- [x] Aanbeveling welke regeling we in fase 2 voorbereiden (§5: VAF Gamefonds, prototype; niet indienen zonder CEO-besluit)
+- [x] Aanbeveling welke regeling we in fase 2 voorbereiden (§5: VAF Gamefonds, productiesteun voor fase 3, voorbereiden in fase 2; niet indienen zonder CEO-besluit)
 - [x] Input voor gate-vraag 3 in #10 (§6)
 - [x] Niets aangevraagd of ingediend (§7)
+
+## 9. Logboek wijzigingen
+
+| Versie | Datum | Wijziging |
+|---|---|---|
+| 1.0 | 2026-11-08 | Eerste versie (PR #28) |
+| 1.1 | 2026-11-08 | Lead-review EP (PR #28): één nummering voor de CEO-vragen (bevestiging V + vragen 1–3) in §1, §2, §3.2, §5 en §6; vestiging is een bevestiging, vraag 1 gaat alleen over de vennootschap, met kost per optie; vraag 2 (Nederlands) voorwaardelijk, met grove raming en "pas bij release nodig"; §5 kiest één route (productiesteun voor fase 3) met een stappenplan en de tijdskost van alle routes tegenover fase 2; art. 9 preciezer ("tot 80% mogelijk", "eerste of tweede game waarvoor een studio steun krijgt"). Geen nieuw onderzoek, behalve een richtprijs voor de oprichting van een vennootschap. |
