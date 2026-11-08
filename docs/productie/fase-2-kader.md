@@ -2,7 +2,7 @@
 
 Versie 0.1 (concept) · 2026-11-08 · Eigenaar: Executive Producer · Issue: #10 · Lead-review: Creative Director
 
-**Status: concept.** Dit kader is de bijlage bij het gate-voorstel van fase 1 (#10, gate-vraag 2). Het geldt pas na een `Besluit:` van de CEO; bij een andere keuze in het gate-issue past de EP het aan (nieuwe versie, logboek §9). Werktitel *Wraithstep* (besluit #24); niet publiek vóór de formele merkcheck (besluit #24, 3A).
+**Status: concept.** Dit kader is de bijlage bij het gate-voorstel van fase 1 (#10, gate-issue #51, vraag 2). Het geldt pas na een `Besluit:` van de CEO; bij een andere keuze in het gate-issue past de EP het aan (nieuwe versie, logboek §9). Werktitel *Wraithstep* (besluit #24); niet publiek vóór de formele merkcheck (besluit #24, 3A).
 
 ## 1. Doel
 
@@ -32,8 +32,8 @@ Taken met een **T-nummer** zijn nieuw of expliciet gemaakt in dit kader; de Prod
 | T10 | UX: HUD, menu's, drop-in/drop-out | ux-designer, ui-artist | F3 |
 | T11 | QA-testplan; elke slice-puzzel in solo én co-op getest (R10, R16) | qa-lead | F4 |
 | T12 | Vindbaarheidstoets *Wraithstep* (#44), vóór de betaalde merkcheck (volgorde §7) | marketing-community-manager (met creative-director) | R24, R15 |
-| T13 | VAF-dossier voor **productiesteun fase 3** voorbereiden (route c, `subsidies.md` §5), **zonder indienen**; met het **tweede criterium uit categorie I** van de culturele test (voorstel CD) en de VAF-deadlines 2027 ingepland (A16). Alleen als de CEO de VAF-route openhoudt (gate-issue) | business-legal-advisor (met creative-director, executive-producer, marketing-community-manager); planning: producer | R6, R23 |
-| T14 | **Lokalisatie inbouwen** (vertaalbestanden, geen tekst in code), ≈ 1 run. Alleen als de CEO de Nederlandse versie in principe toestaat (gate-issue) | engine-platform-programmer | fasekader fase 1 §6.2 |
+| T13 | VAF-dossier voor **productiesteun fase 3** voorbereiden (route c, `subsidies.md` §5), **zonder indienen**; met het **tweede criterium uit categorie I** van de culturele test (voorstel CD) en de VAF-deadlines 2027 ingepland (A16). Alleen als de CEO de VAF-route openhoudt (#51, vraag 4–6) | business-legal-advisor (met creative-director, executive-producer, marketing-community-manager); planning: producer | R6, R23 |
+| T14 | **Lokalisatie inbouwen** (vertaalbestanden, geen tekst in code), ≈ 1 run. Alleen als de CEO de Nederlandse versie in principe toestaat (#51, vraag 5) | engine-platform-programmer | fasekader fase 1 §6.2 |
 | T15 | Productieraming per gebied, voorstel releasevenster, statusrapport en gate-voorstel fase 2 | executive-producer | F6, F8, R20 |
 
 Lopende fase-1-issues die meegaan (geen voorwaarde voor de gate van fase 1): #21 (lichtmeting; mag lopen terwijl de CEO beslist), #43 (pitch v0.4), #37–#40 (werktitel bij de volgende wijziging).
@@ -92,7 +92,7 @@ Bron: `docs/productie/risico.md` (Producer). De risico's met impact H en wat fas
 
 ## 7. Budget en merkcheck
 
-- **Extern budget fase 2**: € 0 voor tools en assets (gratis tools en eigen werk), **plus een reservering voor de formele merkcheck** (A8): rekenadvies **€ 3.750 excl. btw**, de herberekende bovenkant uit de reviews op PR #33 (`naamcheck-wraithstep.md` §4.2); **worstcase ≈ € 4.800 excl. btw** als een kantoor per klasse rekent (§4). Het bedrag dat geldt, besluit de CEO in het gate-issue.
+- **Extern budget fase 2**: € 0 voor tools en assets (gratis tools en eigen werk), **plus een reservering voor de formele merkcheck** (A8): rekenadvies **€ 3.750 excl. btw**, de herberekende bovenkant uit de reviews op PR #33 (`naamcheck-wraithstep.md` §4.2); **worstcase ≈ € 4.800 excl. btw** als een kantoor per klasse rekent (§4). Het bedrag dat geldt, besluit de CEO in #51 (vraag 3).
 - **Subsidie**: fase 2 rekent met **€ 0** (`subsidies.md` §5). VAF-geld is hooguit een meevaller voor fase 3.
 - **Volgorde merkcheck** (geld pas uitgeven als de naam blijft): (1) vindbaarheidstoets #44 (Marketing, € 0) → (2) zoekactie TMview/WIPO door de CEO in een gewone browser (€ 0, ± 15 min; vervalt als #44 een nieuwe naam adviseert) → (3) 2–3 offertes voor alle vier klassen samen → (4) betaalde merkcheck, pas vlak vóór een CEO-besluit over de eerste publieke uiting.
 - Andere externe kosten (bv. audiotools, een boekhouder voor de vennootschap) vragen een apart besluit; de EP meldt ze met hun kost.
