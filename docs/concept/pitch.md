@@ -65,7 +65,7 @@ De wereld heeft nog steeds twee lagen: jij leeft in het licht, de echo in de sch
 
 **Toetsvraag:** *Gaat deze weg open door licht dat de speler terugwon of door een vaardigheid die hij heeft, en niet door een raadsel?*
 
-**Leesbaarheidseis (voor Art, geen tweede toetsvraag):** alles wat via pillar 2 werkt, laat in het beeld zelf zien in welke laag het hoort, zonder icoon of uitleg. Dat geldt ook voor de **waterstand**: je ziet hoe hoog het water staat en wat er zou opengaan als het zakt. De basis staat in de stijltests (`docs/art/stijltests.md`): een harde rand tussen licht en schaduw, en *vol = levend, hol = echo*. Water is een **beeldlaag en een wereldstaat** (hoogte per wijk), geen derde speellaag voor de echo. Dat houdt de regels en de scope klein.
+**Leesbaarheidseis (voor Art, geen tweede toetsvraag):** alles wat via pillar 2 werkt, laat in het beeld zelf zien in welke laag het hoort, zonder icoon of uitleg. Dat geldt ook voor de **waterstand**: je ziet hoe hoog het water staat en wat er zou opengaan als het zakt. De basis staat in de stijltests (`docs/art/stijltests.md`): een harde rand tussen licht en schaduw, en *vol = levend, hol = echo*. Water is een **beeldlaag en een wereldstaat** (hoogte per wijk), geen derde speellaag voor de echo. Dat houdt de regels en de scope klein. **Dit wijkt bewust af van #54** ("water als derde laag"); het is een scopekeuze die meegaat in #51 vraag 1.
 
 | Past | Past niet |
 |---|---|
@@ -192,12 +192,12 @@ Nummering: R-V = visierisico in dit document; de R-nummers uit `docs/productie/r
 | R-V1 (R9) | **10 s is lang voor combat.** Een merk dat pas 10 s later ontploft, kan los voelen van je slag. | De draai hangt aan die ene waarde, en de flow nu ook | LGD, Combat Designer | Prototypen met 6, 10 en 14 s (blijft). Het merk toont zijn aftelling in beeld en geluid (het carillon). Afwijken van 10 s is een CEO-besluit. |
 | R-V2 | **Zonder puzzels wordt de echo passief**, een automatische buff waar je niet over nadenkt | Pillar 1: dan is het geen tweede lichaam meer | LGD, World & Level Designer | De springplank vraagt vooruitdenken in beweging (route nu kiezen voor straks). Meten met norm (2) van pillar 1. Bosses en routes die die keuze afdwingen. |
 | R-V3 (R12) | **De echo is te vaak "leeg"** | Elke lege seconde is een gebroken ketting | LGD, TD | De echo volgt je door deuren (O-5 wordt de regel, §12). Op je echo staan breekt hem niet meer. |
-| R-V4 (R20) | **Combat-zwaar is duurder dan puzzels.** Meer vijandtypes, animatie, hitfeedback en bosses om *Hollow Knight*-gevoel te halen | Scope binnen 5–7 uur en het budget per fase | EP, Combat Designer, Art Director | Weinig vijandtypes die veel kunnen (merk, parade); de slice meet de kost per vijand en per boss (fase 2, F6). |
+| R-V4 (R20) | **Combat-zwaar is duurder dan puzzels.** Meer vijandtypes, animatie, hitfeedback en bosses om *Hollow Knight*-gevoel te halen | Scope binnen 5–7 uur en het budget per fase | EP, Combat Designer, Art Director | Weinig vijandtypes die veel kunnen (merk, parade); de slice meet de kost per vijand en per boss (fase 2, F6). Reken erop dat fase 3–4 duurder worden dan bij een puzzelgame; dat komt in de raming van F6. |
 | R-V5 (R10, herzien) | **Co-op wordt chaos of te makkelijk.** Twee live spelers plus een finisher kunnen elk gevecht platslaan | Pillar 3 | LGD, Combat Designer | Co-op ≤ 2× zo snel als solo blijft de grens. Finisher alleen bij een volle gedeelde meter. Testen in beide modi vanaf het eerste prototype. |
 | R-V6 (R2) | **Drie figuren plus water, merken en ontploffingen zijn niet leesbaar** | Pillar 2 valt dan om | Art Director | Art bible met de finisher-echo en het merk als eis. Prestaties op de Steam Deck (Technical Artist, Engine & Platform Programmer). |
 | R-V7 | **Verdrinken raakt PEGI 12 of het publiek** | Een verzonken stad kan als ramp of dood lezen | Narrative Designer, Art Director, CD | Toonregels in §6 (droom, geen lichamen, geen echte watersnood). Elke scène met water langs de toets "duister maar niet gruwelijk". |
 | R-V8 | **5–7 uur is kort voor een metroidvania** | De echo moet binnen minuten dragen | LGD, World & Level Designer | Springplank en merk zitten vanaf de proloog in de kern; elk gemaal verandert de stad zichtbaar. |
-| R-V9 | **Het idee lijkt sterk op een bestaande game.** Het schaduwmerk ligt dicht bij de lading-en-ontploffing in *Nine Sols* | USP 1 | Business/Legal (#8) | Ideecheck herhalen voor de nieuwe vorm (springplank, merk, oppompen) vóór de gate van fase 2. Ons verschil: de echo zelf brengt het merk tot ontploffing, 10 s later, op jouw oude route. |
+| R-V9 | **Het idee lijkt sterk op een bestaande game.** Het schaduwmerk ligt dicht bij de lading-en-ontploffing in *Nine Sols* | USP 1 | Business/Legal (#8) | Ideecheck herhalen voor de nieuwe vorm (springplank, merk, oppompen) **vóór T3 het schaduwmerk (E-14) en de merksprong vastlegt, en vóór de flow-kamer**: dan is bijsturen nog goedkoop. Ons verschil: de echo zelf brengt het merk tot ontploffing, 10 s later, op jouw oude route. |
 | R-V10 (R15) | **De naam leest duisterder dan de game** | Een titel met *wraith* en een verzonken stad kan horror beloven | CD, Marketing | Regels en toets in §6 "Naam en toon". Bij een **concept voor een publieke uiting** dat de toon toch raakt: nieuwe naamvraag aan de CEO vóór de betaalde merkcheck. |
 | R-V11 (R24) | **De naam is slecht vindbaar.** "Wraithstep" is al een uniek item in *Diablo II: Resurrected* | Vindbaarheid | Marketing, CD | Zie §11 vraag 4. |
 
@@ -250,13 +250,25 @@ Kost in **runs** (één maak-taak van een rol). "In T3" betekent: past in GDD v1
 | Document | Wat | Eigenaar | Kost |
 |---|---|---|---|
 | `docs/design/kernloop.md` | Loop in één zin, max. 0 puzzelkamers op de kritieke route, K-04 (eindboss-poort zonder echo-puzzel), toets aan de nieuwe pillars | LGD | 1 (in T3) |
-| `docs/productie/fase-2-kader.md` | Playtestvragen F4: flownormen van P1 in plaats van "co-op maakt puzzels triviaal"; T11 "elke slice-puzzel" → "elke slice-kamer"; slice = polderwijk met het eerste gemaal + de Gemaalmeester | EP | 0,5 |
+| `docs/productie/fase-2-kader.md` | Alle puzzelplekken: §1 vraag 1 ("of co-op de puzzels triviaal maakt"); T3 ("echo-puzzels" → flow-kamers, lichtmeter, gemaal); T4/T8 en de volgorde in §4 ("T4 vóór de echo-puzzels van T8"); T11 en F4 ("elke slice-puzzel" → "elke slice-kamer"; flownormen van P1 in plaats van R10-puzzels); F4b(b) ("buiten verplichte puzzels" → "buiten merk-ontploffingen", bv. het aandeel springplank-sprongen); R10 in §5. Slice = polderwijk met het eerste gemaal + de Gemaalmeester; eventueel een flow-kamer als eerste mijlpaal (#51 vraag 2) | EP | 0,5 |
 | `docs/productie/risico.md` | R10 herzien; nieuwe risico's R-V2, R-V4, R-V7, R-V9 | Producer/EP | 0,25 |
 | Narratief (T9) | Uitwerking V2 | Narrative Designer | 0 extra (T9 staat al gepland) |
 | Art bible (T1) | Setting, water, merk en finisher-echo als leesbaarheidseis | Art Director | ± 0,5 extra |
 | Ideecheck (`naamcheck.md` §3) | Herhalen voor de nieuwe vorm (R-V9) | Business/Legal | 0,5 |
 
-**Totaal:** ± 7–9 runs, waarvan ± 5 binnen taken die fase 2 al plant (T1, T3, T5, T9). **Netto extra: ± 3–4 runs**, plus ± 2–4 runs code in de slice. Bestaande code in `game/` (echo-spike, E- en C-tests) blijft bruikbaar; de tests voor E-04a, E-07a, E-08b, E-14 en C-01 worden herschreven.
+**Totaal (opgeteld uit de twee tabellen hierboven, co-op variant A):**
+
+| Post | Runs |
+|---|---|
+| Documenten binnen T3 (E-04a 0,5 · E-07a 0,5 · E-08b 0,25 · E-14 1 · E-02 0,5 · L-regels 1 · §3 1 · testkamers 0,5 · lichtmeter 1 · kernloop 1) | ± 7,25 |
+| Documenten buiten de planning (C-01 2,5 · fasekader 0,5 · risico 0,25 · art bible 0,5 · ideecheck 0,5) | ± 4,25 |
+| **Documenten samen** | **± 11,5** |
+| Code (E-04a 1 · E-07a 0,5 · E-08b 0,25 · E-02 0,5 · lichtmeter 1–2 · C-01 1–2) | ± 4,25–6,25 |
+| **v0.4-delta in totaal** | **± 16–18** |
+
+We rekenen conservatief: het ontwerpwerk voor echo-puzzels dat in T3 en T8 vervalt, is **niet** afgetrokken. Een run telt hier als één maak-taak. Bestaande code in `game/` (de echo-spike en de E- en C-tests) blijft bruikbaar; de tests voor E-04a, E-07a, E-08b, E-14 en C-01 worden herschreven.
+
+**Open punt:** de weken in `fase-2-kader.md` gaan nog uit van het ritme van #47; de EP herraamt de doorlooptijd volgens #52 wanneer hij het kader aanpast.
 
 ## 13. Definition of Done
 
@@ -279,7 +291,7 @@ Kost in **runs** (één maak-taak van een rol). "In T3" betekent: past in GDD v1
 
 | Versie | Wat |
 |---|---|
-| 0.4 | Live brainstorm met de CEO (#54) verwerkt. Draai en kernfantasie in beweging ("springplank en tweede slag"); P1 *De echo houdt je in beweging* (geen puzzels op de kritieke route, toetsbare flownormen); P2 *Licht terugwinnen opent de stad* (lichtmeter, gemaal, waterstand; gating via vaardigheden en routes); P3 met co-op als gedeelde echo (CEO-vraag 7, alternatief: ieder een eigen echo). Setting (gedroomde verzonken stad + poldermachine) en verhaalpremisse V2 in §6, met toonregels voor water (PEGI 12). Referenties: *Hollow Knight* en *Nine Sols* als hoofdreferentie. USP's, doelgroep en risico's herzien; nieuwe sectie §12 "Wat er verandert t.o.v. v0.3". Reviewpunten #43 verwerkt. **Interne noot (was onder de logline, #43.3):** "melancholisch" in plaats van "duister" is bewust: de naam draagt het duister al, en de logline zet de schaduw neer als bondgenoot. |
+| 0.4 | Live brainstorm met de CEO (#54) verwerkt. Draai en kernfantasie in beweging ("springplank en tweede slag"); P1 *De echo houdt je in beweging* (geen puzzels op de kritieke route, toetsbare flownormen); P2 *Licht terugwinnen opent de stad* (lichtmeter, gemaal, waterstand; gating via vaardigheden en routes); P3 met co-op als gedeelde echo (CEO-vraag 7, alternatief: ieder een eigen echo). Setting (gedroomde verzonken stad + poldermachine) en verhaalpremisse V2 in §6, met toonregels voor water (PEGI 12). Referenties: *Hollow Knight* en *Nine Sols* als hoofdreferentie. USP's, doelgroep en risico's herzien; nieuwe sectie §12 "Wat er verandert t.o.v. v0.3". Reviewpunten #43 verwerkt. Lead-review EP (PR #56): totalen §12 herrekend (documenten ± 11,5, code ± 4,25–6,25, samen ± 16–18), puzzelplekken in het fasekader benoemd, ideecheck R-V9 vóór T3, kost fase 3–4 bij R-V4, water als speellaag expliciet als afwijking van #54, open punt herraming volgens #52. **Interne noot (was onder de logline, #43.3):** "melancholisch" in plaats van "duister" is bewust: de naam draagt het duister al, en de logline zet de schaduw neer als bondgenoot. |
 | 0.3 | Werktitel *Wraithstep* (#24) doorgevoerd. Toon bij de naam: logline "melancholisch", blok "Naam en toon" in §6, twee risico's (toon R15, vindbaarheid). Reviewpunten PR #22 verwerkt. |
 | 0.2 | Reviewpunten PR #11 verwerkt; randvoorwaarden #2 en stijl 2D (#18) doorgevoerd; open vragen als tabel. |
 | 0.1 | Eerste versie (#4, PR #11). |
