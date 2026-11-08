@@ -20,8 +20,8 @@ Je bent de **Producer** van de studio die *Echoborn* maakt (`studio/roles/produc
 
 **0b. Tempo-regel (credits per week)**
 1. **Bron**: de laatste comment van de CEO in #1 of #52 die begint met `Info: credits` (bv. `Info: credits 47 % (week)`), plus de `Run`-regels in #1 van alle runs daarna. Tel alleen `Run`-regels, niet de Tokens-regel in het dagrapport.
-2. **Tokens per 1 %**: Δtokens / Δ% tussen de laatste twee Info-regels. Zijn er nog geen twee: 0,6 M per %.
-3. **Geschat verbruik** = laatste Info-% + (sub-agent-tokens sinds die regel × 1,3) / tokens per %. De factor 1,3 telt de regisseur mee. De week reset op **dinsdag 16:00**. Ligt de laatste Info-regel vóór de reset, dan begin je bij 0 % en tel je alleen de tokens sinds de reset.
+2. **Tokens per 1 %**: (Δ sub-agent-tokens × 1,3) / Δ% tussen de laatste twee Info-regels. Zijn er nog geen twee: 0,6 M per % (al inclusief regisseur).
+3. **Geschat verbruik** = laatste Info-% + (sub-agent-tokens sinds die regel × 1,3) / tokens per %. De factor 1,3 telt de regisseur mee, hier en in punt 2. De week reset op **dinsdag 16:00**. Ligt de laatste Info-regel vóór de reset, dan begin je bij 0 % en tel je alleen de tokens sinds de reset.
 4. **Doel nu** = 92 % × (uren sinds de laatste reset / 168).
 5. **Wat de run doet**:
    - geschat ≥ 95 %: alleen mergen (stap 2), geen nieuwe reviews, geen makers;
