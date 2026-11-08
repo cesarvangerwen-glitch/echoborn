@@ -11,7 +11,7 @@ labels: ["status:todo"]
 ## Wat moet er gebeuren?
 
 ## Input (wat je nodig hebt en waar het staat)
--
+- `<pad>` §<sectie> (lees alleen deze secties)
 
 ## Output (deliverable, formaat, pad)
 -
