@@ -30,13 +30,16 @@ Hoort bij: besluit #24 (werktitel) en #51 deel 2 (concept v0.4) · Risico's: R24
 
 ## 3. Advies voor de Creative Director
 
+Keuze CD (2026-11-08, [comment in #44](https://github.com/cesarvangerwen-glitch/echoborn/issues/44#issuecomment-6727804374)): c – "wraith" is een dark-fantasyspook; v0.4 is melancholisch en hoopvol, en een toevoeging lost toon en D2R niet op.
+
 **(c) Nieuwe naamvraag aan de CEO**, vóór TMview/WIPO en vóór de offertes. Reden: op het kanaal waar ontdekking gebeurt (zoekmachine, YouTube) staat het D2R-item bovenaan, een toevoeging verandert dat niet (punt 3), en de naam past minder bij v0.4. Zo betalen we geen merkcheck voor een naam die wordt vervangen.
 
 - **Terugval (b)** als de CEO toch wil houden: houden met een vaste toevoeging uit v0.4 (richting "sluiswachter", "verzonken stad" of licht), in logo en storetitel altijd samen. Dat helpt alleen op Steam en in eigen materiaal, niet bij zoeken op het kale woord.
 - **(a) Houden** raad ik af.
 - **Toets voor een nieuwe naam** (voorstel, zelfde methode): 0 games op Steam; geen bestaand game-item of -personage in de top 10 van Google en YouTube; past bij licht/schaduw en de Lage Landen; werkt in Engels en Nederlands. Marketing toetst de kandidaten, Business/Legal doet daarna de korte merkcheck.
+- **Route:** de naamvraag komt pas ná de keuze van de CD. De **EP** opent haar als `ceo-beslissing` volgens `.github/ISSUE_TEMPLATE/ceo-beslissing.md` (A ⭐ nieuwe naam, B terugval (b) met vaste toevoeging), met dit document en de richting van de CD als bron. Marketing opent die issue niet zelf en toetst kandidaatnamen pas na het `Besluit:` van de CEO, met de toets hierboven.
 
-Gevolg voor de volgorde uit #44: kiest de CD (c), dan vervalt de stap TMview/WIPO door de CEO voor *Wraithstep*, en gaat die mee naar de nieuwe naam.
+Gevolg voor de volgorde uit #44: de stap TMview/WIPO door de CEO staat stil tot het `Besluit:` van de CEO. Kiest de CEO (b), dan gaat de stap voor *Wraithstep* door; bij een nieuwe naam gaat hij mee naar die naam.
 
 ## 4. Beperkingen
 
@@ -44,3 +47,8 @@ Gevolg voor de volgorde uit #44: kiest de CD (c), dan vervalt de stap TMview/WIP
 - YouTube-titels zijn uit de publieke zoekpagina gehaald (zonder account); de volgorde kan per kijker verschillen.
 - Steam-API toont max. 10 items per zoekopdracht; voor "wraith" zijn er meer.
 - Geen socials, Reddit of Twitch doorzocht (zie `naamcheck-wraithstep.md` §5.1).
+
+## 5. Definition of Done (#44)
+
+- [x] Zoekresultaten per kanaal met datum (§1)
+- [x] Advies a/b/c met reden, afgestemd met de Creative Director: keuze CD = c (§3)
