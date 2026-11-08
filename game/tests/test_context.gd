@@ -66,6 +66,7 @@ func verdict(errors: PackedStringArray, finished: bool) -> PackedStringArray:
 		reasons.append("test niet afgerond binnen de tijdslimiet (hangt of wacht op een tick die niet komt)")
 	for error in errors:
 		reasons.append("fout tijdens de test: %s" % error)
-	if checks == 0:
+	# Alleen als er nog geen andere reden is: na een crash zegt 0 checks niets nieuws.
+	if checks == 0 and reasons.is_empty():
 		reasons.append("0 checks: de test controleerde niets (gecrasht vóór de eerste check?)")
 	return reasons

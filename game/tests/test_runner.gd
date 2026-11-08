@@ -24,6 +24,13 @@ func test_script_error_is_fail_even_with_passing_checks(t) -> void:
 	t.check(reasons.size() == 1, "scriptfout moet FAIL geven, kreeg %s" % str(reasons))
 
 
+func test_crash_before_first_check_gives_only_the_error(t) -> void:
+	var ctx := _fresh(t)
+	var reasons := ctx.verdict(["Invalid call (res://x.gd:3, f)"], true)
+	t.check(reasons.size() == 1 and reasons[0].contains("Invalid call"),
+		"alleen de foutregel verwacht, kreeg %s" % str(reasons))
+
+
 func test_unfinished_test_is_fail(t) -> void:
 	var ctx := _fresh(t)
 	ctx.check(true, "")

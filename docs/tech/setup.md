@@ -70,6 +70,7 @@ Echoborn tests - Godot 4.6.3-stable (official), physics 60 Hz
 res://tests/test_runner.gd
   PASS test_zero_checks_is_fail (1 checks)
   PASS test_script_error_is_fail_even_with_passing_checks (1 checks)
+  PASS test_crash_before_first_check_gives_only_the_error (1 checks)
   PASS test_unfinished_test_is_fail (1 checks)
   PASS test_clean_test_with_checks_is_pass (1 checks)
   PASS test_failed_check_is_reported (1 checks)
@@ -90,7 +91,7 @@ res://tests/test_sim.gd
 res://tests/test_input.gd
   PASS test_p2_action_only_on_right_ctrl (4 checks)
 
-Resultaat: 15 geslaagd, 0 mislukt (0.61 s)
+Resultaat: 16 geslaagd, 0 mislukt (0.66 s)
 ```
 
 ## 4. De spike spelen
