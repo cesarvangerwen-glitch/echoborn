@@ -71,7 +71,14 @@ res://tests/test_echo.gd
   PASS test_hidden_state_breaks_input_echo_at_clip_start (3 checks)
   PASS test_recorder_snapshot_is_independent_copy (4 checks)
 
-Resultaat: 7 geslaagd, 0 mislukt (0.68 s)
+res://tests/test_sim.gd
+  PASS test_tick_order_shadow_before_p1 (1 checks)
+  PASS test_p1_sees_shadow_of_same_tick_and_is_recorded_after_step (5 checks)
+
+res://tests/test_input.gd
+  PASS test_p2_action_only_on_right_ctrl (4 checks)
+
+Resultaat: 10 geslaagd, 0 mislukt (0.63 s)
 ```
 
 ## 4. De spike spelen
@@ -87,7 +94,7 @@ Besturing: P1 A/D + spatie, E = echo. P2 pijltjes + Enter, rechter Ctrl = echo. 
 
 | Symptoom | Oorzaak / oplossing |
 |---|---|
-| `sha512sum: WARNING: 1 computed checksum did NOT match` | Download onvolledig of afgebroken door de proxy. Opnieuw downloaden. |
+| `sha512sum: WARNING: 1 computed checksum did NOT match` | Download onvolledig of afgebroken door de proxy (gezien in #14: eerste poging gaf een zip van 23 bytes). Zip verwijderen en opnieuw downloaden. |
 | `gh api repos/godotengine/godot/...` geeft 403 | Verwacht in de agent-omgeving. Gebruik de `curl`-URL's hierboven. |
 | Tests hangen | `--fixed-fps` vergeten en wachten op echte tijd (±2 min), of een test wacht op een tick die nooit komt. Draai met `--fixed-fps 60`. |
 | `Parse Error` op een script | Draai `godot --headless --path game --check-only -s <script>` voor het precieze bericht. |

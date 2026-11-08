@@ -13,7 +13,7 @@ Dit is het eerste technisch ontwerp. Het legt de architectuur vast die nodig is 
 ## 2. Kernprincipes
 
 1. **Eén vaste simulatietick: 60 Hz.** Alle gameplay draait in `_physics_process` (`physics_ticks_per_second = 60`, `physics_jitter_fix = 0`). Niets dat de echo beïnvloedt draait in `_process`. Rendering mag interpoleren; de simulatie niet.
-2. **Eén klok, vaste volgorde.** De `Sim`-node is de enige met een gameplay-`_physics_process`. Hij stapt eerst de spelers (op `player_index`), daarna de echo's (in spawnvolgorde) en telt `tick`. De volgorde hangt dus niet af van de volgorde in de scèneboom.
+2. **Eén klok, vaste volgorde.** De `Sim`-node is de enige met een gameplay-`_physics_process`. Per tick geldt de volgorde van **E-07b** (`docs/design/gdd.md`, door de TD bevestigd in #14): (1) de schaduw: echo's (in spawnvolgorde) zetten hun frame, of P2 stapt; (2) P1 stapt; (3) P1 wordt opgenomen; (4) events, eerst van P1, dan van de schaduw; (5) objecten werken hun stand bij. Daarna telt de Sim `tick`. Zo staat de schaduwplank al op zijn plek van tick `t` als P1 stapt (nodig voor E-07a), en hangt de volgorde niet af van de scèneboom. De spike doet (1) t/m (3); (4) en (5) komen met het event-systeem (R5). Test: `test_sim.gd`.
 3. **Input komt alleen uit een inputbron.** Gameplay-code roept nooit `Input` aan. Een inputbron (`DeviceInput`, `ScriptedInput`, later bv. een `AIInput` voor demo's) geeft per tick een bitmasker. Daardoor kunnen tests, de echo en twee spelers dezelfde code voeden.
 4. **Eén bewegingsfunctie.** `Motor.step(body, bits, delta)` is de enige plek waar beweging berekend wordt. Speler en input-echo gebruiken exact hetzelfde codepad.
 5. **Geen verborgen bronnen van verschil.** Geen `randf()` zonder seed uit de Sim, geen echte tijd (`Time`, `OS`), geen logica in signalen die afhangt van de volgorde waarin Godot ze afvuurt.
@@ -69,16 +69,19 @@ Gebieden zijn losse scènes, zodat World & Level Designers parallel kunnen werke
 ### Datastroom per tick
 
 ```
-tick t:
-  for speler in spelers (op index):
-      bits = speler.inputbron.sample(t)
+tick t:                                   (volgorde E-07b)
+  (1) schaduw
+      for echo in echo's (spawnvolgorde):
+          STATE: positie, snelheid = clip.post[frame]
+          INPUT: Motor.step(echo, clip.inputs[frame], 1/60)
+          frame += 1
+      for speler in spelers met index >= 2:  (P2; stapt en neemt op zoals P1)
+  (2)+(3) P1
+      bits = P1.inputbron.sample(t)
       pre  = (positie, snelheid, op_vloer)
-      Motor.step(speler, bits, 1/60)
-      speler.recorder.push(t, bits, pre, post=(positie, snelheid))
-  for echo in echo's:
-      STATE: positie, snelheid = clip.post[frame]
-      INPUT: Motor.step(echo, clip.inputs[frame], 1/60)
-      frame += 1
+      Motor.step(P1, bits, 1/60)
+      P1.recorder.push(t, bits, pre, post=(positie, snelheid))
+  (4) events, (5) objecten               (nog niet in de spike)
   t += 1
 ```
 
@@ -174,6 +177,9 @@ Spelers maskeren 1 + 4, echo's 1 + 5. Zo kan een echo door een lichtmuur heen en
 | `test_world_change_breaks_input_echo_not_state_echo` | Legt het risico van input-opname vast |
 | `test_hidden_state_breaks_input_echo_at_clip_start` | Legt het risico van verborgen toestand vast |
 | `test_recorder_snapshot_is_independent_copy` | Een clip verandert niet als de recorder doorschrijft |
+| `test_tick_order_shadow_before_p1` (`test_sim.gd`) | Logtest E-07b: per tick echo → P2 → P1, ongeacht de volgorde van toevoegen |
+| `test_p1_sees_shadow_of_same_tick_and_is_recorded_after_step` (`test_sim.gd`) | Als P1 stapt, staat de echo al op zijn frame van dezelfde tick; P1 wordt na zijn stap opgenomen |
+| `test_p2_action_only_on_right_ctrl` (`test_input.gd`) | P2-echo alleen op rechter Ctrl, niet op linker |
 
 De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gaven dezelfde posities.
 

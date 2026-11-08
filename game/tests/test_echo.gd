@@ -84,7 +84,7 @@ func test_input_echo_reaches_same_position(t) -> void:
 	var echo := _spawn_echo(sim, clip, EchoActor.Mode.INPUT)
 	await t.run_ticks(sim, TEN_SECONDS)
 	t.check(echo.finished, "echo is niet klaar met afspelen")
-	t.check(echo.position.distance_to(original_end) < 0.001,
+	t.check(echo.position == original_end,
 		"eindpositie echo %s != origineel %s" % [_fmt(echo.position), _fmt(original_end)])
 	t.note("input-replay: max afwijking %.6f px, eind %s vs %s" % [
 		echo.max_deviation(), _fmt(echo.position), _fmt(original_end)])
@@ -123,8 +123,8 @@ func test_two_players_each_get_exact_echo(t) -> void:
 	await t.run_ticks(sim, TEN_SECONDS)
 	t.check(echo1_state.position == end1, "P1 state-echo %s != %s" % [_fmt(echo1_state.position), _fmt(end1)])
 	t.check(echo2_state.position == end2, "P2 state-echo %s != %s" % [_fmt(echo2_state.position), _fmt(end2)])
-	t.check(echo1_input.position.distance_to(end1) < 0.001, "P1 input-echo %s != %s" % [_fmt(echo1_input.position), _fmt(end1)])
-	t.check(echo2_input.position.distance_to(end2) < 0.001, "P2 input-echo %s != %s" % [_fmt(echo2_input.position), _fmt(end2)])
+	t.check(echo1_input.position == end1, "P1 input-echo %s != %s" % [_fmt(echo1_input.position), _fmt(end1)])
+	t.check(echo2_input.position == end2, "P2 input-echo %s != %s" % [_fmt(echo2_input.position), _fmt(end2)])
 	t.check(end1.distance_to(end2) > 1.0, "P1 en P2 eindigen op dezelfde plek; test zegt dan weinig")
 	t.check(p1.position != end1 and p2.position != end2, "spelers bewogen niet live tijdens het afspelen")
 	t.note("P1 eind %s, P2 eind %s; spelers live verder naar %s / %s" % [
@@ -172,7 +172,9 @@ func test_hidden_state_breaks_input_echo_at_clip_start(t) -> void:
 		state_echo.max_deviation(), input_echo.max_deviation()])
 
 
-## Geheugen/kosten: 10 s opnemen is goedkoop en alloceert niet per tick.
+## Ringbuffer met capaciteit 4: na 6 pushes bevat de snapshot tick 2-5 in
+## chronologische volgorde, blijft ongewijzigd als de recorder doorschrijft,
+## en snapshot(2) geeft alleen de laatste 2 frames.
 func test_recorder_snapshot_is_independent_copy(t) -> void:
 	var recorder := EchoRecorder.new(4)
 	for i in 6:

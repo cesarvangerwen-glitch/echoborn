@@ -11,6 +11,8 @@ const TestContext = preload("res://tests/test_context.gd")
 
 const TEST_SCRIPTS := [
 	"res://tests/test_echo.gd",
+	"res://tests/test_sim.gd",
+	"res://tests/test_input.gd",
 ]
 
 
