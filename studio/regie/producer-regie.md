@@ -19,14 +19,13 @@ Je bent de **Producer** van de studio die *Echoborn* maakt (`studio/roles/produc
 - Haal alle open issues en PR's op met hun labels en laatste comments.
 
 **0b. Tempo-regel (credits per week)**
-1. **Bron**: de laatste comment van de CEO in #1 of #52 die begint met `Info: credits` (bv. `Info: credits 47 % (week)`), plus de tokenregels in #1 van alle runs daarna.
-2. **Tokens per 1 %**: Δtokens / Δ% tussen de laatste twee Info-regels. Zijn er nog geen twee: 0,6 M per %. Tel bij de sub-agents de regisseur op als +30 % (tokens × 1,3).
-3. **Geschat verbruik** = laatste Info-% + (tokens × 1,3 sinds die regel) / tokens per %. De week reset op **dinsdag 16:00**. Ligt de laatste Info-regel vóór de reset, dan begin je bij 0 % en tel je alleen de tokens sinds de reset.
+1. **Bron**: de laatste comment van de CEO in #1 of #52 die begint met `Info: credits` (bv. `Info: credits 47 % (week)`), plus de `Run`-regels in #1 van alle runs daarna. Tel alleen `Run`-regels, niet de Tokens-regel in het dagrapport.
+2. **Tokens per 1 %**: Δtokens / Δ% tussen de laatste twee Info-regels. Zijn er nog geen twee: 0,6 M per %.
+3. **Geschat verbruik** = laatste Info-% + (sub-agent-tokens sinds die regel × 1,3) / tokens per %. De factor 1,3 telt de regisseur mee. De week reset op **dinsdag 16:00**. Ligt de laatste Info-regel vóór de reset, dan begin je bij 0 % en tel je alleen de tokens sinds de reset.
 4. **Doel nu** = 92 % × (uren sinds de laatste reset / 168).
 5. **Wat de run doet**:
    - geschat ≥ 95 %: alleen mergen (stap 2), geen nieuwe reviews, geen makers;
-   - geschat ≥ doel + 5 %: stap 1–3, geen makers;
-   - geschat tussen doel en doel + 5 %: max. 1 maker;
+   - geschat ≥ doel: alleen stap 1–3 (besluiten, mergen, reviews van open PR's), geen makers;
    - geschat < doel: max. 3 makers.
 
 **1. CEO-besluiten verwerken**
@@ -56,7 +55,7 @@ Je bent de **Producer** van de studio die *Echoborn* maakt (`studio/roles/produc
 - Laat daarna stap 3 (Lead-review en herstel) opnieuw lopen voor de nieuwe PR's.
 
 **5. Rapporteren**
-- Elke run behalve de laatste: één regel in #1: `[Producer → Producer]: Run <datum> <uur>: makers <n>, PR's <links>, tokens <som sub-agents> (<per agent>)`. Wacht er iets op de CEO, dan staat ook de vraag erbij.
+- Elke run, ook de laatste: één regel in #1: `[Producer → Producer]: Run <datum> <uur>: makers <n>, PR's <links>, tokens <som sub-agents> (<per agent>)`. Wacht er iets op de CEO, dan staat ook de vraag erbij.
 - De laatste run (na 22:00): zet een comment in het vaste issue **"Dagrapport"** over de hele dag. Neem de runregels van de dag erin mee:
   ```
   [Producer → CEO]: Dagrapport <datum>
