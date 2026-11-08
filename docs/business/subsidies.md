@@ -1,6 +1,6 @@
 # Subsidieonderzoek: *Wraithstep* (werktitel)
 
-Versie 1.1 · 2026-11-08 · Eigenaar: Business/Legal Advisor · Issue: #19 · Lead-review: Executive Producer
+Versie 1.2 · 2026-11-08 · Eigenaar: Business/Legal Advisor · Issues: #19, #35 · Lead-review: Executive Producer
 Voedt: gate-vraag 3 "Budget fase 2" (#10, `docs/productie/fase-1-kader.md` §3) · Risico: R6 · Besluit: Randvoorwaarden #2 ("zelf financieren + subsidies uitzoeken")
 
 > **Geen juridisch of fiscaal advies.** Dit is een verkenning door de studio op basis van openbare bronnen. Vóór een aanvraag, de oprichting van een vennootschap of een tax-shelterconstructie moet de CEO een **boekhouder/accountant** en zo nodig een **advocaat** raadplegen. Er is niets aangevraagd, ingediend of geregistreerd, en er zijn geen accounts gemaakt (ook niet in MyVAF).
@@ -46,8 +46,8 @@ Deze aannames bepalen welke regelingen openstaan. Ze staan **niet vast** in `doc
 
 | Steunvorm | Wat | Max. bedrag | Fase bij ons | Bron |
 |---|---|---|---|---|
-| **Prototype** | Proof of concept, gameplay en USP's testen ("finding the fun") | **€ 25.000** per project, max. 2× per jaar per studio | Begin fase 2; **niet gekozen** (§5.1, route a) | art. 6, 8 |
-| **Vertical slice** | Speelbaar, afgewerkt level met de core loop; vraagt aantoonbaar potentieel uit prototypes | Binnen het creatieplafond | Fase 2 (onze slice); **niet gekozen** (§5.1, route b) | art. 6 |
+| **Prototype** | Proof of concept, gameplay en USP's testen ("finding the fun") | **€ 25.000** per project, max. 2× per jaar per studio | **Niet gekozen** (zou zijn: begin fase 2; §5.1, route a) | art. 6, 8 |
+| **Vertical slice** | Speelbaar, afgewerkt level met de core loop; vraagt aantoonbaar potentieel uit prototypes | Binnen het creatieplafond | **Niet gekozen** (zou zijn: fase 2, onze slice; §5.1, route b) | art. 6 |
 | **Productie** | Definitieve versie; voor games **met tractie** (wishlists, interesse publishers) | Binnen het creatieplafond | Fase 3; **gekozen route** (§5.1, route c) | art. 6; pagina productiesteun |
 | Creatieplafond | Vertical slice + productie + post-release, inclusief eerdere prototypesteun | **€ 400.000** totaal | | art. 8 |
 | **Promotie** | Marketing, events, community | **€ 75.000**, los van het creatieplafond | Fase 4–5 | art. 8 |
@@ -134,8 +134,10 @@ Fase 2 is geraamd op **6–10 weken** (roadmap). Elk VAF-traject loopt langs dez
 **Kanttekeningen bij route (c):**
 - De slice zelf valt buiten de steun. Of slicewerk als erkende pre-investering mag meetellen, vragen we bij de intake (§3.2).
 - Productiesteun vraagt **tractie**: wishlists en interesse van publishers (pagina productiesteun). Wishlists vragen een openbare Steam-pagina, en die publiceren is een **apart CEO-besluit** (roadmap, fase 2–3). Zonder tractie is de kans kleiner. Dat besluit komt na de slice; nu hoeft het nog niet.
+- **Terugverwijzing naar prototype- of slicesteun.** Het VAF "kan adviseren om een aanvraag voor productiesteun terug te verwijzen naar prototype- of vertical slice steun, indien een project niet rijp wordt geacht" (art. 6.1). Voor de eerste game van een nieuwe studio is dat realistisch. Op dat moment is onze slice al af en dus niet meer subsidiabel (art. 14.9): we krijgen dan voor die fase niets, en de productieaanvraag schuift een deadline op. Dit risico verkleinen we niet door de slice te vertragen (dat kost fase 2 maanden, zie route b). Wel: (1) bij de intake vragen hoe het VAF de rijpheid van een eerste game beoordeelt en wat een terugverwijzing betekent als de slice al af is (§5.2, stap 5); (2) indienen met de sterkst mogelijke slice en tractie. Gevolg voor fase 2: geen, want fase 2 rekent met € 0 subsidie.
 - Duurt het traject langer dan fase 3, dan is fase 3 af bij het contract en vervalt de steun. Daarom: de eerste deadline plannen die vóór de verwachte helft van fase 3 een beslissing geeft. De Producer plant dat zodra de deadlines 2027 bekend zijn (R6).
-- Hoeveel de steun echt oplevert, hangt af van het creatiebudget van fase 3. Met € 0 externe kosten is ook de steun klein. Uitgestelde vergoedingen van de oprichter ("participaties") tellen wel als eigen inbreng (financiële gids). De EP raamt het budget.
+- **Timing van het indienen.** Na een deadline duurt het nog ± 2 tot 4 maanden tot het contract (stap 8); met het wachten op een deadline erbij loopt het hele traject ± 3 tot 10 maanden (§1). Fase 3 duurt 4–8 maanden. Wie pas ná de slice indient, wacht eerst op een deadline (0 tot ± 6 maanden) en krijgt het contract mogelijk pas laat in fase 3 of te laat. Overweeg daarom een deadline **aan het eind van fase 2**, met een bijna-afgewerkte slice: het contract komt dan vroeger in fase 3. De keerzijde: op dat moment is er nog weinig tractie (geen openbare Steam-pagina zonder apart CEO-besluit), en de terugverwijzing hierboven wordt iets waarschijnlijker. De Producer weegt de twee deadlines tegen elkaar af zodra de datums 2027 bekend zijn (R6, stap 7). Gaat het project sneller, dan worden fase 2 en 3 korter en het venster dus ook: dat pleit voor de vroegere deadline.
+- Hoeveel de steun echt oplevert, hangt af van het creatiebudget van fase 3: de steun is een percentage (max. 50 %, tot 80 % mogelijk) van dat budget. Met € 0 externe kosten is ook de steun klein. Uitgestelde vergoedingen van de oprichter ("participaties") tellen wel als eigen inbreng (financiële gids). De EP raamt het budget.
 
 ### 5.2 Stappenplan route (c)
 
@@ -145,9 +147,9 @@ Fase 2 is geraamd op **6–10 weken** (roadmap). Elk VAF-traject loopt langs dez
 | 2 | VAF-deadlines 2027 lezen op https://www.vaf.be/deadlines en in #19 zetten; de Producer plant de deadline in | CEO, Producer | Begin fase 2 | Nee (alleen lezen) |
 | 3 | Kosten van de vennootschap laten ramen (oprichting, jaarlijkse boekhouding, rechtsvorm) | CEO met eigen boekhouder | Fase 2, vóór de intake | Ja: gesprek met een professional (CEO) |
 | 4 | 2-pager en conceptdossier, check op de culturele test | BLA, met CD (criterium categorie I), EP (budget), Marketing (markt) | Fase 2 | Nee |
-| 5 | Intakegesprek; vragen: AI-rollen en kernteam, timing van de Nederlandse versie, pre-investering slice, deadlines | CEO (BLA bereidt voor) | Fase 2, na vraag 3A | Ja (MyVAF-account) |
+| 5 | Intakegesprek; vragen: (a) AI-rollen en kernteam; (b) timing van de Nederlandse versie; (c) pre-investering slice; (d) **telt fase 3-werk van vóór de indiening mee in het creatiebudget?** (de versie 2024 maakte kosten pas subsidiabel vanaf de ontvangst van de aanvraag, §3.2); (e) **wanneer verwijst het VAF een productieaanvraag terug naar slicesteun, en wat als de slice dan al af is?** (art. 6.1, §5.1); (f) deadlines | CEO (BLA bereidt voor) | Fase 2, na vraag 3A | Ja (MyVAF-account) |
 | 6 | Vennootschap oprichten | CEO, notaris, boekhouder | Na de intake, vóór het indienen, alleen bij vraag 1A | Ja |
-| 7 | Indienen productiesteun, met slice en tractie | CEO | Eerste geschikte deadline na de slice | Ja: **apart CEO-besluit** |
+| 7 | Indienen productiesteun, met slice en tractie | CEO | Eerste geschikte deadline: aan het eind van fase 2 (bijna-afgewerkte slice) of direct na de slice; de Producer weegt af (§5.1, timing) | Ja: **apart CEO-besluit** |
 | 8 | Formele controle, hearing, advies, beslissing, contract | VAF, CEO | ± 2 tot 4 maanden na de deadline (raming) | Ja |
 | 9 | Productie afbouwen; technisch dossier binnen 12 maanden, oplevering binnen 18 maanden na ondertekening (art. 13.12, 19) | Team | Fase 3 | Nee |
 
@@ -163,7 +165,7 @@ Voorstel aan de EP: neem dit over in het gate-issue (format `.github/ISSUE_TEMPL
 
 ```markdown
 **Budget fase 2, met wat het subsidieonderzoek opleverde** (`docs/business/subsidies.md`)
-Kort: alleen het VAF Gamefonds past. We halen de toegangsvoorwaarden nog niet. Fase 2 rekent met € 0 subsidie; in fase 2 bereiden we productiesteun voor fase 3 voor (§5).
+Kort: alleen het VAF Gamefonds past. We halen de toegangsvoorwaarden nog niet. Fase 2 rekent met € 0 subsidie; in fase 2 bereiden we productiesteun voor fase 3 voor (§5). Die steun is een percentage (max. 50 %, tot 80 % mogelijk) van het creatiebudget van fase 3: met € 0 externe kosten is ze dus ook klein.
 
 **Bevestiging V (geen keuze). Is de studio gevestigd in Vlaanderen of Brussel?** Antwoord: ja of nee (zo nee: waar).
 Bij "nee" valt het VAF af en vervallen vraag 1–3; de BLA onderzoekt dan de regelingen van die plek.
@@ -225,3 +227,4 @@ Of een Nederlandse versie kort ná de launch ook volstaat, staat niet in art. 4.
 |---|---|---|
 | 1.0 | 2026-11-08 | Eerste versie (PR #28) |
 | 1.1 | 2026-11-08 | Lead-review EP (PR #28): één nummering voor de CEO-vragen (bevestiging V + vragen 1–3) in §1, §2, §3.2, §5 en §6; vestiging is een bevestiging, vraag 1 gaat alleen over de vennootschap, met kost per optie; vraag 2 (Nederlands) voorwaardelijk, met grove raming en "pas bij release nodig"; §5 kiest één route (productiesteun voor fase 3) met een stappenplan en de tijdskost van alle routes tegenover fase 2; art. 9 preciezer ("tot 80% mogelijk", "eerste of tweede game waarvoor een studio steun krijgt"). Geen nieuw onderzoek, behalve een richtprijs voor de oprichting van een vennootschap. |
+| 1.2 | 2026-11-08 | Niet-blokkerende reviewpunten PR #28 (EP en SM, issue #35): §5.1 risico van terugverwijzing naar prototype-/slicesteun (art. 6.1) als kanttekening, plus intakevraag; §5.1 en stap 7 indienen op een deadline aan het eind van fase 2 als optie naast "na de slice", af te wegen door de Producer; §5.1 en §6 de steun is een percentage van het creatiebudget fase 3; §5.2 stap 5 intakevraag of fase 3-werk van vóór de indiening meetelt; §3.1 fasekolom bij prototype en slice leest niet meer als geplande route. Geen nieuw onderzoek. De VAF-deadlines 2027 zijn nog niet gelezen (§3.3, §7). Na Lead-review EP (PR #48): doorlooptijd in §5.1 gelijkgetrokken met stap 8 en §1. |
