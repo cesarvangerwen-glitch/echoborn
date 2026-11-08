@@ -13,3 +13,9 @@ export_presets.cfg.local
 # OS
 .DS_Store
 Thumbs.db
+
+# Godot-binaries en downloads nooit committen (docs/tech/setup.md)
+Godot_v*
+godot.zip
+SHA512-SUMS.txt
+/tools/
