@@ -2,7 +2,7 @@
 
 Versie 1.0 · 2026-11-08 · Executive Producer · Issue: #10 (exit-criterium E8) · Lead-review: Creative Director
 
-**Kort:** E1–E7 zijn gehaald, elk met bewijs. Fase 1 liep binnen de raming van 7–10 regie-runs (6 runs t/m het procesrapport, `docs/proces/rapport-week-1.md`) en met € 0 extern. Advies: concept B (*Wraithstep*) definitief en fase 2 starten op het concept-kader `docs/productie/fase-2-kader.md`. **Eerlijk:** fase 1 bewijst de draai op papier en technisch; of hij speelbaar en leuk is, toetst de verticale slice van fase 2 (R3). De beslisvragen staan in het `ceo-beslissing`-issue #51.
+**Kort:** E1–E7 zijn gehaald, elk met bewijs. Fase 1 liep binnen de raming van 7–10 regie-runs (7 regie-runs t/m deze gate-run: 6 in [dagrapport #1](https://github.com/cesarvangerwen-glitch/echoborn/issues/1) en `docs/proces/rapport-week-1.md`, plus deze) en met € 0 extern. Advies: concept B (*Wraithstep*) definitief en fase 2 starten op het concept-kader `docs/productie/fase-2-kader.md`. **Eerlijk:** fase 1 bewijst de draai op papier en technisch; of hij speelbaar en leuk is, toetst de verticale slice van fase 2 (R3). De beslisvragen staan in het `ceo-beslissing`-issue #51.
 
 ## Exit-criteria (toets: `fase-1-kader.md` §3)
 
@@ -14,10 +14,10 @@ SM-scores: Kwaliteit / Visie / Haalbaarheid / Volledigheid. Geen deliverable sco
 | E2 | Kernloop en echo-mechaniek | **Gehaald** | PR [#16](https://github.com/cesarvangerwen-glitch/echoborn/pull/16) + [Visie-review: past](https://github.com/cesarvangerwen-glitch/echoborn/pull/16#issuecomment-6720821394) | 8/8/8/8 |
 | E3 | Stijlkeuze voorgelegd | **Gehaald** | PR [#17](https://github.com/cesarvangerwen-glitch/echoborn/pull/17) + [Visie-review: past](https://github.com/cesarvangerwen-glitch/echoborn/pull/17#issuecomment-6723748727) + besluit [#18](https://github.com/cesarvangerwen-glitch/echoborn/issues/18#issuecomment-6720626752) (2D) | 8/9/8/8 |
 | E4 | Echo-techniek in spike | **Gehaald** | PR [#13](https://github.com/cesarvangerwen-glitch/echoborn/pull/13), fixes [#26](https://github.com/cesarvangerwen-glitch/echoborn/pull/26), testrunner [#49](https://github.com/cesarvangerwen-glitch/echoborn/pull/49) | 8/8/9/8 · 9/8/9/8 · 8/8/9/8 |
-| E5 | Naam- en ideecheck | **Gehaald** | PR [#23](https://github.com/cesarvangerwen-glitch/echoborn/pull/23) + naambesluit #24; merkcheck *Wraithstep* oranje: PR [#33](https://github.com/cesarvangerwen-glitch/echoborn/pull/33), [#48](https://github.com/cesarvangerwen-glitch/echoborn/pull/48) | 8/8/8/7 |
+| E5 | Naam- en ideecheck | **Gehaald** | PR [#23](https://github.com/cesarvangerwen-glitch/echoborn/pull/23) + naambesluit [#24](https://github.com/cesarvangerwen-glitch/echoborn/issues/24); merkcheck *Wraithstep* oranje: PR [#33](https://github.com/cesarvangerwen-glitch/echoborn/pull/33), [#48](https://github.com/cesarvangerwen-glitch/echoborn/pull/48) | 8/8/8/7 · 8/8/9/8 · 8/8/8/8 |
 | E6 | Randvoorwaarden | **Gehaald** | [`Besluit:` in #2](https://github.com/cesarvangerwen-glitch/echoborn/issues/2#issuecomment-6719257174) | n.v.t. |
 | E7 | Risicoregister v1 | **Gehaald** | PR [#27](https://github.com/cesarvangerwen-glitch/echoborn/pull/27), v1.2 [#42](https://github.com/cesarvangerwen-glitch/echoborn/pull/42) (24 risico's) | 8/8/8/7 · 8/8/9/9 |
-| E8 | Gate-besluit CEO | **Ligt voor** | dit rapport + `fase-2-kader.md` + gate-issue #51 | |
+| E8 | Gate-besluit CEO | **Ligt voor** | dit rapport + `fase-2-kader.md` + gate-issue [#51](https://github.com/cesarvangerwen-glitch/echoborn/issues/51) | |
 
 ## Risico's met impact H (bron: `risico.md` v1.2)
 
@@ -42,4 +42,4 @@ SM-scores: Kwaliteit / Visie / Haalbaarheid / Volledigheid. Geen deliverable sco
 
 ## Besluiten nodig (details en opties: #51)
 
-1. Concept B definitief. 2. Start fase 2 op het concept-kader. 3. Budget fase 2: € 0 extern + reservering merkcheck (€ 3.750, worstcase ≈ € 4.800 excl. btw). 4–6. Subsidie (na bevestiging vestiging): vennootschap, Nederlandse versie, VAF-intake. Plus twee informatieverzoeken: VAF-deadlines 2027 en, na #44, de € 0-zoekactie TMview/WIPO.
+1. Concept B definitief. 2. Start fase 2 op het concept-kader. 3. Budget fase 2: € 0 extern; de merkcheck (€ 3.750, worstcase ≈ € 4.800 excl. btw) in de fase van de eerste publicatie. V. Vestiging. 4–6. Subsidie: vennootschap, Nederlandse versie, VAF-intake. Plus één informatieverzoek (VAF-deadlines 2027, de gate wacht er niet op); de € 0-zoekactie TMview/WIPO hangt aan #44.

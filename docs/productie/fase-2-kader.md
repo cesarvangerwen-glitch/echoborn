@@ -93,7 +93,8 @@ Bron: `docs/productie/risico.md` (Producer). De risico's met impact H en wat fas
 
 ## 7. Budget en merkcheck
 
-- **Extern budget fase 2**: € 0 voor tools en assets (gratis tools en eigen werk), **plus een reservering voor de formele merkcheck** (A8): rekenadvies **€ 3.750 excl. btw**, de herberekende bovenkant uit de reviews op PR #33 (`naamcheck-wraithstep.md` §4.2); **worstcase ≈ € 4.800 excl. btw** als een kantoor per klasse rekent (§4). Het bedrag dat geldt, besluit de CEO in #51 (vraag 3).
+- **Extern budget fase 2**: **€ 0** (gratis tools en eigen werk). Fase 2 plant geen publieke uiting (§2), dus ook geen merkcheck.
+- **Formele merkcheck** (A8): rekenadvies **€ 3.750 excl. btw**, de herberekende bovenkant uit de reviews op PR #33 (`naamcheck-wraithstep.md` §4.2); **worstcase ≈ € 4.800 excl. btw** als een kantoor per klasse rekent (§4). Volgens §4 hoort de post in de fasebegroting van de **eerste publicatie** (verwacht fase 3). Wil de CEO in fase 2 toch een publieke uiting (bv. een Steam-pagina voor wishlists, R23), dan vraagt de EP het bedrag aan in dat publicatiebesluit. Keuze: #51, vraag 3.
 - **Subsidie**: fase 2 rekent met **€ 0** (`subsidies.md` §5). VAF-geld is hooguit een meevaller voor fase 3.
 - **Volgorde merkcheck** (geld pas uitgeven als de naam blijft): (1) vindbaarheidstoets #44 (Marketing, € 0) → (2) zoekactie TMview/WIPO door de CEO in een gewone browser (€ 0, ± 15 min; vervalt als #44 een nieuwe naam adviseert) → (3) 2–3 offertes voor alle vier klassen samen → (4) betaalde merkcheck, pas vlak vóór een CEO-besluit over de eerste publieke uiting.
 - Andere externe kosten (bv. audiotools, een boekhouder voor de vennootschap) vragen een apart besluit; de EP meldt ze met hun kost.
@@ -124,6 +125,7 @@ Zelfde procedure als in fase 1 (`fase-1-kader.md` §6): een issue voor de EP met
 | A2 en A3 als expliciete taken (T4, T3) | Open punten zonder issue (risico.md §6) | ≈ 1 run TD/GPM + ≈ 1 run LGD, binnen T3/T4 |
 | Vindbaarheidstoets #44 (T12) | R24; vóór de betaalde merkcheck | ≈ 1 run Marketing, € 0 |
 | Lokalisatie inbouwen (T14), alleen na CEO-besluit | VAF-eis Nederlandse versie | ≈ 1 run; totaal NL-versie ≈ 4–7 runs + mogelijke externe post over fase 2–4 |
+| Merkcheck niet meer als reservering in fase 2 (wijkt af van gate-vraag 3 in `fase-1-kader.md` v1.2) | Fase 2 heeft geen publieke uiting; `naamcheck-wraithstep.md` §4 begroot de post in de fase van de eerste publicatie (SM-review PR #50) | € 0 in fase 2; € 3.750–4.800 excl. btw verschuift naar het eerste publicatiebesluit |
 | F4b: CEO speelt de slice + gedragsmaat R3 | Fase 2 toetste nergens of de slice leuk is (Lead-review CD op PR #50) | ± 1 uur CEO-tijd, ≈ 0 runs (grens binnen T3, meting binnen T11) |
 | VAF-dossier (T13), alleen als de VAF-route openblijft | Route (c) | ≈ 2 runs BLA + bijdragen CD, EP, Marketing; € 0 |
 
@@ -134,4 +136,4 @@ Zelfde procedure als in fase 1 (`fase-1-kader.md` §6): een issue voor de EP met
 ### Logboek
 | Versie | Datum | Wijziging | Kost |
 |---|---|---|---|
-| 0.1 | 2026-11-08 | Concept, bijlage bij het gate-voorstel fase 1 (#10); Lead-review CD op PR #50: F4b (is de slice leuk), wie test (F4), toon in T9 en F7, setting-voorstel in T13 | F4b: ± 1 uur CEO-tijd, ≈ 0 runs |
+| 0.1 | 2026-11-08 | Concept, bijlage bij het gate-voorstel fase 1 (#10); Lead-review CD op PR #50: F4b (is de slice leuk), wie test (F4), toon in T9 en F7, setting-voorstel in T13. SM-review PR #50: merkcheck naar de fase van de eerste publicatie (§7) | F4b: ± 1 uur CEO-tijd, ≈ 0 runs; merkcheck: € 0 in fase 2 |
