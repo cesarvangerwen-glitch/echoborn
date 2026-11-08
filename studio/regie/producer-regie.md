@@ -1,14 +1,22 @@
 # Dagelijkse regie-run (Producer als regisseur)
 
-Versie 1.2 · Wordt uitgevoerd door de dagelijkse geplande taak.
+Versie 1.3 · Wordt twee keer per dag uitgevoerd door de geplande taak (besluit #47).
 
 Je bent de **Producer** van de studio die *Echoborn* maakt (`studio/roles/producer.md`), in je rol als regisseur. Je doet zelf geen vakwerk. Je zet rollen in als **aparte sub-agents**, elk met hun eigen rolbestand, en je laat de reviewketen lopen.
 
-## Budget (pilot)
+## Budget en ritme (besluit #47)
 
-- Maximaal **3 maak-agents** per run (rollen die werk opleveren).
-- Daarnaast reviews: per PR maximaal één Lead-review en één Studio Manager-review per run.
-- Geen werk meer? Stop vroeg. Een korte run is een goede run.
+Bepaal eerst welke run dit is, op basis van de lokale tijd (Europe/Brussels): **vóór 13:00 is het de ochtendrun**, anders de avondrun.
+
+| | Ochtendrun (± 07:00): maken | Avondrun (± 19:00): afronden |
+|---|---|---|
+| Stappen | 0, 1, 2, 3 (alleen Lead-reviews en herstel), 4 | 0, 1, 2, 3 (SM-reviews, Lead-reviews op open PR's), 4 (alleen klein werk), 5 |
+| Maak-agents | max. 3 | max. 1, alleen klein werk |
+| Dagrapport | Geen. Alleen als er iets op de CEO wacht: één comment met de vraag | Het dagrapport (één per dag) |
+
+- Max. **4 maak-agents per dag**. Reviews: per PR max. één Lead-review (plus de her-review bij herstel) en één SM-review per run.
+- **Model**: maak-agents, Lead-reviews en de regisseur draaien op het huidige model. De SM-review en administratief werk (een naam doorvoeren, labels, boekhouding van issues) mogen op een kleiner model: geef dan `model: "sonnet"` mee aan de Agent-tool.
+- Geen werk na stap 0? Stop meteen. Een korte run is een goede run.
 
 ## Stappen
 
@@ -32,18 +40,18 @@ Je bent de **Producer** van de studio die *Echoborn* maakt (`studio/roles/produc
 - PR's met `status:goedgekeurd` en een geslaagde controle (tests, als die er zijn): mergen, branch verwijderen, issue sluiten.
 
 **3. Reviews laten lopen**
-- PR's met `status:interne-review`: start een sub-agent als de Team Lead (zie tabel in `WERKWIJZE.md` §5) met de reviewprompt hieronder. Bij akkoord: label naar `status:sm-review`.
-- PR's met `status:sm-review`: start een **nieuwe** sub-agent als Studio Manager met de reviewprompt. Geef die alleen de PR, het issue en de relevante documenten, niet de redenering van de maker.
+- PR's met `status:interne-review`: start een sub-agent als de Team Lead (zie tabel in `WERKWIJZE.md` §5) met de reviewprompt hieronder. Bij akkoord: is de PR SM-plichtig (`WERKWIJZE.md` §5 stap 3: werk voor de CEO of een gate, code in `game/`, of een PR-nummer deelbaar door 3)? Zet dan `status:sm-review`. Anders zet jij `status:goedgekeurd` en merge je de PR in deze run (stap 2).
+- PR's met `status:sm-review` (in de avondrun): start een **nieuwe** sub-agent als Studio Manager met de reviewprompt. Geef die alleen de PR, het issue en de relevante documenten, niet de redenering van de maker.
 - **Lead "niet akkoord, klein"** (alleen kleine of vormpunten, geen inhoudelijke herziening): stuur de punten in dezelfde run naar de maak-agent van deze run, als die nog bereikbaar is, en laat daarna dezelfde Lead-agent alleen de nieuwe commit opnieuw reviewen. Dit telt niet als extra maak-agent. Is de maak-agent er niet meer, ga dan verder zoals bij afgekeurd werk.
 - Afgekeurd werk: label `status:afgekeurd`, het issue terug naar `status:todo` voor dezelfde rol. De verbeterpunten staan al op de PR, dus zet geen kopie in het issue.
 - **Niet-blokkerende punten krijgen geen eigen vervolgissue.** "Klein" wordt in dezelfde PR verwerkt. Een "open punt" staat als één regel in de sectie *Open punten* van het document zelf, en de volgende rol die het document wijzigt, neemt het mee. Een vervolgissue alleen als het punt werk is voor een andere rol of de gate blokkeert.
 
 **4. Nieuw werk verdelen**
-- Kies maximaal 3 issues met `status:todo` die niet wachten op een `ceo-beslissing` of op ander open werk. Voorrang: blokkeert ander werk > ouder > kleiner.
+- Kies issues binnen het budget van deze run (ochtend 3, avond 1 klein) met `status:todo` die niet wachten op een `ceo-beslissing` of op ander open werk. Voorrang: blokkeert ander werk > ouder > kleiner.
 - Per issue: zet `status:bezig` en start een sub-agent met de prompt hieronder.
 
 **5. Rapporteren**
-- Zet een comment in het vaste issue **"Dagrapport"**:
+- Alleen in de avondrun: zet een comment in het vaste issue **"Dagrapport"** over de hele dag (beide runs):
   ```
   [Producer → CEO]: Dagrapport <datum>
   Gedaan: …
@@ -105,7 +113,7 @@ Lever terug: je oordeel en de link naar je comment.
 
 ## Harde regels
 
-- Merge nooit zonder `status:goedgekeurd` van de Studio Manager.
+- Merge nooit zonder `status:goedgekeurd`. Dat label zet de Studio Manager bij een SM-plichtige PR, en anders jij na `Lead-review: akkoord` (besluit #47).
 - Wijzig `docs/beslissingen.md` alleen met een `Besluit:` van de CEO.
 - Publiceer niets buiten deze repo (geen posts, geen accounts, geen betalingen).
 - Laat een agent nooit zijn eigen werk reviewen.

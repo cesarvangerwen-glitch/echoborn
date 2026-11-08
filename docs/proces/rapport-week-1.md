@@ -1,6 +1,6 @@
 # Procesrapport week 1 (regie-runs 1–6, 2026-11-08)
 
-Versie 1.0 · Workflow & Process Optimization Lead · issue #45 · peildatum 2026-11-08 16:30 UTC
+Versie 1.0.1 · Workflow & Process Optimization Lead · issue #45 · peildatum 2026-11-08 16:30 UTC
 
 ## 1. Samenvatting
 
@@ -212,6 +212,8 @@ Elke wijziging staat in een eigen commit.
 `WERKWIJZE.md` en `docs/beslissingen.md` blijven ongewijzigd.
 
 ## 6. Voorstellen voor de CEO (ceo-beslissing)
+
+> **Besloten:** de CEO koos `Besluit: akkoord (1A, 2A, 3A)` in [#47](https://github.com/cesarvangerwen-glitch/echoborn/issues/47#issuecomment-6724220244) en het staat in `docs/beslissingen.md`. Het is doorgevoerd in `WERKWIJZE.md` §5 en §7, de README en `producer-regie.md` v1.3. Hieronder staat het voorstel zoals het werd voorgelegd.
 
 *De regisseur maakt hiervan het `ceo-beslissing`-issue.*
 

@@ -8,7 +8,7 @@ Een 2D-metroidvania in pixel art voor pc (Steam, Steam Deck als doel), singlepla
 
 ## Hoe deze studio werkt
 
-Deze repo is tegelijk de game én de studio. Elke functie is een rolbestand in `studio/roles/`. Een dagelijkse geplande taak (de **Producer als regisseur**) zet per taak een agent in met het juiste rolbestand. Die agents communiceren via issues en pull requests. De Studio Manager beoordeelt elk werkstuk apart, met een frisse blik.
+Deze repo is tegelijk de game én de studio. Elke functie is een rolbestand in `studio/roles/`. Een dagelijkse geplande taak (de **Producer als regisseur**) zet per taak een agent in met het juiste rolbestand. Die agents communiceren via issues en pull requests. De Team Lead reviewt elk werkstuk; de Studio Manager beoordeelt met een frisse blik het werk voor de CEO of een gate, code en een steekproef (zie `studio/WERKWIJZE.md` §5).
 
 | Map | Inhoud |
 |---|---|

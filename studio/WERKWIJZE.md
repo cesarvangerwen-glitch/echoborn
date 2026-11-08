@@ -31,13 +31,18 @@ Je onthoudt niets tussen runs. **Alles wat de volgende run moet weten, staat in 
 - Branch: `rol/<rol-slug>/<issue-nr>-<kort-onderwerp>`, bv. `rol/gameplay-programmer/12-echo-opname`
 - Commitbericht: `[<rol-slug>] korte omschrijving (#issue)`
 - PR-titel: `[<rol>] <deliverable> (#issue)`. In de PR-beschrijving: wat, hoe te controleren, bekende beperkingen.
-- **Niemand merget zijn eigen PR.** Mergen gebeurt pas na goedkeuring door de Studio Manager.
+- **Niemand merget zijn eigen PR.** Mergen gebeurt pas met `status:goedgekeurd` (zie §5).
 
 ## 5. Werkstroom van een deliverable
 
 1. **Team** maakt het werk → PR met label `status:interne-review`
 2. **Team Lead** reviewt (zie tabel) → comment `Lead-review: akkoord` of concrete feedback
-3. **Studio Manager** beoordeelt met de rubric → label `status:goedgekeurd` of `status:afgekeurd`
+3. **Studio Manager** beoordeelt met de rubric → label `status:goedgekeurd` of `status:afgekeurd`, maar alleen bij:
+   - werk voor de CEO of een gate (een `ceo-beslissing`, fase-statusrapport of gate-voorstel, of een document met CEO-vragen);
+   - code in `game/`;
+   - een steekproef: elke andere PR waarvan het PR-nummer deelbaar is door 3.
+
+   Bij alle andere PR's telt `Lead-review: akkoord` als goedkeuring: de regisseur zet `status:goedgekeurd` (besluit #47).
 4. Bij goedkeuring merget de regisseur de PR. Bij afkeuring gaat het terug naar het team.
 5. **CEO** komt alleen in beeld via `ceo-beslissing` of het fase-statusrapport.
 
@@ -74,9 +79,9 @@ Elk criterium krijgt een score van 1–10:
 | `status:todo` | Klaar om op te pakken |
 | `status:bezig` | Wordt aan gewerkt |
 | `status:interne-review` | Wacht op Team Lead |
-| `status:sm-review` | Wacht op Studio Manager |
+| `status:sm-review` | Wacht op Studio Manager (alleen bij PR's uit §5 stap 3) |
 | `status:afgekeurd` | Terug naar het team |
-| `status:goedgekeurd` | Klaar om te mergen |
+| `status:goedgekeurd` | Klaar om te mergen (gezet na SM-review, of na Lead-akkoord als er geen SM-review nodig is) |
 | `status:geblokkeerd` | Kan niet verder, zie laatste comment |
 | `ceo-beslissing` | Wacht op de CEO. Werk dat ervan afhangt stopt. |
 | `skillvoorstel` | Voorstel om een rolbestand te wijzigen |
