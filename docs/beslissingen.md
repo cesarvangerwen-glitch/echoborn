@@ -4,6 +4,7 @@ Alleen CEO-beslissingen. Nieuwste bovenaan. Alleen wijzigen na een `Besluit:` va
 
 | Datum | Besluit | Toelichting |
 |---|---|---|
+| 2026-11-08 | **Randvoorwaarden** (#2): budget per fase · geen deadline · omvang 5–7 uur, 3–4 gebieden, 4–5 bosses · ~€20, geen microtransacties, DLC alleen na nieuw besluit · zelf financieren + subsidies uitzoeken, geen publisher voorlopig · duister maar niet gruwelijk, PEGI 12 · alleen Engels bij launch, Steam Deck verified als doel · geen extra no-go's/must-haves | EP vraagt per fase budget aan; EP stelt na fase 2 een releasevenster voor; Business/Legal zoekt subsidies (bv. VAF Gamefonds) uit |
 | 2026-11-08 | Werkwijze: GitHub + één dagelijkse regie-run (Producer) die rollen als agents inzet | Rollen als bestanden in `studio/roles/`; communicatie via issues en PR's |
 | 2026-11-08 | **Concept B, *Echoborn*, is de voorlopige keuze** | Schaduw herhaalt je laatste 10 seconden; licht- en schaduwlaag; solo en co-op op dezelfde mechaniek. Definitief na de conceptfase. |
 | 2026-11-08 | Engine: **Godot 4.6** | Gratis, open source, sterke 2D, geen royalties |
@@ -18,9 +19,4 @@ Deze gelden tot de CEO ze vastlegt of wijzigt.
 
 | Onderwerp | Aanname |
 |---|---|
-| Speelduur | 10–14 uur, 6–8 gebieden, 8–10 bosses |
-| Prijs | ongeveer €20, geen microtransacties |
-| Toon en rating | duister maar niet gruwelijk, PEGI 12–16 |
-| Platform | Steam (Windows/Linux), Steam Deck verified als doel |
-| Talen | Engels en Nederlands bij launch |
-| Budget, releasevenster, financiering | Nog te bepalen in de randvoorwaardensessie |
+| Totaalbudget, releasevenster | Volgen per fase (zie besluit Randvoorwaarden) |

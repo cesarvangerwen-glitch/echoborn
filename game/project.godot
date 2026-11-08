@@ -1,0 +1,34 @@
+; Engine configuration file.
+; Echoborn - spike echo-opname (issue #5). Zie docs/tech/ontwerp.md.
+
+config_version=5
+
+[application]
+
+config/name="Echoborn"
+config/description="Spike: echo-opname en -afspelen, 2 lokale spelers."
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.6")
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+
+[layer_names]
+
+2d_physics/layer_1="wereld"
+2d_physics/layer_2="licht"
+2d_physics/layer_3="schaduw"
+
+[physics]
+
+common/physics_ticks_per_second=60
+common/max_physics_steps_per_frame=8
+common/physics_jitter_fix=0.0
+2d/physics_engine="GodotPhysics2D"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

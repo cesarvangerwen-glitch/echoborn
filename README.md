@@ -20,4 +20,4 @@ Deze repo is tegelijk de game én de studio. Elke functie is een rolbestand in `
 
 ## Rol van de CEO
 
-De CEO (eigenaar van deze repo) beslist alleen over visie, scope, budget en grote afwegingen. Die vragen komen als issue met het label `ceo-beslissing`, in het format: probleem, 2–3 opties, aanbeveling. De CEO antwoordt met een comment die begint met `Besluit:`.
+De CEO (eigenaar van deze repo) beslist alleen over visie, scope, budget en grote afwegingen. Die vragen komen als issue met het label `ceo-beslissing`: genummerde vragen met lettervoorstellen (A, B, C), de aanbeveling altijd als A. De CEO antwoordt kort, bv. `Besluit: 1A, 2B` of `Besluit: akkoord` (alle aanbevelingen). Of de CEO vraagt in een Claude-chat om de openstaande vragen als klikbare meerkeuze.
