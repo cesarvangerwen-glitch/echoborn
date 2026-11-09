@@ -1,95 +1,112 @@
 # Kernloop *Polderlight*
 
-Versie 0.2.1 · Eigenaar: Lead Game Designer · Issue #6 · Status: interne review (Executive Producer)
+Versie 0.4.1 · Eigenaar: Lead Game Designer · Issue [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (T3c) · vorige versies: #6
 Werktitel *Polderlight* (besluit #96); repo en mappen heten nog "echoborn", de mechaniek heet "echo".
+Bronnen: `docs/concept/pitch.md` **v0.4** (pillars P1–P3, puzzeldefinitie en normen §4, R-V4), `docs/beslissingen.md` (#2 randvoorwaarden, #18 stijl 2D, **#51 deel 2**: 1A, 7A, 8A), `docs/productie/fase-2-kader.md` v0.2.
+De exacte regels staan in `docs/design/gdd.md` v0.5.1. Dit document laat zien hoe ze in de loop passen, legt de aantallen en de terugkeerregels vast, toetst alles aan de pillars (§6) en zet op een rij wat de partner in co-op van de echo houdt (§7).
 
-> **Let op (v0.2.1):** dit document is nog van vóór pitch v0.4 en wordt in T3c herzien ([#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81)). Tot dan gelden bij verschil de regels in `docs/design/gdd.md` v0.4: de echo-staart is D (± 2 s) in plaats van 10 s (§2.2), en co-op volgt §2.7 (co-op 7A, C-01–C-16). Dat raakt vooral §4 (P2 neemt de echo niet meer over als kopie, maar speelt dezelfde rol live) en §7 (P2 slaat, merkt en is ook zelf springer).
-Bronnen: `docs/concept/pitch.md` (pillars), `docs/tech/ontwerp.md` (echo-spike), `docs/productie/fase-1-kader.md` (E2a, E2b), `docs/beslissingen.md` (randvoorwaarden #2, stijl 2D #18).
-De exacte echo-regels staan in `docs/design/gdd.md` §2. Dit document laat zien hoe ze in de loop passen, toetst ze aan de pillars (§6, fasekader E2a) en zet op een rij wat de schaduwspeler in co-op van de echo houdt (§7, fasekader E2b).
+**Werkaanname** (kader §5): CEO-besluiten #2 (5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12) en #51 deel 2, fasekader v0.2. Daarnaast **werkaanname LGD**: 4 gebieden (de bovengrens van #2) en alle aantallen in §5 als **maximum**; de wereldstructuur in GDD v1 (T3c) bevestigt of kiest 3 gebieden, met de gevolgen uit §5.
 
 ---
 
 ## 1. De loop in één zin
 
-**Verkennen → een plek vinden die je met één lichaam niet haalt → een vaardigheid vinden (bijna altijd: iets nieuws wat de echo kan) → oude plekken opnieuw openen.**
+**Bewegen en vechten in flow → je lichtmeter vult, ook door wat je echo doet → bij een gemaal pomp je dat licht de stad in → het water zakt, de wijk gaat aan, routes gaan open → een vaardigheid vinden → oude plekken opnieuw openen.**
 
-De loop draait op drie tijdschalen. Alle drie leunen ze op de echo (pillar 1) en lezen ze af aan licht en schaduw (pillar 2). Solo en co-op doorlopen precies dezelfde stappen (pillar 3).
+Er staan **geen puzzels op de kritieke route** (pillar 1; puzzeldefinitie in pitch §4: een plek waar je pas verder komt nadat je stilstaat om een volgorde of timing te bedenken). De echo is op de route nooit een slot: hij maakt je sneller, hoger en sterker (gdd C-15). Bij bosses is samenwerken verplicht, solo met je echo en in co-op met je partner (C-16).
 
-| Schaal | Duur | Wat de speler doet | Wat de echo doet |
+De loop draait op vier tijdschalen. Alle vier leunen ze op de echo (P1), lezen ze af aan licht, schaduw en water (P2), en zijn ze solo en co-op dezelfde (P3).
+
+| Schaal | Duur | Wat de speler doet | Wat het tweede lichaam doet (solo de echo, co-op de partner) |
 |---|---|---|---|
-| **Moment** | 10 s | Handelen voor nu én voor straks | Herhaalt jouw laatste 10 s in de schaduwlaag |
-| **Kamer** | 1–5 min | Lezen → plannen (solo) of afstemmen (co-op) → uitvoeren → kijken wat de echo doet | Lost de kamer samen met jou op, of breekt en laat zien waar het misging |
-| **Gebied** | 65–80 min | Verkennen, poorten in licht/schaduw tegenkomen, vaardigheid vinden, boss, terug naar oude poorten | Krijgt per gebied een nieuwe vaardigheid |
+| **Moment** | ± 2 s (D, gdd E-02) | Springen, dashen, slaan, merken | Komt een tel later vóór of onder je uit: springplank, vang, tweede slag die je merk laat knallen |
+| **Keten** | 20–60 s | Een sprongketen of een merk-arena in één beweging | Minstens één echo-actie per ± 20 s (norm 2, L-11); vult de meter het snelst |
+| **Wijk** | ± 10–20 min | Door een donkere, grijze wijk naar het gemaal, oppompen, de geopende route nemen | Pompt mee (LM-03); zonder echo kan het ook, hooguit 2× zo lang (LM-09) |
+| **Gebied** | 60–70 min eerste bezoek, **exclusief minibaas, boss en terugkeren** (die tellen apart, §5) | 2–4 wijken en een vaardigheid; daarna een minibaas, een boss en terugkeren | Krijgt bij elke vaardigheid een nieuwe betekenis (gdd §3); verplicht bij de boss |
 
 ## 2. Diagram: macro-loop (gebied en spel)
 
 ```mermaid
 flowchart TD
-    A[Verkennen van gebied n] --> B{Poort gevonden?<br/>licht, schaduw, echo of vaardigheid}
-    B -- nee --> A
-    B -- ja, nu te openen --> C[Kamerloop<br/>zie diagram 3]
-    B -- ja, nog niet te openen --> D[Onthouden<br/>de wereld laat zien waarom:<br/>fel licht, schaduwkloof, te hoog]
-    C --> A
-    D --> A
-    A --> E[Vaardigheid n vinden<br/>nieuw voor speler én echo]
-    E --> F[Gebiedsboss n<br/>vraagt vaardigheid n + echo]
-    F --> G[Terug naar oude poorten<br/>die nu met vaardigheid n opengaan]
-    G --> H{n = 4?}
-    H -- "nee: ingang gebied n+1 (K-02)" --> A
-    H -- "ja: laatste terugkeerpoorten (K-03)" --> J["Eindboss-poort<br/>vraagt alle 4 vaardigheden (K-04)"]
-    J --> I[Eindboss]
+    A[Gebied n binnen<br/>wijken donker en grijs] --> B[Wijk: route in flow<br/>sprongketens, merk-arena's]
+    B --> C[Lichtmeter vult<br/>ook door je echo of partner]
+    C --> D[Gemaal: oppompen in beweging<br/>checkpoint]
+    D --> E[Water zakt één stand<br/>wijk gaat aan, route open]
+    E --> F{Nog een wijk<br/>in gebied n?}
+    F -- ja --> B
+    F -- nee --> G[Vaardigheid n vinden<br/>nieuw voor jou, je echo en je partner]
+    G --> H[Gebiedsboss n<br/>samenwerken verplicht, finisher]
+    H --> I[Terugkeren door open wijken<br/>poorten die vaardigheid n vragen]
+    I --> J{n = 4?}
+    J -- "nee: ingang gebied n+1 (K-02)" --> A
+    J -- "ja: laatste terugkeerpoorten (K-03)" --> K["Eindboss-poort<br/>route met alle 4 vaardigheden (K-04)"]
+    K --> L[Eindboss<br/>de sluiswachter krijgt zijn 10 s terug]
 ```
 
-## 3. Diagram: kamerloop (de minuut-tot-minuut ervaring)
+## 3. Diagram: kamerloop (minuut tot minuut)
+
+Geen stap "plannen" of "oplossen": de speler leest de route in beweging en kiest waar zijn schaduw straks onder hem staat (pitch §5).
 
 ```mermaid
 flowchart LR
-    K1[Kamer binnen<br/>echo is leeg] --> K2[Lezen<br/>waar is licht, waar schaduw,<br/>wat kan alleen de echo?]
-    K2 --> K3{Modus}
-    K3 -- solo --> K4[Plannen<br/>wat ik nu doe, doet de echo over 10 s]
-    K3 -- co-op --> K5[Afstemmen<br/>P2 is de schaduw, live]
-    K4 --> K6[Uitvoeren]
-    K5 --> K6
-    K6 --> K7{Klopt het?}
-    K7 -- ja --> K8[Kamer open<br/>deur, brug, vijand weg]
-    K7 -- nee, echo breekt<br/>of verkeerde timing --> K9[Goedkoop opnieuw:<br/>Loslaten of 10 s wachten]
-    K9 --> K2
+    K1[Kamer binnen<br/>echo volgt door de deur, E-04a] --> K2[Route lezen in beweging<br/>waar komt mijn echo vóór of onder me uit?]
+    K2 --> K3[Bewegen en vechten<br/>sprong, dash, slag, merk]
+    K3 --> K4{Echo-actie?}
+    K4 -- "ja: bounce, lancering,<br/>vang, merk-combo" --> K5[Sneller, hoger, sterker<br/>meer licht in de meter]
+    K4 -- "nee: langzame lijn" --> K6[Verder, alleen langzamer<br/>hooguit 2×, C-15]
+    K3 -- gemiste sprong --> K7[Vang op je echo, B5<br/>of korte terugweg ≤ 10 s, L-10]
+    K7 --> K3
+    K5 --> K8[Volgende keten, arena of gemaal]
+    K6 --> K8
 ```
 
-## 4. Diagram: toestand van de schaduw (solo en co-op)
-
-> Verouderd sinds gdd v0.4: lees 600 ticks als D; drop-in en drop-out kloppen nog in de kern (C-03, C-05). Herziening in T3c.
+## 4. Diagram: toestand van het tweede lichaam
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Leeg: kamer binnen
-    Leeg --> Actief: 600 ticks na geldig_vanaf (E-03)
-    Leeg --> Leeg: kamerwissel, respawn of Loslaten (E-04: geldig_vanaf = t)
-    Actief --> Gebroken: controle faalt (E-08) of Loslaten (E-09)
-    Actief --> Leeg: kamerwissel of respawn (E-04a, E-04b)
-    Gebroken --> Leeg: direct, geldig_vanaf = t (E-04d)
-    Actief --> Overgenomen: drop-in, P2 op de plek van de echo (C-03)
-    Leeg --> Overgenomen: drop-in, P2 op de plek van P1 (C-03)
-    Overgenomen --> Actief: drop-out en t − D ≥ geldig_vanaf (C-05)
-    Overgenomen --> Leeg: drop-out en buffer nog niet geldig (C-05)
+    [*] --> Leeg: start, laden (gdd LM-12)
+    Leeg --> Actief: D ticks na geldig_vanaf (E-03)
+    Actief --> Leeg: kamer die geen buur is, respawn, wissel van D (E-04)
+    Actief --> Leeg: breken (E-08) of Loslaten (E-09), met breek-effect
+    Actief --> Buiten: frame p in een kamer die niet geladen is (E-04a)
+    Buiten --> Actief: frame p weer geladen, geen reset
+    Actief --> Merksprong: AANVAL-event met doelmerk binnen R (E-02m)
+    Merksprong --> Actief: na 12 ticks, of meteen terug als het merk weg is
+    Actief --> Partner: drop-in, P2 op de plek van de echo (C-03)
+    Leeg --> Partner: drop-in, P2 op de plek van P1 (C-03)
+    Buiten --> Partner: drop-in, P2 op de plek van P1 (C-03)
+    Partner --> Actief: drop-out en t − D ≥ geldig_vanaf (C-05)
+    Partner --> Leeg: drop-out, opname nog niet geldig (C-05)
 ```
 
-In *Overgenomen* loopt de opname van P1 door en blijven kamerwissel, respawn en Loslaten `geldig_vanaf` zetten (C-04). P2 die oplost (C-06) blijft in *Overgenomen*: hij komt na 120 ticks terug.
+In *Actief* is de echo **dragend** of **zwevend**: hij draagt alleen waar P1 in frame `p` vanaf de grond liep of sprong (E-07c); waar P1 op hem stond, zweeft hij zonder te breken (E-08b) en draagt hij niet. In *Partner* loopt de opname van P1 door en blijven kamerwissel, respawn en Loslaten `geldig_vanaf` zetten (C-04). P2 die oplost (C-06) blijft in *Partner*: er is dan geen echo (C-01), en hij komt na 120 ticks terug.
 
 ## 5. Hoe de loop past binnen de randvoorwaarden
 
-Randvoorwaarden (besluit #2): 5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12. Alle aantallen hieronder zijn **maxima** (werkaanname LGD), zodat de Producer ermee kan plannen. Uitwerking: Systems Designer en World & Level Designer.
+Randvoorwaarden (besluit #2): 5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12. Alle aantallen zijn **maxima** (werkaanname LGD), zodat de Producer en de EP ermee kunnen plannen (F6, R20). Uitwerking: Systems Designer en World & Level Designer.
 
 | Onderdeel | Maximum / richtgetal |
 |---|---|
-| Gebieden | Max. **4**, elk 65–80 min bij een eerste run; plus een proloog van 10–15 min |
-| Vaardigheden | **4** echo-vaardigheden, één per gebied (`gdd.md` §3); geen vaardigheid zonder echo-betekenis |
-| Bosses | Max. **5**: 4 gebiedsbosses + 1 eindboss; elke boss toetst de vaardigheid van zijn gebied plus de basis-echo; 6–12 min per boss inclusief pogingen |
-| Kamers | Max. **30 per gebied** (120 totaal), waarvan max. **10 echo-puzzelkamers op de kritieke route** per gebied (40 totaal). Verkenning bij voorkeur in grote kamers (`gdd.md` L-07). Dit is de grootste werkpost in productie. |
+| Gebieden | Max. **4**, elk **60–70 min** bij een eerste bezoek, **exclusief minibaas, boss en terugkeren**; plus een proloog van 10–15 min |
+| Wijken | **2–4 per gebied**, elk met één gemaal van 1–2 trappen (gdd L-14, LM-08) |
+| Vaardigheden | **4**, één per gebied (gdd §3: Neerslag, Snijlijn, Wandgreep, Meerlijn); geen vaardigheid zonder echo-betekenis |
+| Bosses | Max. **5**: 4 gebiedsbosses + 1 eindboss, 8–12 min per boss inclusief pogingen; elke boss vraagt samenwerken (C-16) |
+| **Scopeplafond combat** (pitch R-V4, voor F6) | Max. **4 nieuwe vijandtypes per gebied**, max. **14 in totaal** inclusief varianten; max. **1 minibaas per gebied** (3–5 min); de 4–5 bosses hierboven. Weinig types die veel kunnen (merk, pantser, neerslag, snijlijn). De slice meet de kost per vijandtype en per boss tegen dit plafond (F6) |
+| Kamers | Max. **30 per gebied** (120 totaal). **Puzzelkamers op de kritieke route: 0.** Grote kamers mogen weer, maar zijn niet meer nodig voor de echo (E-04a) |
+| Optionele echo-uitdagingen | Alleen in beweging (springparcours, tijdrit; pitch §11 vraag 8), nooit op de kritieke route, **max. 2 per gebied**, pas in fase 3 en alleen als de scope het toelaat |
 | Terugkeerpoorten | **2–4 per gebied** in gebied 1–3 (max. 12), zie de terugkeerregels hieronder |
-| Toon (PEGI 12) | Echo en vijanden lossen op in licht of schaduw; geen bloed. De "breek" van de echo is een oplossing in schaduwdeeltjes, geen sterfscène. |
+| Toon (PEGI 12) | Echo en vijanden lossen op in licht of schaduw; geen bloed. Water is een droom, geen ramp in beeld (pitch §6). De "breek" van de echo is een oplossing in schaduwdeeltjes, geen sterfscène |
 
-Rekensom: ondergrens 15 min proloog + 4 × 65 min + 5 × 6 min = 305 min ≈ **5,1 uur**; bovengrens 15 + 4 × 80 + 5 × 12 = 395 min ≈ **6,6 uur**. Beide binnen 5–7 uur, ook als de bosses het dubbele van de oorspronkelijke 6 min kosten.
+**Rekensom** (inclusief terugkeren, A3: SM-punt 4 op PR #16). De 60–70 min van een gebied zijn **exclusief** minibaas, boss en terugkeren: die drie tellen apart (kolommen hieronder). Terugkeren kost **2–3 min per terugkeerpoort**: ≤ 2 min lopen (heen vanaf het dichtstbijzijnde gemaal en terug, elk ≤ 1 min, K-05) plus ≤ 1 min voor de poort en wat erachter ligt.
+
+| | Proloog | Gebieden | Bosses | Minibazen | Terugkeren | Totaal |
+|---|---|---|---|---|---|---|
+| Ondergrens | 10 | 4 × 60 = 240 | 5 × 8 = 40 | 4 × 3 = 12 | 6 × 2 = 12 | **314 min ≈ 5,2 uur** |
+| Bovengrens | 15 | 4 × 70 = 280 | 5 × 12 = 60 | 4 × 5 = 20 | 12 × 3 = 36 | **411 min ≈ 6,9 uur** |
+
+Beide binnen 5–7 uur. **Met 3 gebieden** (4 bosses, terugkeerpoorten alleen in gebied 1–2) haalt de ondergrens de 5 uur pas als een gebied **± 85 min** duurt (10 + 3 × 85 + 4 × 8 + 3 × 3 + 4 × 2 = 314 min). Dat zijn grotere gebieden met meer wijken; de wereldstructuur kiest (gdd §8).
+
+**Open punt (wereldstructuur, gdd §8 punt 1):** met 3 gebieden haalt de ondergrens de 5 uur pas bij ± 85 min per gebied; de wereldstructuur kiest dat expliciet, met het aantal wijken per gebied en de kost in kamers (max. 30 per gebied).
 
 ### Terugkeerregels (backtracking)
 
@@ -97,84 +114,85 @@ Voor de World & Level Designer. Gebied *n* is het gebied waar vaardigheid *n* li
 
 | ID | Regel |
 |---|---|
-| **K-01** | Gebied 1, 2 en 3 hebben elk **2–4 terugkeerpoorten**: poorten die pas opengaan met de vaardigheid van een *later* gebied. Over gebied 1–3 samen vraagt elk van vaardigheid 2, 3 en 4 minstens één terugkeerpoort. |
-| **K-02** | De ingang van gebied *n + 1* (n = 1–3) ligt in gebied 1 t/m *n* achter een poort die vaardigheid *n* vraagt. Zo is terugkeren de brug naar het volgende gebied (diagram §2). |
+| **K-01** | Gebied 1, 2 en 3 hebben elk **2–4 terugkeerpoorten**: poorten die pas opengaan met de vaardigheid van een *later* gebied. Over gebied 1–3 samen vraagt elk van vaardigheid 2, 3 en 4 minstens één terugkeerpoort. Een terugkeerpoort is een vaardigheidspoort die zichzelf leest (gdd L-03, §3.2): een luik, rietgordijn, kale schacht of kloof met meerringen. |
+| **K-02** | De ingang van gebied *n + 1* (n = 1–3) ligt in gebied 1 t/m *n* achter een poort die vaardigheid *n* vraagt. Zo is terugkeren de brug naar het volgende gebied (diagram §2). Een **K-02-poort is geen terugkeerpoort**: ze ligt op de kritieke route, telt **niet** mee in de 2–4 poorten van K-01 en **niet** in de 2–3 min per terugkeerpoort van de rekensom; de loop erheen valt in de 60–70 min van gebied *n + 1* (het eerste bezoek begint bij de poort). |
 | **K-03** | **Gebied 4 heeft geen terugkeerpoorten**: alles in gebied 4 is te openen met vaardigheid 1–4 tijdens het eerste bezoek. Gebied 4 rondt het terugkeren af: met vaardigheid 4 gaan de laatste terugkeerpoorten in gebied 1–3 open (K-01). |
-| **K-04** | De **eindboss-poort** vraagt alle vier vaardigheden: een echo-poort met vier stappen, één per vaardigheid (`gdd.md` L-03, L-04). De eindboss toetst alle vier vaardigheden plus de basis-echo. Achter terugkeerpoorten ligt verder alleen optionele inhoud (verzamelobjecten, snelkoppelingen); de kritieke route gaat alleen door de poorten uit K-02 en K-04. |
+| **K-04** | De **eindboss-poort** is **geen echo-puzzel** maar een **route in beweging** die elke vaardigheid minstens één keer vraagt (een luik, een rietgordijn, een greep-schacht, een kloof met meerringen), met een echolijn en een langzame lijn per stuk (gdd L-08) en zonder stap waarin je stilstaat om iets te bedenken (FK-1). De eindboss vraagt samenwerken (C-16) en mag alle vier vaardigheden gebruiken. Achter terugkeerpoorten ligt verder alleen optionele inhoud (verzamelobjecten, snelkoppelingen); de kritieke route gaat alleen door de poorten uit K-02 en K-04. |
+| **K-05** | **Terugkeren gaat door open wijken.** Elke terugkeerpoort ligt binnen **≤ 1 min lopen, enkele reis,** van een gemaal (checkpoint, LM-08) via wijken die al zijn opgepompt (lussen en snelkoppelingen, L-12, L-14f); heen en terug dus ≤ 2 min. Zo blijft terugkeren in flow en klopt de rekensom hierboven (2–3 min per poort). Gemeten bij een eerste speler zonder omwegen; de World & Level Designer toetst het met de wereldkaart. |
 
-Toetsing: checklist bij de wereldkaart (World & Level Designer, review LGD), in fase 2.
+Toetsing: checklist bij de wereldkaart (World & Level Designer, review LGD), in T3c.
 
-## 6. Toets aan de drie pillars (fasekader E2a)
+## 6. Toets aan de drie pillars
 
-Toetsvragen uit `docs/concept/pitch.md` §4:
-- **P1:** *Gebruikt of versterkt het wat de echo kan, of maakt het de echo overbodig?*
-- **P2:** *Kan een speler in één oogopslag zien in welke laag dit hoort, en loopt de gating via licht, schaduw of de echo?*
-- **P3:** *Werkt het zowel met de 10-secondenecho (solo) als met een live gespeelde schaduw (co-op), zonder aparte versie?*
+Toetsvragen uit `docs/concept/pitch.md` v0.4 §4:
+- **P1, De echo houdt je in beweging:** *Maakt de echo deze actie vloeiender of krachtiger, zonder dat de speler ervoor moet stilstaan?*
+- **P2, Licht terugwinnen opent de stad:** *Gaat deze weg open door licht dat de speler terugwon of door een vaardigheid die hij heeft, en niet door een raadsel?*
+- **P3, Samen bewegen = sterker bewegen:** *Werkt deze actie zowel met een partner (co-op) als met je echo (solo), in dezelfde kamer zonder aparte versie?*
 
-### 6.1 Per groep echo-regels
+### 6.1 Per groep regels (`gdd.md` v0.5)
 
-| Regels (`gdd.md`) | P1 | P2 | P3 |
+| Regels | P1 | P2 | P3 |
 |---|---|---|---|
-| **Opnamemodel** (E-01–E-04e): altijd 10 s achter je aan, toestandsopname, één reset | **Ja.** De echo doet altijd mee, ook buiten puzzels; elke basisactie krijgt een tweede betekenis. | **Ja.** De echo staat altijd in de schaduwlaag; in 2D gerasterd met de contour van P1 (vol = levend, hol = echo, stijltest #7). | **Ja.** Dezelfde buffer loopt in co-op door; bij drop-out neemt de echo over zonder kamer-reset. |
-| **Lagen en platform** (E-05–E-07b, E-11, E-12) | **Ja.** De echo is een lichaam met gewicht: P1 staat erop en beweegt mee, hij houdt drukplaten vast. | **Ja.** Wat de echo raakt, volgt uit één eigenaarslaag per object; fel licht is een zone die bij een zichtbare lamp hoort. | **Ja.** P2 gebruikt dezelfde lagen, maskers en schaduwplank. |
-| **Breken** (E-08, L-06) | **Ja.** Falen is zichtbaar in de echo zelf; opnieuw kost hooguit 10 s. | **Ja.** De oorzaak staat in beeld: schaduwmuur, ontbrekende schaduwsteun, fel licht of schaduwgevaar. | **Ja.** P2 lost op door dezelfde licht- en gevaaroorzaken (C-06). |
-| **Events en aanval** (E-10–E-10b, E-13, E-14, tweeslagschild) | **Ja.** Een slag nu is een slag over 10 s; het tweeslagschild vraagt twee lichamen tegelijk (pitch: "past"). | **Ja.** De echo raakt alleen gedeelde en schaduwobjecten; welke dat zijn, zie je aan het object. | **Ja.** P2 slaat en bedient met dezelfde bits en dezelfde laagregels. |
-| **Loslaten** (E-09) | **Ja.** Geen "slow motion": je wacht nog steeds 10 s op je nieuwe echo, de tijdsdruk blijft. | n.v.t. (geen gating) | **Ja.** In co-op zet het alleen `geldig_vanaf`, zodat een drop-out klopt. |
-| **Co-op** (C-01–C-08) | **Ja.** P2 neemt precies de rol van de echo over; er komt geen derde lichaam bij. | **Ja.** Altijd één lichaam in het licht en één in de schaduw; P2 is vol, de echo hol. | **Ja.** Zelfde kamers, zelfde regels; zie §7 voor wat P2 van de echo houdt. |
-| **Levelregels en terugkeren** (L-01–L-07, K-01–K-04) | **Ja.** Kritieke-route-kamers zijn niet met één lichaam op te lossen (L-01); de eindboss-poort vraagt alle echo-vaardigheden. | **Ja.** Poorten zijn licht, schaduw, echo of vaardigheid, nooit gekleurde sleutels (L-03). | **Ja.** Geen co-op-only plekken (L-02). |
+| **Opname en staart** (E-01–E-04e) | **Ja.** De echo loopt ± 2 s achter je en volgt je door de deur, dus hij is er bijna altijd (MP-4 ≤ 40 %). | **Ja.** Hij staat altijd in de schaduwlaag, gerasterd met de contour van P1 (vol = levend, hol = echo). | **Ja.** De opname loopt in co-op door; bij drop-out neemt de echo naadloos over (C-05). |
+| **Lagen, plank en springplank** (E-05–E-07c) | **Ja.** Landen op je echo houdt je vaart en geeft je dash terug; geen toren, dus hij maakt routes niet overbodig. | **Ja.** Eén eigenaarslaag per object; zones zijn zichtbaar bij een lamp of gevaar. | **Ja.** P2 heeft dezelfde plank, en P1 is voor P2 een lichtplank (C-09). |
+| **Breken** (E-08, L-06) | **Ja.** Breken kost hooguit ± 2 s; op je echo staan breekt hem niet. | **Ja.** De oorzaak staat in beeld: schaduwmuur, fel licht, schaduwgevaar. | **Ja.** P2 lost op door dezelfde oorzaken (C-06). |
+| **Aanval en schaduwmerk** (E-10–E-14, E-02m) | **Ja.** Je slaat, een tel later slaat je schaduw daar nog eens en laat je merk knallen; geen ontsteekknop, geen wachten. | **Ja.** Het merk is een lichtvonk (peilmerk) en de ontploffing licht en schaduw. | **Ja.** Co-op: de een zet, de ander laat knallen (C-12). |
+| **Loslaten** (E-09) | **Ja.** Een ongelukkige echo is in een tel leeg; je nieuwe is er ± 2 s later. | n.v.t. | **Ja.** In co-op zet het alleen `geldig_vanaf`. |
+| **Co-op 7A** (C-01–C-16) | **Ja.** Vier acties in beweging; optioneel op de route, verplicht bij bosses, nooit een slot. | **Ja.** Max. twee lichamen; de finisher-echo is half licht, half schaduw. | **Ja.** Elke actie heeft een solo- en een co-op-vorm in dezelfde kamer. |
+| **Lichtmeter, gemalen, water** (LM-01–LM-12) | **Ja.** Flow vult de meter het snelst; oppompen en genezen kunnen lopend. | **Ja.** Pillar 2 zelf: licht terugwinnen laat het water zakken en opent routes. | **Ja.** Eén gedeelde meter; P2 pompt mee. |
+| **Vaardigheden** (V-01–V-04) | **Ja.** Elke vaardigheid geeft de echo iets nieuws (tweede neerslag, snijlijn, plank aan de muur, lijn naar je echo); geen dubbele sprong. | **Ja.** Elke poort leest zichzelf (luik, riet, schacht, meerring). | **Ja.** P1 en P2 krijgen ze tegelijk, met dezelfde regel. |
+| **Levelregels en terugkeren** (L-02–L-14, K-01–K-05) | **Ja.** Bouwstenen waar de echo vóór je uitkomt, elke ± 20 s een kans, missen kost weinig. | **Ja.** Poorten via licht, water of een vaardigheid, nooit een sleutel of raadsel (L-03). | **Ja.** Geen co-op-only plekken (L-02), geen aparte versie van een kamer (C-15d). |
 
 ### 6.2 Per onderdeel van de loop
 
 | Onderdeel | P1 | P2 | P3 |
 |---|---|---|---|
-| **Moment** (E-01) | Ja: lopen, springen, slaan en hendels hebben een tweede betekenis. Dat dekt het pitch-risico "te weinig flow". Playtestvraag 1 meet hoe vaak de echo tijdens verkennen Leeg is. | Ja: de echo is altijd zichtbaar in de schaduwlaag. | Ja: in co-op is P2 diezelfde schaduw. |
-| **Kamer** | Ja: L-01. | Ja: L-03. | Ja: solo gepland, co-op afgestemd (L-02). |
-| **Vaardigheid vinden** | Ja: alle 4 vaardigheden zijn echo-vaardigheden; geen dubbele sprong of dash die de echo overbodig maakt. | Ja: Dempen en Dragen werken op licht; Ankeren en Terugstappen op de echo. | Ja: P1 en P2 krijgen elke vaardigheid tegelijk. |
-| **Boss** | Ja: elke boss heeft minstens één fase die de echo vraagt (bv. het tweeslagschild). | Ja: bosses wisselen het licht en dus de lagen. | Ja: zelfde boss, zelfde regels; in co-op voelt hij anders (live in plaats van gepland). |
-| **Terugkeren** (K-01–K-04) | Ja: oude poorten gaan open door wat de echo nu kan. | Ja: de poort laat zelf zien waarom hij dicht was (te fel, te donker, te hoog). | Ja: geen co-op-only poorten. |
+| **Moment** | Ja: de echo is springplank en tweede slag binnen ± 2 s (norm 1 en 2). | Ja: de echo is altijd zichtbaar in de schaduwlaag. | Ja: in co-op doet de partner hetzelfde, live. |
+| **Keten** | Ja: L-08 en L-11; normen gemeten in de flow-kamer (F0) en de slice (F4, F4b). | Ja: ketens vullen de meter (LM-02). | Ja: dezelfde bouwstenen voor beide modi. |
+| **Wijk en gemaal** | Ja: oppompen zonder stilstand (LM-04), de echo pompt mee. | Ja: het water zakt, de wijk gaat aan. | Ja: samen oppompen uit één meter. |
+| **Vaardigheid vinden** | Ja: elke vaardigheid versterkt de echo (gdd §3.1). | Ja: een vaardigheid opent een route die je eerder zag maar niet haalde. | Ja: P1 en P2 krijgen hem tegelijk. |
+| **Boss** | Ja: samenwerken is verplicht, in beweging, vensters ≥ 10 ticks, ≤ 5 s stilstand (C-16). | Ja: een boss gebruikt fel licht en schaduwgevaar en leest je echo (O-1). | Ja: dezelfde boss en arena, de finisher speelt jullie laatste 10 s (C-14). |
+| **Terugkeren** | Ja: oude poorten gaan open door wat je nu kunt, via open wijken (K-05). | Ja: de poort laat zelf zien waarom hij dicht was. | Ja: geen co-op-only poorten. |
 
 **Bewuste uitzonderingen** (pitch §4 staat ze toe als ze benoemd zijn):
-1. Basisbeweging (lopen, springen, slaan) bestaat zonder echo.
+1. Basisbeweging (lopen, springen, slaan, dash) bestaat zonder echo; de echo voegt er iets aan toe als hij haar herhaalt.
 2. Alleen P1 verzamelt (E-12), zodat er één duidelijke eigenaar van de voortgang is.
-3. Vijanden doen de echo en P2 niets (E-14). Gevaar voor de schaduw loopt alleen via licht en schaduwgevaar (pillar 2). Of vijanden de echo later toch als doelwit kiezen, is open vraag O-1 (Combat Designer).
+3. Vijanden doen de echo en P2 niets (E-14h). Gevaar voor de schaduw loopt alleen via licht en schaduwgevaar (pillar 2); bosses lezen je echo zonder hem schade te doen (O-1).
 
-## 7. Co-op: wat de schaduwspeler van de echo houdt (fasekader E2b)
+## 7. Co-op: wat de partner van de echo houdt
 
-> Verouderd sinds gdd v0.4 (co-op 7A): de beperkingen van de schaduw blijven (laag, fel licht, gevaar, lichtobjecten, verzamelen, leiband), maar P2 kan nu ook slaan, merken en pompen (C-02) en op P1 staan via de lichtplank (C-09). De vier samenwerkingsacties en de finisher staan in `gdd.md` §2.7. Herziening in T3c.
+Co-op 7A (besluit #51): één rol, solo de echo en in co-op de partner (P2). Co-op mag de game niet triviaal maken en niemand mag wachten (pillar 3, R10, R-V5). Daarom houdt P2 de beperkingen van de schaduw; wat hij extra heeft, is dat hij live speelt en meeslaat.
 
-Doel: co-op mag de puzzels niet triviaal maken (pillar 3, risico R10). Daarom houdt P2 alle beperkingen van de echo. Het enige echte verschil is dat P2 *live* speelt.
+**Wat P2 houdt**
 
 | Beperking | Echo (solo) | P2 (co-op) | Regel |
 |---|---|---|---|
 | Laag | Alleen schaduw (laag 3) | Alleen schaduw (laag 3) | E-05, C-02 |
 | Botst met | Wereld en schaduwgeometrie (breekt erop) | Wereld en schaduwgeometrie (botst ertegen) | E-08a, C-02 |
-| Lichtgeometrie | Bestaat niet: geen steun, geen muur | Bestaat niet: geen steun, geen muur | E-05, E-08b |
-| Fel licht | Breekt | Lost op, terug na 120 ticks | E-08c, C-06 |
-| Schaduwgevaar | Breekt | Lost op, terug na 120 ticks | E-08d, C-06 |
-| Lichtobjecten (lichtplaat, lichtschakelaar, lichtwezen) | Kan ze niet bedienen of raken | Kan ze niet bedienen of raken | E-06, C-02 |
-| Gedeelde en schaduwobjecten | Bedient en raakt ze | Bedient en raakt ze | E-06, C-02 |
-| Verzamelen (items, vaardigheden, gezondheid) | Nee | Nee | E-12, C-02 |
-| Levenspunten, vijandelijke treffers | Geen; vijanden doen niets | Geen; vijanden doen niets | E-14, C-02 |
-| Op P1 staan | Kan niet | Kan niet | E-05, C-02 |
-| P1 op de schaduw | P1 kan erop staan en beweegt mee | P1 kan erop staan en beweegt mee | E-07, E-07a |
-| Duwen | Duwt niets | Duwt niets | E-07, C-02 |
-| Kamerwissel, camera | Veroorzaakt geen kamerwissel | Veroorzaakt geen kamerwissel; moet in beeld blijven (leiband), P1 bepaalt de camera | E-04e, C-07 |
-| Aantal | Eén schaduwlichaam | Eén schaduwlichaam; geen echo ernaast | C-01 |
+| Lichtgeometrie | Bestaat niet | Bestaat niet | E-05 |
+| Fel licht, schaduwgevaar | Breekt | Lost op, terug na 120 ticks | E-08c/d, C-06 |
+| Lichtobjecten | Kan ze niet bedienen of raken | Kan ze niet bedienen of raken | E-06, C-02 |
+| Verzamelen | Nee | Nee | E-12, C-02 |
+| Levenspunten | Geen; vijanden doen niets | Geen; vijanden doen niets | E-14h, C-02 |
+| Camera | Veroorzaakt geen kamerwissel | Veroorzaakt geen kamerwissel; moet in beeld blijven (leiband) | E-04e, C-07 |
+| Aantal | Eén tweede lichaam | Eén tweede lichaam; geen echo ernaast | C-01 |
 
-**Wat P2 extra heeft, en waarom dat de puzzel niet triviaal maakt:**
+**Wat P2 extra heeft, en wat het afdekt**
 
 | Extra van P2 | Risico | Wat het afdekt |
 |---|---|---|
-| **Live timing** (nu in plaats van 10 s later) | Bedoeld verschil: van plannen naar afstemmen (pillar 3) | Playtestvraag 3: co-op niet meer dan 2× zo snel als solo |
-| **Eigen route** (niet gebonden aan het pad van P1) | P2 bereikt plekken waar de echo nooit komt | L-02: elke plek die de schaduw op de kritieke route of voor een verzamelobject moet bereiken, is ook voor de solo-echo bereikbaar; plekken die alleen P2 bereikt, bevatten niets |
-| **Botsen in plaats van breken** | Goedkoper herstel bij een fout | P2 komt nog steeds niet door een schaduwmuur; alleen de straf is kleiner (pitch-vraag 3: vergevingsgezind) |
-| **Onbeperkt wachten** (bv. lang op een plaat staan) | Tijdsdruk valt weg | Solo kan P1 ook lang op een plaat staan, de echo herhaalt dat; puzzels met een tijdsvenster gebruiken Eenmalige of Wissel-schakelaars (L-04, L-05) of het tweeslagschild |
+| **Live timing en een eigen route** | P2 komt waar de echo nooit komt | Plekken die alleen P2 bereikt, bevatten niets (L-02); samenwerken levert alleen tempo, nooit een plek (C-15) |
+| **Slaan, merken en pompen** (10 SE) | Co-op wordt te makkelijk | MP-7: co-op hooguit 2× zo snel als solo; daarna eerst de boss-SE in co-op bijstellen (O-13) |
+| **Op P1 staan** (lichtplank) en springer zijn | Eindeloos op elkaar klimmen | Ladderregel (C-09), solo dezelfde regel via E-07c |
+| **Botsen in plaats van breken** | Goedkoper herstel | Bedoeld: de minder ervaren speler faalt vergevingsgezind (pitch §11 vraag 3) |
+| **Geen merksprong** | — | P2 richt zelf; de merksprong is er voor de echo, die niet kan richten (C-02) |
 
-In fase 2 wordt elke puzzel van de verticale slice in beide modi gespeeld (R10, fasekader §5).
+Iedereen kan alles ook alleen, alleen langzamer (C-15), dus niemand hoeft op de ander te wachten. Gemeten met MP-7 vanaf de flow-kamer, in de slice per kamer en bij de boss (T11).
 
-## 8. Wat we met het prototype willen leren
+## 8. Wat we willen leren
 
-De drie playtestvragen voor het prototype staan in `gdd.md` §5: de lengte van 10 s (inclusief hoe vaak de echo tijdens verkennen Leeg is), of breken eerlijk voelt, en of co-op afstemmen is zonder triviaal te worden.
+- **Flow-kamer (F0, T17):** de playtestvragen in `gdd.md` §5: welke staart (1,5 / 2 / 3 s), houdt de echo je in beweging (normen 1–3), is hij niet te vaak Leeg, ligt de springplank niet achter je (R-V12), leest het merk als *Nine Sols*, en wacht in co-op iemand.
+- **Slice (F3, F4, F4b, T11):** dezelfde normen in een echte polderwijk met gemaal en de Gemaalmeester, de vragen per vaardigheid die in de slice zit (`gdd.md` §3.5), en of de echo ook buiten verplichte boss-acties gebruikt wordt (grens F4b(b), `gdd.md` §5.1).
 
 ## 9. Wijzigingen
 
@@ -182,4 +200,6 @@ De drie playtestvragen voor het prototype staan in `gdd.md` §5: de lengte van 1
 |---|---|
 | 0.1 | Eerste versie (PR #16). |
 | 0.2 | Lead-review EP (PR #16): terugkeerregels K-01–K-04 (gebied 4 en eindboss), aantallen als maximum met rekensom 5,1–6,6 uur, toestandsdiagram met Leeg → Overgenomen, macro-diagram met eindboss-poort. Fasekader v1.1: pillartoets per groep echo-regels (§6.1, E2a) en overzicht wat P2 van de echo houdt (§7, E2b). Stijlbesluit 2D verwerkt. |
-| 0.2.1 | Werktitel *Polderlight* (besluit #96, [#37](https://github.com/cesarvangerwen-glitch/echoborn/issues/37)); verwijzing naar gdd v0.4 voor staart en co-op 7A (T3b, [#75](https://github.com/cesarvangerwen-glitch/echoborn/issues/75)), tot de herziening in T3c. |
+| 0.2.1 | Werktitel *Polderlight* (besluit #96, [#37](https://github.com/cesarvangerwen-glitch/echoborn/issues/37)); verwijzing naar gdd v0.4 voor staart en co-op 7A. |
+| 0.4.1 | Herstel na de Lead-review van de EP (PR #108): de 60–70 min per gebied zijn **exclusief** minibaas, boss en terugkeren (§1, §5); **K-05** ≤ 1 min lopen enkele reis (heen en terug ≤ 2 min), passend bij 2–3 min per terugkeerpoort in de rekensom (5,2–6,9 uur blijft); open punt 3 gebieden (± 85 min per gebied) naar de wereldstructuur. Na de SM-review: K-02-poort telt niet als terugkeerpoort. |
+| 0.4 | Herschreven naar pitch v0.4 en `gdd.md` v0.5 (T3c, [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81)); het versienummer volgt de pitch. Loop in één zin met licht oppompen en **0 puzzels op de kritieke route** (§1); vier tijdschalen met de staart D (moment, keten, wijk, gebied); macro-loop met wijken en gemalen, kamerloop zonder plannen/oplossen, toestandsdiagram met Buiten, Merksprong en Partner (§2–§4). §5: wijken, vaardigheden bij naam, **scopeplafond combat (R-V4)**, 0 puzzelkamers, optionele echo-uitdagingen max. 2 per gebied; rekensom met minibazen en **terugkeertijd** (A3: SM-punt 4 op PR #16), 5,2–6,9 uur, en het gevolg van 3 gebieden. **K-04** zonder echo-puzzel (route in beweging met alle vier vaardigheden), nieuw **K-05** (terugkeren door open wijken). §6 pillartoets op de pillars van v0.4; §7 co-op 7A; §8 flow-kamer en slice. |
