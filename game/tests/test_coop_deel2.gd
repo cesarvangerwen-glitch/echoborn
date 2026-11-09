@@ -16,6 +16,7 @@ const Zone = preload("res://scripts/objects/zone.gd")
 const GameEvents = preload("res://scripts/events/game_events.gd")
 const ScriptedInput = preload("res://scripts/input/scripted_input.gd")
 const CombatTarget = preload("res://scripts/combat/combat_target.gd")
+const Tuning = preload("res://scripts/echo/tuning.gd")
 const Combat = preload("res://scripts/combat/combat.gd")
 const LightMeter = preload("res://scripts/light/light_meter.gd")
 const Meetlog = preload("res://scripts/events/meetlog.gd")
@@ -289,6 +290,27 @@ func test_c07_camera_matches_leash(t) -> void:
 				if shown != SimScript.partner_in_view(p1_at, p2_at) or not p1_inside:
 					bad.append([dx * sx, dy, shown])
 	t.check(bad.is_empty(), "beeld en leiband verschillen bij %s" % str(bad))
+
+
+## #120: de zoom volgt de rendergrootte. Ingezoomd ziet het venster van
+## 1280 × 720 en de Deck-render van 640 × 400 hetzelfde wereldbeeld (de Deck
+## iets meer in de hoogte); op maximale zoom-uit past `leash_view_px` precies
+## in de breedte, dus de leiband blijft bij elke rendergrootte binnen beeld.
+func test_120_zoom_follows_render_size(t) -> void:
+	var near := FlowRoom.camera_view(Vector2(1000, 400), Vector2(1000, 400))
+	var far := FlowRoom.camera_view(Vector2(1000, 400), Vector2(1960, 400))
+	var c: Dictionary = Tuning.coop()
+	var leash := Vector2(float(c["leash_view_px"][0]), float(c["leash_view_px"][1]))
+	t.check(far.size.is_equal_approx(leash), "maximale zoom-uit %s, leiband %s" % [far.size, leash])
+	for case in [[Vector2(1280, 720), 2.0], [Vector2(1280, 800), 2.0], [Vector2(640, 400), 1.0],
+			[Vector2(1920, 1080), 3.0], [Vector2(640, 360), 1.0]]:
+		var render: Vector2 = case[0]
+		var z := FlowRoom.camera_zoom(near, render)
+		t.check(is_equal_approx(z, case[1]), "zoom bij %s: %.3f, verwacht %.3f" % [render, z, case[1]])
+		var z_far := FlowRoom.camera_zoom(far, render)
+		var shown := render / z_far
+		t.check(shown.x >= leash.x - 0.001 and shown.y >= leash.y - 0.001,
+			"bij %s toont de camera %s, kleiner dan de leiband %s" % [render, shown, leash])
 
 
 ## C-09: P2 lost op terwijl P1 op hem staat: P1 valt op die tick.

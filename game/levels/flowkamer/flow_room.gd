@@ -91,6 +91,10 @@ var _camera: Camera2D
 ## Hoe snel de camera naar zijn doel (zoom en plek) beweegt, per seconde. Zo
 ## springt de zoom niet in één frame bij P2_OPGELOST of P2_TERUG.
 const CAMERA_EASE := 8.0
+## Het kleinste camerabeeld (maximaal ingezoomd) in wereldpixels: de
+## pixel-art-maat van besluit #18. Hoe groot dat op het scherm wordt, volgt uit
+## de rendergrootte (`camera_zoom`), niet uit een vaste venstermaat.
+const BASE_VIEW_PX := Vector2(640, 360)
 var _scores: Array = []
 var _k3_tint: Polygon2D
 var _overlay: Node2D
@@ -141,11 +145,12 @@ func _ready() -> void:
 		router.slot_joined.connect(_on_slot_joined)
 		router.slot_left.connect(_on_slot_left)
 	_camera = Camera2D.new()
-	_camera.zoom = Vector2(2, 2)  # 640 × 360 wereldpixels in het venster van 1280 × 720
+	var start_zoom := camera_zoom(camera_view(p1.position, p1.position), _render_size())
+	_camera.zoom = Vector2(start_zoom, start_zoom)
 	_camera.limit_left = 0
 	_camera.limit_top = 0
 	_camera.limit_right = int(Layout.K3.end.x)
-	_camera.limit_bottom = 720
+	_camera.limit_bottom = int(Layout.K1.end.y)
 	_camera.position = p1.position
 	add_child(_camera)
 	if show_hud:
@@ -164,7 +169,7 @@ func _process(delta: float) -> void:
 		var view := camera_view(p1.position, p2.position if with_p2 else p1.position)
 		# Easen op de zoom; het middelpunt volgt het doelbeeld, zodat P1 en P2
 		# tijdens het easen in beeld blijven (uitzoomen gaat even snel).
-		var target_zoom := 1280.0 / view.size.x
+		var target_zoom := camera_zoom(view, _render_size())
 		var w := 1.0 - exp(-CAMERA_EASE * delta)
 		var zoom := lerpf(_camera.zoom.x, target_zoom, w)
 		if target_zoom < _camera.zoom.x:
@@ -181,17 +186,35 @@ func _process(delta: float) -> void:
 ## `leash_view_px` om P1 en P2 in beeld te houden; P1 blijft altijd minstens
 ## `leash_margin_px` van de rand. Dezelfde maten als de leiband in
 ## `Sim._check_partner`: P2 staat in dit beeld precies als de leiband niet telt.
-## (Vaste venstermaat 1280 × 720; de zoom uit de rendergrootte volgt na #119.)
+## Het beeld is in wereldpixels en hangt niet af van de rendergrootte; die zit
+## alleen in `camera_zoom` (#120).
 static func camera_view(p1_at: Vector2, p2_at: Vector2) -> Rect2:
 	var c: Dictionary = Tuning.coop()
 	var max_view := Vector2(float(c["leash_view_px"][0]), float(c["leash_view_px"][1]))
 	var margin := float(c["leash_margin_px"])
 	var gap := (p2_at - p1_at).abs() + Vector2(2.0 * margin, 2.0 * margin)
-	var zoom := clampf(minf(1280.0 / gap.x, 720.0 / gap.y), 1280.0 / max_view.x, 2.0)
-	var half := Vector2(640, 360) / zoom
+	# Schaal t.o.v. het kleinste beeld (BASE_VIEW_PX): 1 = ingezoomd, < 1 = uit.
+	var fit := clampf(minf(BASE_VIEW_PX.x / gap.x, BASE_VIEW_PX.y / gap.y), BASE_VIEW_PX.x / max_view.x, 1.0)
+	var half := BASE_VIEW_PX * 0.5 / fit
 	var inner := half - Vector2(margin, margin)
 	var focus := ((p1_at + p2_at) * 0.5).clamp(p1_at - inner, p1_at + inner)
 	return Rect2(focus - half, half * 2.0)
+
+
+## #120: de camerazoom die `view` (wereldpixels) in een render van
+## `render_px` pixels laat passen. Het hele beeld past altijd: bij een andere
+## beeldverhouding dan die van `view` (bv. 16:10 op de Deck) toont de camera
+## boven en onder (of links en rechts) iets meer wereld. Voorbeelden met het
+## kleinste beeld (640 × 360): 1280 × 720 → 2, 1280 × 800 → 2, 640 × 400 → 1.
+static func camera_zoom(view: Rect2, render_px: Vector2) -> float:
+	return minf(render_px.x / view.size.x, render_px.y / view.size.y)
+
+
+## Grootte van het beeld waarop de wereld rendert, in pixels: bij stretch
+## `viewport` de basisgrootte (bv. 640 × 400), anders het venster.
+func _render_size() -> Vector2:
+	var size := get_viewport().get_visible_rect().size
+	return size if size.x > 0.0 and size.y > 0.0 else BASE_VIEW_PX
 
 
 ## Duur van de run in ticks (tot nu, of tot RUN_EIND).
