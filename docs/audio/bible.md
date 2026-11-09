@@ -162,7 +162,7 @@ De finisher speelt jullie laatste 10 s versneld ×5 af in 120 ticks. Elke finish
 
 **Opnieuw maken:** `python3 docs/audio/f2-fragment/bron/genereer_f2.py` vanaf de repo-root. Nodig: numpy, scipy; optioneel ffmpeg met libvorbis (OGG en de ebur128-meting) en matplotlib (spectrogram). Geen externe samples. De **WAV-bestanden zijn byte-gelijk** opnieuw te maken (vaste seed; twee runs gaven dezelfde hashes). De **OGG** en de PNG kunnen per ffmpeg- of matplotlib-build verschillen. Controle: `sha256sum` van de fragment-WAV = `b09aa64310188f997e46dcddf7fea1c8af0e8ced74dccd34fc4606d0c9609057` (numpy 2.5, scipy 1.18).
 
-**Waarom nog `_placeholder`:** niemand heeft het fragment beluisterd. Het verliest het achtervoegsel pas wanneer deze versie SM-Kwaliteit ≥ 7 én drie keer "ja" van de CEO haalt (§0). Dan hernoemt de Audio Director de bestanden; de inhoud verandert niet.
+**Waarom nog `_placeholder`:** niemand heeft het fragment beluisterd. Het verliest het achtervoegsel pas wanneer deze versie SM-Kwaliteit ≥ 7 én drie keer "ja" van de CEO haalt (§0). Dan hernoemt de Audio Director de bestanden **en past hij in dezelfde commit de bestandsnamen in `bron/genereer_f2.py` aan**, zodat het script de nieuwe namen blijft maken; de inhoud verandert niet.
 
 ### 9.1 Wat je hoort (tijdlijn, D = 120 ticks)
 
@@ -208,7 +208,7 @@ Alle waarden komen uit het script; de loudness ook onafhankelijk uit **ffmpeg eb
 | Aftelslag 1 grijs / opgepompt | **17,6 / 15,1 LU** | ≥ 8 | ✓ | 10,1 / — |
 | Ontploffing grijs / ketting | **12,5 / 23,7 LU** | ≥ 10 | ✓ | 11,2 / 13,8 |
 
-**Timing op de gdd-ticks.** Elke gebeurtenis wordt sample-exact op `tick / 60` s gezet; de meting zoekt daarna in de gerenderde stem de aanzet terug (eerste ms waarin de energie boven 1 kHz 6 dB stijgt).
+**Timing op de gdd-ticks.** Elke gebeurtenis wordt sample-exact op `tick / 60` s gezet; de meting zoekt daarna in de gerenderde stem de aanzet terug (eerste ms waarin de energie boven 1 kHz 6 dB stijgt). **Deze meting bewijst de renderlogica** (de geluiden klinken op de ticks die het script ze geeft), **niet de lezing van de gdd**: dat die ticks (D − 30, D − 15, D, D + 15, D + 30) E-14b goed volgen, staat in §6.1 en blijft aan de LGD om te bevestigen.
 
 | Wat | Afwijking | |
 |---|---|---|
@@ -237,6 +237,8 @@ Alle waarden komen uit het script; de loudness ook onafhankelijk uit **ffmpeg eb
 | 7. Laag gemaal | aandeel 20–60 Hz, wereld opgepompt | 25 % | **8 %** | gemaal met hoogdoorlaat op 45 Hz; de pompslag blijft (46–98 Hz) |
 | — | partialen klok D5 opgepompt / grijs (t.o.v. slagtoon) | — | 0,500 · 1,000 · **1,199** · 1,496 · 2,000 · 2,510 · 2,667 / 0,499 · 0,999 · 1,500 · 2,009 (**geen terts**) | carillon-spectrum en A3 kloppen (ongewijzigd) |
 
+*Kurtosis en spectrale vlakheid van het water zijn **richtingmaten zonder referentie**: ze tonen dat v2 verder van egale ruis af ligt dan v1, maar we hebben geen meting van echt kadewater om ze tegen te leggen. Ze bewijzen dus niet dat het water echt klinkt.*
+
 ### 9.3 Wat veranderde en waarom het nu de 7 kan halen
 
 **Wat veranderde (§9.3 van v1, punten 2–6, plus 7):**
@@ -264,7 +266,7 @@ Eén keer, op dit fragment (`f2_merk_aftelling_carillon_placeholder.wav`), op ko
 
 1. **Klinkt het als een carillon?** Luister naar de klokjes op 2,1 s en 2,35 s en de klokslag op 2,6 s; daarna 10,5–11,1 s.
 2. **Hoor je dat de slag op 2,6 s "jij, maar hol" is?** Vergelijk de slag van speler 1 op 0,6 s met de echo op 2,6 s (en 9,0 s met 11,0 s).
-3. **Voelt het opgepompte deel (vanaf ± 9 s) warmer en levendiger dan het grijze begin (0–6 s)?**
+3. **Voelt het opgepompte deel (vanaf ± 9 s) warmer dan het grijze begin (0–6 s)?** (één woord, zoals in §0)
 
 F2 = SM-Kwaliteit ≥ 7 **én** drie keer "ja" (§0).
 
