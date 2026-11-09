@@ -7,7 +7,7 @@ config_version=5
 
 config/name="Echoborn"
 config/description="Spike: echo-opname en -afspelen, 2 lokale spelers."
-run/main_scene="res://scenes/main.tscn"
+run/main_scene="res://levels/flowkamer/flowkamer.tscn"
 config/features=PackedStringArray("4.6")
 
 [autoload]
