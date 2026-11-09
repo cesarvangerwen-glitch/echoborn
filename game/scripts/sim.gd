@@ -131,9 +131,13 @@ func can_add_echo() -> bool:
 	return true
 
 
-## Koppelt de AreaLoader aan de Sim en aan de echo's die er al zijn.
+## Koppelt de AreaLoader aan de Sim en aan de echo's die er al zijn. De
+## loader krijgt de Sim terug, om objecten in gestreamde inhoud aan en af te
+## melden (R10) en P2 te volgen (ontwerp.md §3a).
 func set_area_loader(loader: Node) -> void:
 	area_loader = loader
+	if loader != null and "sim" in loader:
+		loader.sim = self
 	for echo in echoes:
 		if "area_loader" in echo:
 			echo.area_loader = loader
@@ -145,12 +149,31 @@ func remove_echo(echo: EchoBody) -> void:
 	echo.queue_free()
 
 
+## Meldt een object aan. Zonder ouder wordt het een kind van de Sim; een
+## object dat al in de boom staat (gestreamde inhoud van een kamer, §3a)
+## blijft waar het is.
 func add_object(object: SimObject) -> void:
 	objects.append(object)
 	if object is CombatTarget:
 		combat.add_target(object)
 		object.hit_player.connect(_on_enemy_hit_player)
-	add_child(object)
+	if object.get_parent() == null:
+		add_child(object)
+
+
+## Meldt een object af (de AreaLoader bij het ontladen van een kamer, R10).
+## Aanroepen tussen twee ticks of in `sim_track`, niet in stap (4) of (5).
+## Een merk op een vijand die weggaat, dooft (E-14b); de node zelf ruimt de
+## aanroeper op.
+func remove_object(object: SimObject) -> void:
+	objects.erase(object)
+	if object is CombatTarget:
+		combat.targets.erase(object)
+		for mark in combat.marks:
+			if mark.target == object:
+				mark.alive = false
+		if object.hit_player.is_connected(_on_enemy_hit_player):
+			object.hit_player.disconnect(_on_enemy_hit_player)
 
 
 func is_coop() -> bool:
@@ -206,7 +229,8 @@ func _physics_process(delta: float) -> void:
 	if p2_steps and p1_first:
 		_step_player(p2, p1, "1", delta)
 	# Na (3): de AreaLoader volgt P1 (E-04e); een kamerwissel naar een kamer
-	# die geen buur is, vraagt een reset aan (E-04a). P2 wisselt nooit.
+	# die geen buur is, vraagt een reset aan (E-04a). P2 wisselt nooit, maar
+	# de loader meldt het als P2 in een kamer staat die niet geladen is (§3a).
 	if area_loader and p1:
 		area_loader.sim_track(tick, p1)
 	# C-08: stierf P1 in co-op, dan respawnt P2 mee, naast P1. Anders: lost P2
