@@ -4,7 +4,7 @@ Versie 2.0 · 2026-11-09 · Eigenaar: Producer · Issue: [#73](https://github.co
 Werktitel *Polderlight* (besluit #96), vervangt *Wraithstep* (#24, #61) en *Echoborn*. Niet publiek gebruiken vóór de formele merkcheck (#24, 3A). Repo en mappen heten voorlopig nog "echoborn".
 Bronnen: `docs/concept/pitch.md` v0.4 (§10 R-V1–R-V12), `docs/productie/fase-2-kader.md` v0.2 (§2–§4, §6, §7), `docs/business/ideecheck-v0-4.md`, `docs/beslissingen.md` (#2, #24, #47, #51, #52, #61, #96). Versie 1.2 (fase 1, met de volledige onderbouwing per risico) staat in de git-geschiedenis.
 
-**Werkaannames die dit document gebruikt** (kader §5): extern budget fase 2 € 0 en een raming van ≈ 61–88 maak-taken (EP, kader §7 en §8); totaalbudget en releasevenster volgen per fase (werkaanname in `beslissingen.md`). Kans en impact zijn de inschatting van de Producer, behalve waar een bron staat. Alle andere uitgangspunten zijn CEO-besluiten.
+**Werkaannames die dit document gebruikt** (kader §5): extern budget fase 2 € 0 (EP, kader §7); totaalbudget en releasevenster volgen per fase (werkaanname in `beslissingen.md`). Kans en impact zijn de inschatting van de Producer, behalve waar een bron staat. Alle andere uitgangspunten zijn CEO-besluiten, waaronder de omvang van fase 2 van ≈ 61–88 maak-taken (besluit #51: 2A; kader §8).
 
 ## 1. Samenvatting
 
@@ -100,7 +100,7 @@ Afgeronde acties A1, A4–A12, A14, A15 en A17 staan in v1.2 (git-geschiedenis).
 - De Producer beheert dit register en werkt het bij bij elke merge die een risico raakt, en bij elke gate. Elke rol meldt een risico in het issue van het register of in de eigen PR ("risico voor het register").
 - Elk risico heeft één eigenaar. Een risico met impact H heeft altijd een lopende maatregel. Naar `verkleind` of `gesloten` alleen met een verwijzing naar het bewijs.
 - Het fase-statusrapport (T15, [#89](https://github.com/cesarvangerwen-glitch/echoborn/issues/89)) neemt de 13 risico's met impact H over.
-- Kader §6 noemt R26 / R-V7 niet bij de H-risico's; dit register wel (toon en PEGI 12 vallen onder F7). Voorstel aan de EP: opnemen bij de volgende versie van het kader.
+- Twee afwijkingen van kader §6, met één voorstel aan de EP voor de volgende versie van het kader: (1) kader §6 noemt R26 / R-V7 niet bij de H-risico's; dit register wel (toon en PEGI 12 vallen onder F7); (2) kader §6 koppelt R-V2 aan R3; dit register geeft R-V2 een eigen nummer (R25), want "echo wordt passief zonder puzzels" is een ander risico dan "de draai voelt als trucje" (R3 verwijst naar R25).
 
 **Open punten**: A16 (geen issue). Signaalwaarden die nog een grens nodig hebben (R25: grens uit T3c; R16: raming per QA-taak) worden ingevuld zodra die documenten gemergd zijn.
 
