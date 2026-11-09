@@ -1,6 +1,6 @@
 # Audio bible v0: audiorichting
 
-Versie 0.2 · Eigenaar: Audio Director · Issue: #66 (T2 uit `docs/productie/fase-2-kader.md` §2) · Met: Composer/Sound Designer · Basis: pitch v0.4 (besluit #51), art bible v0 (`docs/art/bible.md`), `docs/design/gdd.md` (E-02, E-14, C-14)
+Versie 0.3 · Eigenaar: Audio Director · Issue: #66 (T2 uit `docs/productie/fase-2-kader.md` §2) · Met: Composer/Sound Designer · Basis: pitch v0.4 (besluit #51), art bible v0 (`docs/art/bible.md`), `docs/design/gdd.md` (E-02, E-14, C-14)
 
 Deze bible legt vast hoe *Polderlight* (werktitel, besluit #96) klinkt en wat elke audiorol moet halen. Ze is **v0**: genoeg voor de grijze flow-kamer en voor het F2-fragment. Muziek per gebied en de assetlijst volgen in v1 (§13).
 
@@ -49,11 +49,11 @@ We kiezen bewust instrumenten die **met code op eindkwaliteit te maken zijn** (R
 | Familie | Klank | Waar | Hoe gemaakt | Haalbaar met code? |
 |---|---|---|---|---|
 | **Carillon** | Klokken met de partialen van een minor-terts-klok: hum 0,5, prime 1, terts 1,2, kwint 1,5, nominaal 2, deciem 2,5, … | Merk, aftelling, ontploffing, oppompen, muziekmotief | Modale synthese met doubletten (het trage zweven van brons) en een klepelaanslag | **Ja**: de meting bevestigt de partialen (§9) |
-| **Rietorgel / harmonium** | Kerk- en huiskamerorgel uit de Lage Landen, met balgadem | Muziek: grondlaag en akkoorden | Additief (riettoon) met trage ademmodulatie | Ja, met werk aan de aanzet en het riet-geruis |
+| **Rietorgel / harmonium** | Kerk- en huiskamerorgel uit de Lage Landen, met balgadem | Muziek: grondlaag en akkoorden | Additief: twee rieten per toon (celeste), riet-geruis, toetsklik, balgdruk die ook de klankkleur stuurt (v2) | Ja |
 | **Bourdon** | Lege kwint, laag, onveranderlijk | Muziek in grijs | Twee rietstemmen, dof gefilterd | Ja |
 | **Hakkebord / luit** | Getokkelde snaar | Muziek: melodie in opgepompte wijken (v1) | Karplus-Strong | Ja |
 | **Machine** | Pompslag, schoepenrad, koppeling, 50 Hz-brom | Gemaal, Gemaalmeester | Modaal metaal + gefilterde ruis + lage sinusplof | Ja |
-| **Water en wind** | Kabbelen tegen kademuren, leeglopen, druppels | Omgeving | Gefilterde roze ruis, korrels | **Twijfel**: het zwakste deel van de synthese (§9) |
+| **Water en wind** | Kabbelen tegen kademuren, leeglopen, druppels | Omgeving | Bellenmodel: Minnaert-bellen met stijgende toon op golfslagen (v2); wind als gefilterde ruis met vlagen | **Waarschijnlijk**: v2 is gemeten korreliger en tonaler dan ruis (§9.2), maar blijft het grootste luisterrisico |
 | **Stilte** | Bijna niets | Na een gevecht, bij bevroren echo's | — | — |
 
 **Niet in het palet:** orkeststrijkers, koor, zang, elektronische bas-drops, epische trailer-percussie. Ze passen niet bij de toon, of we halen ze niet op eindkwaliteit zonder externe samples.
@@ -64,10 +64,10 @@ We kiezen bewust instrumenten die **met code op eindkwaliteit te maken zijn** (R
 
 | Eigenschap | Levend (speler 1, speler 2) | Echo (en schaduwlaag) | Gemeten in het fragment (§9) |
 |---|---|---|---|
-| Lijf | Laag in de aanslag (plof < 250 Hz) | Geen lijf: hoogdoorlaat op 260 Hz | Aandeel 60–250 Hz: P1 46 %, echo 19 % |
-| Kleur | Vol spectrum, lucht boven 8 kHz | Holle buis: terugkoppelende kam van 4,6 ms (resonanties om de ± 217 Hz), band 0,7–4,2 kHz | > 8 kHz: P1 4,2 %, echo 0,7 % |
+| Lijf | Laag in de aanslag (plof < 250 Hz) | Geen lijf: hoogdoorlaat op 260 Hz (4e orde) | Aandeel 60–250 Hz: P1 47 %, echo 6 % |
+| Kleur | Vol spectrum, lucht boven 8 kHz | Holle buis: terugkoppelende kam van 4,6 ms (resonanties om de ± 217 Hz), band 0,7–4,2 kHz | > 8 kHz: P1 4,7 %, echo 0,8 % |
 | Aanzet | Direct, met transiënt | **Omgekeerde aanloop**: de galm van de slag, achterstevoren, eindigt op de slag. Het geluid komt uit het verleden terug | — |
-| Plaats | In het midden van zijn lichaam | Breder (Haas 11 ms) en iets achter het beeld | Stereocorrelatie van de mix 0,62 |
+| Plaats | In het midden van zijn lichaam | Breder (Haas 11 ms) en iets achter het beeld | Stereocorrelatie van de mix 0,69 |
 | Niveau | Referentie | −7 dB (slag), −8 dB (beweging) | — |
 | Timing | Op de event-tick | Op de event-tick van de afspeling (D ticks later), **framexact**, nooit gequantiseerd | — |
 
@@ -80,11 +80,11 @@ We kiezen bewust instrumenten die **met code op eindkwaliteit te maken zijn** (R
 | **Klokken** | Zonder terts, licht valser (partialen uitgerekt), dof (laagdoorlaat ± 2,6 kHz) | — | Volle klok, met terts en heldere bovenpartialen |
 | **Muziek** | Bourdon: lege kwint D–A, ver weg | De terts (F♯) zwelt aan met een grote klok op D4 | Harmonium D-groot add9; later melodie (hakkebord) |
 | **Omgeving** | Water dof en dichtbij, wind, druppels, een verre verzonken klok | Water loopt gorgelend weg, de machine slaat aan | Water helderder en verder, het gemaal draait (pompslag elke 0,8 s, 50 Hz-brom) |
-| **Galm** | "Verzonken": RT60 ± 2,1 s, donker (1,5 kHz), smal | Kruisfade over ± 2 s, met de kleurgolf mee | "Belfort": RT60 ± 2,9 s, warm (5,2 kHz), breed |
+| **Galm** | "Verzonken": laag nat gewelf (5 × 9 × 3,2 m), RT60 ± 1,8 s, donker (1,3 kHz), smal, weinig galm (droog) | Kruisfade over ± 2 s, met de kleurgolf mee | "Belfort": stenen toren (7,5 × 7,5 × 19 m), RT60 ± 2,9 s, warm (6 kHz), breed |
 | **Echo** | Hol, grijs | Kleurt mee met ± 0,5 s vertraging (art bible §5) | Hol, maar met meer lucht |
 | **Speler 1** | Vol (altijd in kleur) | — | Vol |
 
-Gemeten op de **wereld zonder spelers** (bed, muziek, galm): opgepompt heeft 4× zoveel energie in 2–8 kHz (4,6 % tegen 1,1 %), maar ook veel meer laag door het gemaal (20–60 Hz: 25 % tegen 0,1 %). Het verschil zit dus vooral in de terts, de galm en het gemaal, niet in de spectrale zwaartepunt (585 Hz grijs, 497 Hz opgepompt).
+Gemeten op de **wereld zonder spelers** (bed, muziek, galm), fragment v2: het spectrale zwaartepunt stijgt van **455 Hz (grijs) naar 795 Hz (opgepompt)**, en de energie in 2–8 kHz van 0,5 % naar 4,5 % (× 9). In v1 daalde het zwaartepunt nog (585 → 497 Hz) door het laag van het gemaal. Het verschil zit nu in drie dingen tegelijk: de terts, een helderdere galm en helderder water, en een droger, donkerder grijs.
 
 ## 6. Carillon en gemaal
 
@@ -145,6 +145,10 @@ De finisher speelt jullie laatste 10 s versneld ×5 af in 120 ticks. Elke finish
 
 ## 9. Referentiefragment F2
 
+**Versie v2: dit is de versie die F2 claimt** (§0). v1 staat in de geschiedenis van de repo; het script en de bestanden hieronder zijn v2.
+
+**Werkaannames** (fasekader §5): D = 120 ticks op 60 Hz, merk leeft D + 30 ticks, aftelling in de laatste 60 ticks (één slag per 15 ticks), solo (speler 1 + echo), € 0 extern (alles eigen synthese). Zie de kop van deze bible.
+
 **Bestanden** in `docs/audio/f2-fragment/`:
 
 | Bestand | Wat |
@@ -153,69 +157,118 @@ De finisher speelt jullie laatste 10 s versneld ×5 af in 120 ticks. Elke finish
 | `f2_merk_aftelling_carillon_placeholder.ogg` | Hetzelfde in Vorbis (q6), zoals Godot het zou laden |
 | `f2_spectrogram_placeholder.png` | Golfvorm en spectrogram met de momenten erop |
 | `losse-sfx/*_placeholder.wav` | De bouwstenen los: slag P1, echo-slag, merk zetten (grijs/kleur), aftelling 1–4 (grijs/kleur), merksprong, ontploffing k1 (grijs/kleur) en k3, merk dooft |
-| `bron/genereer_f2.py` | Het script dat alles maakt (± 8 s), met vaste seed; het print de metingen hieronder |
+| `losse-sfx/merk_levensduur_zonder_echo_grijs_placeholder.wav` | **Nieuw in v2:** één merk zonder echo, van zetten tot doven: slagen op tick 90, 105, 120, de zachte slag 4 op 135 (D + 15) en **doven op 150 (D + 30)** (§6.1, E-14b). **Tick 0 = 0,1 s in het bestand**: het doven valt in het bestand dus op 2,6 s |
+| `bron/genereer_f2.py` | Het script dat alles maakt (± 10 s), met vaste seed; het print de metingen hieronder, ook die van ffmpeg ebur128 |
 
-**Opnieuw maken:** `python3 docs/audio/f2-fragment/bron/genereer_f2.py` vanaf de repo-root. Nodig: numpy, scipy; optioneel ffmpeg (OGG) en matplotlib (spectrogram). Geen externe samples. De **WAV is byte-gelijk** opnieuw te maken (vaste seed); de **OGG** en de PNG kunnen per ffmpeg- of matplotlib-build verschillen. Controle: `sha256sum` van de WAV tegen de waarde in de PR.
+**Opnieuw maken:** `python3 docs/audio/f2-fragment/bron/genereer_f2.py` vanaf de repo-root. Nodig: numpy, scipy; optioneel ffmpeg met libvorbis (OGG en de ebur128-meting) en matplotlib (spectrogram). Geen externe samples. De **WAV-bestanden zijn byte-gelijk** opnieuw te maken (vaste seed; twee runs gaven dezelfde hashes). De **OGG** en de PNG kunnen per ffmpeg- of matplotlib-build verschillen. Controle: `sha256sum` van de fragment-WAV = `b09aa64310188f997e46dcddf7fea1c8af0e8ced74dccd34fc4606d0c9609057` (numpy 2.5, scipy 1.18).
 
-**Waarom `_placeholder`:** het fragment is bedoeld als kandidaat voor eindkwaliteit, maar niemand heeft het beluisterd (§0). Het verliest het achtervoegsel pas wanneer de versie die F2 claimt SM-Kwaliteit ≥ 7 én drie keer "ja" van de CEO haalt (§0).
+**Waarom nog `_placeholder`:** niemand heeft het fragment beluisterd. Het verliest het achtervoegsel pas wanneer deze versie SM-Kwaliteit ≥ 7 én drie keer "ja" van de CEO haalt (§0). Dan hernoemt de Audio Director de bestanden **en past hij in dezelfde commit de bestandsnamen in `bron/genereer_f2.py` aan**, zodat het script de nieuwe namen blijft maken; de inhoud verandert niet.
 
 ### 9.1 Wat je hoort (tijdlijn, D = 120 ticks)
 
-| Tijd | Wat | Pillar |
-|---|---|---|
-| 0,0–6,2 s | **Grijze wijk**: dof water, wind, druppels, een verre verzonken klok, de bourdon D–A | P2 |
-| 0,60 | Speler 1 slaat een vijand: zwaai + koperen tik met lijf; het merk zet (lichtvonk, grijs) | P1 |
-| 1,20 / 1,78 | Speler 1 springt en landt op natte steen | — |
-| 2,10 / 2,35 | Aftelling, slag 1 en 2 (A5, B5), klokken zonder terts | A2 |
-| 2,60 | **Slag 3 = de echo**: holle echo-slag met omgekeerde aanloop, merksprong-zip, ontploffing (grijs) | P1, A1, A2 |
-| 3,20 / 3,78 | De echo herhaalt de sprong en de landing, hol en zacht | A1 |
-| 6,2–8,6 s | **Oppompen**: de machine slaat aan, het water loopt gorgelend weg, een grote klok op D4, de terts F♯ zwelt aan, het gemaal versnelt | P2, A3 |
-| 9,00 / 9,30 | **Opgepompte wijk**: twee slagen, twee merken (volle klokjes) | P1 |
-| 10,50 / 10,75 | Aftelling van het eerste merk (één aftelling tegelijk), klokken met terts | A2, A3 |
-| 11,00 | Echo op slag 3: ontploffing en **ketting** (k = 1 op D5, k = 2 op F♯5, gerold op 45 ms) | P1 |
-| 11,30 | De tweede echo-slag vindt geen merk meer: alleen de holle slag (gewone echo-treffer) | A1 |
-| 11–15,5 s | Galm van het belfort, gemaal, harmonium D-groot add9; uitfaden | P2 |
-
-### 9.2 Metingen
-
-| Meting | Waarde | Doel (§8) | |
+| Tijd (s) | Tick | Wat | Pillar |
 |---|---|---|---|
-| Duur | 15,50 s | — | |
-| Geïntegreerde loudness | **−18,1 LUFS** | −18 ± 2 | ✓ |
-| Max. korte termijn (3 s) / momentaan (400 ms) | −15,3 / −10,9 LUFS | — | |
-| True peak WAV / OGG na decoderen | **−1,8 / −1,4 dBTP** | ≤ −1 | ✓ |
-| Sample-piek | −1,81 dBFS | — | |
-| Clipping | 0 samples | 0 | ✓ |
-| DC-offset | < 0,0001 | — | ✓ |
-| Crestfactor | 19,2 dB | — (veel dynamiek, geen platgeslagen mix) | |
-| Stereocorrelatie | 0,62 | > 0 (mono-compatibel) | ✓ |
-| Aftelslag 1 (grijs) boven het bed | **10,1 LU** | ≥ 8 | ✓ |
-| Ontploffing grijs / ketting boven het bed | 11,2 / 13,8 LU | ≥ 10 | ✓ |
-| Partialen klok D5, opgepompt (gemeten / slagtoon) | 0,500 · 1,001 · **1,199** · 1,496 · 2,001 · 2,510 | carillon: 0,5 · 1 · 1,2 · 1,5 · 2 · 2,5 | ✓ |
-| Partialen klok D5, grijs | 0,499 · 1,001 · 1,500 · 2,007 · 2,526 (**geen terts**) | zonder terts (A3) | ✓ |
-| P1-slag tegenover echo-slag: aandeel 60–250 Hz | 46 % tegenover 19 % | echo zonder lijf | ✓ |
-| Spectrum hele mix, grijs 0–6 s | 20–60 Hz 2 %, 60–250 Hz 27 %, 0,25–2 kHz 62 %, 2–8 kHz 8 %, > 8 kHz 1 %; zwaartepunt 986 Hz | — | |
-| Spectrum hele mix, opgepompt 9–15 s | 12 %, 27 %, 49 %, 11 %, 1 %; zwaartepunt 1008 Hz | — | |
-| Aftelling: eerste slag na de treffer / echo op slag | 1,50 s / slag 3 | slag 3 (§6.1) | ✓ |
+| 0,0–6,2 | 0–372 | **Grijze wijk**, droog en dichtbij: golfjes tegen de kade met bellen, vlagen wind, druppels, een verre verzonken klok, de bourdon D–A | P2 |
+| 0,60 | 36 | Speler 1 slaat een vijand: zwaai met fladderend stof, harde tik, hout met lijf, koperen naklank, gruis; het merk zet (lichtvonk, grijs) | P1 |
+| 1,20 / 1,78 | 72 / 107 | Speler 1 springt en landt op natte steen (spatbelletjes) | — |
+| 2,10 / 2,35 | 126 / 141 | Aftelling, slag 1 en 2 (A5, B5), klokken zonder terts; bed en muziek dukken 5 dB | A2 |
+| 2,60 | 156 | **Slag 3 = de echo**: holle echo-slag met omgekeerde aanloop, merksprong-zip, ontploffing (grijs) | P1, A1, A2 |
+| 3,20 / 3,78 | 192 / 227 | De echo herhaalt de sprong en de landing, hol en zacht | A1 |
+| 6,2–8,6 | 372–516 | **Oppompen**: de machine slaat aan, het water klokt weg door de duiker, een grote klok op D4, de stemmen van het harmonium zetten één voor één in (D, A, F♯, E, E5), het gemaal versnelt | P2, A3 |
+| 9,00 / 9,30 | 540 / 558 | **Opgepompte wijk**: twee slagen, twee merken (volle klokjes) | P1 |
+| 10,50 / 10,75 | 630 / 645 | Aftelling van het eerste merk (één aftelling tegelijk), klokken met terts | A2, A3 |
+| 11,00 | 660 | Echo op slag 3: ontploffing en **ketting** (k = 1 op D5, k = 2 op F♯5, gerold op 45 ms) | P1 |
+| 11,30 | 678 | De tweede echo-slag vindt geen merk meer: alleen de holle slag | A1 |
+| 11–15,5 | — | Galm van het belfort, gemaal met spattend schoepenrad, harmonium D-groot add9; uitfaden | P2 |
 
-### 9.3 Eerlijke beoordeling
+### 9.2 Metingen (v2)
 
-**Hoe het zou moeten klinken** (volgens opzet en metingen, niet beluisterd): een stille, natte, grijze kade; een slag met lijf; twee heldere klokjes die oplopen; dan op de derde tel een holle herhaling van je eigen slag en een klokslag die openbreekt, gedempt en dof in grijs. Daarna slaat een machine aan, loopt het water weg en zwelt een akkoord aan dat warmer is dan alles ervoor. In het opgepompte deel klinkt hetzelfde patroon voller, met galm van een belfort en een kettingrol.
+Alle waarden komen uit het script; de loudness ook onafhankelijk uit **ffmpeg ebur128** (`-af ebur128=peak=true+sample`).
 
-**Waar het tekortschiet:**
-1. **Niet beluisterd.** Alle oordelen komen uit metingen. Een synthese die op papier klopt, kan toch "synthetisch" klinken. Dit is het grootste risico.
-2. **Water en wind** zijn gefilterde ruis. Dat leest vaak als "ruis" en niet als water. Waarschijnlijk het zwakste onderdeel.
-3. **De P1-slag** (ruiszwaai + modale tik) is functioneel maar generiek; er zit geen opgenomen foley in.
-4. **Het harmonium** is statisch: geen riet-geruis, geen toetsklik, geen kleine ontstemming tussen stemmen.
-5. **De galm** is een synthetische impulsrespons (ruis met verval), zonder de echte vroege reflecties van een belfort.
-6. **Grijs → leven** is in de metingen kleiner dan bedoeld: het zwaartepunt van de wereld daalt zelfs (585 → 497 Hz) door het gemaal; het verschil zit in terts, galm en de 2–8 kHz-band (×4). Een v2 mag het grijze deel droger en kaler maken.
-7. **Het laag in het opgepompte deel** (12 % onder 60 Hz, vooral het gemaal) is op een tv met subwoofer misschien te veel; op de Deck valt het weg zonder informatieverlies (regel §8.2).
+**Loudness, piek, mix:**
 
-**Zelfscore van de Audio Director:** de **carillon-onderdelen** (aftelling, merk, ontploffingsklok, ketting) schat ik op **± 7**: het klokspectrum klopt gemeten en de klokken zijn het best te synthetiseren. Het **fragment als geheel** schat ik op **± 5–6**, door water, slag en harmonium. **Kwaliteit ≥ 7 is dus nog niet bewezen.**
+| Meting | v2 | Doel (§8) | | v1 |
+|---|---|---|---|---|
+| Duur | 15,50 s | — | | 15,50 s |
+| Geïntegreerde loudness (script / ffmpeg ebur128) | **−18,0 / −18,0 LUFS** | −18 ± 2 | ✓ | −18,1 |
+| Loudness range (ebur128) | 10,6 LU | — (veel dynamiek) | | — |
+| Max. korte termijn (3 s) / momentaan (400 ms) | −14,9 / −9,7 LUFS | — | | −15,3 / −10,9 |
+| True peak WAV (script / ebur128) | **−1,8 / −1,8 dBTP** | ≤ −1 | ✓ | −1,8 |
+| True peak OGG na decoderen (ebur128) | **−1,5 dBTP** (I = −18,1 LUFS) | ≤ −1 | ✓ | −1,4 |
+| Clipping | **0 samples** | 0 | ✓ | 0 |
+| DC-offset | < 0,0001 | — | ✓ | < 0,0001 |
+| Crestfactor | 19,5 dB | — | | 19,2 |
+| Stereocorrelatie | 0,69 | > 0 (mono-compatibel) | ✓ | 0,62 |
+| Duk van bed en muziek onder het gevecht | max. −5,0 dB (−5,0 op 2,7 s; −0,7 op 4,5 s) | 3–6 dB | ✓ | geen |
 
-**Wat nu (binnen de raming van 2–3 maak-taken):**
-- **Maak-taak 2** (Composer/Sound Designer, met mij): v2 van het fragment op de punten 2–6 hierboven. v1 krijgt geen SM-review en geen luistercheck; die komen pas op de v2-PR, die F2 claimt (§0).
-- **Haalt v2 geen 7**, dan open ik een `brainstorm`-issue met de CEO (fasekader §4), met als opties: (a) **eigen veldopnames** (water, steen, metaal) door een mens, als eigen werk vastgelegd in `docs/licenties.md`; (b) een **CC0-bibliotheek** voor alleen omgeving, na een licentiecheck door de BLA; (c) het palet nog smaller maken (minder omgeving, meer carillon en stilte).
+**Hoorbaarheid boven het bed** (400 ms vanaf het moment, bed = omgeving + muziek na de duk):
+
+| Moment | v2 | Doel | | v1 |
+|---|---|---|---|---|
+| Aftelslag 1 grijs / opgepompt | **17,6 / 15,1 LU** | ≥ 8 | ✓ | 10,1 / — |
+| Ontploffing grijs / ketting | **12,5 / 23,7 LU** | ≥ 10 | ✓ | 11,2 / 13,8 |
+
+**Timing op de gdd-ticks.** Elke gebeurtenis wordt sample-exact op `tick / 60` s gezet; de meting zoekt daarna in de gerenderde stem de aanzet terug (eerste ms waarin de energie boven 1 kHz 6 dB stijgt). **Deze meting bewijst de renderlogica** (de geluiden klinken op de ticks die het script ze geeft), **niet de lezing van de gdd**: dat die ticks (D − 30, D − 15, D, D + 15, D + 30) E-14b goed volgen, staat in §6.1 en blijft aan de LGD om te bevestigen.
+
+| Wat | Afwijking | |
+|---|---|---|
+| Alle klokslagen (merk zetten, aftelslag 1–2 grijs en opgepompt, ontploffing grijs en k1, bloei D4) en de machine | **0,0–1,3 ms** (< 1/12 tick) | ✓ |
+| Levensduur zonder echo: zet 0, slagen 90 / 105 / 120 / 135, **doven 150 = D + 30** | **0,8–1,3 ms** per tick | ✓ |
+| P1-slag | −7,8 ms: de zwaai komt vóór de treffer, met opzet (de klap zelf valt op de tick) | ✓ |
+| Echo-slag | −3 tot −10 ms: de omgekeerde aanloop zwelt aan naar de treffer, met opzet (§4) | ✓ |
+| Ketting k = 2 | −10 ms: de meting vindt de ontploffing van schakel 2 op de sim-tick (+16,7 ms); de rol-klok volgt op +45 ms (§6.2) | ✓ |
+| Aftelling | eerste slag 1,50 s (90 ticks) na de treffer; de echo valt op **slag 3** | ✓ |
+
+**Klank: v1 tegenover v2** (punten uit §9.3 van v1):
+
+| Punt | Meting | v1 | v2 | Wat het zegt |
+|---|---|---|---|---|
+| 2. Water | kurtosis van de omhullende (5 ms) van het grijze bed | 1,4 | **7,0** | ruis is egaal (± 0–1); water bestaat uit losse gebeurtenissen (bellen, golfslagen) |
+| 2. Water | spectrale vlakheid (0,1–8 kHz; 1 = witte ruis) | 0,020 | **0,005** | v2 is tonaler: elke bel is een korte stijgende toon (Minnaert), zoals echt water |
+| 3. P1-slag | kurtosis van de omhullende | 0,6 | **4,5** | eerst een zwaai, dan één harde aanslag en een snelle val, in plaats van één brij |
+| 3. P1-slag | aandeel 60–250 Hz (lijf) / > 8 kHz (lucht) | 48 % / 4,3 % | 47 % / 4,7 % | het lijf blijft, de lagen komen erbij |
+| 3. Echo-slag | aandeel 60–250 Hz | 19 % | **6 %** | de echo heeft nu echt geen lijf (hoogdoorlaat 4e orde) |
+| 4. Harmonium | rieten per toon / zweving / riet-geruis / toetsklik / inzet | 1 / geen / geen / geen / alle stemmen tegelijk | 2 (± 1,5 cent, ongelijk) / ± 0,25 Hz op D3 / ja, synchroon met de periode / ja / 0,14 s na elkaar | de bouwstenen van een echt rietorgel; balgdruk stuurt ook de klankkleur |
+| 5. Galm belfort | nagalm < 0,5 / 0,5–3 / > 3 kHz | één RT60 (2,9 s) | **2,92 / 2,45 / 1,74 s** | hoog sterft sneller dan laag, zoals in steen |
+| 5. Galm verzonken | idem | één RT60 (2,1 s) | **1,75 / 1,32 / 0,91 s** | korter en doffer dan v1: grijs is droger |
+| 5. Galm | vroege reflecties in de eerste 80 ms (> −20 dB) | 9 willekeurige | **29** (belfort), **20** (verzonken), uit een spiegelbronmodel van de ruimte | de ruimte heeft nu een vorm |
+| 6. Grijs → leven | zwaartepunt wereld zonder spelers, grijs → opgepompt | 585 → 497 Hz (daalt) | **455 → 795 Hz (stijgt)** | opgepompt is nu helderder dan grijs |
+| 6. Grijs → leven | aandeel 2–8 kHz, wereld | 1,1 → 4,6 % | 0,5 → 4,5 % | |
+| 7. Laag gemaal | aandeel 20–60 Hz, wereld opgepompt | 25 % | **8 %** | gemaal met hoogdoorlaat op 45 Hz; de pompslag blijft (46–98 Hz) |
+| — | partialen klok D5 opgepompt / grijs (t.o.v. slagtoon) | — | 0,500 · 1,000 · **1,199** · 1,496 · 2,000 · 2,510 · 2,667 / 0,499 · 0,999 · 1,500 · 2,009 (**geen terts**) | carillon-spectrum en A3 kloppen (ongewijzigd) |
+
+*Kurtosis en spectrale vlakheid van het water zijn **richtingmaten zonder referentie**: ze tonen dat v2 verder van egale ruis af ligt dan v1, maar we hebben geen meting van echt kadewater om ze tegen te leggen. Ze bewijzen dus niet dat het water echt klinkt.*
+
+### 9.3 Wat veranderde en waarom het nu de 7 kan halen
+
+**Wat veranderde (§9.3 van v1, punten 2–6, plus 7):**
+2. **Water** is geen gefilterde ruis meer maar een **bellenmodel**: golven slaan op onregelmatige afstand (1,4–3,1 s) tegen de kade, met een zwiep langs de steen en een wolk bellen (Minnaert-resonantie, demping en stijgende toon volgens van den Doel). Grijs: grotere bellen (220–1100 Hz), dof. Opgepompt: kleinere, helderdere bellen (380–3600 Hz). Leeglopen is nu klokken van grote bellen door een duiker, dalend van ± 520 naar 190 Hz; druppels zijn een "plink". Ook de landing en het schoepenrad spatten met bellen.
+3. **De P1-slag** heeft vijf lagen: zwaai met fladderend stof (38 Hz), een klik van 1,5 ms, zeven houtmodi met kleine spreiding, drie koperen boventonen die langer naklinken (speler 1 = koper en hout, A5), het lijf (plof 72–142 Hz) en wat gruis na de klap.
+4. **Het harmonium** heeft per toon twee rieten die licht ontstemd zijn (celeste), riet-geruis dat met elke periode meeblaast, een toetsklik, een balgdruk die ook de helderheid stuurt (meer druk = meer boventonen), een riet dat heel even te laag aanspreekt, en stemmen die na elkaar inzetten.
+5. **De galm** heeft vroege reflecties uit een spiegelbronmodel van een echte ruimte (belfort 7,5 × 7,5 × 19 m; verzonken gewelf 5 × 9 × 3,2 m) en een staart die aansluit op de mengtijd, met een eigen nagalmtijd per band.
+6. **Grijs → leven:** grijs is droger (galm 0,20 in plaats van 0,30), donkerder (water tot 1,1 kHz, bourdon tot 750 Hz) en dichterbij; opgepompt is helderder (belfort tot 6 kHz, harmonium tot 5 kHz met E5 erbij, helder water). Het gemaal verloor zijn subsonisch laag.
+- **Mix:** bed en muziek dukken nu 5 dB onder gevecht en speler (§8, voorheen niet), zodat aftelling en ontploffing ruim boven de 8 en 10 LU staan.
+
+**Waarom dit de 7 kan halen (onderbouwing, geen oordeel):**
+- **Alle harde drempels uit §8 gehaald**, met een tweede, onafhankelijke meting (ffmpeg ebur128): −18,0 LUFS, −1,8 dBTP (OGG −1,5), 0 clipping, spelinformatie 12,5–23,7 LU boven het bed.
+- **Timing klopt op de tick:** alle klokken binnen 1,3 ms van hun gdd-tick, ook het doven op D + 30 (E-14b).
+- **De drie zwakste punten van v1 zijn gemeten anders geworden in de richting van echt geluid:** water is korrelig en tonaal in plaats van egaal (kurtosis × 5, vlakheid ÷ 4), de slag heeft een duidelijke aanslag (kurtosis 0,6 → 4,5), de galm heeft vorm (29 vroege reflecties) en een nagalm per band zoals in steen.
+- **Grijs → leven is nu meetbaar in de goede richting:** het zwaartepunt van de wereld stijgt (455 → 795 Hz) in plaats van te dalen, en de terts komt terug (partialen 1,199).
+- **Het palet speelt op de sterke kant van synthese** (§3): klokken, riet, machine. De klokken waren in v1 al ± 7.
+
+**Wat ik niet kan uitsluiten:** ik kan niet luisteren. Metingen zeggen dat de bouwstenen kloppen, niet dat het geheel natuurlijk klinkt. De grootste risico's blijven: (a) het water kan nog "synthetisch" bellen (te regelmatige chirps); (b) de P1-slag kan als "geluidseffect" lezen in plaats van als een klap op een vijand; (c) het harmonium kan te stil of te zweverig zijn. Het geheel opgepompt heeft een lager zwaartepunt dan grijs (851 tegen 941 Hz in de volle mix), omdat het harmonium en het gemaal er body bij geven; dat is de bedoelde warmte, maar het is een keuze die de luistervraag 3 moet bevestigen.
+
+**Zelfscore van de Audio Director:** carillon-onderdelen **± 7**, fragment als geheel **± 6,5–7**. Ik claim F2 op deze versie, maar het oordeel ligt bij de **SM-score Kwaliteit** en de **luistercheck van de CEO** (§0). Haalt v2 geen 7 of geen drie keer "ja", dan open ik een `brainstorm`-issue met de CEO, met als opties: (a) **eigen veldopnames** (water, steen, metaal) door een mens, als eigen werk vastgelegd in `docs/licenties.md`; (b) een **CC0-bibliotheek** voor alleen omgeving, na een licentiecheck door de BLA; (c) het palet nog smaller maken (minder omgeving, meer carillon en stilte). Een "nee" op één vraag wijst de bouwsteen aan: vraag 1 → klokken, vraag 2 → `echo_versie`, vraag 3 → water, harmonium en galm.
+
+### 9.4 Luistercheck voor de CEO (T17)
+
+Eén keer, op dit fragment (`f2_merk_aftelling_carillon_placeholder.wav`), op koptelefoon én op tv-luidsprekers, ± 5 minuten. Antwoord per vraag met **ja** of **nee**, zonder cijfer; een korte opmerking mag.
+
+1. **Klinkt het als een carillon?** Luister naar de klokjes op 2,1 s en 2,35 s en de klokslag op 2,6 s; daarna 10,5–11,1 s.
+2. **Hoor je dat de slag op 2,6 s "jij, maar hol" is?** Vergelijk de slag van speler 1 op 0,6 s met de echo op 2,6 s (en 9,0 s met 11,0 s).
+3. **Voelt het opgepompte deel (vanaf ± 9 s) warmer dan het grijze begin (0–6 s)?** (één woord, zoals in §0)
+
+F2 = SM-Kwaliteit ≥ 7 **én** drie keer "ja" (§0).
 
 ## 10. Techniek in Godot 4.6
 
@@ -263,8 +316,8 @@ Master  (HardLimiter, plafond −1 dB)
 
 ## 13. Open punten
 
-- De QA Lead zet de drie luistervragen uit §0 op de CEO-kaart van T17.
-- **v2 van het fragment** (§9.3) claimt F2: SM-review en luistercheck op die versie; haalt ze het niet, een `brainstorm`-issue.
+- **QA Lead:** zet de drie luistervragen uit §9.4 op de CEO-kaart van T17 (fragment v2, koptelefoon en tv, ± 5 min, ja/nee zonder cijfer).
+- **Fragment v2** (§9) claimt F2: SM-score Kwaliteit en de luistercheck van de CEO op die versie. Haalt het geen 7 of geen drie keer "ja", dan een `brainstorm`-issue met de opties uit §9.3.
 - **Assetlijst** (`docs/audio/assetlijst.md`) en muziek per gebied: v1, na T3a (welke events en vaardigheden er komen).
 - **gdd O-4** (speelt de echo audio af?) is met §2 A1 beantwoord: ja, gedempt. De LGD kan O-4 sluiten.
 - **Geluid van speler 2** (ijzer en glas, A5) en de **finisher** (§6.4) zitten nog niet in het fragment.
@@ -274,5 +327,6 @@ Master  (HardLimiter, plafond −1 dB)
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.3 | 2026-11-09 | Fragment v2 dat F2 claimt (§9): water als bellenmodel, gelaagde P1-slag, harmonium met celeste, riet-geruis en toetsklik, galm met spiegelbronnen en nagalm per band, droger grijs, gemaal zonder subsonisch laag, dukken van bed en muziek, levensduur zonder echo (doven op D + 30) als losse reeks; metingen met ffmpeg ebur128 en timing op ticks; luistervragen klaar voor T17 (§9.4). §3, §4, §5 bijgewerkt met de v2-metingen. |
 | 0.2 | 2026-11-09 | Lead-review EP (PR #106): doven op D + 30 met een zachte slag 4 op D + 15 (§6.1, §10); EP-besluit over de luistercheck (§0, §9, §13); WAV byte-gelijk, OGG per build (§9). |
 | 0.1 | 2026-11-09 | Eerste versie (#66, T2): akkoord op de F2-eis (A10) met twee preciseringen, pijlers, palet, echo tegenover levend, grijs → leven, carillon en gemaal, mixregels, F2-fragment met metingen en eerlijke beoordeling, techniek in Godot 4.6. |
