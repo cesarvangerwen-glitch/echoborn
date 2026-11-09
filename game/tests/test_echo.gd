@@ -11,6 +11,7 @@ const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 const EchoActor = preload("res://scripts/echo/echo_actor.gd")
 const EchoRecorder = preload("res://scripts/echo/echo_recorder.gd")
 const SpikeWorld = preload("res://scripts/world/spike_world.gd")
+const Motor = preload("res://scripts/echo/motor.gd")
 
 const TEN_SECONDS := 600
 
@@ -125,7 +126,17 @@ func test_coop_recorders_each_give_exact_echo(t) -> void:
 	var sim = t.make_sim()
 	var p1 := _spawn_player(sim, 1, SCRIPT_P1 + SCRIPT_LIVE + SCRIPT_LIVE)
 	var p2 := _spawn_player(sim, 2, SCRIPT_P2 + SCRIPT_LIVE, Vector2(400, 0))
+	# Sinds C-09 dragen P1 en P2 elkaar (licht- en schaduwplank). Een lichaam
+	# dat op de ander stond, kan zijn INPUT-echo alleen niet exact herhalen
+	# (de ander is er bij het afspelen niet); zijn STATE-echo wel.
+	var carried := {1: false, 2: false}
+	var watch := func(_tick: int) -> void:
+		for p: PlayerActor in [p1, p2]:
+			if p.motor.support == Motor.Support.SHADOW_BODY:
+				carried[p.player_index] = true
+	sim.tick_finished.connect(watch)
 	await t.run_ticks(sim, TEN_SECONDS)
+	sim.tick_finished.disconnect(watch)
 	var end1 := p1.position
 	var end2 := p2.position
 	var clip1 = p1.recorder.snapshot()
@@ -138,8 +149,11 @@ func test_coop_recorders_each_give_exact_echo(t) -> void:
 	var echo1_input: EchoActor = await _play(t, sim, clip1, EchoActor.Mode.INPUT)
 	t.check(echo1_state.position == end1, "P1 state-echo %s != %s" % [_fmt(echo1_state.position), _fmt(end1)])
 	t.check(echo2_state.position == end2, "P2 state-echo %s != %s" % [_fmt(echo2_state.position), _fmt(end2)])
-	t.check(echo1_input.position == end1, "P1 input-echo %s != %s" % [_fmt(echo1_input.position), _fmt(end1)])
-	t.check(echo2_input.position == end2, "P2 input-echo %s != %s" % [_fmt(echo2_input.position), _fmt(end2)])
+	if not carried[1]:
+		t.check(echo1_input.position == end1, "P1 input-echo %s != %s" % [_fmt(echo1_input.position), _fmt(end1)])
+	if not carried[2]:
+		t.check(echo2_input.position == end2, "P2 input-echo %s != %s" % [_fmt(echo2_input.position), _fmt(end2)])
+	t.note("gedragen (C-09): P1 %s, P2 %s; hun input-echo is dan niet exact" % [carried[1], carried[2]])
 	t.check(end1.distance_to(end2) > 1.0, "P1 en P2 eindigen op dezelfde plek; test zegt dan weinig")
 	t.check(p1.position != end1, "P1 bewoog niet live tijdens het afspelen")
 	t.note("P1 eind %s, P2 eind %s; P1 live verder naar %s" % [

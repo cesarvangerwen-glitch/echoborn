@@ -57,7 +57,7 @@ func _ready() -> void:
 
 # Demo: D wisselen en meedoen gebeuren hier buiten de tick, op de volgende
 # tick (`_sim.tick`). In productie loopt dit via het debugmenu (T16b) en de
-# InputRouter (T16c).
+# InputRouter (T16c deel 2).
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo \
 			and DEBUG_TAIL_KEYS.has(event.physical_keycode):
@@ -68,13 +68,16 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("p2_join") and _p2 == null:
 		_p2 = PlayerActor.new()
 		_p2.setup(2, DeviceInput.new(2), PLAYER_COLORS[1])
-		_p2.position = _p1.position
-		_sim.add_player(_p2)
-		_echo = null  # de Sim heeft hem weggehaald (C-01)
+		# C-03: P2 neemt de echo over, of verschijnt bij P1 (plaatsingsregel).
+		if _sim.drop_in(_p2):
+			_echo = null  # de Sim heeft hem weggehaald (C-01)
+		else:
+			_p2.free()
+			_p2 = null
 	elif event.is_action_pressed("p2_leave") and _p2 != null:
-		_sim.remove_player(_p2)
+		# C-05: de echo neemt over met de `geldig_vanaf` van P1.
+		_echo = _sim.drop_out(ECHO_COLOR)
 		_p2 = null
-		_add_echo()
 
 
 func _add_echo() -> void:

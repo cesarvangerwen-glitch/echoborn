@@ -122,6 +122,20 @@ func attack_held(index: int) -> bool:
 	return _attack_held[index] == 1
 
 
+## C-11a voor de echo: was frame `index` in lanceerhouding? Dan de tick van het
+## AANVAL-event waarop die houding begon, anders -1. Houding = AANVAL sinds dat
+## event aaneengesloten ingedrukt, en het event is ≥ `hold_ticks` geleden.
+func stance_event_tick(index: int, hold_ticks: int, attack_event: int = 1 << 0) -> int:
+	var tick := _ticks[index]
+	for back in _count:
+		var i := (index - back + capacity) % capacity
+		if _ticks[i] != tick - back or _attack_held[i] != 1:
+			return -1
+		if _events[i] & attack_event:
+			return _ticks[i] if back >= hold_ticks else -1
+	return -1
+
+
 func events(index: int) -> int:
 	return _events[index]
 

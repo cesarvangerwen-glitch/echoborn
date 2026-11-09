@@ -18,6 +18,11 @@ const SimObject = preload("res://scripts/objects/sim_object.gd")
 const GameEvents = preload("res://scripts/events/game_events.gd")
 const Combat = preload("res://scripts/combat/combat.gd")
 const CombatTarget = preload("res://scripts/combat/combat_target.gd")
+const Carry = preload("res://scripts/coop/carry.gd")
+const TailEcho = preload("res://scripts/echo/tail_echo.gd")
+const Motor = preload("res://scripts/echo/motor.gd")
+const Layers = preload("res://scripts/world/layers.gd")
+const Tuning = preload("res://scripts/echo/tuning.gd")
 
 ## Vlak vóór elke stap van een actor of object. `phase` is de stap uit E-07b:
 ## "1", "2", "3", "4" of "5". Bedoeld voor tests en debug-overlays; zonder
@@ -31,6 +36,11 @@ signal event_executed(tick: int, kind: int, actor: Node2D, target: Node)
 ## Na stap (5), vóór `tick` ophoogt. Alle standen van deze tick zijn dan af;
 ## een echo die deze tick zijn laatste frame speelde, staat er nog.
 signal tick_finished(tick: int)
+
+## P2 is opgelost bij een drop-out (breek-effect op `at`, C-05).
+signal partner_left(tick: int, at: Vector2)
+## P2 doet mee (C-03), op positie `at`.
+signal partner_joined(tick: int, at: Vector2)
 
 ## Aantal verwerkte ticks sinds de start.
 var tick := 0
@@ -147,18 +157,19 @@ func _physics_process(delta: float) -> void:
 	for echo in echoes:
 		actor_stepping.emit(tick, "1", echo)
 		echo.sim_step(tick, delta)
-	for player in players:
-		if player.player_index != 1:
-			actor_stepping.emit(tick, "1", player)
-			player.sim_step(tick, delta)
-			player.record(tick)
+	var p1 := get_player(1)
+	var p2 := get_player(2)
+	# C-09 / E-07b: stond P2 aan het eind van t − 1 op de lichtplank van P1,
+	# dan stapt P1 eerst en daarna P2; anders eerst P2.
+	var p1_first := p1 != null and p2 != null and p2.motor.support == Motor.Support.SHADOW_BODY \
+		and p2.motor.plank == p1.plank
+	if p2 and not p1_first:
+		_step_player(p2, p1, "1", delta)
 	# (2) P1 stapt, (3) P1 wordt opgenomen.
-	for player in players:
-		if player.player_index == 1:
-			actor_stepping.emit(tick, "2", player)
-			player.sim_step(tick, delta)
-			actor_stepping.emit(tick, "3", player)
-			player.record(tick)
+	if p1:
+		_step_player(p1, p2 if p2 else _carrier_echo(), "2", delta)
+	if p2 and p1_first:
+		_step_player(p2, p1, "1", delta)
 	# Na (3): een echo reageert in dezelfde tick op Loslaten of respawn van
 	# P1 (E-04b/c, E-09), zodat zijn events in (4) dan niet meer uitgaan.
 	for echo in echoes:
@@ -192,6 +203,138 @@ func _physics_process(delta: float) -> void:
 		if echo.finished and not echo.is_present():
 			echoes.erase(echo)
 	tick += 1
+
+
+## De speler met deze index, of null.
+func get_player(index: int) -> PlayerActor:
+	for p in players:
+		if p.player_index == index:
+			return p
+	return null
+
+
+## De solo-echo als drager (C-09): de staart-echo die nu afspeelt, of null.
+func _carrier_echo() -> Node2D:
+	for echo in echoes:
+		if echo.has_method("carrier_valid") and echo.is_present():
+			return echo
+	return null
+
+
+## Eén speler: de plank van de drager klaarzetten, stappen, vang en lancering
+## (C-11, C-13), opnemen en de eigen plank op zijn nieuwe plek.
+func _step_player(p: PlayerActor, carrier: Node2D, phase: String, delta: float) -> void:
+	if carrier is PlayerActor:
+		(carrier as PlayerActor).refresh_plank(true)
+	actor_stepping.emit(tick, phase, p)
+	p.sim_step(tick, delta)
+	Carry.after_step(tick, p, carrier, p.pre_position(), p.pre_velocity())
+	if p.player_index == 1:
+		actor_stepping.emit(tick, "3", p)
+	p.record(tick)
+	p.refresh_plank(is_coop())
+
+
+# --- drop-in en drop-out (C-03, C-05) ---------------------------------------
+
+## C-03: P2 doet mee op deze tick (aanroepen tussen twee ticks, vóór stap 1).
+## Speelde de echo af, dan neemt P2 zijn positie, snelheid en kijkrichting
+## over; anders verschijnt P2 bij P1 volgens de plaatsingsregel. Geeft
+## `false` als C-01 het niet toelaat (de aanroeper ruimt P2 dan op).
+func drop_in(p2: PlayerActor) -> bool:
+	var p1 := get_player(1)
+	if p2.player_index != 2 or not can_add_player(2):
+		return false
+	var echo: TailEcho = null
+	for e in echoes:
+		if e is TailEcho and e.is_present():
+			echo = e
+	var p1_on_echo := false
+	if echo != null:
+		# In een merksprong: de huidige positie, en de merksprong stopt zonder
+		# ontploffing (de echo verdwijnt vóór stap 4).
+		p2.position = echo.position
+		var index := echo.source.recorder.index_of_tick(tick - 1 - echo.tail_ticks)
+		var v := Vector2.ZERO if echo.in_merksprong or index < 0 \
+			else echo.source.recorder.post_velocity(index)
+		p2.motor.velocity = v
+		p2.motor.facing = echo.facing
+		p1_on_echo = p1 != null and p1.motor.support == Motor.Support.SHADOW_BODY \
+			and p1.motor.plank == echo.plank
+	elif p1 != null:
+		p2.position = placement(p1)
+	if not add_player(p2):
+		return false
+	if p1 != null:
+		p1.refresh_plank(true)
+	p2.refresh_plank(true)
+	if p1_on_echo:
+		# Stond P1 op de echo, dan staat hij nu op P2 en valt hij niet.
+		p1.motor.plank = p2.plank
+		p1.motor.plank_position = p2.plank.global_position
+	partner_joined.emit(tick, p2.position)
+	return true
+
+
+## C-05: P2 lost op (aanroepen tussen twee ticks, vóór stap 1). De lichtplank
+## van P1 gaat uit en de echo van P1 neemt op deze tick over volgens E-02/E-03,
+## met de `geldig_vanaf` van P1 (TD-noot PR #100): niets wordt gesimuleerd of
+## verzonnen. Merken van P2 blijven staan.
+func drop_out(echo_color: Color = Color(0.1, 0.1, 0.1)) -> TailEcho:
+	var p2 := get_player(2)
+	if p2 == null:
+		return null
+	var at := p2.position
+	p2.plank.collision_layer = 0
+	remove_player(p2)
+	partner_left.emit(tick, at)
+	var p1 := get_player(1)
+	if p1 == null:
+		return null
+	p1.refresh_plank(false)
+	var echo := TailEcho.new()
+	echo.setup(p1, echo_color, combat.tail_ticks, -1)
+	if not add_echo(echo):
+		echo.free()
+		return null
+	return echo
+
+
+## Plaatsingsregel (C-03): de positie van P1, tenzij die in laag 1 of 5
+## bezet is; dan de dichtstbijzijnde vrije plek binnen 64 px (stappen van
+## 4 px), anders de laatste vloerpositie van P1.
+func placement(p1: PlayerActor) -> Vector2:
+	var c: Dictionary = Tuning.coop()
+	var space := get_world_2d().direct_space_state
+	var query := PhysicsShapeQueryParameters2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = Tuning.body_size() - Vector2(0.02, 0.02)
+	query.shape = rect
+	query.collision_mask = Layers.WORLD | Layers.SHADOW_GEOMETRY
+	var origin := p1.global_position
+	var radius := float(c["dropin_radius_px"])
+	var step := float(c["dropin_step_px"])
+	var n := int(radius / step)
+	var candidates: Array[Vector2] = []
+	for iy in range(-n, n + 1):
+		for ix in range(-n, n + 1):
+			var offset := Vector2(ix * step, iy * step)
+			if offset.length() <= radius + 0.001:
+				candidates.append(offset)
+	# Dichtstbijzijnde eerst; bij gelijke afstand vaste volgorde (boven, dan links).
+	candidates.sort_custom(func(a: Vector2, b: Vector2) -> bool:
+		var la := a.length_squared()
+		var lb := b.length_squared()
+		if la != lb:
+			return la < lb
+		if a.y != b.y:
+			return a.y < b.y
+		return a.x < b.x)
+	for offset in candidates:
+		query.transform = Transform2D(0.0, origin + offset)
+		if space.intersect_shape(query, 1).is_empty():
+			return origin + offset
+	return p1.last_floor_position
 
 
 func _run_events(actor: Node2D, events: int) -> void:
