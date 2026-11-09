@@ -333,6 +333,9 @@ func drop_out(echo_color: Color = Color(0.1, 0.1, 0.1)) -> TailEcho:
 	var at := p2.position
 	p2.plank.collision_layer = 0
 	remove_player(p2)
+	# C-06/C-07: geen oud oplossen of leibandteller voor een volgende P2.
+	_p2_return_tick = -1
+	_p2_offscreen = 0
 	partner_left.emit(tick, at)
 	var p1 := get_player(1)
 	if p1 == null:

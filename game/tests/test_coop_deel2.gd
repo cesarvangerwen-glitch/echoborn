@@ -107,6 +107,43 @@ func test_e07c_recorded_flag(t) -> void:
 	t.check(carrier.is_present(), "drager niet Actief")
 
 
+## (1) gdd §4.6 letterlijk: P1 bouncet op `x` van zijn echo en valt op
+## `x + D + 10` van boven op de plek van de echo, die dan zijn eigen
+## bounce-boog volgt: P1 valt erdoor. Spookbron: tot `x` loopt de opname op
+## de vloer, vanaf `x` volgt hij de boog van een bounce (`plank_sinds_grond`).
+## Controle zonder de vlag: P1 landt wel.
+func test_e07c_fall_at_x_plus_d_plus_10_all_d(t) -> void:
+	var x := 40
+	for d: int in ALL_D:
+		for flag in [true, false]:
+			var sim = Fx.world(t)
+			var ghost := Fx.ghost(t)
+			var arc := func(k: int) -> Vector2:
+				if k < x:
+					return Vector2(300, Fx.STAND_Y)
+				var j := float(k - x)
+				return Vector2(300, minf(Fx.STAND_Y, Fx.STAND_Y - 30.0 - 6.0 * j + 0.125 * j * j))
+			for k in 500:
+				var at: Vector2 = arc.call(k)
+				Fx.ghost_frame(ghost, k, at, at.y >= Fx.STAND_Y, Motor.Support.WORLD if k < x else Motor.Support.NONE,
+					0, flag and k >= x and at.y < Fx.STAND_Y)
+			var echo := Fx.tail_echo(sim, ghost, d)
+			await t.run_ticks(sim, x + d + 9)
+			# Op x + D + 10 valt P1 net boven de bovenkant van de echo op hem.
+			var p1 := Fx.p1(sim, [], Vector2(300, echo.position.y - 33.0))
+			p1.motor.velocity = Vector2(0, 1.0)
+			var landed := {"on": false}
+			sim.tick_finished.connect(func(_tick: int) -> void:
+				if p1.motor.support == Motor.Support.SHADOW_BODY:
+					landed["on"] = true)
+			await t.run_ticks(sim, 6)
+			if flag:
+				t.check(not landed["on"], "D=%d: P1 landde op de echo in zijn bounce-boog" % d)
+			else:
+				t.check(landed["on"], "D=%d: zonder vlag landde P1 niet (controle)" % d)
+			await t.cleanup()
+
+
 ## (1) P1 bouncet van zijn echo en valt D + 10 later op de echo die zijn
 ## eigen bounce-boog volgt: P1 valt erdoor. (4) Vanaf de grond gesprongen:
 ## de echo draagt wel (de gewone springplank-landing).
@@ -489,10 +526,11 @@ func _c15_coop(t, d: int) -> void:
 	var coop_events := 0
 	for ev in ["SPRINGPLANK", "BOUNCE", "LANCERING", "VANGEN", "ONTPLOFFING"]:
 		coop_events += room.meetlog.count(ev)
-	# Werkaanname: er is nog geen gescripte geoefende co-op-run; de maat is
-	# 2× de FK-2-run zonder echo (± 6000 ticks), dus ≤ 12 000 ticks.
-	t.check(room.run_over and room.run_ticks() <= 12000,
-		"C-15 D=%d: co-op met meelopende P2 geen RUN_EIND binnen de maat (%d ticks)" % [d, room.run_ticks()])
+	# Werkaanname: er is nog geen gescripte geoefende co-op-run; de basis is
+	# de run met echo uit van dezelfde D (gemeten in de test hiervoor).
+	var base: int = _echo_off_ticks.get(d, 0)
+	t.check(room.run_over and base > 0 and room.run_ticks() <= 2 * base,
+		"C-15 D=%d: co-op %d ticks, basis echo uit %d (≤ 2×)" % [d, room.run_ticks(), base])
 	t.check(coop_events == 0, "C-15 D=%d: %d samenwerkings-events" % [d, coop_events])
 	t.note("C-15 co-op meelopen, D=%d: %d ticks, P2 %d× opgelost (%s)" % [d, room.run_ticks(),
 		room.meetlog.count("P2_OPGELOST"), _causes(room)])
@@ -506,6 +544,29 @@ func _causes(room) -> String:
 		if row[2] == "P2_OPGELOST":
 			c[row[4]] = int(c.get(row[4], 0)) + 1
 	return str(c)
+
+
+## Basis voor C-15 (2): de run met echo uit per D (P1 alleen, dezelfde bot).
+static var _echo_off_ticks := {}
+
+
+func _c15_base(t, d: int) -> void:
+	var pair := _coop_room(t, d)
+	var room = pair[0]
+	while not room.run_over and room.sim.tick < 7000:
+		await t.tree.physics_frame
+	t.check(room.run_over, "D=%d: basisrun met echo uit haalt RUN_EIND niet" % d)
+	_echo_off_ticks[d] = room.run_ticks()
+	room.queue_free()
+	await t.tree.process_frame
+
+
+func test_c15_base_echo_off_d90(t) -> void:
+	await _c15_base(t, 90)
+
+
+func test_c15_base_echo_off_d180(t) -> void:
+	await _c15_base(t, 180)
 
 
 func test_c15_coop_follow_only_d90(t) -> void:

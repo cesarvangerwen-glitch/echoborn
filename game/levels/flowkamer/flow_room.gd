@@ -88,6 +88,9 @@ var _hud_label: Label
 var _hud_bar: ColorRect
 var _hud_fill: ColorRect
 var _camera: Camera2D
+## Hoe snel de camera naar zijn doel (zoom en plek) beweegt, per seconde. Zo
+## springt de zoom niet in één frame bij P2_OPGELOST of P2_TERUG.
+const CAMERA_EASE := 8.0
 var _scores: Array = []
 var _k3_tint: Polygon2D
 var _overlay: Node2D
@@ -155,12 +158,19 @@ func _ready() -> void:
 		add_child(_overlay)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _camera and is_instance_valid(p1):
 		var with_p2 := p2 != null and is_instance_valid(p2) and not p2.dissolved
 		var view := camera_view(p1.position, p2.position if with_p2 else p1.position)
-		_camera.zoom = Vector2.ONE * (1280.0 / view.size.x)
-		_camera.position = view.get_center()
+		# Easen op de zoom; het middelpunt volgt het doelbeeld, zodat P1 en P2
+		# tijdens het easen in beeld blijven (uitzoomen gaat even snel).
+		var target_zoom := 1280.0 / view.size.x
+		var w := 1.0 - exp(-CAMERA_EASE * delta)
+		var zoom := lerpf(_camera.zoom.x, target_zoom, w)
+		if target_zoom < _camera.zoom.x:
+			zoom = target_zoom  # uitzoomen meteen: niemand valt buiten beeld
+		_camera.zoom = Vector2(zoom, zoom)
+		_camera.position = _camera.position.lerp(view.get_center(), w)
 	if _hud_label:
 		_update_hud()
 	if _overlay:
