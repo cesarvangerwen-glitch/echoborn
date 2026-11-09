@@ -4,7 +4,7 @@ extends Node
 ## Alle spelerszichtbare tekst staat als sleutel in `res://locale/strings.csv`; code
 ## gebruikt `tr("SLEUTEL")`. Regels en werkaannames: `docs/tech/ontwerp.md` §8a.
 
-## Brontaal: elke sleutel heeft een Engelse tekst (pitch §6: Engels bij launch).
+## Brontaal: elke sleutel heeft een Engelse tekst; NL komt erbij (#51 deel 1: 5A).
 const SOURCE_LOCALE := "en"
 ## Talen die het spel aanbiedt (NL in principe ja, #51: 5A).
 const LOCALES := ["en", "nl"]

@@ -27,6 +27,41 @@ func test_csv_loads_with_english_for_every_key(t) -> void:
 		t.note("nog zonder NL (valt terug op EN, vertaling in fase 4): %s" % ", ".join(missing_nl))
 
 
+## Elke vertaling heeft dezelfde opmaakcodes (%d, %s, %.1f) in dezelfde volgorde
+## als het Engels; anders crasht `tr(...) % [...]` of komen waarden verkeerd.
+func test_translations_keep_format_codes(t) -> void:
+	var result := Localization.load_csv(Localization.CSV_PATH)
+	var codes := RegEx.create_from_string("%[-+0-9.]*[a-zA-Z]")
+	var source: Translation = null
+	for translation: Translation in result["translations"]:
+		if translation.locale == Localization.SOURCE_LOCALE:
+			source = translation
+	t.check(source != null, "geen Engelse vertaling")
+	if source == null:
+		return
+	var compared := 0
+	for translation: Translation in result["translations"]:
+		if translation == source:
+			continue
+		for key: String in result["keys"]:
+			var text := String(translation.get_message(key))
+			if text.is_empty():
+				continue
+			var want := _codes(codes, String(source.get_message(key)))
+			var got := _codes(codes, text)
+			t.check(got == want, "%s %s: opmaakcodes %s, Engels heeft %s" % [
+				translation.locale, key, got, want])
+			compared += 1
+	t.check(compared > 0, "geen enkele vertaling vergeleken")
+
+
+func _codes(regex: RegEx, text: String) -> PackedStringArray:
+	var out := PackedStringArray()
+	for m in regex.search_all(text.replace("%%", "")):
+		out.append(m.get_string())
+	return out
+
+
 ## Elke sleutel die code of een scène gebruikt, staat in strings.csv.
 func test_every_key_in_code_exists(t) -> void:
 	var known: PackedStringArray = Localization.load_csv(Localization.CSV_PATH)["keys"]

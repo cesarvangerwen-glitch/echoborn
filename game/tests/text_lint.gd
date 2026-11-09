@@ -3,6 +3,8 @@ extends RefCounted
 ##
 ## Hulp voor `test_localization.gd`: geeft overtredingen en de gebruikte sleutels terug.
 
+const Localization = preload("res://scripts/locale/localization.gd")
+
 ## Mappen met code en scènes die de speler kan zien.
 const SCAN_DIRS := ["res://scripts", "res://scenes", "res://levels"]
 ## Ontwikkelaarsschermen en meetscènes: geen speltekst, dus niet gecontroleerd.
@@ -22,7 +24,6 @@ const UI_PATTERN := "(\\.(text|tooltip_text|placeholder_text|title)\\s*[+]?=\\s*
 const KEY_CALL_PATTERN := "\\b(tr|tr_n|translate)\\(\\s*$"
 ## Tekstvelden in een .tscn: de waarde moet een sleutel zijn.
 const TSCN_PATTERN := "^(text|tooltip_text|placeholder_text|title) = \"(.*)\"$"
-const KEY_PATTERN := "^[A-Z][A-Z0-9_]*$"
 ## Een woord: alleen letters, eventueel met leestekens eromheen. Twee woorden met
 ## een spatie ertussen = natuurlijke taal; `tail_ticks` of een pad is dat niet.
 const WORD_PATTERN := "^[(\"'«]*[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ'’-]+[.,:;!?)»]*$"
@@ -31,7 +32,7 @@ const LETTER_PATTERN := "[A-Za-zÀ-ÿ]"
 var _ui := RegEx.create_from_string(UI_PATTERN)
 var _key_call := RegEx.create_from_string(KEY_CALL_PATTERN)
 var _tscn := RegEx.create_from_string(TSCN_PATTERN)
-var _key := RegEx.create_from_string(KEY_PATTERN)
+var _key := RegEx.create_from_string(Localization.KEY_PATTERN)
 var _word := RegEx.create_from_string(WORD_PATTERN)
 var _letter := RegEx.create_from_string(LETTER_PATTERN)
 var _format := RegEx.create_from_string("%[-+0-9.]*[a-zA-Z%]")
