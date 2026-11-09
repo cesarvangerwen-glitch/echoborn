@@ -4,7 +4,7 @@ extends Node2D
 ## Volgorde per tick volgens E-07b (docs/design/gdd.md, ontwerp.md §2 en §4a):
 ##   (1) de schaduw: de echo zet zijn frame, óf P2 stapt (en wordt opgenomen)
 ##   (2) P1 stapt
-##   (3) P1 wordt opgenomen
+##   (3) P1 wordt opgenomen; de echo verwerkt een reset van P1 (E-09, E-04b)
 ##   (4) events: eerst van P1, dan van de schaduw (E-10)
 ##   (5) objecten werken hun stand bij (drukplaten, hendels, later zones)
 ## Zo hangt het resultaat niet af van de volgorde van nodes in de boom.
@@ -13,7 +13,7 @@ extends Node2D
 ## schaduwlichaam, de echo óf P2. Doet P2 mee, dan speelt er geen echo.
 
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
-const EchoActor = preload("res://scripts/echo/echo_actor.gd")
+const EchoBody = preload("res://scripts/echo/echo_body.gd")
 const SimObject = preload("res://scripts/objects/sim_object.gd")
 const GameEvents = preload("res://scripts/events/game_events.gd")
 
@@ -33,7 +33,7 @@ signal tick_finished(tick: int)
 ## Aantal verwerkte ticks sinds de start.
 var tick := 0
 var players: Array[PlayerActor] = []
-var echoes: Array[EchoActor] = []
+var echoes: Array[EchoBody] = []
 var objects: Array[SimObject] = []
 
 
@@ -75,7 +75,7 @@ func remove_player(player: PlayerActor) -> void:
 ## Voegt een echo toe als C-01 dat toelaat: geen P2 in het spel en geen
 ## andere echo die nog speelt. Anders gebeurt er niets en is het antwoord
 ## `false`; de aanroeper ruimt de echo dan zelf op.
-func add_echo(echo: EchoActor) -> bool:
+func add_echo(echo: EchoBody) -> bool:
 	if not can_add_echo():
 		return false
 	echoes.append(echo)
@@ -92,7 +92,7 @@ func can_add_echo() -> bool:
 	return true
 
 
-func remove_echo(echo: EchoActor) -> void:
+func remove_echo(echo: EchoBody) -> void:
 	echoes.erase(echo)
 	echo.stop()
 	echo.queue_free()
@@ -147,6 +147,10 @@ func _physics_process(delta: float) -> void:
 			player.sim_step(tick, delta)
 			actor_stepping.emit(tick, "3", player)
 			player.record(tick)
+	# Na (3): een echo reageert in dezelfde tick op Loslaten of respawn van
+	# P1 (E-04b/c, E-09), zodat zijn events in (4) dan niet meer uitgaan.
+	for echo in echoes:
+		echo.sim_after_source(tick)
 	# (4) events, eerst van P1, dan van de schaduw.
 	for player in players:
 		if player.player_index == 1:

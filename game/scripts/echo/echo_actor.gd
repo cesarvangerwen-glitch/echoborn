@@ -1,5 +1,9 @@
-extends CharacterBody2D
-## De echo: speelt een EchoClip af, één frame per physics-tick.
+extends "res://scripts/echo/echo_body.gd"
+## Clip-echo: speelt een vaste EchoClip af, één frame per physics-tick.
+##
+## Dit is de echo van de spike (knop, 10 s). De echo van v0.4 is de
+## staart-echo (`tail_echo.gd`, E-02). De clip-echo blijft voor tests van
+## het event- en objectsysteem en later voor de co-op-finisher (8A, T3b).
 ##
 ## Twee modi, zodat de spike beide aanpakken naast elkaar bewijst:
 ## - STATE: zet per tick de opgenomen toestand (positie/snelheid). Exact
@@ -18,14 +22,11 @@ const Layers = preload("res://scripts/world/layers.gd")
 
 var mode: Mode = Mode.STATE
 var clip: EchoClip
-var finished := false
-## Events van het frame dat deze tick is afgespeeld (E-10); 0 als de echo
-## niet actief is. De Sim voert ze uit in stap (4), tegen de huidige wereld.
-var tick_events := 0
 ## Positie na elke afgespeelde tick; tests vergelijken dit met clip.post_pos.
 var trace := PackedVector2Array()
 
 var _frame := 0
+var _motor := Motor.State.new()
 
 
 func setup(color: Color) -> void:
@@ -67,14 +68,15 @@ func start(p_clip: EchoClip, p_mode: Mode) -> void:
 	_frame = 0
 	finished = clip.is_empty()
 	trace = PackedVector2Array()
+	_motor = Motor.State.new()
 	if not finished:
 		position = clip.start_position()
-		velocity = clip.start_velocity()
+		_motor.velocity = clip.start_velocity()
 	tick_events = 0
 	_sync_presence()
 
 
-func sim_step(_tick: int, delta: float) -> void:
+func sim_step(tick: int, _delta: float) -> void:
 	tick_events = 0
 	if finished:
 		return
@@ -83,7 +85,7 @@ func sim_step(_tick: int, delta: float) -> void:
 			position = clip.post_pos[_frame]
 			velocity = clip.post_vel[_frame]
 		Mode.INPUT:
-			Motor.step(self, clip.inputs[_frame], delta)
+			Motor.step(self, _motor, clip.inputs[_frame], tick)
 	tick_events = clip.events[_frame]
 	trace.append(position)
 	_frame += 1
@@ -92,6 +94,12 @@ func sim_step(_tick: int, delta: float) -> void:
 		# einde van deze tick; `sim_end_tick` haalt hem daarna weg.
 		finished = true
 		playback_finished.emit()
+
+
+## Door de Sim aangeroepen na stap (3). Een clip-echo reageert niet op
+## resets van zijn bron.
+func sim_after_source(_tick: int) -> void:
+	pass
 
 
 ## Door de Sim aangeroepen na stap (5): een echo die deze tick zijn laatste

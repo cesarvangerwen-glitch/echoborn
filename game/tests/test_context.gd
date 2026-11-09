@@ -16,12 +16,14 @@ func _init(p_tree: SceneTree) -> void:
 	tree = p_tree
 
 
-## Nieuwe, lege testwereld met de spike-level en een Sim.
-func make_sim() -> Sim:
+## Nieuwe testwereld met een Sim; standaard met de spike-level. Met
+## `with_level = false` is de wereld leeg en bouwt de test zijn eigen geometrie.
+func make_sim(with_level: bool = true) -> Sim:
 	_root = Node2D.new()
 	_root.name = "TestWorld"
 	tree.root.add_child(_root)
-	SpikeWorld.build(_root)
+	if with_level:
+		SpikeWorld.build(_root)
 	var sim := Sim.new()
 	sim.name = "Sim"
 	_root.add_child(sim)

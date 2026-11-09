@@ -1,16 +1,23 @@
 extends RefCounted
-## Bitmasker voor één tick input van één speler.
+## Bitmasker voor één tick input van één speler (gdd §2.5, inputbitset v0.4).
 ##
-## Eén int per tick per speler: compact (600 ticks = 2,4 kB) en exact
-## vergelijkbaar. Nieuwe knoppen krijgen het volgende vrije bit.
+## Eén int per tick per speler: compact en exact vergelijkbaar. Bit 6 en 7
+## (UP, DOWN) zijn gereserveerd voor de Combat Designer.
 
 const LEFT := 1
 const RIGHT := 2
 const JUMP := 4
-const ACTION := 8
-## INTERACTIE uit gdd §2.5 (bit 4). Alleen nog als bit; een toets volgt met
-## de volledige bitset van de Gameplay Programmer (T16a).
+## AANVAL (gdd §2.5, bit 3). Heette ACTION in de spike.
+const ATTACK := 8
+## Oude naam van ATTACK. Blijft tot de InputRouter (T5a) de nieuwe acties
+## kent; nieuwe code gebruikt ATTACK.
+const ACTION := ATTACK
+## INTERACTIE (bit 4): hendel, deur, oppakken.
 const INTERACT := 16
+## Echo-knop (bit 5): Loslaten na 30 ticks vasthouden (E-09). Nooit een event.
+const ECHO := 32
+## Dash (bit 8, §2.5a).
+const DASH := 256
 
 
 static func describe(bits: int) -> String:
@@ -21,8 +28,12 @@ static func describe(bits: int) -> String:
 		parts.append("R")
 	if bits & JUMP:
 		parts.append("J")
-	if bits & ACTION:
+	if bits & ATTACK:
 		parts.append("A")
 	if bits & INTERACT:
 		parts.append("I")
+	if bits & ECHO:
+		parts.append("E")
+	if bits & DASH:
+		parts.append("D")
 	return "-" if parts.is_empty() else "".join(parts)

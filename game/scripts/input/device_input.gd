@@ -26,5 +26,10 @@ func sample(_tick: int) -> int:
 	if Input.is_action_pressed(prefix + "jump"):
 		bits |= InputBits.JUMP
 	if Input.is_action_pressed(prefix + "action"):
-		bits |= InputBits.ACTION
+		bits |= InputBits.ATTACK
+	# Dash en echo-knop (gdd §2.5) bestaan alleen voor P1 op het toetsenbord.
+	if InputMap.has_action(prefix + "dash") and Input.is_action_pressed(prefix + "dash"):
+		bits |= InputBits.DASH
+	if InputMap.has_action(prefix + "echo") and Input.is_action_pressed(prefix + "echo"):
+		bits |= InputBits.ECHO
 	return bits

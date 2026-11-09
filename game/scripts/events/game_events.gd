@@ -19,7 +19,7 @@ const KINDS: PackedInt32Array = [ATTACK, INTERACT]
 ## binnen `cooldown` ticks na een event van die soort ontstaat er geen nieuw).
 ## Waarden zijn parameters uit gdd v0.2; T3a kan ze wijzigen.
 const FROM_INPUT := [
-	{"bit": InputBits.ACTION, "event": ATTACK, "cooldown": 20},
+	{"bit": InputBits.ATTACK, "event": ATTACK, "cooldown": 20},
 	{"bit": InputBits.INTERACT, "event": INTERACT, "cooldown": 0},
 ]
 
