@@ -304,6 +304,7 @@ def build(state):
     mats = ["huis_rood", "huis_oker", "huis_wit", "huis_groen", "huis_rood", "huis_wit", "huis_oker"]
     i = 0
     w.house_windows = []
+    w.deuren = np.zeros((H, W), bool)   # deur met stoep: gaat open als het water zakt (#98)
     while x < 470:
         bw = [56, 48, 60, 44, 52, 58, 46][i % 7]
         top = [182, 200, 170, 206, 188, 176, 198][i % 7]
@@ -347,6 +348,7 @@ def build(state):
         w.paint(deurm, "hout", 1, layer=2)
         w.off[deurm & ((XX - dx0) % 4 == 0)] -= 1
         w.paint(rect(dx0 - 4, 330, dx0 + 16, 334), "steen", 2, layer=2)
+        w.deuren |= deurm | rect(dx0 - 4, 330, dx0 + 16, 334)
         w.paint(rect(dx0 - 4, 330, dx0 + 16, 331), "steen", 3, layer=2)
         # klimop op sommige gevels
         if i % 3 == 1:
@@ -444,6 +446,7 @@ def build(state):
     w.paint(loop, "steen", 2, layer=4, solid=4)
     w.paint(rect(262, 366, 440, 368), "steen", -1, layer=4, solid=4)
     w.paint(rect(262, 362, 440, 363), "steen", 3, layer=4, solid=4)
+    w.duiker, w.loopbrug = duiker, rect(262, 362, 440, 368)
     # getijdenrand: de oude waterstand
     if kleur:
         gr = rect(262, 322, 440, 332) & (BAY < 0.75 - (YY - 322) * 0.07) & (w.layer >= 2)
@@ -940,6 +943,15 @@ def render(state, return_info=False, figures=True):
     under_l = (srgb_to_lab(img[watm])[:, 0] / 100.0)
     wi = (1 + np.floor(under_l * 4 + (BAY[watm] - 0.5) * 0.8)).clip(1, 4).astype(int)
     img[watm] = WR[wi]
+    # grijs: alles onder het hoge water valt in tint 1. Wat opengaat als het water
+    # zakt (duiker, loopbrug, deur met stoep) krijgt daarom een vaste contour in
+    # water-tint 3 (dL* >= 8 tegen tint 1), zodat het net onder het oppervlak te
+    # raden is (bible 4.5, #98). In de opgepompte toestand staat niets hiervan onder.
+    w.watm = watm
+    w.onder = onder_water_contour(w, watm) if not kleur else np.zeros((H, W), bool)
+    if not kleur:
+        img[w.loopbrug & watm & (YY > 362) & (YY < 367) & ~w.duiker] = WR[2]  # lijf van de loopbrug
+    img[w.onder] = WR[3]
     # reflecties: gespiegelde heldere pixels, onderbroken (elke 2e rij)
     src = img.copy()
     for d in range(1, 34):
@@ -985,6 +997,19 @@ def render(state, return_info=False, figures=True):
     if return_info:
         return img, dict(w=w, LF=LF, masks={"speler 1": p1_m, "speler 2": p2_m, "echo": e_m})
     return img
+
+
+def onder_water_contour(w, watm):
+    """Contour (1 px) van de vormen die in de grijze toestand onder water staan."""
+    c = np.zeros((H, W), bool)
+    # duiker: de boog en de dagkanten, niet de bodem
+    c |= outer_of(w.duiker) & (YY < 366)
+    # loopbrug: bovenkant (looprand) en voorkant, onderbroken door de deining
+    c |= rect(262, 362, 440, 363) & ~w.duiker
+    c |= rect(262, 367, 440, 368) & (((XX + YY) % 4) != 0)
+    # deur met stoep: alleen het deel onder het oppervlak
+    c |= edge_of(w.deuren & (w.layer == 2))
+    return c & watm & (YY > w.wl + 1)
 
 
 # ------------------------------------------------------------------ uitvoer
@@ -1172,6 +1197,29 @@ def main():
             inner = ndimage.binary_erosion(m, iterations=3)
             mi = np.array(Image.fromarray(inner.astype(np.uint8) * 255).resize((ts_.shape[1], ts_.shape[0]), Image.BOX)) > 250
             print(f"Deck ware grootte {st} {nm}: binnenkant L* mediaan {np.median(L[mi]):.1f}, spreiding (p90-p10) {np.percentile(L[mi], 90) - np.percentile(L[mi], 10):.1f}")
+
+    # onder water in grijs (#98): contour van duiker, loopbrug en deur met stoep tegen het water
+    img, info = res["grijs"]
+    w_ = info["w"]
+    lab = srgb_to_lab(img)[..., 0]
+    ref = w_.watm & ~ndimage.binary_dilation(w_.onder | w_.loopbrug, iterations=3) & (YY > w_.wl + 2)
+    Lw = np.median(lab[ref])
+    big = np.kron(img, np.ones((2, 2, 1)))
+    ts_ = np.array(deck_true_size(big)).astype(float) / 255
+    Ld = srgb_to_lab(ts_)[..., 0]
+
+    def to_deck(m):
+        cov = np.array(Image.fromarray(np.kron(m, np.ones((2, 2))).astype(np.uint8) * 255)
+                       .resize((ts_.shape[1], ts_.shape[0]), Image.BOX)).astype(float) / 255
+        return cov
+    Lwd = np.median(Ld[to_deck(ref) > 0.99])
+    print(f"\nOnder water, grijs (water-tint 1 rondom: L* {Lw:.1f} op 640x400, {Lwd:.1f} op ware Deck-grootte):")
+    delen = {"duiker": outer_of(w_.duiker), "loopbrug": w_.loopbrug, "deur met stoep": ndimage.binary_dilation(w_.deuren)}
+    for nm, zone in delen.items():
+        c = w_.onder & zone
+        cd = to_deck(c)
+        print(f"  {nm:15s}: contour dL* {np.median(lab[c]) - Lw:4.1f} (640x400) | {np.percentile(Ld[cd > 0.4], 90) - Lwd:4.1f} (Deck, p90)  [{c.sum()} px]")
+    print(f"  aandeel van het kanaal onder water in tint 1: {np.mean(np.all(np.isclose(img[w_.watm], RAMP_GRIJS[MI['water']][1]), axis=1)) * 100:.0f} %")
 
 
 if __name__ == "__main__":
