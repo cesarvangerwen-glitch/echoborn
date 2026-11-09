@@ -291,6 +291,32 @@ func test_e07a_2_landing_keeps_speed_and_returns_dash(t) -> void:
 	t.check(_count(rows, Motor.EV_DASH) == 2, "%d dashes (2)" % _count(rows, Motor.EV_DASH))
 
 
+## (2) Landen tijdens een dash: P1 dasht van een richel op plankhoogte de
+## echo op en landt in tick 4 van de dash. De dash loopt door tot tick 10
+## (4 px/tick), de dash is pas daarna terug, en er is één SPRINGPLANK-event.
+func test_e07a_2_landing_during_dash_from_ledge(t) -> void:
+	var sim = Fx.world(t)
+	# Plank 290–306 op y 370; richel (laag 1) tot x = 274 met dezelfde bovenkant.
+	_still_echo(t, sim, 298.0)
+	Fx.block(t, "Ledge", Rect2(150, 370, 124, 30), Layers.WORLD)
+	var p1 := Fx.p1(sim, [[10, 0], [1, D], [30, 0]], Vector2(268, Fx.ON_ECHO_Y))
+	var rows := _log(sim, p1)
+	await t.run_ticks(sim, 30)
+	t.check(rows[10]["ev"] & Motor.EV_DASH != 0, "geen dash op tick 10")
+	var land := _first(rows, Motor.EV_SPRINGPLANK)
+	t.check(land == 13, "landing op de plank op tick %d (13 = dash-tick 4)" % land)
+	t.check(_count(rows, Motor.EV_SPRINGPLANK) == 1, "%d SPRINGPLANK-events (1)" % _count(rows, Motor.EV_SPRINGPLANK))
+	var steps_ok := true
+	for k in range(10, 20):
+		steps_ok = steps_ok and absf(rows[k]["pos"].x - rows[k - 1]["pos"].x - 4.0) < EPS
+	t.check(steps_ok and absf(rows[20]["pos"].x - rows[19]["pos"].x) < EPS,
+		"de dash liep niet precies 10 ticks door na de landing")
+	var waiting := true
+	for k in range(13, 19):
+		waiting = waiting and not rows[k]["dash_ready"]
+	t.check(waiting and rows[19]["dash_ready"], "dash niet pas na de dash terug (tick 19)")
+
+
 ## (3) Bounce: v.y = −6, top 70–74 px boven de plank, v.x blijft, BOUNCE-
 ## event; ≥ 98 px boven de vloer; buffer 10 (11 te vroeg), coyote 6 (7 te laat).
 func test_e07a_3_bounce_buffer_and_coyote(t) -> void:

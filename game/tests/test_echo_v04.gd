@@ -254,14 +254,23 @@ func test_e08b_light_bridge_needs_shadow_support(t) -> void:
 			Fx.block(t, "ShadowBridge", Rect2(300, 400, 100, 10), Layers.SHADOW_GEOMETRY)
 		var p1 := Fx.p1(sim, [[300, R]])
 		var echo := Fx.tail_echo(sim, p1, 90)
+		var log := _trace(sim, p1, echo)
 		var at: Array = []
-		echo.broke.connect(func(_tick: int, where: Vector2) -> void: at.append(where))
+		var when: Array = []
+		echo.broke.connect(func(tick: int, where: Vector2) -> void:
+			when.append(tick)
+			at.append(where))
 		await t.run_ticks(sim, 300)
 		if shadow_bridge:
 			t.check(at.is_empty() and echo.position.x > 400.0, "echo brak op de schaduwbrug: %s" % str(at))
 		else:
-			t.check(not at.is_empty() and at[0].x > 300.0 and at[0].x < 320.0,
-				"echo brak niet aan de rand van de lichtbrug: %s" % str(at))
+			# De steun faalt zodra de proef (x ± 7,99) de linkervloer (tot 300)
+			# niet meer raakt. Breuk op de 3e slechte tick (G = 3); het effect
+			# staat op de laatste geldige positie: 3 ticks vóór de breuk.
+			t.check(when.size() >= 1 and at[0] == log["echo"][when[0] - 3],
+				"breek-effect niet op de laatste geldige positie: %s op tick %s" % [str(at), str(when)])
+			t.check(not at.is_empty() and at[0].x <= 307.99 and at[0].x > 305.0,
+				"laatste geldige positie %s (x in 305–307,99)" % str(at))
 		await t.cleanup()
 
 

@@ -132,10 +132,11 @@ static func step(body: CharacterBody2D, s: State, bits: int, tick: int) -> int:
 		s.velocity.y = 0.0
 
 	# Steun aan het eind van de tick, landen (E-07a (2)) en de buffer.
-	var support := _floor_support(body)
+	var floor := _floor_collider(body, s)
+	var support := _support_of(floor)
 	s.on_floor = support != Support.NONE
 	s.support = support
-	s.plank = _floor_collider(body) if support == Support.SHADOW_BODY else null
+	s.plank = floor if support == Support.SHADOW_BODY else null
 	if s.plank:
 		s.plank_position = s.plank.global_position
 	if s.on_floor:
@@ -180,18 +181,30 @@ static func _plank_usable(plank: CollisionObject2D) -> bool:
 	return plank != null and is_instance_valid(plank) and plank.collision_layer & Layers.PLANK != 0
 
 
-static func _floor_collider(body: CharacterBody2D) -> CollisionObject2D:
+## De vloer onder het lichaam na de stap. Staat het op twee vloeren tegelijk
+## (bv. een richel en de plank ernaast), dan blijft de vloer van de vorige
+## tick gelden zolang hij er nog onder ligt: zo wisselt de steun maar één
+## keer en telt een springplank-landing maar één keer (E-07a (2)).
+static func _floor_collider(body: CharacterBody2D, s: State) -> CollisionObject2D:
 	if not body.is_on_floor():
 		return null
+	var first: CollisionObject2D = null
 	for i in body.get_slide_collision_count():
 		var collision := body.get_slide_collision(i)
-		if collision.get_normal().dot(body.up_direction) > 0.7:
-			return collision.get_collider() as CollisionObject2D
-	return null
+		if collision.get_normal().dot(body.up_direction) <= 0.7:
+			continue
+		var collider := collision.get_collider() as CollisionObject2D
+		if collider == null:
+			continue
+		if first == null:
+			first = collider
+		var same_kind := (_support_of(collider) == Support.SHADOW_BODY) == (s.support == Support.SHADOW_BODY)
+		if s.on_floor and same_kind:
+			return collider
+	return first
 
 
-static func _floor_support(body: CharacterBody2D) -> int:
-	var collider := _floor_collider(body)
+static func _support_of(collider: CollisionObject2D) -> int:
 	if collider == null:
 		return Support.NONE
 	if collider.collision_layer & Layers.PLANK:

@@ -43,6 +43,13 @@ var last_valid_position := Vector2.ZERO
 var _active := false
 var _bad_run := 0
 var _body_size := Vector2.ZERO
+var _has_valid := false
+var _tolerance_ticks := 3
+var _support_offset := Vector2.ZERO
+var _free_query: PhysicsShapeQueryParameters2D
+var _support_query: PhysicsShapeQueryParameters2D
+var _danger_query: PhysicsShapeQueryParameters2D
+var _light_query: PhysicsPointQueryParameters2D
 
 
 func setup(p_source: PlayerActor, color: Color, p_tail_ticks: int = -1, start_tick: int = 0) -> void:
@@ -55,6 +62,7 @@ func setup(p_source: PlayerActor, color: Color, p_tail_ticks: int = -1, start_ti
 	_body_size = Tuning.body_size()
 	BodyBuilder.add_box(self, color, _body_size)
 	_build_plank()
+	_build_checks()
 	_apply_presence(false)
 
 
@@ -85,6 +93,7 @@ func set_tail_ticks(p_tail_ticks: int, tick: int) -> void:
 func reset(tick: int) -> void:
 	valid_from = tick
 	_bad_run = 0
+	_has_valid = false
 	tick_events = 0
 	_set_active(false, tick)
 
@@ -109,7 +118,11 @@ func sim_step(tick: int, _delta: float) -> void:
 		_break(tick)
 		return
 	_set_active(true, tick)
-	last_valid_position = position
+	# Alleen een tick waarop (a) en (b) slaagden, is geldig: faalt er een
+	# binnen de tolerantie G, dan komt het breek-effect op de tick ervoor.
+	if _bad_run == 0:
+		last_valid_position = position
+		_has_valid = true
 	tick_events = rec.events(index) & REPLAYED_EVENTS
 
 
@@ -131,79 +144,75 @@ func sim_end_tick() -> void:
 
 
 ## E-08 (a)–(d) op de opgenomen positie van nu. `true` = de echo breekt.
+## De vormen en query-objecten staan klaar uit `_build_checks`; hier komt
+## alleen de positie erin (geen allocaties per tick).
 func _breaks(recorded_on_floor: bool) -> bool:
-	var e: Dictionary = Tuning.echo()
 	var space := get_world_2d().direct_space_state
-	var free := not _overlaps(space, _inset_rect(float(e["overlap_tolerance_px"])),
-		Vector2.ZERO, Layers.ECHO_CHECK_MASK, false)
+	var at := global_position
+	_free_query.transform = Transform2D(0.0, at)
+	var free := space.intersect_shape(_free_query, 1).is_empty()
 	var supported := true
 	# E-08b: stond P1 op een schaduwlichaam, dan geen steuncontrole (zweven).
 	if recorded_on_floor and (support == Motor.Support.WORLD or support == Motor.Support.LIGHT):
-		var probe := float(e["support_probe_px"])
-		var rect := RectangleShape2D.new()
-		rect.size = Vector2(_body_size.x - 0.02, probe)
-		supported = _overlaps(space, rect, Vector2(0, (_body_size.y + probe) * 0.5),
-			Layers.ECHO_CHECK_MASK, false)
+		_support_query.transform = Transform2D(0.0, at + _support_offset)
+		supported = not space.intersect_shape(_support_query, 1).is_empty()
 	if free and supported:
 		_bad_run = 0
 	else:
 		_bad_run += 1
-		if _bad_run >= int(e["break_tolerance_ticks"]):
+		if _bad_run >= _tolerance_ticks:
 			return true
 	# E-08c: middelpunt in fel licht; E-08d: vorm raakt een schaduwgevaar.
-	if _zone_at_point(space, Zone.Kind.FEL_LICHT):
-		return true
-	var full := RectangleShape2D.new()
-	full.size = _body_size
-	return _zone_overlaps(space, full, Zone.Kind.GEVAAR)
+	_light_query.position = at
+	for hit in space.intersect_point(_light_query, 8):
+		if _is_zone(hit["collider"], Zone.Kind.FEL_LICHT):
+			return true
+	_danger_query.transform = Transform2D(0.0, at)
+	for hit in space.intersect_shape(_danger_query, 8):
+		if _is_zone(hit["collider"], Zone.Kind.GEVAAR):
+			return true
+	return false
 
 
 func _break(tick: int) -> void:
-	broke.emit(tick, last_valid_position if _active else position)
+	broke.emit(tick, last_valid_position if _has_valid else position)
 	reset(tick)
 
 
-## Vorm van het lichaam, aan elke kant `inset` px kleiner (E-08a: tot 2 px
-## overlap mag). 0,01 px extra zodat precies 2 px overlap nog vrij is.
-func _inset_rect(inset: float) -> RectangleShape2D:
-	var rect := RectangleShape2D.new()
-	rect.size = _body_size - Vector2.ONE * (inset + 0.01) * 2.0
-	return rect
+## Vormen en queries voor E-08, één keer per echo. Ruimte-queries tegen
+## statische geometrie en zones (mag volgens standaarden §4.8).
+func _build_checks() -> void:
+	var e: Dictionary = Tuning.echo()
+	_tolerance_ticks = int(e["break_tolerance_ticks"])
+	# (a) Vorm aan elke kant `overlap_tolerance_px` kleiner (tot 2 px overlap
+	# mag), plus 0,01 px zodat precies 2 px overlap nog vrij is.
+	var inset := float(e["overlap_tolerance_px"]) + 0.01
+	var free_rect := RectangleShape2D.new()
+	free_rect.size = _body_size - Vector2.ONE * inset * 2.0
+	_free_query = _shape_query(free_rect, Layers.ECHO_CHECK_MASK, false)
+	# (b) Strook van `support_probe_px` direct onder het lichaam.
+	var probe := float(e["support_probe_px"])
+	var support_rect := RectangleShape2D.new()
+	support_rect.size = Vector2(_body_size.x - 0.02, probe)
+	_support_offset = Vector2(0, (_body_size.y + probe) * 0.5)
+	_support_query = _shape_query(support_rect, Layers.ECHO_CHECK_MASK, false)
+	# (c) Middelpunt; (d) hele vorm, beide tegen zones op laag 7.
+	_light_query = PhysicsPointQueryParameters2D.new()
+	_light_query.collision_mask = Layers.ZONES
+	_light_query.collide_with_areas = true
+	_light_query.collide_with_bodies = false
+	var full_rect := RectangleShape2D.new()
+	full_rect.size = _body_size
+	_danger_query = _shape_query(full_rect, Layers.ZONES, true)
 
 
-func _query(shape: Shape2D, offset: Vector2, mask: int, areas: bool) -> PhysicsShapeQueryParameters2D:
+func _shape_query(shape: Shape2D, mask: int, areas: bool) -> PhysicsShapeQueryParameters2D:
 	var query := PhysicsShapeQueryParameters2D.new()
 	query.shape = shape
-	query.transform = Transform2D(0.0, global_position + offset)
 	query.collision_mask = mask
 	query.collide_with_areas = areas
 	query.collide_with_bodies = not areas
 	return query
-
-
-## Ruimte-query tegen statische geometrie (mag volgens standaarden §4.8).
-func _overlaps(space: PhysicsDirectSpaceState2D, shape: Shape2D, offset: Vector2,
-		mask: int, areas: bool) -> bool:
-	return not space.intersect_shape(_query(shape, offset, mask, areas), 1).is_empty()
-
-
-func _zone_overlaps(space: PhysicsDirectSpaceState2D, shape: Shape2D, kind: Zone.Kind) -> bool:
-	for hit in space.intersect_shape(_query(shape, Vector2.ZERO, Layers.ZONES, true), 8):
-		if _is_zone(hit["collider"], kind):
-			return true
-	return false
-
-
-func _zone_at_point(space: PhysicsDirectSpaceState2D, kind: Zone.Kind) -> bool:
-	var query := PhysicsPointQueryParameters2D.new()
-	query.position = global_position
-	query.collision_mask = Layers.ZONES
-	query.collide_with_areas = true
-	query.collide_with_bodies = false
-	for hit in space.intersect_point(query, 8):
-		if _is_zone(hit["collider"], kind):
-			return true
-	return false
 
 
 func _is_zone(collider: Object, kind: Zone.Kind) -> bool:
