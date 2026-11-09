@@ -210,7 +210,7 @@ Spelers maskeren 1 + 4, echo's 1 + 5. Zo kan een echo door een lichtmuur heen en
 - FAIL is ook: 0 checks, een scriptfout of enginefout tijdens de test (opgevangen met een `Logger`), of een test die niet binnen de tijdslimiet klaar is (#30).
 - Geen testhaken in gameplaycode. Tests luisteren naar signalen, zoals `Sim.actor_stepping(tick, phase, actor)` (#30).
 - Open punt: een fout in een signaalhandler (bv. een test die naar `actor_stepping` luistert) geeft één foutregel per tick. De test wordt terecht FAIL, maar de uitvoer is lang; ontdubbelen in de runner kan later.
-- Schuld: geen test bewaakt de runner zelf. Verdwijnt `OS.add_logger()` of de time-out-lus uit `run_tests.gd`, dan blijft de suite groen. Plan: bij de overstap op GUT (R2) of de CI-workflow (R6) een meta-run toevoegen die een kapotte test draait en exit 1 verwacht.
+- ~~Schuld: geen test bewaakt de runner zelf. Verdwijnt `OS.add_logger()` of de time-out-lus uit `run_tests.gd`, dan blijft de suite groen. Plan: bij de overstap op GUT (R2) of de CI-workflow (R6) een meta-run toevoegen die een kapotte test draait en exit 1 verwacht.~~ **Opgelost** (#70, PR #94): de meta-run in `.github/workflows/tests.yml` eist exitcode 1 met 2 FAIL's, op Linux en Windows.
 - Huidige tests:
 
 | Test | Bewijst |
@@ -238,10 +238,10 @@ De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gave
 
 | # | Item | Soort | Plan |
 |---|---|---|---|
-| R1 | Godot 4.6.3 vastgepind; determinisme van input-replay is alleen bewezen op deze build en deze machine (Linux x86_64). | Risico | Met toestand-opname is dit geen blokkade. Bij elke engine-update de tests draaien. Windows-run in preproductie (Engine & Platform Programmer). |
+| R1 | Godot 4.6.3 vastgepind; determinisme van input-replay is alleen bewezen op deze build en deze machine (Linux x86_64). | Risico | Met toestand-opname is dit geen blokkade. Bij elke engine-update de tests draaien. Windows-run in CI (T6, `tests.yml`); determinisme-vergelijking tussen OS'en nog open. Open: een cross-OS-check die bewijst dat dezelfde opname op Linux en Windows dezelfde toestand oplevert, hoort bij T16a. |
 | R2 | Eigen testrunner in plaats van GUT of gdUnit4. | Schuld | Volstaat voor nu. Bij meer dan ±30 tests overstappen op GUT (MIT). Daarvoor eerst opname in `docs/licenties.md` door de Business/Legal Advisor. |
 | R3 | Acties in `input_setup.gd` staan in code, niet in een rebindbare config. | Schuld | Vervangen door InputRouter + opgeslagen bindings (preproductie). |
-| R4 | `preload()` in plaats van `class_name` (geen globale klassennamen). | Bewuste keuze | Werkt op een verse clone zonder importcache. Heroverwegen als CI `--import` draait. |
+| R4 | `preload()` in plaats van `class_name` (geen globale klassennamen). | Bewuste keuze | Werkt op een verse clone zonder importcache. Heroverwegen als CI `--import` draait. Open: zodra `game/` importeerbare assets krijgt (png, wav), komt er een `--import`-stap in CI en wordt R4 heroverwogen (besluit TD, PR #94). |
 | R5 | ~~Echo-acties zijn alleen een bit; er is nog geen event-systeem.~~ | Afgelost | Event-systeem en objecten gebouwd (§4a, #68). Rest: aanvallen raken nog niets (E-10a, E-14: T16a). |
 | R8 | De physics-ruimte ziet kinematische lichamen één tick te laat (§4a). Objecten omzeilen dat, maar de schaduwplank (E-07a) botst via de ruimte. | Risico | Plank als `StaticBody2D` met `body_set_state` in stap (1); bewijzen met de E-07a-test (T16a, Gameplay Programmer). |
 | R6 | Geen CI: tests draaien alleen als een agent of mens ze start. | Risico | GitHub Actions-workflow met dezelfde download en hetzelfde commando. Vraagt een besluit over Actions-minuten (EP). |

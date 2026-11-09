@@ -11,7 +11,7 @@ Dit document is voor elke agent en elke mens die code in `game/` wil draaien of 
 | Engine-besluit | Godot 4.6 (`docs/beslissingen.md`) |
 | Vastgepinde build | **Godot 4.6.3-stable, officieel, Linux x86_64, standaard (niet mono)** |
 | Waarom 4.6.3 | Nieuwste 4.6.x-patch op 2026-11-08 (4.6.4 bestaat nog niet). Patches binnen 4.6 zijn compatibel; dit valt onder het CEO-besluit "Godot 4.6". |
-| Getest | 4.6.3 headless: tests groen. 4.6, 4.6.1, 4.6.2 zijn ook downloadbaar, maar niet getest. |
+| Getest | 4.6.3 headless: tests groen op Linux x86_64 en op Windows (`windows-2022`, CI, §6). 4.6, 4.6.1, 4.6.2 zijn ook downloadbaar, maar niet getest. |
 
 Iedereen gebruikt dezelfde build. Determinisme van de echo (zie `ontwerp.md`) hangt mede af van de engineversie. Een upgrade naar een nieuwe patch is een TD-besluit; een upgrade naar 4.7 of hoger is een vraag aan de CEO.
 
@@ -123,4 +123,6 @@ Toegevoegd door de Tools Programmer (#70, fasekader fase 2 T6). Workflow: `.gith
 - **Stappen**: (1) het commando uit §3; (2) een **meta-run**: de job zet `.github/ci/test_meta_broken.gd` (een scriptfout en een test zonder checks) tijdelijk in `TEST_SCRIPTS` en verwacht exitcode 1 met precies die 2 FAIL's. Zo blijft de suite niet stil groen als `OS.add_logger()` of het 0-checks-oordeel verdwijnt (`ontwerp.md` §9, R18).
 - **Uitvoer**: `tests.log` en `meta.log` per OS als artifact `testuitvoer-<os>` (14 dagen).
 - **Andere Godot-patch** (TD-besluit, §1): pas `GODOT_VERSION`, `SHA512_LINUX` en `SHA512_WINDOWS` bovenaan de workflow aan, met de waarden uit `SHA512-SUMS.txt` van die release. De oude cache vervalt vanzelf.
+- **Besluit TD (a), PR #94**: het padfilter blijft; een verplichte check kan niet (branch protection geeft HTTP 403 op deze privérepo), dus de regisseur merget een PR die `game/**` raakt alleen bij een groene `tests`-run op beide OS'en, en de SM-review van code in `game/` kijkt mee.
+- **Besluit TD (b), PR #94**: geen `--import` in CI; R4 in `ontwerp.md` blijft (`preload()`, geen `class_name`).
 - **Werkaanname**: Godot 4.6.3-stable (standaard, niet mono) volgens §1, onder het CEO-besluit "Godot 4.6"; de CI kost € 0 extern binnen de gratis Actions-minuten (fase 2 € 0 extern, besluit #51 deel 1).
