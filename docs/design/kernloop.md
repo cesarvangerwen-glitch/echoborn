@@ -1,6 +1,9 @@
-# Kernloop *Echoborn*
+# Kernloop *Polderlight*
 
-Versie 0.2 · Eigenaar: Lead Game Designer · Issue #6 · Status: interne review (Executive Producer)
+Versie 0.2.1 · Eigenaar: Lead Game Designer · Issue #6 · Status: interne review (Executive Producer)
+Werktitel *Polderlight* (besluit #96); repo en mappen heten nog "echoborn", de mechaniek heet "echo".
+
+> **Let op (v0.2.1):** dit document is nog van vóór pitch v0.4 en wordt in T3c herzien ([#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81)). Tot dan gelden bij verschil de regels in `docs/design/gdd.md` v0.4: de echo-staart is D (± 2 s) in plaats van 10 s (§2.2), en co-op volgt §2.7 (co-op 7A, C-01–C-16). Dat raakt vooral §4 (P2 neemt de echo niet meer over als kopie, maar speelt dezelfde rol live) en §7 (P2 slaat, merkt en is ook zelf springer).
 Bronnen: `docs/concept/pitch.md` (pillars), `docs/tech/ontwerp.md` (echo-spike), `docs/productie/fase-1-kader.md` (E2a, E2b), `docs/beslissingen.md` (randvoorwaarden #2, stijl 2D #18).
 De exacte echo-regels staan in `docs/design/gdd.md` §2. Dit document laat zien hoe ze in de loop passen, toetst ze aan de pillars (§6, fasekader E2a) en zet op een rij wat de schaduwspeler in co-op van de echo houdt (§7, fasekader E2b).
 
@@ -54,6 +57,8 @@ flowchart LR
 ```
 
 ## 4. Diagram: toestand van de schaduw (solo en co-op)
+
+> Verouderd sinds gdd v0.4: lees 600 ticks als D; drop-in en drop-out kloppen nog in de kern (C-03, C-05). Herziening in T3c.
 
 ```mermaid
 stateDiagram-v2
@@ -135,6 +140,8 @@ Toetsvragen uit `docs/concept/pitch.md` §4:
 
 ## 7. Co-op: wat de schaduwspeler van de echo houdt (fasekader E2b)
 
+> Verouderd sinds gdd v0.4 (co-op 7A): de beperkingen van de schaduw blijven (laag, fel licht, gevaar, lichtobjecten, verzamelen, leiband), maar P2 kan nu ook slaan, merken en pompen (C-02) en op P1 staan via de lichtplank (C-09). De vier samenwerkingsacties en de finisher staan in `gdd.md` §2.7. Herziening in T3c.
+
 Doel: co-op mag de puzzels niet triviaal maken (pillar 3, risico R10). Daarom houdt P2 alle beperkingen van de echo. Het enige echte verschil is dat P2 *live* speelt.
 
 | Beperking | Echo (solo) | P2 (co-op) | Regel |
@@ -175,3 +182,4 @@ De drie playtestvragen voor het prototype staan in `gdd.md` §5: de lengte van 1
 |---|---|
 | 0.1 | Eerste versie (PR #16). |
 | 0.2 | Lead-review EP (PR #16): terugkeerregels K-01–K-04 (gebied 4 en eindboss), aantallen als maximum met rekensom 5,1–6,6 uur, toestandsdiagram met Leeg → Overgenomen, macro-diagram met eindboss-poort. Fasekader v1.1: pillartoets per groep echo-regels (§6.1, E2a) en overzicht wat P2 van de echo houdt (§7, E2b). Stijlbesluit 2D verwerkt. |
+| 0.2.1 | Werktitel *Polderlight* (besluit #96, [#37](https://github.com/cesarvangerwen-glitch/echoborn/issues/37)); verwijzing naar gdd v0.4 voor staart en co-op 7A (T3b, [#75](https://github.com/cesarvangerwen-glitch/echoborn/issues/75)), tot de herziening in T3c. |
