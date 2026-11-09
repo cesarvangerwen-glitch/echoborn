@@ -1,6 +1,6 @@
 # Codestandaarden v0
 
-Eigenaar: Technical Director · Versie 0 · Issue #5
+Eigenaar: Technical Director · Versie 0.1 · Issues #5, #68
 
 Geldt voor alle code in `game/`. De Technical Director reviewt alle code van programmeurs hierop (WERKWIJZE §5). Afwijken mag, met een reden in de PR.
 
@@ -42,7 +42,8 @@ De echo werkt alleen als de simulatie voorspelbaar is. Elke PR met gameplay-code
 4. **Geen ongeseede random.** Gebruik een `RandomNumberGenerator` met een seed die de Sim beheert.
 5. **Geen afhankelijkheid van de volgorde van nodes of signalen.** Als volgorde ertoe doet, regelt de Sim die.
 6. **Beweging alleen via de gedeelde motor/controller**, zodat speler en echo hetzelfde codepad hebben.
-7. Alles wat de echo moet kunnen herhalen, komt in de recorder (toestand per tick) of als event in de eventlijst.
+7. Alles wat de echo moet kunnen herhalen, komt in de recorder (toestand per tick) of als event in het eventmasker (`GameEvents`, `ontwerp.md` §4a).
+8. **Objecten detecteren lichamen met een directe vormtest** (`SimObject.overlaps`), nooit met `Area2D`-signalen, `get_overlapping_bodies()` of een ruimte-query op bewegende lichamen: die lopen één of twee ticks achter (A2, `ontwerp.md` §4a). Een ruimte-query tegen statische geometrie mag wel.
 
 ## 5. Mappenstructuur `game/`
 
@@ -52,7 +53,9 @@ game/
 ├── scenes/            # .tscn + bijbehorend script (main.tscn, later areas/, ui/)
 ├── scripts/
 │   ├── echo/          # recorder, clip, echo-actor, motor
+│   ├── events/        # eventsoorten, events uit input (E-10)
 │   ├── input/         # inputbronnen, input-acties
+│   ├── objects/       # SimObject en objecten: drukplaat, hendel
 │   ├── world/         # lagen, level-hulpmiddelen
 │   └── sim.gd         # simulatieklok
 ├── assets/            # (later) art/, audio/, fonts/ – eigendom van art/audio-rollen
