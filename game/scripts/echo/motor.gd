@@ -22,6 +22,8 @@ const EV_BOUNCE := 2         ## E-07a (3)
 const EV_SPRINGPLANK := 4    ## E-07a (2): landing van boven op een schaduwplank
 const EV_LAND := 8           ## landing op wereld of licht-geometrie
 const EV_DASH := 16
+const EV_LAUNCH := 32        ## C-11b: gelanceerd (op de lanceertick, bij de springer)
+const EV_CATCH := 64         ## C-13: gevangen (op de vangtick, bij de springer)
 
 const TICKS_PER_SECOND := 60.0
 const NEVER := -1_000_000
@@ -47,6 +49,11 @@ class State:
 	var last_dash_tick := NEVER
 	var prev_bits := 0
 	var anim: int = Anim.IDLE
+	## C-11b: lancering gaat in op de volgende stap, met deze richting.
+	var launch_pending := false
+	var launch_dir := 1
+	## C-11b/c: ticks lanceerstaat die nog over zijn (0 = geen).
+	var launch_left := 0
 
 
 ## Stap van één tick. Geeft het masker met bewegingsevents van deze tick.
@@ -63,19 +70,36 @@ static func step(body: CharacterBody2D, s: State, bits: int, tick: int) -> int:
 	elif horizontal == InputBits.RIGHT:
 		s.facing = 1
 
+	# C-11b: de lancering van de vorige tick gaat nu in (`v.y`, 30 ticks `v.x`).
+	var launch_start := false
+	if s.launch_pending:
+		var c: Dictionary = Tuning.coop()
+		s.launch_pending = false
+		s.launch_left = int(c["launch_ticks"])
+		s.velocity.y = float(c["launch_velocity_y"])
+		s.facing = s.launch_dir
+		launch_start = true
+	elif s.launch_left > 0:
+		# C-11b: LEFT en RIGHT veranderen tijdens de lanceerstaat niets.
+		s.facing = s.launch_dir
+
 	# E-07a (1): meebewegen met de plank van de vorige tick, tegen laag 1 + 4.
 	var started_on_plank := s.support == Support.SHADOW_BODY and _plank_usable(s.plank)
 	if started_on_plank:
 		var delta := s.plank.global_position - s.plank_position
 		if delta != Vector2.ZERO:
 			var mask := body.collision_mask
-			body.collision_mask = mask & ~Layers.PLANK
+			body.collision_mask = mask & ~Layers.ANY_PLANK
 			body.move_and_collide(delta)
 			body.collision_mask = mask
 	var started_supported := s.on_floor and (s.support != Support.SHADOW_BODY or started_on_plank)
 
 	if rising & InputBits.JUMP:
 		s.jump_flank_tick = tick
+	if launch_start:
+		# Afzetten gebeurt door de lancering, niet door een sprong.
+		started_supported = false
+		s.jumped_since_support = true
 
 	# Springen vanaf de grond of de plank (bounce), of in de coyote-tijd.
 	var jump_now := false
@@ -100,6 +124,7 @@ static func step(body: CharacterBody2D, s: State, bits: int, tick: int) -> int:
 			s.dash_ready = false
 			s.dash_ready_after_dash = false
 			s.last_dash_tick = tick
+			s.launch_left = 0  # C-11c: de dash neemt het over
 			events |= EV_DASH
 
 	# Snelheid en verplaatsing.
@@ -115,6 +140,8 @@ static func step(body: CharacterBody2D, s: State, bits: int, tick: int) -> int:
 		if bits & InputBits.LEFT:
 			direction -= 1.0
 		s.velocity.x = direction * float(m["walk_speed"])
+		if s.launch_left > 0:
+			s.velocity.x = float(Tuning.coop()["launch_speed_x"]) * s.launch_dir
 		# Middelpuntsregel: de verplaatsing is het gemiddelde van de snelheid
 		# vóór en na de zwaartekracht. Zo is de sprong een exacte parabool
 		# (top 50 px, 40 ticks in de lucht bij -5,0 en 0,25; gdd §2.5a).
@@ -130,6 +157,12 @@ static func step(body: CharacterBody2D, s: State, bits: int, tick: int) -> int:
 		s.velocity.y = 0.0
 	if body.is_on_ceiling() and s.velocity.y < 0.0:
 		s.velocity.y = 0.0
+	if s.launch_left > 0:
+		s.launch_left -= 1
+		# C-11c: tegen een muur stopt de lanceerstaat, `v.x = 0`.
+		if body.is_on_wall():
+			s.velocity.x = 0.0
+			s.launch_left = 0
 
 	# Steun aan het eind van de tick, landen (E-07a (2)) en de buffer.
 	var floor := _floor_collider(body, s)
@@ -139,6 +172,8 @@ static func step(body: CharacterBody2D, s: State, bits: int, tick: int) -> int:
 	s.plank = floor if support == Support.SHADOW_BODY else null
 	if s.plank:
 		s.plank_position = s.plank.global_position
+	if s.on_floor and not launch_start:
+		s.launch_left = 0  # C-11c: landen stopt de lanceerstaat
 	if s.on_floor:
 		var on_plank := support == Support.SHADOW_BODY
 		var new_landing := not started_supported or on_plank != started_on_plank
@@ -178,7 +213,7 @@ static func _start_jump(s: State, m: Dictionary, bounce: bool) -> int:
 
 
 static func _plank_usable(plank: CollisionObject2D) -> bool:
-	return plank != null and is_instance_valid(plank) and plank.collision_layer & Layers.PLANK != 0
+	return plank != null and is_instance_valid(plank) and plank.collision_layer & Layers.ANY_PLANK != 0
 
 
 ## De vloer onder het lichaam na de stap. Staat het op twee vloeren tegelijk
@@ -207,7 +242,8 @@ static func _floor_collider(body: CharacterBody2D, s: State) -> CollisionObject2
 static func _support_of(collider: CollisionObject2D) -> int:
 	if collider == null:
 		return Support.NONE
-	if collider.collision_layer & Layers.PLANK:
+	# Schaduwplank (E-07) of lichtplank (C-09): steun op een lichaam.
+	if collider.collision_layer & Layers.ANY_PLANK:
 		return Support.SHADOW_BODY
 	if collider.collision_layer & Layers.LIGHT_GEOMETRY:
 		return Support.LIGHT
