@@ -12,7 +12,12 @@ const EXEMPT_DIRS := ["res://scenes/debug", "res://prototypes"]
 ## Bestanden met alleen ontwikkelaarstekst, elk met de reden.
 const EXEMPT_FILES := {
 	"res://levels/flowkamer/flow_report.gd": "meetrapport voor QA (T17), geen speltekst",
-	"res://scripts/input/input_router.gd": "redenen bij slot_left, alleen in het debugscherm",
+}
+## Losse teksten met alleen ontwikkelaarsbetekenis, per bestand, elk met de reden.
+const EXEMPT_TEXTS := {
+	"res://scripts/input/input_router.gd": {
+		"apparaat weg": "reden bij slot_left, alleen in het debugscherm",
+	},
 }
 ## Regels die ontwikkelaarstekst schrijven (log, fout, validatie): niet vertalen.
 const DEV_CALLS := ["print(", "printerr(", "print_rich(", "print_debug(", "push_error(",
@@ -45,7 +50,8 @@ func scan_project() -> Dictionary:
 	for dir: String in SCAN_DIRS:
 		for path in _collect(dir):
 			var source := FileAccess.get_file_as_string(path)
-			var result := scan_scene(source) if path.ends_with(".tscn") else scan_source(source)
+			var allowed: Dictionary = EXEMPT_TEXTS.get(path, {})
+			var result := scan_scene(source) if path.ends_with(".tscn") else scan_source(source, allowed)
 			for v: String in result["violations"]:
 				violations.append("%s:%s" % [path, v])
 			for key: String in result["keys"]:
@@ -54,7 +60,8 @@ func scan_project() -> Dictionary:
 
 
 ## Controleert één GDScript-bron. Geeft {violations: ["regel: uitleg"], keys}.
-func scan_source(source: String) -> Dictionary:
+## `allowed`: teksten die in dit bestand ontwikkelaarstekst zijn (EXEMPT_TEXTS).
+func scan_source(source: String, allowed: Dictionary = {}) -> Dictionary:
 	var violations := PackedStringArray()
 	var keys := PackedStringArray()
 	var lines := source.split("\n")
@@ -79,7 +86,7 @@ func scan_source(source: String) -> Dictionary:
 				else:
 					keys.append(text)
 				continue
-			if dev:
+			if dev or allowed.has(text):
 				continue
 			if _word_count(text) >= 2:
 				violations.append("%d: harde tekst, gebruik tr(\"SLEUTEL\"): \"%s\"" % [n + 1, text])
