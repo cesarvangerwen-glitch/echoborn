@@ -142,7 +142,7 @@ Gemeten verschil warm/FelLicht: ΔE 73–83, ook bij deuteranopie (§7).
 - Gedeelde dingen (zuil, kade, muren) zijn gewone steen en baksteen.
 
 ### 4.5 Water
-Water is een **beeldlaag en een wereldstaat**, geen speellaag. De waterstand is zichtbaar aan drie dingen: het **oppervlak** (1 px-lijn in tint 5–7 met onderbrekingen), wat **eronder verdwijnt** (vormen onder water blijven vaag zichtbaar in de water-ramp) en de **getijdenrand** (klimop in tint 1–2) op de oude stand zodra het water gezakt is. Wat opengaat als het water zakt (duiker, loopbrug, deur met stoep), is in de grijze toestand **net onder het oppervlak** te zien of te raden. Reflecties zijn gespiegelde heldere pixels, om de rij onderbroken, met golfverschuiving.
+Water is een **beeldlaag en een wereldstaat**, geen speellaag. De waterstand is zichtbaar aan drie dingen: het **oppervlak** (1 px-lijn in tint 5–7 met onderbrekingen), wat **eronder verdwijnt** (vormen onder water blijven vaag zichtbaar in de water-ramp) en de **getijdenrand** (klimop in tint 1–2) op de oude stand zodra het water gezakt is. Wat opengaat als het water zakt (duiker, loopbrug, deur met stoep), is in de grijze toestand **net onder het oppervlak** te zien of te raden. Omdat in grijs alles onder het hoge water in water-tint 1 valt, krijgen die vormen daar een **vaste contour van 1 px in water-tint 3** (ΔL* ≥ 8 tegen het water, gemeten in §7.5); het lijf van de loopbrug staat in tint 2. De rest onder water blijft tint 1 ([#98](https://github.com/cesarvangerwen-glitch/echoborn/issues/98)). Reflecties zijn gespiegelde heldere pixels, om de rij onderbroken, met golfverschuiving.
 
 ### 4.6 Budget
 De R5-scène telt (rekenregel uit `docs/tech/lichtmeting.md`, PR #62, in review): grijs = lantaarn 3 + echo 0,8 + saturatiepass 4 + occluders ± 0,5 = **± 8,3 LE**; opgepompt = lantaarn 3 + straatlamp met schaduw 2,5 + FelLicht-zone 3 + echo 0,8 + saturatiepass 4 + occluders ± 0,5 = **± 13,8 LE**. Beide passen in ≤ 20 LE. Ramen, belfort en halo's zijn sprites (emissief), geen lichten.
@@ -155,7 +155,7 @@ De R5-scène telt (rekenregel uit `docs/tech/lichtmeting.md`, PR #62, in review)
 |---|---|---|
 | Wereld | Grijze ramps (§3), omgeving 1, dunne koude bundels door het wolkendek | Volle ramps, omgeving 2, stadsgloed boven de daken, warme bundels uit het belfort |
 | **Licht = kleur** | In de lichtpoel van een lamp keert de kleur terug: banden 2 = half, ≥ 3 = vol. Zo voelt de speler de kernloop al vóór het eerste gemaal | Overal kleur |
-| Water | Hoog: duiker en loopbrug staan onder | Gezakt: duiker, loopbrug en getijdenrand zichtbaar, het rad staat vrij |
+| Water | Hoog: duiker, loopbrug en de stoepen van de deuren staan onder, alleen als contour te raden (§4.5). De **loopbrug** is de richel onderaan de kanaalwand (R5: rij 362–368 op 640×400, onder de duiker); de koperen perspijp met beugels op de gemaalkade is géén loopbrug en staat in beide toestanden droog | Gezakt: duiker, loopbrug en getijdenrand zichtbaar, het rad staat vrij |
 | Ramen, gemaal | Donker, gemaal uit | Warm verlicht, gemaal aan (machine zichtbaar achter het boograam) |
 | **Speler 1** | **Altijd in kleur.** Hij is de machinist die het licht brengt | idem |
 | **Echo** | Grijs en somber: lichtgrijze rand, grijze arcering. **Alleen de ogen houden een zweem amber** (de eigenaarskleur) | Rand amber, paarse arcering, amber ogen, de sjaal flakkert amber in de arcering |
@@ -233,6 +233,17 @@ Huiswerk uit de EP-review op PR #17 (punt 5). Getest in `r5_beweging_*`: speler 
 - **Geen flikkering** in de test, omdat de arcering aan de sprite hangt en mee beweegt met de figuur. Een echte meting op een Deck volgt (*Open punten*).
 - **Nabeelden:** met 3 nabeelden las de echo op Deck-grootte als meerdere figuren (stijltests). Daarom zijn het er nu 2, alleen de rand, en gestippeld.
 
+### 7.5 Wat onder water staat, in grijs
+Huiswerk uit de visie-review op P2 ([#98](https://github.com/cesarvangerwen-glitch/echoborn/issues/98)). Gemeten met `genereer_r5.py`: ΔL* van de contour (water-tint 3) tegen het water eromheen (tint 1, L* 4,3). Op ware Deck-grootte (96 ppi) is het de piek van de lijn (p90), zoals bij de contouren in §7.3.
+
+| Vorm onder water | ΔL* op 640×400 | ΔL* op ware Deck-grootte | Diepte onder het oppervlak |
+|---|---:|---:|---:|
+| duiker (boog en dagkanten) | 11,6 | 10,3 | 10 px |
+| loopbrug (looprand; onderrand onderbroken) | 11,6 | 9,4 | 38 px |
+| deur met stoep | 11,6 | 10,8 | 0–10 px |
+
+De loopbrug ligt 38 px diep: te raden, niet "net onder" het oppervlak, omdat hij in de opgepompte toestand niet mag verschuiven. Ook met de contouren valt 90 % van het kanaal onder water nog in tint 1: het water blijft donker en diep, de vormen zijn te raden, niet te zien. Water-tint 2 (ΔL* 4,9) is te zwak voor een contour; die gebruiken we alleen voor een vlak (het lijf van de loopbrug). De opgepompte toestand verandert niet: daar staat niets hiervan onder.
+
 ---
 
 ## 8. Tegen een generieke 2D-look (eisen)
@@ -270,7 +281,7 @@ De markt voor pixel-metroidvania's is vol. Deze eisen maken een screenshot herke
 |---|---|---|
 | Paletten per gebied (slice: polderwijk met het eerste gemaal; daarna de andere 2–3 gebieden) en hun grijs-kleur-varianten | Art Director met Concept Artist | Bible v1, na T3 (gebiedsthema's van de Narrative Designer) |
 | Banden-licht in Godot 4.6: 2D-licht kwantiseren in 5 banden, harde schaduw, saturatiepass per wijk, stippel-laaggrens als shader of als lijn | Technical Artist | Vóór T7; deze bible geeft de visuele norm |
-| Ware Deck-test op een echte Steam Deck: flikkering van de arcering en de nabeelden in beweging | Technical Artist (met Engine & Platform Programmer) | Bij de eerste Deck-build (T7) |
+| Ware Deck-test op een echte Steam Deck: flikkering van de arcering en de nabeelden in beweging; onderwatercontouren in grijs (ΔL* 9,4–10,8 gesimuleerd, §7.5) | Technical Artist (met Engine & Platform Programmer) | Bij de eerste Deck-build (T7) |
 | Animatienormen (loopcyclus, sprong, landing, merk, ontploffing), frames en timing; de loopcyclus in de bewegingstest is placeholder | Animator | Na de flow-test, vóór de slice-art |
 | Hoe zichtbaar zijn vijanden die alleen in de schaduwlaag bestaan | Art Director met Combat Designer | Bible v1 |
 | Combat-leesbaarheid in één frame: schaduwmerk, ontploffing, parade, met twee spelers en de finisher | Art Director met Combat Designer | Bible v1, na T3 |
