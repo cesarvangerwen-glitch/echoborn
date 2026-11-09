@@ -386,6 +386,7 @@ De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gave
 - **Gameplay Programmer (C-06):** het oplossen van P2 koppelen aan `AreaLoader.partner_in_ontladen_kamer` (keuze (c), §3a), samen met de andere oorzaken van C-06.
 - **Gameplay Programmer (T16c):** `valid_from` (`geldig_vanaf`) staat op de `TailEcho`-node en gaat verloren als C-01 hem weghaalt; E-09 in co-op en C-05 vragen dat hij bij P1 hoort.
 - **T5b deel 3, vlag van een object:** de vlag `<kamer_id>/<nodepad>` (§3a) verliest zijn stand als een level designer de kamer of het object hernoemt; een controle (bekende vlaggen tegen de inhoud) of een migratie hoort bij deel 3.
+- **T5b deel 3, kapotte back-up:** zijn de save én de `.bak` allebei kapot, dan geeft `read` alleen de fouten; deel 3 beslist wat het spel dan toont (melding, slot leeg of herstel) en test dat geval.
 - **Debugmenu, `force_unloaded`:** zodra het debugmenu het aanroept, een `push_error`-guard als het tijdens stap (4) of (5) gebeurt (§3a).
 - **T5b, volgend deel** (Technical Director met de Engine & Platform Programmer): (3) de autoloads `GameState` en `SaveService` met slots, checkpoint-objecten en autosave (met `AreaLoader.store_objects()` vlak vóór elke save), het gemaal in gestreamde inhoud, Steam Cloud op de Deck, en zo nodig threaded laden (R9).
 

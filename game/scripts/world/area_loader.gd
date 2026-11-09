@@ -115,6 +115,7 @@ func start(tick: int, position: Vector2, kamer_id: StringName = &"") -> PackedSt
 	for error in errors:
 		push_error("AreaLoader: %s" % error)
 	huidige = start_room(position, kamer_id)
+	_partner_outside = false
 	_last_tick = tick
 	_apply_loaded(tick)
 	return errors
@@ -286,6 +287,8 @@ func _attach_objects(kamer: Kamer) -> void:
 		if node is SimObject:
 			found.append(node)
 	_objects[kamer.id()] = found
+	if sim == null and not found.is_empty():
+		push_error("AreaLoader: kamer '%s' heeft %d objecten in zijn inhoud, maar er is geen Sim (eerst Sim.set_area_loader)" % [kamer.id(), found.size()])
 	for object in found:
 		if game_state != null and object.has_persistent_state():
 			object.set_persistent_state(game_state.has_flag(_flag_of(kamer, object)))
