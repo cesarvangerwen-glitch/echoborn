@@ -14,11 +14,13 @@ const Layers = preload("res://scripts/world/layers.gd")
 const SpikeWorld = preload("res://scripts/world/spike_world.gd")
 
 const R := InputBits.RIGHT
-const PLATE_X := 420.0
+## Oneven, zodat een rand van P1 (x ± 8 op even posities) nooit precies op
+## een rand van de plaat valt: daar verschillen Rect2 en Shape2D.collide.
+const PLATE_X := 421.0
 const PLATE_SIZE := Vector2(48, 8)
 const PLATE_Y := SpikeWorld.FLOOR_Y - 2.0
-## P1 loopt 60 ticks naar de plaat, staat er 30 ticks stil en loopt door.
-const SCRIPT := [[20, 0], [60, R], [30, 0], [60, R], [430, 0]]
+## P1 loopt 100 ticks (2 px/tick) naar de plaat, staat er 30 ticks stil en loopt door.
+const SCRIPT := [[20, 0], [100, R], [30, 0], [80, R], [370, 0]]
 
 
 func _plate_rect() -> Rect2:

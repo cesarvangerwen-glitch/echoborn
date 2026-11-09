@@ -1,24 +1,32 @@
 extends Node2D
-## Speelbare spike: P1 met zijn echo, en P2 die mee kan doen (C-01).
+## Speelbare demo van de echo v0.4: P1 met zijn staart-echo (E-02), en P2
+## die mee kan doen (C-01).
 ##
-## Beweeg met A/D + spatie (P1). Druk op E om je laatste 10 s als echo te
-## laten afspelen. Rechter Ctrl laat P2 meedoen of stoppen (pijltjes + Enter
-## om te bewegen); zolang P2 meedoet, speelt er geen echo (C-01). De echte
-## drop-in en drop-out (C-03, C-05, InputRouter) komen in T16c.
+## P1: A/D lopen, spatie springen, linker Shift dash, E aanval, Q 0,5 s
+## vasthouden = Loslaten (E-09). Spring op je echo: landen geeft je dash
+## terug, springen vanaf de echo is een bounce (E-07a). Debug: F1/F2/F3 zet
+## D op 90/120/180 ticks (1,5/2/3 s; telt als reset). Rechter Ctrl laat P2
+## meedoen of stoppen (pijltjes + Enter); zolang P2 meedoet, is er geen echo
+## (C-01). De echte drop-in en drop-out (C-03, C-05) komen in T16c; de
+## flow-kamer in T16b.
 
 const Sim = preload("res://scripts/sim.gd")
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
-const EchoActor = preload("res://scripts/echo/echo_actor.gd")
+const TailEcho = preload("res://scripts/echo/tail_echo.gd")
 const DeviceInput = preload("res://scripts/input/device_input.gd")
 const InputSetup = preload("res://scripts/input/input_setup.gd")
 const SpikeWorld = preload("res://scripts/world/spike_world.gd")
+const Tuning = preload("res://scripts/echo/tuning.gd")
 
 const PLAYER_COLORS := [Color(1.0, 0.85, 0.4), Color(0.5, 0.85, 1.0)]
 const ECHO_COLOR := Color(0.2, 0.15, 0.35, 0.8)
+const DEBUG_TAIL_KEYS := {KEY_F1: 0, KEY_F2: 1, KEY_F3: 2}
 
 var _sim: Sim
-var _echo: EchoActor
+var _p1: PlayerActor
+var _echo: TailEcho
 var _p2: PlayerActor
+var _tail := 120
 
 
 func _ready() -> void:
@@ -27,40 +35,42 @@ func _ready() -> void:
 	_sim = Sim.new()
 	_sim.name = "Sim"
 	add_child(_sim)
-	var p1 := PlayerActor.new()
-	p1.setup(1, DeviceInput.new(1), PLAYER_COLORS[0])
-	p1.position = SpikeWorld.PLAYER_SPAWN
-	_sim.add_player(p1)
+	_tail = int(Tuning.echo()["tail_ticks"])
+	_p1 = PlayerActor.new()
+	_p1.setup(1, DeviceInput.new(1), PLAYER_COLORS[0])
+	_p1.position = SpikeWorld.PLAYER_SPAWN
+	_sim.add_player(_p1)
+	_add_echo()
 	var camera := Camera2D.new()
 	camera.position = Vector2(640, 260)
 	add_child(camera)
 
 
-# Spike-demo: echo en meedoen worden hier buiten de tick opgeroepen. In
-# productie loopt dit via de InputRouter en events in de tick (standaarden §4).
+# Demo: D wisselen en meedoen gebeuren hier buiten de tick, op de volgende
+# tick (`_sim.tick`). In productie loopt dit via het debugmenu (T16b) en de
+# InputRouter (T16c).
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("p1_action"):
-		_spawn_echo(_sim.players[0])
+	if event is InputEventKey and event.pressed and not event.echo \
+			and DEBUG_TAIL_KEYS.has(event.physical_keycode):
+		var options: Array = Tuning.echo()["tail_options"]
+		_tail = int(options[DEBUG_TAIL_KEYS[event.physical_keycode]])
+		if _echo:
+			_echo.set_tail_ticks(_tail, _sim.tick)
 	elif event.is_action_pressed("p2_action") and _p2 == null:
 		_p2 = PlayerActor.new()
 		_p2.setup(2, DeviceInput.new(2), PLAYER_COLORS[1])
-		_p2.position = _sim.players[0].position
+		_p2.position = _p1.position
 		_sim.add_player(_p2)
 		_echo = null  # de Sim heeft hem weggehaald (C-01)
 	elif event.is_action_pressed("p2_action") and _p2 != null:
 		_sim.remove_player(_p2)
 		_p2 = null
+		_add_echo()
 
 
-func _spawn_echo(player: PlayerActor) -> void:
-	if _echo != null:
-		_sim.remove_echo(_echo)
+func _add_echo() -> void:
+	_echo = TailEcho.new()
+	_echo.setup(_p1, ECHO_COLOR, _tail, _sim.tick)
+	if not _sim.add_echo(_echo):
+		_echo.free()
 		_echo = null
-	var echo := EchoActor.new()
-	echo.setup(ECHO_COLOR)
-	echo.name = "Echo1"
-	if not _sim.add_echo(echo):
-		echo.free()
-		return
-	echo.start(player.recorder.snapshot(), EchoActor.Mode.STATE)
-	_echo = echo

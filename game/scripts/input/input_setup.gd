@@ -1,7 +1,8 @@
 extends RefCounted
 ## Zet de acties voor 2 lokale spelers in de InputMap en legt de joypadknoppen vast.
 ##
-## Toetsenbord: helft 1 = WASD + spatie + E, helft 2 = pijltjes + Enter + rechter Ctrl,
+## Toetsenbord: helft 1 = WASD + spatie + E (+ linker Shift = dash, Q = echo-knop,
+## gdd §2.5; de InputRouter zet die nog niet om in bits), helft 2 = pijltjes + Enter + rechter Ctrl,
 ## met meedoen (Enter) en stoppen (Backspace) op helft 2 (gdd §2.5). Later komt dit uit
 ## een rebind-scherm (UX Designer) en een opgeslagen config; de actienamen blijven gelijk.
 
@@ -13,7 +14,8 @@ const DEADZONE := 0.3
 const CONTROLS: PackedStringArray = ["left", "right", "jump", "action"]
 
 const KEYS := {
-	1: {"left": KEY_A, "right": KEY_D, "jump": KEY_SPACE, "action": KEY_E},
+	1: {"left": KEY_A, "right": KEY_D, "jump": KEY_SPACE, "action": KEY_E,
+		"dash": KEY_SHIFT, "echo": KEY_Q},
 	2: {"left": KEY_LEFT, "right": KEY_RIGHT, "jump": KEY_ENTER, "action": KEY_CTRL,
 		"join": KEY_ENTER, "leave": KEY_BACKSPACE},
 }
@@ -22,6 +24,7 @@ const KEYS := {
 ## van P2 (#14).
 const KEY_LOCATIONS := {
 	"p2_action": KEY_LOCATION_RIGHT,
+	"p1_dash": KEY_LOCATION_LEFT,
 }
 
 ## Joypadknoppen per besturing, voor elke pad gelijk (de InputRouter kiest de speler).

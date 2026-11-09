@@ -24,6 +24,10 @@ window/size/viewport_height=720
 2d_physics/layer_1="wereld"
 2d_physics/layer_2="licht"
 2d_physics/layer_3="schaduw"
+2d_physics/layer_4="licht-geometrie"
+2d_physics/layer_5="schaduw-geometrie"
+2d_physics/layer_6="schaduwplank"
+2d_physics/layer_7="zones"
 
 [physics]
 

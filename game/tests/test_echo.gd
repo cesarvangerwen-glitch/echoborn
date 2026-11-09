@@ -165,9 +165,10 @@ func test_world_change_breaks_input_echo_not_state_echo(t) -> void:
 		state_echo.max_deviation(), input_echo.max_deviation()])
 
 
-## Grens van input-opname: verborgen toestand (is_on_floor) zit niet in
-## positie+snelheid. Begint de clip met een sprong vanaf de vloer, dan
-## springt een vers gespawnde input-echo niet.
+## Grens van input-opname: verborgen toestand (op de vloer, buffers) zit niet
+## in positie+snelheid. Begint de clip met een sprong vanaf de vloer, dan
+## springt een vers gespawnde input-echo niet op tijd: met de sprongbuffer
+## van v0.4 (§2.5a) springt hij één tick te laat, en wijkt hij toch af.
 func test_hidden_state_breaks_input_echo_at_clip_start(t) -> void:
 	var sim = t.make_sim()
 	var player := _spawn_player(sim, 1, [[30, 0], [1, J], [200, R], [369, 0]])
@@ -179,8 +180,8 @@ func test_hidden_state_breaks_input_echo_at_clip_start(t) -> void:
 	var state_echo: EchoActor = await _play(t, sim, clip, EchoActor.Mode.STATE)
 	var input_echo: EchoActor = await _play(t, sim, clip, EchoActor.Mode.INPUT)
 	t.check(state_echo.max_deviation() == 0.0, "state-echo week af: %f px" % state_echo.max_deviation())
-	t.check(input_echo.max_deviation() > 10.0,
-		"input-echo zou de eerste sprong missen, afwijking %f px" % input_echo.max_deviation())
+	t.check(input_echo.max_deviation() > 1.0,
+		"input-echo zou de eerste sprong te laat nemen, afwijking %f px" % input_echo.max_deviation())
 	t.note("verborgen vloer-toestand: state-echo %.3f px, input-echo %.1f px max afwijking" % [
 		state_echo.max_deviation(), input_echo.max_deviation()])
 
