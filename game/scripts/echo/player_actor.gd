@@ -16,6 +16,10 @@ const Tuning = preload("res://scripts/echo/tuning.gd")
 
 enum EchoReset { NONE, RELEASE, RESPAWN }
 
+## Een vijandelijke treffer kostte een levenspunt (LM-05). Bij 0 volgt de
+## respawn in de flow-kamer (T16b).
+signal health_changed(tick: int, health: int)
+
 ## Elke inputbron heeft `sample(tick: int) -> int` (DeviceInput, ScriptedInput).
 var input_source: RefCounted
 var recorder: EchoRecorder
@@ -31,6 +35,8 @@ var motor := Motor.State.new()
 ## Vraagt deze tick een reset van de echo (E-04b respawn, E-04c Loslaten)?
 ## De echo leest dit na stap (3) van dezelfde tick (`sim_after_source`).
 var echo_reset: EchoReset = EchoReset.NONE
+## Levenspunten (LM-05: 5 in de flow-kamer). P2 heeft er geen (C-02).
+var health := 5
 
 var _detector := EventDetector.new()
 var _pre_position := Vector2.ZERO
@@ -42,10 +48,12 @@ var _respawn_position := Vector2.ZERO
 
 
 func setup(p_player_index: int, p_input_source: RefCounted, color: Color,
-		capacity: int = EchoRecorder.DEFAULT_CAPACITY) -> void:
+		capacity: int = -1) -> void:
 	player_index = p_player_index
 	input_source = p_input_source
-	recorder = EchoRecorder.new(capacity)
+	health = int(Tuning.combat()["p1_health"])
+	# E-02: recorder-capaciteit uit de data, tenzij de aanroeper hem opgeeft.
+	recorder = EchoRecorder.new(capacity if capacity > 0 else int(Tuning.echo()["recorder_capacity"]))
 	name = "Player%d" % player_index
 	# E-05: P1 op laag 2 met masker 1 + 4 + 6; P2 op laag 3 met masker 1 + 5.
 	if player_index == 1:
@@ -65,6 +73,14 @@ func setup(p_player_index: int, p_input_source: RefCounted, color: Color,
 func respawn_at(at: Vector2) -> void:
 	_respawn_requested = true
 	_respawn_position = at
+
+
+## Een vijandelijk aanvalsvlak raakt dit lichaam (alleen laag 2, E-14h).
+func take_hit(tick: int) -> void:
+	if player_index != 1 or health <= 0:
+		return
+	health -= 1
+	health_changed.emit(tick, health)
 
 
 ## Stap (2) voor P1, (1) voor P2: input lezen, events bepalen, bewegen.
@@ -90,7 +106,7 @@ func sim_step(tick: int, _delta: float) -> void:
 func record(tick: int) -> void:
 	recorder.push(tick, last_input, _pre_position, _pre_velocity, _pre_floor,
 		position, motor.velocity, tick_events, motor.on_floor, motor.facing,
-		motor.support, motor.anim)
+		motor.support, motor.anim, last_input & InputBits.ATTACK != 0)
 
 
 ## E-09: ECHO 30 ticks aaneengesloten vasthouden is Loslaten, één keer per druk.

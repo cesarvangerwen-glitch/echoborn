@@ -41,14 +41,17 @@ func accepts(body: CollisionObject2D) -> bool:
 
 
 ## Overlapt dit lichaam het vlak nu, en mag het het object voelen?
-func overlaps(body: CollisionObject2D) -> bool:
+## Met `offset` wordt het lichaam zoveel verschoven getest (bv. de echo op
+## zijn opgenomen positie tijdens een merksprong, E-02m/E-10b).
+func overlaps(body: CollisionObject2D, offset: Vector2 = Vector2.ZERO) -> bool:
 	if not accepts(body):
 		return false
 	var own := global_transform
+	var body_xform := body.global_transform.translated(offset)
 	for owner_id in body.get_shape_owners():
 		if body.is_shape_owner_disabled(owner_id):
 			continue
-		var xform := body.global_transform * body.shape_owner_get_transform(owner_id)
+		var xform := body_xform * body.shape_owner_get_transform(owner_id)
 		for i in body.shape_owner_get_shape_count(owner_id):
 			if shape.collide(own, body.shape_owner_get_shape(owner_id, i), xform):
 				return true

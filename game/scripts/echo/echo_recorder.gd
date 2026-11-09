@@ -24,6 +24,7 @@ var _post_on_floor := PackedByteArray()
 var _facing := PackedByteArray()      ## 0 = links (-1), 1 = rechts (+1)
 var _support := PackedByteArray()     ## Motor.Support
 var _anim := PackedByteArray()        ## Motor.Anim
+var _attack_held := PackedByteArray() ## `aanval_vast` (E-01, voor C-11)
 var _head := 0
 var _count := 0
 
@@ -43,16 +44,17 @@ func _init(p_capacity: int = DEFAULT_CAPACITY) -> void:
 	_facing.resize(capacity)
 	_support.resize(capacity)
 	_anim.resize(capacity)
+	_attack_held.resize(capacity)
 
 
 ## `events` is het eventmasker van die tick (GameEvents, E-10). Events worden
 ## opgenomen ongeacht of ze bij de speler iets raakten. De velden na `events`
 ## zijn de toestand ná de stap (E-01): op de vloer, kijkrichting, steunsoort
-## en animatietoestand.
+## animatietoestand en of AANVAL ingedrukt is (`aanval_vast`).
 func push(tick: int, bits: int, pre_position: Vector2, pre_velocity: Vector2,
 		pre_floor: bool, post_position: Vector2, post_velocity: Vector2,
 		events: int = 0, post_floor: bool = false, facing: int = 1,
-		support: int = 0, anim: int = 0) -> void:
+		support: int = 0, anim: int = 0, attack_held: bool = false) -> void:
 	_ticks[_head] = tick
 	_inputs[_head] = bits
 	_events[_head] = events
@@ -65,6 +67,7 @@ func push(tick: int, bits: int, pre_position: Vector2, pre_velocity: Vector2,
 	_facing[_head] = 1 if facing > 0 else 0
 	_support[_head] = support
 	_anim[_head] = anim
+	_attack_held[_head] = 1 if attack_held else 0
 	_head = (_head + 1) % capacity
 	_count = mini(_count + 1, capacity)
 
@@ -113,6 +116,10 @@ func support(index: int) -> int:
 
 func anim(index: int) -> int:
 	return _anim[index]
+
+
+func attack_held(index: int) -> bool:
+	return _attack_held[index] == 1
 
 
 func events(index: int) -> int:

@@ -1,7 +1,10 @@
 {
-	"_uitleg": "Startwaarden echo-regels v0.4 en beweging voor de flow-kamer (gdd.md §2.5a, §2.9; werkaanname LGD). Tijden in ticks van 60 Hz, afstanden in wereldpixels, snelheden in px/tick. Aanpassen mag zonder code; de tests in game/tests/test_echo_v04.gd en test_motor.gd rekenen met deze waarden.",
+	"_uitleg": "Startwaarden echo-regels v0.4 en beweging voor de flow-kamer (gdd.md §2.5a, §2.9; werkaanname LGD). Tijden in ticks van 60 Hz, afstanden in wereldpixels, snelheden in px/tick. Aanpassen mag zonder code; de tests in game/tests/test_echo_v04.gd, test_motor.gd en test_combat.gd rekenen met deze waarden.",
 	"movement": {
-		"body_size": [16, 30],
+		"body_size": [
+			16,
+			30
+		],
 		"walk_speed": 2.0,
 		"gravity": 0.25,
 		"max_fall_speed": 6.0,
@@ -17,12 +20,46 @@
 	},
 	"echo": {
 		"tail_ticks": 120,
-		"tail_options": [90, 120, 180],
+		"tail_options": [
+			90,
+			120,
+			180
+		],
 		"recorder_capacity": 600,
 		"break_tolerance_ticks": 3,
 		"overlap_tolerance_px": 2.0,
 		"support_probe_px": 4.0,
 		"release_hold_ticks": 30,
 		"plank_thickness_px": 4.0
+	},
+	"combat": {
+		"attack_box": [
+			20,
+			16
+		],
+		"hit_p1": 10,
+		"hit_p2": 10,
+		"hit_echo": 5,
+		"mark_extra_life_ticks": 30,
+		"mark_countdown_ticks": 60,
+		"explosion_radius_px": 32.0,
+		"explosion_damage": 20,
+		"chain_radius_px": 48.0,
+		"chain_step": 0.25,
+		"chain_max_link": 5,
+		"merksprong_radius_px": 80.0,
+		"merksprong_out_ticks": 4,
+		"merksprong_back_ticks": 8,
+		"enemy_size": [
+			16,
+			24
+		],
+		"enemy_health": 30,
+		"enemy_speed": 0.25,
+		"enemy_stun_ticks": 30,
+		"enemy_attack_range_px": 16.0,
+		"enemy_windup_ticks": 30,
+		"enemy_attack_ticks": 6,
+		"p1_health": 5
 	}
 }

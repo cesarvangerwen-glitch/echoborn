@@ -3,7 +3,8 @@ extends Node2D
 ## die mee kan doen (C-01).
 ##
 ## P1: A/D lopen, spatie springen, linker Shift dash, E aanval, Q 0,5 s
-## vasthouden = Loslaten (E-09). Spring op je echo: landen geeft je dash
+## vasthouden = Loslaten (E-09). Sla de rode vijand of het grijze pantserdoel:
+## je zet een merk, en je echo laat het D ticks later knallen (E-14, E-02m). Spring op je echo: landen geeft je dash
 ## terug, springen vanaf de echo is een bounce (E-07a). Debug: F1/F2/F3 zet
 ## D op 90/120/180 ticks (1,5/2/3 s; telt als reset). Enter laat P2 meedoen,
 ## Backspace laat P2 stoppen (pijltjes + Enter + rechter Ctrl, `input.md`
@@ -18,6 +19,7 @@ const DeviceInput = preload("res://scripts/input/device_input.gd")
 const InputSetup = preload("res://scripts/input/input_setup.gd")
 const SpikeWorld = preload("res://scripts/world/spike_world.gd")
 const Tuning = preload("res://scripts/echo/tuning.gd")
+const CombatTarget = preload("res://scripts/combat/combat_target.gd")
 
 const PLAYER_COLORS := [Color(1.0, 0.85, 0.4), Color(0.5, 0.85, 1.0)]
 const ECHO_COLOR := Color(0.2, 0.15, 0.35, 0.8)
@@ -42,6 +44,12 @@ func _ready() -> void:
 	_p1.position = SpikeWorld.PLAYER_SPAWN
 	_sim.add_player(_p1)
 	_add_echo()
+	# Een basisvijand en een pantserdoel om het schaduwmerk te proberen (E-14).
+	for spec: Array in [[CombatTarget.Kind.ENEMY, 520.0], [CombatTarget.Kind.ARMORED, 1000.0]]:
+		var target := CombatTarget.new()
+		target.setup_target(spec[0])
+		target.position = Vector2(spec[1], SpikeWorld.FLOOR_Y - 12.0)
+		_sim.add_object(target)
 	var camera := Camera2D.new()
 	camera.position = Vector2(640, 260)
 	add_child(camera)
