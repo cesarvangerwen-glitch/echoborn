@@ -299,7 +299,7 @@ func test_e08b_echo_floats_where_p1_stood_on_it_all_d(t) -> void:
 ## niet; staat er een schaduwmuur, dan breekt hij wel (E-08a). Sinds E-07c
 ## (gdd v0.5) draagt een zwevende echo niet meer: stond P1 in het frame op een
 ## plank (`plank_sinds_grond`), dan valt een P1 erdoor; zonder die vlag landt hij.
-func test_e08b_floating_echo_carries_p1_but_walls_still_break(t) -> void:
+func test_e08b_floating_echo_carries_only_from_ground_and_walls_break(t) -> void:
 	for variant in ["muur", "zweeft", "vanaf_grond"]:
 		var sim = Fx.world(t)
 		if variant == "muur":

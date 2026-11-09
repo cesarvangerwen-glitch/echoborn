@@ -22,6 +22,7 @@ const Meetlog = preload("res://scripts/events/meetlog.gd")
 const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
 const FlowBot = preload("res://levels/flowkamer/flow_bot.gd")
 const Layout = preload("res://levels/flowkamer/flow_layout.gd")
+const SimScript = preload("res://scripts/sim.gd")
 
 const L := InputBits.LEFT
 const R := InputBits.RIGHT
@@ -233,6 +234,24 @@ func test_c07_leash_59_and_60_ticks(t) -> void:
 				"60 ticks: opgelost %s (tick %d, leiband)" % [str(log["gone"]), start + 59])
 		t.check(p1.position == Vector2(100, Fx.STAND_Y), "camera/leiband verplaatste P1 naar %s" % p1.position)
 		await t.cleanup()
+
+
+## C-07: camera en leiband sluiten aan. Voor afstanden rond de grens (op
+## maximale zoom-uit) staat P2 in het camerabeeld precies als de leiband niet
+## telt; P1 staat altijd minstens de marge binnen het beeld.
+func test_c07_camera_matches_leash(t) -> void:
+	var p1_at := Vector2(1000, 400)
+	var bad: Array = []
+	for dx in [0.0, 400.0, 900.0, 927.0, 928.0, 928.5, 929.0, 960.0, 1000.0]:
+		for dy in [0.0, 300.0, 507.0, 508.0, 509.0, 540.0]:
+			for sx in [-1.0, 1.0]:
+				var p2_at := p1_at + Vector2(dx * sx, -dy)
+				var rect := FlowRoom.camera_view(p1_at, p2_at)
+				var shown := rect.grow(0.001).has_point(p2_at)
+				var p1_inside := rect.grow(-31.999).has_point(p1_at)
+				if shown != SimScript.partner_in_view(p1_at, p2_at) or not p1_inside:
+					bad.append([dx * sx, dy, shown])
+	t.check(bad.is_empty(), "beeld en leiband verschillen bij %s" % str(bad))
 
 
 ## C-09: P2 lost op terwijl P1 op hem staat: P1 valt op die tick.

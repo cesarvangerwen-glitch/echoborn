@@ -366,9 +366,7 @@ func set_tail_ticks(p_tail_ticks: int) -> void:
 ## aaneengesloten buiten het camerabeeld (leiband).
 func _check_partner(p2: PlayerActor, p1: PlayerActor) -> void:
 	var c: Dictionary = Tuning.coop()
-	var view: Array = c["leash_view_px"]
-	var delta := (p2.global_position - p1.global_position).abs()
-	if delta.x > float(view[0]) or delta.y > float(view[1]):
+	if not partner_in_view(p1.global_position, p2.global_position):
 		_p2_offscreen += 1
 	else:
 		_p2_offscreen = 0
@@ -388,6 +386,17 @@ func _check_partner(p2: PlayerActor, p1: PlayerActor) -> void:
 		cause = "leiband"
 	if cause != "":
 		dissolve_partner(cause)
+
+
+## C-07: staat P2 in het camerabeeld op maximale zoom-uit? De camera houdt P1
+## `leash_margin_px` van de rand, dus P2 mag hooguit `leash_view_px − marge`
+## van P1 af staan (zelfde maten als `FlowRoom.camera_view`).
+static func partner_in_view(p1_at: Vector2, p2_at: Vector2) -> bool:
+	var c: Dictionary = Tuning.coop()
+	var view: Array = c["leash_view_px"]
+	var margin := float(c["leash_margin_px"])
+	var delta := (p2_at - p1_at).abs()
+	return delta.x <= float(view[0]) - margin and delta.y <= float(view[1]) - margin
 
 
 ## C-06: P2 lost op deze tick op (breek-effect op zijn plek). Geen

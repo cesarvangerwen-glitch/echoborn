@@ -157,23 +157,31 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if _camera and is_instance_valid(p1):
-		var focus := p1.position
-		var zoom := 2.0
-		if p2 and is_instance_valid(p2) and not p2.dissolved:
-			# C-07: beide in beeld tot de maximale zoom-uit (leash_view_px,
-			# werkaanname); daarbuiten volgt de camera P1 en loopt de leiband.
-			var view: Array = Tuning.coop()["leash_view_px"]
-			var gap := (p2.position - p1.position).abs() + Vector2(64, 64)
-			zoom = clampf(minf(1280.0 / gap.x, 720.0 / gap.y), 1280.0 / float(view[0]), 2.0)
-			var half := Vector2(640, 360) / zoom
-			focus = (p1.position + p2.position) * 0.5
-			focus = focus.clamp(p1.position - half + Vector2(32, 32), p1.position + half - Vector2(32, 32))
-		_camera.zoom = Vector2(zoom, zoom)
-		_camera.position = focus
+		var with_p2 := p2 != null and is_instance_valid(p2) and not p2.dissolved
+		var view := camera_view(p1.position, p2.position if with_p2 else p1.position)
+		_camera.zoom = Vector2.ONE * (1280.0 / view.size.x)
+		_camera.position = view.get_center()
 	if _hud_label:
 		_update_hud()
 	if _overlay:
 		_overlay.queue_redraw()
+
+
+## C-07: het beeld van de gedeelde camera in wereldpixels. Zoomt uit tot
+## `leash_view_px` om P1 en P2 in beeld te houden; P1 blijft altijd minstens
+## `leash_margin_px` van de rand. Dezelfde maten als de leiband in
+## `Sim._check_partner`: P2 staat in dit beeld precies als de leiband niet telt.
+## (Vaste venstermaat 1280 × 720; de zoom uit de rendergrootte volgt na #119.)
+static func camera_view(p1_at: Vector2, p2_at: Vector2) -> Rect2:
+	var c: Dictionary = Tuning.coop()
+	var max_view := Vector2(float(c["leash_view_px"][0]), float(c["leash_view_px"][1]))
+	var margin := float(c["leash_margin_px"])
+	var gap := (p2_at - p1_at).abs() + Vector2(2.0 * margin, 2.0 * margin)
+	var zoom := clampf(minf(1280.0 / gap.x, 720.0 / gap.y), 1280.0 / max_view.x, 2.0)
+	var half := Vector2(640, 360) / zoom
+	var inner := half - Vector2(margin, margin)
+	var focus := ((p1_at + p2_at) * 0.5).clamp(p1_at - inner, p1_at + inner)
+	return Rect2(focus - half, half * 2.0)
 
 
 ## Duur van de run in ticks (tot nu, of tot RUN_EIND).
