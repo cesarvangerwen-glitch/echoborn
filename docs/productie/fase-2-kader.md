@@ -17,7 +17,7 @@ Aan het eind van fase 2 weet de CEO **of de draai speelbaar en leuk is** en **wa
 
 ### Binnen scope
 
-Elke regel is **één issue** voor de Producer (T1 en T12 bestaan al: #20, #44). "Na" = moet gemergd zijn vóór de taak start (behalve waar anders staat). Runs = maak-taken (raming EP, inclusief herstel in dezelfde run).
+Elke regel is **één issue** voor de Producer (T1 bestaat al: #20). "Na" = moet gemergd zijn vóór de taak start (behalve waar anders staat). Runs = maak-taken (raming EP, inclusief herstel in dezelfde run).
 
 **A. Parallel vanaf de start**
 
@@ -31,7 +31,6 @@ Elke regel is **één issue** voor de Producer (T1 en T12 bestaan al: #20, #44).
 | T5a | **Input voor 2 controllers + drop-in/drop-out** | engine-platform-programmer | InputRouter op apparaat-GUID; drop-in/out met test | — | 1–2 | F0, F3, R19 |
 | T6 | **CI met headless tests** + Windows-run | tools-programmer | Gecachete download, SHA-512-check, echo-tests groen op Linux en Windows | — | 1–2 | F5, R1, R18 |
 | T9 | **Narratief V2** ("het gemaal van herinneringen", pitch §6) | narrative-designer | Wereld, verhaalboog op hoofdlijnen, toon duister maar niet gruwelijk, melancholisch, PEGI 12; de 10 s blijven in het verhaal (bevroren echo's, einde; #51: 8A); water langs de toonregels (R-V7) | — | 2–3 | F3, F7, R-V7 |
-| T12 | **Vindbaarheidstoets** (#44); vervolg werktitel in #61 | marketing-community-manager | Afgerond (#44) | — | 0 | R24 |
 | T13 | **VAF-dossier productiesteun fase 3** voorbereiden, **niet indienen** (#51 deel 1: 6B), met het tweede criterium uit categorie I (verzonken stad in de Lage Landen) | business-legal-advisor (met creative-director, executive-producer, marketing-community-manager) | Dossier klaar tot indienen; VAF-deadlines 2027 ingepland (A16) door de Producer | — | 2 | R6, R23 |
 | T14 | **Lokalisatie inbouwen** (NL in principe ja, #51 deel 1: 5A) | engine-platform-programmer | Vertaalbestanden, geen tekst in code | T5a | 1 | — |
 | T18 | **`risico.md` bijwerken** naar pitch v0.4 | producer | R10 herzien; R-V2, R-V4, R-V7, R-V9, R-V12 opgenomen | — | 1 | — |
@@ -62,7 +61,7 @@ Elke regel is **één issue** voor de Producer (T1 en T12 bestaan al: #20, #44).
 
 **Totaal: ≈ 61–88 maak-taken** (som van de kolom Runs), € 0 extern; binnen besluit #51 (2A: ≈ 61–88 maak-taken). De v0.4-delta (pitch §12, ≈ 16–18 runs) zit in T1, T3a–c, T5b, T16a–c, T18 en de ideecheck.
 
-Lopende issues die meegaan: #21 (lichtmeting, input voor T7), #61 (werktitel, CEO).
+Lopende issues die meegaan: #21 (lichtmeting, input voor T7), #61 (werktitel, CEO). De vindbaarheidstoets (#44) is geen taak in fase 2.
 
 ### Buiten scope (bewust niet in fase 2)
 - De overige gebieden en bosses (fase 3).
@@ -157,7 +156,7 @@ Zelfde procedure als in fase 1 (`fase-1-kader.md` §6): een issue voor de EP met
 | Visie-review P2 op de F1-scène (A9) | Kwaliteit ≥ 7 alleen is te smal (PR #34) | ≈ 0 runs |
 | Akkoord Audio Director op F2 (A10) | SM-punt 5 op PR #34 | ≈ 0 runs (eerste stap in T2) |
 | A2 en A3 als expliciete taken (T4, T3c) | Open punten zonder issue | ≈ 1 run TD/GPM + ≈ 1 run LGD |
-| Vindbaarheidstoets #44 (T12) | R24; vóór de betaalde merkcheck | ≈ 1 run Marketing, € 0 |
+| Vindbaarheidstoets #44 | R24; vóór de betaalde merkcheck | ≈ 1 run Marketing, € 0 |
 | Lokalisatie inbouwen (T14) | NL in principe ja (#51 deel 1: 5A) | ≈ 1 run; NL-versie in totaal ≈ 4–7 runs + mogelijke externe post over fase 2–4 |
 | Merkcheck naar de fase van de eerste publicatie | #51 deel 1: 3A | € 0 in fase 2 |
 | F4b: CEO speelt de slice + gedragsmaat R3 | Is de slice leuk (Lead-review CD op PR #50) | ± 1 uur CEO-tijd, ≈ 0 runs |
