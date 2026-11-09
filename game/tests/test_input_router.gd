@@ -230,6 +230,28 @@ func test_drop_in_and_out_drive_player_in_sim(t) -> void:
 		% [x_before_join, x_after_leave])
 
 
+## Overdracht voor T16c: met `set_physics_process(false)` telt de router zelf niet meer, en
+## telt hij precies mee met de Sim als die `step()` aanroept (hier via `tick_finished`).
+func test_sim_can_drive_step_after_set_physics_process_false(t) -> void:
+	var sim = t.make_sim()
+	var router := _router({})
+	t.world_root().add_child(router)
+	router.set_physics_process(false)
+	router.handle_event(_key(KEY_A, true))
+	router.handle_event(_key(KEY_A, false))
+	router.handle_event(_key(KEY_ENTER, true))
+	router.handle_event(_key(KEY_ENTER, false))
+	router.handle_event(_key(KEY_BACKSPACE, true))
+	await t.run_ticks(sim, 90)
+	t.check(router.slot_state(2) == InputRouter.SlotState.ACTIVE,
+		"router telde zelf door na set_physics_process(false)")
+	sim.tick_finished.connect(func(_tick: int) -> void: router.step())
+	await t.run_ticks(sim, InputRouter.LEAVE_HOLD_TICKS - 1)
+	t.check(router.slot_state(2) == InputRouter.SlotState.ACTIVE, "P2 weg na 59 Sim-ticks")
+	await t.run_ticks(sim, 1)
+	t.check(router.slot_state(2) == InputRouter.SlotState.FREE, "P2 niet weg na 60 Sim-ticks")
+
+
 ## Het autoload bestaat en echte events (via de viewport) bereiken `_input`.
 func test_autoload_exists_and_viewport_events_reach_router(t) -> void:
 	t.check(t.tree.root.has_node("InputRouter"), "autoload InputRouter ontbreekt")

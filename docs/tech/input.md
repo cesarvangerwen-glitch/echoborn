@@ -58,7 +58,7 @@ Starten: `godot --path game res://scenes/debug/input_debug.tscn` (Desktop Mode, 
 | 7 | Herhaal 1–6 in Game Mode met Steam Input **aan** en **uit** (controllerinstellingen van de game), en in Desktop Mode. | Noteer per modus naam en GUID van beide pads. |
 | 8 | Als er twee identieke pads zijn: herhaal 3–4 met beide. | Beide pads krijgen een eigen plaats; de teruggekeerde pad gaat naar de wachtende plaats. |
 
-**Waar het mis kan gaan.** Met Steam Input aan meldt Steam elke pad als virtuele pad ("Steam Virtual Gamepad"). Dan kunnen alle pads dezelfde GUID hebben (zoals bij twee identieke pads, §2) en kan de index na opnieuw aansluiten wisselen. Herkennen werkt dan alleen nog op volgorde. Blijkt dat in stap 7, dan wordt `guid_lookup` gevuld met de Steam Input-handle (Steamworks, later) of `get_joy_info`, als daar een vaste ID in staat.
+**Waar het mis kan gaan.** Met Steam Input aan meldt Steam elke pad als virtuele pad ("Steam Virtual Gamepad"). Dan kunnen alle pads dezelfde GUID hebben (zoals bij twee identieke pads, §2) en kan de index na opnieuw aansluiten wisselen. Herkennen werkt dan alleen nog op volgorde. **Vallen twee pads met dezelfde GUID tegelijk weg** (bv. een USB-hub los, of Steam die zijn virtuele pads opnieuw opbouwt), dan wachten beide plaatsen. De eerste pad die terugkomt, krijgt plaats 1 en de tweede plaats 2, ongeacht wie welke pad vasthoudt. Spelers kunnen dus van lichaam wisselen. Er blijft niets hangen en er valt niemand weg (binnen 180 ticks); de spelers ruilen hun pad of stoppen en doen opnieuw mee. Controleer dit in stap 7 door beide pads tegelijk los te koppelen en ze in omgekeerde volgorde weer aan te sluiten. Blijkt dat in stap 7, dan wordt `guid_lookup` gevuld met de Steam Input-handle (Steamworks, later) of `get_joy_info`, als daar een vaste ID in staat.
 
 De resultaten van een hardwarerun komen in deze sectie, met datum, modus en de genoteerde GUID's.
 
@@ -75,13 +75,14 @@ De resultaten van een hardwarerun komen in deze sectie, met datum, modus en de g
 | `test_identical_pads_share_guid_but_stay_separate` | Twee pads met één GUID lopen niet door elkaar; de teruggekeerde pad gaat naar de wachtende plaats |
 | `test_other_device_takes_over_a_waiting_slot` | W4: een ander apparaat neemt een wachtende plaats over |
 | `test_drop_in_and_out_drive_player_in_sim` | In een draaiende Sim staat een `PlayerActor` op een vrije plaats stil, beweegt na meedoen en stopt na stoppen |
+| `test_sim_can_drive_step_after_set_physics_process_false` | Overdracht voor T16c: na `set_physics_process(false)` telt de router niet zelf; roept de Sim `step()` aan, dan valt C-05 op de 60e Sim-tick |
 | `test_autoload_exists_and_viewport_events_reach_router` | Het autoload staat in `project.godot`; echte events via de viewport komen aan |
 | `test_pause_and_focus_loss_leave_no_stuck_controls` | Loslaten tijdens een pauze komt aan; de stopknop telt niet door tijdens de pauze; focusverlies zet alle knoppen los |
 | `test_debug_scene_shows_both_slots` | Het controlescherm van §4 laadt zonder fouten |
 
 ## Open punten
 
-- Hardwarerun op een Steam Deck met een 2e pad (§4) is nog niet gedaan; er is geen hardware in de werkomgeving.
+- Hardwarerun op een Steam Deck met een 2e pad (§4): eigenaar engine-platform-programmer, vóór de eerste co-op-speltest in T16c ([#78](https://github.com/cesarvangerwen-glitch/echoborn/issues/78)); er is geen hardware in de werkomgeving.
 - `kb1` (WASD) kan niet als partner meedoen: de gdd geeft alleen Enter op de P2-helft. Speelt P1 met een pad, dan moet een toetsenbordspeler de pijltjes gebruiken. Keuze voor de UX Designer.
 - W4 laat een wachtende plaats 1 vóór een vrije plaats 2 gaan: valt de pad van een solospeler weg en drukt een vriend op Start, dan wordt die vriend P1 en moet de teruggekeerde pad als P2 meedoen. Keuze voor UX Designer en LGD.
 - Bindings staan nog in code (`ontwerp.md` R3); herbinden en opslaan horen bij het rebindscherm (UX) en het save-systeem.
