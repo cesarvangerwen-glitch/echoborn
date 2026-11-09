@@ -232,13 +232,19 @@ func _on_enemy_hit_player(hit_tick: int, player: Node2D) -> void:
 ## E-10b: het object waarvan het interactievlak het lichaam nu overlapt en dat
 ## dit lichaam mag bedienen (E-06); bij meerdere het dichtstbijzijnde
 ## middelpunt, bij gelijke afstand het eerst toegevoegde.
+## Een echo in een merksprong bedient objecten op zijn *opgenomen* positie
+## (E-02m: INTERACTIE werkt op de opgenomen positie, E-10b).
 func _interaction_target(actor: Node2D) -> SimObject:
+	var at := actor.global_position
+	if "in_merksprong" in actor and actor.in_merksprong:
+		at = actor.recorded_position
+	var offset := at - actor.global_position
 	var best: SimObject = null
 	var best_distance := INF
 	for object in objects:
-		if not object.is_interactable() or not object.overlaps(actor):
+		if not object.is_interactable() or not object.overlaps(actor, offset):
 			continue
-		var distance := object.global_position.distance_squared_to(actor.global_position)
+		var distance := object.global_position.distance_squared_to(at)
 		if distance < best_distance:
 			best = object
 			best_distance = distance

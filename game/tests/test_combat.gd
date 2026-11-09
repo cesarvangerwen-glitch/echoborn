@@ -543,3 +543,32 @@ func test_c11e_no_merksprong_with_p1_on_plank(t) -> void:
 	t.check(on_plank["at_130"], "P1 stond aan het eind van tick 129 niet op de echo")
 	t.check(jumps.is_empty() and damage == [[10, 10], [130, 5]],
 		"merksprong %s, schade %s (gewone echo-treffer op 130)" % [str(jumps), str(damage)])
+
+
+## E-02m: een INTERACTIE in een frame tijdens de merksprong werkt op de
+## opgenomen positie. Op t + 2 staat de echo uitgerekt op x = 385, zijn
+## opname op 340: de hendel op de opname gaat om, die op de echte plek niet.
+func test_e02m_interaction_on_recorded_position(t) -> void:
+	var a := await _arena(t, [400.0])
+	await _mark(t, a, a["targets"][0])
+	var sim: Node = a["sim"]
+	var levers: Array = []
+	for x in [340.0, 385.0]:
+		var lever := Lever.new()
+		lever.setup(Layers.SHADOW, Vector2(40, 40))
+		lever.position = Vector2(x, Fx.STAND_Y)
+		sim.add_object(lever)
+		levers.append(lever)
+	var ghost := Fx.ghost(t)
+	var start: int = sim.tick
+	var q := Vector2(340, Fx.STAND_Y)
+	for k in 100:
+		var events := GameEvents.ATTACK if k == 4 else (GameEvents.INTERACT if k == 6 else 0)
+		Fx.ghost_frame(ghost, start + k, q, false, Motor.Support.NONE, events)
+	var echo := Fx.tail_echo(sim, ghost, 1)
+	var trace := Fx.trace(sim, [echo])
+	await t.run_ticks(sim, 12)
+	var t0 := start + 5
+	t.check(trace[0][t0 + 2].x == 385.0, "echo op t + 2 op %s (x = 385)" % trace[0][t0 + 2])
+	t.check(levers[0].on and not levers[1].on,
+		"hendel op de opname %s, op de echte plek %s (aan, uit)" % [levers[0].on, levers[1].on])
