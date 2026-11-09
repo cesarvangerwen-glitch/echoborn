@@ -11,6 +11,7 @@ const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 const EchoActor = preload("res://scripts/echo/echo_actor.gd")
 const EchoRecorder = preload("res://scripts/echo/echo_recorder.gd")
 const SpikeWorld = preload("res://scripts/world/spike_world.gd")
+const Motor = preload("res://scripts/echo/motor.gd")
 
 const TEN_SECONDS := 600
 
@@ -29,6 +30,9 @@ const SCRIPT_P2 := [
 	[10, 0], [1, J], [45, 0], [120, R], [1, R | J], [30, R], [5, 0], [1, J],
 	[60, L], [1, L | J], [100, L], [30, 0], [80, R], [1, J], [115, 0],
 ]
+## Startverschuiving van P2 in de co-op-opnametest: ver genoeg van P1 dat ze
+## elkaar niet dragen (C-09).
+const P2_OFFSET := Vector2(700, 0)
 ## Wat de spelers doen terwijl hun echo afspeelt.
 const SCRIPT_LIVE := [[100, L], [1, J], [200, R], [1, R | J], [400, 0]]
 
@@ -124,8 +128,20 @@ func test_ring_buffer_keeps_last_10_seconds(t) -> void:
 func test_coop_recorders_each_give_exact_echo(t) -> void:
 	var sim = t.make_sim()
 	var p1 := _spawn_player(sim, 1, SCRIPT_P1 + SCRIPT_LIVE + SCRIPT_LIVE)
-	var p2 := _spawn_player(sim, 2, SCRIPT_P2 + SCRIPT_LIVE, Vector2(400, 0))
+	# P2 start ver genoeg weg dat P1 en P2 elkaar nooit raken: sinds C-09
+	# dragen ze elkaar (licht- en schaduwplank), en dan kan de INPUT-echo van
+	# één lichaam zonder de ander niet exact zijn. Hard gecontroleerd hieronder.
+	var p2 := _spawn_player(sim, 2, SCRIPT_P2 + SCRIPT_LIVE, P2_OFFSET)
+	var carried := {1: false, 2: false}
+	var watch := func(_tick: int) -> void:
+		for p: PlayerActor in [p1, p2]:
+			if p.motor.support == Motor.Support.SHADOW_BODY:
+				carried[p.player_index] = true
+	sim.tick_finished.connect(watch)
 	await t.run_ticks(sim, TEN_SECONDS)
+	sim.tick_finished.disconnect(watch)
+	t.check(not carried[1] and not carried[2],
+		"P1 of P2 stond op de ander (P1 %s, P2 %s): test meet dan geen exacte opname" % [carried[1], carried[2]])
 	var end1 := p1.position
 	var end2 := p2.position
 	var clip1 = p1.recorder.snapshot()

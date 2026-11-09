@@ -41,3 +41,8 @@ static func _section(section: String) -> Dictionary:
 ## De groep `combat` (E-10a, E-14, E-02m, basisvijand §4.3).
 static func combat() -> Dictionary:
 	return _section("combat")
+
+
+## De groep `coop` (C-03, C-09–C-13).
+static func coop() -> Dictionary:
+	return _section("coop")

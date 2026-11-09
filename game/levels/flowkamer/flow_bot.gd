@@ -217,6 +217,11 @@ func _leg_b3() -> int:
 				return 0
 			return R
 		"off_block":
+			# Snel vallen op de echo is een vang (C-13): de zwiep gaat omhoog als een bounce.
+			if p.move_events & Motor.EV_CATCH:
+				sub = "bounce"
+				_since = 0
+				return R
 			if _on_plank():
 				sub = "bounce"
 				_since = 0

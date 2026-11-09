@@ -4,8 +4,8 @@ extends RefCounted
 ## Eén geheel getal `value` van 0 tot 100 LP. Lekt niet, verliest niets bij
 ## respawn, breken of Loslaten (LM-01). Luistert naar de Sim: treffers en
 ## ontploffingen uit `Combat`, springplank-landingen en bounces uit de
-## bewegingsevents van P1 (Motor.EV_*). Lancering (+4) en vang (+3) komen met
-## co-op 7A in code (T16c, #78): `add` met bron "lancering" of "vang".
+## bewegingsevents van P1 (Motor.EV_*), ook lancering (+4) en vang (+3)
+## uit co-op 7A (T16c, #78).
 ##
 ## Elk vullen geeft `filled`; het meetlog maakt er een LP-regel van (§4.5).
 
@@ -95,6 +95,13 @@ func _on_tick(tick: int) -> void:
 		add(tick, PLANK_BASE + PLANK_STEP * (chain - 1), "springplank", _carrier())
 	if ev & Motor.EV_BOUNCE:
 		add(tick, BOUNCE, "bounce", _carrier())
+	# C-11, C-13: lancering +4, vang +3 (voor de springer). Een vang telt voor
+	# `n` als springplank-landing (C-13).
+	if ev & Motor.EV_CATCH:
+		chain = mini(chain + 1, PLANK_MAX_N)
+		add(tick, CATCH, "vang", _carrier())
+	if ev & Motor.EV_LAUNCH:
+		add(tick, LAUNCH, "lancering", _carrier())
 
 
 ## De drager onder P1: de echo (solo) of P2 (co-op, T16c).

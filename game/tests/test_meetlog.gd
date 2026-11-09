@@ -43,7 +43,7 @@ func test_log_is_deterministic_and_complete(t) -> void:
 		t.check(first.count(event) >= 1, "event %s ontbreekt" % event)
 	var chain: Array = []
 	for row in first.rows:
-		if row[2] == "SPRINGPLANK":
+		if row[2] == "SPRINGPLANK" or row[2] == "VANGEN":
 			chain.append(row[3])
 	t.check(chain.slice(0, 2) == ["1", "2"], "springplank-reeks %s (1, 2)" % str(chain))
 	t.check(first.save("user://meetlog_test_solo_D90_p1.csv") == OK, "log niet opgeslagen")

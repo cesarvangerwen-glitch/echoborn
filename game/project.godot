@@ -28,6 +28,7 @@ window/size/viewport_height=720
 2d_physics/layer_5="schaduw-geometrie"
 2d_physics/layer_6="schaduwplank"
 2d_physics/layer_7="zones"
+2d_physics/layer_8="lichtplank"
 
 [physics]
 

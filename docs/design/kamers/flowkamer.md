@@ -58,7 +58,7 @@ Alle maten uit gdd §4.3; per bouwsteen alleen wat ik koos of moest kiezen.
 
 Vijanden blijven in K2 (x 1458–1992) en doen alleen iets zolang P1 in K2 is. De arena sluit niet af. Waarden van de basisvijand en het pantserdoel: gdd §4.3 (werkaanname LGD).
 
-**4 in plaats van 3 per golf.** Met 3 + 3 haalde de gescripte run 92 LP na K1 en één keer K2; het doel is ≥ 100 (gdd §4.2). Met 4 + 4 is het 102 bij elke D. De LP-waarden zijn ongewijzigd (gdd §4.2: eerst de aantallen bijstellen).
+**4 in plaats van 3 per golf.** Met 3 + 3 haalde de gescripte run 92 LP na K1 en één keer K2; het doel is ≥ 100 (gdd §4.2). Met 4 + 4 is het 102 bij elke D (vóór co-op 7A in code; sinds de vang in B3 is het 100, zie §12). De LP-waarden zijn ongewijzigd (gdd §4.2: eerst de aantallen bijstellen).
 
 **FK-2-grens met 4 + 4 vijanden** (gdd §4.4; zonder echo komt licht alleen uit P1-treffers: 3 treffers × 2 LP = 6 LP per basisvijand, het pantser breekt niet en geeft 0 LP):
 
@@ -110,16 +110,16 @@ Solo, uit het meetlog berekend (`flow_report.gd`). Dit zijn geen speltestresulta
 
 | | D = 90 | D = 120 | D = 180 | Norm |
 |---|---|---|---|---|
-| Runtijd | 64,2 s | 65,4 s | 76,3 s | ≤ 120 s |
-| LP na K1 + één keer K2 | 102 | 102 | 102 | ≥ 100 |
+| Runtijd | 64,1 s | 65,4 s | 76,3 s | ≤ 120 s |
+| LP na K1 + één keer K2 | 100 | 100 | 100 | ≥ 100 |
 | MP-1 langste stilstand | 107 ticks | 137 | 197 | ≤ 300 |
 | MP-2 echo-acties/min (K1 / K2) | 14,0 (8,8 / 38,2) | 12,8 (8,6 / 34,5) | 11,8 (8,1 / 25,4) | ≥ 3,0, ook per kamer |
 | MP-2 langste gat | 13,6 s | 12,8 s | 14,9 s | ≤ 40 s |
-| MP-3 landingen/min, zonder wachten | 5,6 / 100 % | 5,5 / 100 % | 4,7 / 100 % | ≥ 75 % |
+| MP-3 landingen/min, zonder wachten | 4,7 / 100 % | 4,6 / 100 % | 3,9 / 100 % | ≥ 75 % |
 | MP-4 echo Leeg | 2 % | 3 % | 4 % | ≤ 40 % |
 | MP-6 LP met de echo, pompslagen echo | 82 %, 5 | 82 %, 5 | 82 %, 5 | ≥ 40 %, ≥ 1 |
 | Echo breekt | 0 | 0 | 0 | 0 (FK-4) |
-| **Echo uit** (FK-2): runtijd, terugkeren K2 | 113,4 s (1,77×), 3 | 113,9 s (1,74×), 3 | 114,9 s (1,50×), 3 | ≤ 2×, ≤ 4 |
+| **Echo uit** (FK-2): runtijd, terugkeren K2 | 113,4 s (1,77×), 3 | 113,9 s (1,74×), 3 | 114,9 s (1,51×), 3 | ≤ 2×, ≤ 4 |
 
 De langste stilstand zit telkens aan de waterkant in K3: P1 wacht tot de echo zijn pompslagen herhaald heeft en het water zakt (± D + 40 ticks).
 
@@ -165,14 +165,14 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 - K1–K3 worden na de AreaLoader (T5b) `Kamer`-nodes met de AreaLoader, in plaats van `Layout.NEIGHBOURS` (WLD).
 - Gameplay Programmer, in T16c: review van de fix in `tail_echo.gd` (E-08a negeert eenrichtingsrichels, `_is_free`).
 - Gameplay Programmer, in T16c: P1 die een richting vasthoudt tegen een wand op de vloer, is niet `on_floor` en springt niet (de bot laat één tick los).
-- Gameplay Programmer, in T16c: B3 (vang) en B4 (lancering) opnieuw toetsen met de co-op-acties.
+- WLD met Gameplay Programmer: B3 werkt met de vang (getest); B4 met de lancering nog toetsen, de gescripte run neemt daar nog de langzame lijn.
 - Gameplay Programmer: de springplank-reeks `n` opnieuw laten beginnen bij aflopen van de echo kan van `flow_meetlog.gd` naar `meetlog.gd`.
 - LGD: gdd §4.2 en FK-2 naar 4 + 4 vijanden.
-- T17: de LP-marge is 2 (102); met één gemiste landing in K1 zakt de run onder 100. T17 kijkt of 4 + 4 vijanden genoeg is.
+- LGD en T17: sinds co-op 7A in code (#78) is de landing in B3 een vang (+3) in plaats van springplank + bounce (+5); de gescripte run haalt nu precies 100 LP na K1 + K2 (marge 0). T17 kijkt of 4 + 4 vijanden genoeg is.
 
 ## 13. Wijzigingen
 
 | Versie | Wat |
 |---|---|
 | 0.1 | Eerste blockout van de flow-kamer (T16b) |
-| 0.2 | Lead-review: FK-2-grens voor 4 + 4 vijanden voorgerekend (§4), FK-2-test per D, antwoorden van de LGD en open punten (§12) |
+| 0.2 | Merge met co-op 7A (#78): vang en lancering tellen in de lichtmeter (+3, +4), B3 landt met een vang; metingen bijgewerkt. Lead-review: FK-2-grens voor 4 + 4 vijanden voorgerekend (§4), FK-2-test per D, antwoorden van de LGD en open punten (§12) |
