@@ -21,8 +21,8 @@ Doel: de flownormen van pillar 1 meten (sprongketen, merk-arena, één gemaal). 
 | F-02 | Lichtgeometrie en schaduwgeometrie | Platform/brug in de vorm-taal van bible §4.4 (ivoor met maaswerk, paars gearceerd met ranken), plus de **opgeloste toestand** (niets, alleen een eindrand) | EA |
 | F-03 | Lantaarn (verplaatsbaar) | Sprite ± 15×30 met haak en hengsel, kern, 3 halo-ringen, kruisstralen (bible §4.2); 2 frames flakkering | EA (met TA voor het licht) |
 | F-04 | Gemaal (eenvoudig) | Pomp/rad als interactief punt, 2 toestanden (uit/aan); hoeft nog niet te draaien | EA |
-| F-05 | Speler 1 | Idle, loop (4), sprong op/top/val (3), landing, aanval (3), dash (2). Silhouet en kleuren uit `docs/art/r5-scene/bron/sprites.py` | AN |
-| F-06 | Speler 2 | Dezelfde set als F-05, met pikhaak | AN |
+| F-05 | Speler 1 | Idle, loop (4), sprong op/top/val (3), landing, aanval (3), dash (2), plus placeholder-poses voor samenwerken en de kernloop: **bounce** (afzet op echo/partner), **lancering** (opladen en weggeslingerd), **vangen** (gevangen en omhoog gezwiept), **merk-combo** (merk zetten, laten knallen) en **oppompen** (interactie bij het gemaal). Silhouet en kleuren uit `docs/art/r5-scene/bron/sprites.py` | AN |
+| F-06 | Speler 2 | Dezelfde set als F-05, met pikhaak, inclusief de placeholder-poses voor bounce, lancering, vangen, merk-combo en oppompen (de andere kant van elke actie: dragen, slingeren, opvangen) | AN |
 | F-07 | Echo-weergave | Geen eigen sprites: de sprite van de eigenaar als holle versie (rand, arcering om de 3 px aan de sprite verankerd, 2 nabeelden), grijze en kleurtoestand. Shader of gegenereerde sprites | TA |
 | F-08 | Schaduwmerk en ontploffing | Merk op een vijand (1 frame + puls), ontploffing licht/schaduw (4–6 frames). Moet in één frame leesbaar zijn | AN (met AD) |
 | F-09 | Testvijand | Laag, breed, donker, rode bovenrand en kern; idle, loop, geraakt, oplossen | AN |
@@ -40,7 +40,7 @@ Doel: de flownormen van pillar 1 meten (sprongketen, merk-arena, één gemaal). 
 | S-06 | Water | Oppervlak (animatie 4–6 frames), reflectieregel, getijdenrand, 3 waterstanden per wijk | P1 | EA (met TA) |
 | S-07 | Lichtbronnen | Lantaarn (F-03 op eindkwaliteit), straatlamp met kap, raamgloed, FelLicht-zoeklicht; elk met de vijf kenmerken | P1 | EA |
 | S-08 | Volumetrische bundels | Warm (opgepompt) en koud (grijs), als achtergrondsprite of shader | P1 | TA |
-| S-09 | Speler 1 en 2, volledige set | F-05/F-06 op eindkwaliteit, plus geraakt, dood/respawn, bounce, lancering, vangen, oppompen (interactie) | P1 | AN |
+| S-09 | Speler 1 en 2, volledige set | F-05/F-06 op eindkwaliteit (ook bounce, lancering, vangen, merk-combo, oppompen), plus geraakt en dood/respawn | P1 | AN |
 | S-10 | Echo-overgang grijs → kleur | Oplevend in ± 0,5 s na de wijk; oplossen in FelLicht (schaduwdeeltjes) | P1 | TA (met AN) |
 | S-11 | Gemaal (eindkwaliteit) | Gebouw, interieur met pompmachine, rad dat draait (8 frames), oppomp-moment (licht golft de wijk in) | P1 | EA (met TA) |
 | S-12 | Bevroren echo's | 3–5 stilgezette bewoners in schaduw (bakker, kinderen bij het carillon, …), hol, statisch | P2 | AN (met Narrative Designer) |

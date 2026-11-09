@@ -5,7 +5,7 @@ Versie 0.1 · Eigenaar: Art Director · Issue: #20 · Basis: stijlbesluit 2D (#1
 Deze bible legt vast hoe de game eruitziet en wat elke artist moet halen. Ze is **v0**: genoeg om de grijze flow-kamer en de slice-art op te bouwen. De paletten per gebied volgen in v1 (zie *Open punten*).
 
 **Werkaannames:**
-- Lichtbudget: voorlopig ≤ 20 lichteenheden (LE) per scherm, ± 4 schaduwlichten, licht gerenderd op 640×400 en ×2 opgeschaald (Technical Artist, #21, `docs/tech/lichtmeting.md`).
+- Lichtbudget: voorlopig ≤ 20 lichteenheden (LE) per scherm, ± 4 schaduwlichten, licht gerenderd op 640×400 en ×2 opgeschaald (Technical Artist, #21, `docs/tech/lichtmeting.md`, PR #62, in review).
 - Co-op volgens besluit #51 (7A): solo heb je een echo, in co-op is de partner (speler 2) de echo. Nooit meer dan twee lichamen, plus de gedeelde echo als finisher.
 - Echo-staart ± 2 s (8A).
 - Geen naam of logo in de art: de werktitel ligt opnieuw bij de CEO (#61).
@@ -33,6 +33,8 @@ De R5-scène laat dat zien. Het is dezelfde plek bij een gemaal, in twee toestan
 **Opnieuw maken:** `python3 docs/art/r5-scene/bron/genereer_r5.py` vanaf de repo-root. Het script gebruikt het eigen pixelfont uit `docs/art/stijltests/bron/` en geen externe assets.
 
 **Wat in de scène staat:** een kade met een hangende lantaarn (verplaatsbare lichtbron), een zuil die een schaduwwig werpt, een lichtplatform (lichtgeometrie), een schaduwbrug over het kanaal (schaduwgeometrie) die oplost in de lichtkegel van een straatlamp, een FelLicht-zone onder het zoeklicht van het gemaal, een schoepenrad, een duiker die pas vrijkomt als het water zakt, en een getijdenrand op de oude waterstand. Speler 1 staat in het licht, de echo springt boven de brug, speler 2 staat in de schaduw op de brug.
+
+**Let op:** met drie lichamen is dit een **leesbaarheidscompositie**, geen spelsituatie. Onder 7A zijn er nooit meer dan twee lichamen (solo: speler 1 + echo; co-op: speler 1 + speler 2). De scène toont alle figuren naast elkaar om ze te kunnen vergelijken. Ze is **niet bedoeld voor marketing**.
 
 ---
 
@@ -118,7 +120,7 @@ Elke lichtbron, en zeker een die de speler **verplaatst** (de lantaarn), heeft a
 4. een **lichtpoel** op vloer en muur met de harde schaduw van wat ervoor staat;
 5. **stof in het licht**: losse pixels in tint 6, ± 0,4 % van de verlichte lucht.
 
-In de game komt daar een **flakkering** bij (de kern wisselt tussen tint 6 en 7, de halo ademt ± 1 px, ± 4 Hz). Een verplaatsbare bron heeft een **hengsel** en hangt aan een **haak**: je ziet dat je hem kunt pakken. In de grijze toestand is de lantaarn het **enige** dat volle kleur heeft.
+In de game komt daar een **flakkering** bij (de kern wisselt tussen tint 6 en 7, de halo ademt ± 1 px, ± 4 Hz). Een verplaatsbare bron heeft een **hengsel** en hangt aan een **haak**: je ziet dat je hem kunt pakken. In de grijze toestand is de lantaarn het enige in de **omgeving** met volle kleur; alleen speler 1 is verder ook in kleur (§5).
 
 ### 4.3 Warm licht tegenover FelLicht
 "Verlicht is niet fel" (pitch, pillar 2). Ze moeten in één oogopslag verschillen:
@@ -143,7 +145,7 @@ Gemeten verschil warm/FelLicht: ΔE 73–83, ook bij deuteranopie (§7).
 Water is een **beeldlaag en een wereldstaat**, geen speellaag. De waterstand is zichtbaar aan drie dingen: het **oppervlak** (1 px-lijn in tint 5–7 met onderbrekingen), wat **eronder verdwijnt** (vormen onder water blijven vaag zichtbaar in de water-ramp) en de **getijdenrand** (klimop in tint 1–2) op de oude stand zodra het water gezakt is. Wat opengaat als het water zakt (duiker, loopbrug, deur met stoep), is in de grijze toestand **net onder het oppervlak** te zien of te raden. Reflecties zijn gespiegelde heldere pixels, om de rij onderbroken, met golfverschuiving.
 
 ### 4.6 Budget
-De R5-scène telt (rekenregel uit `docs/tech/lichtmeting.md`): grijs = lantaarn 3 + echo 0,8 + saturatiepass 4 + occluders ± 0,5 = **± 8,3 LE**; opgepompt = lantaarn 3 + straatlamp met schaduw 2,5 + FelLicht-zone 3 + echo 0,8 + saturatiepass 4 + occluders ± 0,5 = **± 13,8 LE**. Beide passen in ≤ 20 LE. Ramen, belfort en halo's zijn sprites (emissief), geen lichten.
+De R5-scène telt (rekenregel uit `docs/tech/lichtmeting.md`, PR #62, in review): grijs = lantaarn 3 + echo 0,8 + saturatiepass 4 + occluders ± 0,5 = **± 8,3 LE**; opgepompt = lantaarn 3 + straatlamp met schaduw 2,5 + FelLicht-zone 3 + echo 0,8 + saturatiepass 4 + occluders ± 0,5 = **± 13,8 LE**. Beide passen in ≤ 20 LE. Ramen, belfort en halo's zijn sprites (emissief), geen lichten.
 
 ---
 
@@ -235,7 +237,7 @@ Huiswerk uit de EP-review op PR #17 (punt 5). Getest in `r5_beweging_*`: speler 
 
 ## 8. Tegen een generieke 2D-look (eisen)
 
-De markt voor pixel-metroidvania's is vol. Deze eisen maken een screenshot herkenbaar als deze game; Marketing kan erop bouwen. **Elk schermvullend beeld haalt ze allemaal:**
+De markt voor pixel-metroidvania's is vol. Deze eisen maken een screenshot herkenbaar als deze game; Marketing kan erop bouwen. **Elk buitenscherm van de slice-art haalt ze allemaal.** Voor **interieurs** (gemaal, duikers, kelders) gelden eis 1, 3, 5, 6 en 7. Eis 2 wordt daar licht door ramen, roosters of machinegloed als achtergrondbundel, en eis 4 komt via de materialen (baksteen, koper, sluisdeuren, raderwerk).
 
 1. **Het licht-schaduwmotief is de handtekening.** In elk scherm staat minstens één harde schaduwwig of lichtkegel die over het speelvlak én de achtergrond loopt, met de stippel-laaggrens.
 2. **Volumetrische bundels in de achtergrond**: warm uit belfort, ramen en gemalen (opgepompt), dun en koud door het wolkendek (grijs). Alleen in de parallax-lagen, nooit over het speelvlak.
@@ -276,3 +278,4 @@ De markt voor pixel-metroidvania's is vol. Deze eisen maken een screenshot herke
 | Draagt de echo sporen van de sluiswachter naarmate hij oplevert (V2)? Nu heeft hij het silhouet van de eigenaar | Narrative Designer met Art Director en Creative Director | Bij T9 |
 | Kleurenblind-modus (alternatieve accentkleuren) | UX Designer met Art Director | Preproductie |
 | HUD en lichtmeter in dezelfde beeldtaal | UI Artist met UX Designer | T10 |
+| Placeholder-lichtmeter in de flow-kamer (zonder meter is "oppompen" niet te testen) | Lead Game Designer met UI Artist | Bij de start van de flow-kamer |
