@@ -90,7 +90,7 @@ De studio is één mens (de CEO, vestiging Vlaanderen/Brussel, #51: VA) die werk
 | Categorie | Eis | Ons criterium | Bewijs | Stand |
 |---|---|---|---|---|
 | **I** (min. 2) | **Criterium 1 verplicht**: "De game verschijnt minstens ook in het Nederlands." | Nederlandse versie bij release | #51 deel 1: 5A ("in principe ja"); T14 (lokalisatie inbouwen) in fase 2; de EP raamt de kost vóór het indienen | 🟡 in principe; wordt definitief met de raming EP |
-| **I** | **Tweede criterium** | **Setting, worldbuilding en beeldtaal met verwijzingen naar de Lage Landen** (voorstel CD, #51 deel 1: 5A) | Zie de argumentatie hieronder | ✅ inhoud; ⬜ letterlijke koppeling aan het criteriumnummer (§6, B1) |
+| **I** | **Tweede criterium** | **Setting, worldbuilding en beeldtaal met verwijzingen naar de Lage Landen** (voorstel CD, #51 deel 1: 5A) | Zie de argumentatie hieronder | 🟡 concepttekst; wacht op goedkeuring CD (B2) en op art. 4 letterlijk (B1) |
 | **II** (min. 2; verplicht 1 of 2) | ≥ 50 % kernteam uit het Vlaamse gamelandschap, of een sterk stimulerend effect op de Vlaamse creatieve economie | Onzeker: één Vlaamse maker + AI-rollen | — | ⬜ intakevraag (a); eventueel Vlaamse freelancers (budget, CEO-besluit later) |
 | **III** (min. 1) | Innovatie in gameplay, art, verhaal, technologie of muziek | Gameplay: de echo als bondgenoot (§4.2) | Pitch §1, §4, §8; flow-test F0; slice F3 | 🟡 bewijs volgt uit fase 2 |
 
@@ -106,7 +106,7 @@ Bronnen: pitch §6 (setting, toonregels), #51 deel 1 (5A, voorstel CD). Bewijs i
 
 | # | Wat | Nodig van |
 |---|---|---|
-| B1 | Art. 4 (cat. I–III) en de bijlagenlijst letterlijk overnemen uit het reglement en de pagina productiesteun; hercheck of 08/09/2026 nog de geldende versie is | BLA, met toestemming om vaf.be te lezen (of de CEO plakt de tekst in #72) |
+| B1 | Art. 4 (cat. I–III) en de bijlagenlijst letterlijk overnemen uit het reglement en de pagina productiesteun; hercheck of 08/09/2026 nog de geldende versie is | BLA, met toestemming om vaf.be te lezen. **Terugvaloptie**: is vaf.be weer niet leesbaar, dan plakt de CEO de VAF-teksten (art. 4, bijlagenlijst) en de deadlines 2027 in #72 |
 | B2 | §5: de CD-goedkeuring van de argumentatie verwerken | Creative Director |
 | B3 | 2-pager (D0) in het VAF-sjabloon zetten | BLA |
 | B4 | §6.4 bijwerken met de deadlines 2027 | CEO (`Info:` in #51), dan Producer |
@@ -119,8 +119,11 @@ Bronnen: pitch §6 (setting, toonregels), #51 deel 1 (5A, voorstel CD). Bewijs i
 | D9, D10, D11 | Creatiebudget fase 3 op VAF-sjabloon (participaties, overhead ≤ 15 %), financieringsplan, planning; raming Nederlandse versie (#51: 5A) | Executive Producer | Met F6 (T15); de NL-raming vóór het indienen |
 | D6, D8 | Marktonderzoek, vergelijkbare titels met verkoopcijfers, verkoopraming | Marketing & Community Manager | Fase 2, vóór de intake |
 | D7, D13 | Tractieplan (wishlists) en pitchvideo; beide vragen een publieke uiting of slice-art | Marketing & Community Manager; CEO-besluit over een Steam-pagina (na de merkcheck, #24 3A) | Na de slice |
+| D4 (cat. II) | Kernteam: opties (bv. Vlaamse freelancers in het kernteam) met hun kost uitwerken; het besluit is van de CEO | Executive Producer (optie en kost), CEO (besluit) | Na intakevraag (a) |
 | D12 | Slice-build | Team (F3) | Einde fase 2 |
 | D1, D5, D14 | Vennootschap en statuten, CV, intake en hearing | CEO (met boekhouder) | Na `Besluit:` over de intake |
+
+**Open punt:** de werkaanname "één mens plus AI-rollen" (§7, `subsidies.md` A3) wordt herzien na het antwoord op intakevraag (a).
 
 ### 6.3 Intakevragen (overgenomen uit `subsidies.md` §5.2 stap 5)
 
@@ -149,4 +152,5 @@ Het traject tot het contract duurt naar raming ± 3 tot 10 maanden (`subsidies.m
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.1 | 2026-11-09 | Lead-review EP (PR #110): tweede criterium cat. I naar 🟡, regel cat. II in §6.2, terugvaloptie CEO plakt VAF-teksten in #72, open punt werkaanname A3. |
 | 0.1 | 2026-11-09 | Deel 1 van T13 (#72): structuur, vaste inhoud uit pitch v0.4 en de besluiten, culturele test met het tweede criterium van categorie I, ontbrekende stukken, Producer-actie. Hercheck van vaf.be niet gelukt (§2). |
