@@ -13,6 +13,7 @@ const EventDetector = preload("res://scripts/events/event_detector.gd")
 const InputBits = preload("res://scripts/input/input_bits.gd")
 const Layers = preload("res://scripts/world/layers.gd")
 const Tuning = preload("res://scripts/echo/tuning.gd")
+const GameEvents = preload("res://scripts/events/game_events.gd")
 
 ## ROOM: kamerwissel naar een kamer die geen buur is (E-04a), gezet door de
 ## AreaLoader na stap (3).
@@ -40,6 +41,28 @@ var motor := Motor.State.new()
 var echo_reset: EchoReset = EchoReset.NONE
 ## Levenspunten (LM-05: 5 in de flow-kamer). P2 heeft er geen (C-02).
 var health := 5
+## `geldig_vanaf` van de echo van deze speler (E-03). Hoort bij P1, niet bij
+## de echo-node: Loslaten en respawn zetten hem ook in co-op (E-09, C-04),
+## en de echo van een drop-out neemt hem over (C-05).
+var echo_valid_from := 0
+## De plank van dit lichaam (C-09): P1 de lichtplank (laag 8, alleen in
+## co-op), P2 de schaduwplank (laag 6). De Sim zet de laag per tick.
+var plank: StaticBody2D
+## Stond dit lichaam sinds zijn laatste grondcontact op een plank of werd het
+## gevangen? Dan draagt zijn plank niet (C-09, ladderregel).
+var plank_since_ground := false
+## Werd dit lichaam in deze luchtfase al gevangen (C-13 (4))?
+var caught_this_airphase := false
+## Tot (niet t/m) deze tick onkwetsbaar voor vijandelijke aanvallen (C-13).
+var invulnerable_until := -1
+## Laatste positie op eigen vloer (laag 1, 4 of 5), voor de plaatsingsregel (C-03).
+var last_floor_position := Vector2.ZERO
+## Opgelost (C-06): het lichaam staat niet in de wereld. Nog niet in gebruik
+## in deze versie (deel 2 van T16c), wel al meegenomen in `carrier_valid`.
+var dissolved := false
+
+## De plank waarop dit lichaam aan het begin van deze tick stond (of null).
+var started_on_plank: CollisionObject2D = null
 
 var _detector := EventDetector.new()
 var _pre_position := Vector2.ZERO
@@ -48,6 +71,8 @@ var _pre_floor := false
 var _echo_held := 0
 var _respawn_requested := false
 var _respawn_position := Vector2.ZERO
+var _stance_event := -1000000   ## tick van het laatste AANVAL-event (C-11a)
+var _stance_held := false        ## AANVAL sindsdien aaneengesloten ingedrukt
 
 
 func setup(p_player_index: int, p_input_source: RefCounted, color: Color,
@@ -69,6 +94,43 @@ func setup(p_player_index: int, p_input_source: RefCounted, color: Color,
 	platform_on_leave = CharacterBody2D.PLATFORM_ON_LEAVE_DO_NOTHING
 	platform_floor_layers = Layers.WORLD | Layers.LIGHT_GEOMETRY
 	BodyBuilder.add_box(self, color, Tuning.body_size())
+	plank = BodyBuilder.add_plank(self, Tuning.body_size(), float(Tuning.echo()["plank_thickness_px"]))
+	last_floor_position = position
+
+
+## De laag van de plank als hij aan staat: P1 lichtplank, P2 schaduwplank.
+func plank_layer() -> int:
+	return Layers.LIGHT_PLANK if player_index == 1 else Layers.PLANK
+
+
+## Zet de plank aan of uit en op zijn plek in de physics-ruimte, voor de stap
+## van de springer in dezelfde tick (C-09). `coop`: doet P2 mee?
+func refresh_plank(coop: bool) -> void:
+	plank.collision_layer = plank_layer() if coop and carrier_valid() else 0
+	BodyBuilder.sync_plank(plank)
+
+
+# --- drager (C-09, C-11, C-13) ----------------------------------------------
+
+## Draagt de plank (C-09)? Niet opgelost en sinds het laatste grondcontact
+## niet op een plank gestaan of gevangen (ladderregel).
+func carrier_valid() -> bool:
+	return not dissolved and not plank_since_ground
+
+
+## C-11a: AANVAL sinds het laatste AANVAL-event aaneengesloten ingedrukt, en
+## dat event is ≥ 12 ticks geleden.
+func carrier_in_stance(tick: int) -> bool:
+	return _stance_held and tick - _stance_event >= int(Tuning.coop()["stance_hold_ticks"])
+
+
+## C-11d: de houding eindigt op de lanceertick.
+func consume_stance(_tick: int) -> void:
+	_stance_held = false
+
+
+func carrier_facing() -> int:
+	return motor.facing
 
 
 ## Zet de speler op de volgende tick terug op `at` (respawn, E-04b). Dat
@@ -80,7 +142,7 @@ func respawn_at(at: Vector2) -> void:
 
 ## Een vijandelijk aanvalsvlak raakt dit lichaam (alleen laag 2, E-14h).
 func take_hit(tick: int) -> void:
-	if player_index != 1 or health <= 0:
+	if player_index != 1 or health <= 0 or tick < invulnerable_until:
 		return
 	health -= 1
 	health_changed.emit(tick, health)
@@ -100,9 +162,23 @@ func sim_step(tick: int, _delta: float) -> void:
 	tick_events = _detector.detect(tick, bits)
 	_pre_position = position
 	_pre_velocity = motor.velocity
+	started_on_plank = motor.plank if motor.support == Motor.Support.SHADOW_BODY else null
 	_pre_floor = motor.on_floor
 	move_events = Motor.step(self, motor, bits, tick)
-	_update_release(bits)
+	_update_stance(tick, bits)
+	_update_ground()
+	if player_index == 1:
+		_update_release(bits)
+	if echo_reset != EchoReset.NONE:
+		echo_valid_from = tick
+
+
+func pre_position() -> Vector2:
+	return _pre_position
+
+
+func pre_velocity() -> Vector2:
+	return _pre_velocity
 
 
 ## Stap (3): deze tick opnemen (E-01), na de stap.
@@ -110,6 +186,26 @@ func record(tick: int) -> void:
 	recorder.push(tick, last_input, _pre_position, _pre_velocity, _pre_floor,
 		position, motor.velocity, tick_events, motor.on_floor, motor.facing,
 		motor.support, motor.anim, last_input & InputBits.ATTACK != 0)
+
+
+func _update_stance(tick: int, bits: int) -> void:
+	if tick_events & GameEvents.ATTACK:
+		_stance_event = tick
+		_stance_held = true
+	elif bits & InputBits.ATTACK == 0:
+		_stance_held = false
+
+
+## Grondcontact (C-09, C-13 (4)): staan op laag 1, 4 of 5, niet op een plank.
+func _update_ground() -> void:
+	if not motor.on_floor:
+		return
+	if motor.support == Motor.Support.SHADOW_BODY:
+		plank_since_ground = true
+	else:
+		plank_since_ground = false
+		caught_this_airphase = false
+		last_floor_position = position
 
 
 ## E-09: ECHO 30 ticks aaneengesloten vasthouden is Loslaten, één keer per druk.

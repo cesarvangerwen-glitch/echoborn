@@ -195,7 +195,7 @@ func test_e05_layers_and_walls(t) -> void:
 			t.check(player.position.x > 270.0 and player.position.x <= 352.01,
 				"P1 hoort door de schaduwmuur en tegen de lichtmuur: x = %.2f" % player.position.x)
 		else:
-			t.check(player.collision_layer == Layers.SHADOW and player.collision_mask == Layers.WORLD | Layers.SHADOW_GEOMETRY,
+			t.check(player.collision_layer == Layers.SHADOW and player.collision_mask == Layers.WORLD | Layers.SHADOW_GEOMETRY | Layers.LIGHT_PLANK,
 				"P2: laag %d, masker %d" % [player.collision_layer, player.collision_mask])
 			t.check(player.position.x <= 252.01, "P2 hoort tegen de schaduwmuur: x = %.2f" % player.position.x)
 		await t.cleanup()
@@ -299,7 +299,11 @@ func test_e07a_1_carried_by_plank_same_tick(t) -> void:
 func test_e07a_2_landing_keeps_speed_and_returns_dash(t) -> void:
 	var sim = Fx.world(t)
 	_still_echo(t, sim, 300.0)
-	var p1 := Fx.p1(sim, [[200, R]], Vector2(260, 300))
+	# Lage val (20 px): een gewone landing; vanaf ± 32 px vallen is het een
+	# vang (C-13), zie test_coop.gd. Start-x 276 in plaats van 260: de val van
+	# 20 px duurt ± 13 ticks (± 26 px bij 2,0 px/tick), dus P1 komt zo midden
+	# op de echo (x = 300) uit, net als de oude val van 55 px vanaf x = 260.
+	var p1 := Fx.p1(sim, [[200, R]], Vector2(276, 335))
 	var rows := _log(sim, p1)
 	await t.run_ticks(sim, 60)
 	var land := _first(rows, Motor.EV_SPRINGPLANK)
@@ -318,7 +322,7 @@ func test_e07a_2_landing_keeps_speed_and_returns_dash(t) -> void:
 	# Dash in de lucht, landen op de echo, eraf lopen, opnieuw dashen in de lucht.
 	sim = Fx.world(t)
 	_still_echo(t, sim, 300.0)
-	p1 = Fx.p1(sim, [[1, D], [44, 0], [12, R], [1, R | D], [20, 0]], Vector2(260, 250))
+	p1 = Fx.p1(sim, [[1, D], [44, 0], [12, R], [1, R | D], [20, 0]], Vector2(260, 335))
 	rows = _log(sim, p1)
 	await t.run_ticks(sim, 78)
 	land = _first(rows, Motor.EV_SPRINGPLANK)
