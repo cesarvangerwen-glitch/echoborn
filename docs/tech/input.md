@@ -1,6 +1,6 @@
 # Input voor 2 controllers en drop-in/drop-out
 
-Eigenaar: Engine & Platform Programmer · Versie 0 · Issue [#69](https://github.com/cesarvangerwen-glitch/echoborn/issues/69) (T5a, `docs/productie/fase-2-kader.md` §2)
+Eigenaar: Engine & Platform Programmer · Versie 1 · Issues [#69](https://github.com/cesarvangerwen-glitch/echoborn/issues/69) (T5a, `docs/productie/fase-2-kader.md` §2) en [#101](https://github.com/cesarvangerwen-glitch/echoborn/issues/101) (volledige bitset)
 
 Dit document beschrijft de `InputRouter`: welk apparaat bij welke speler hoort, en hoe spelers meedoen en stoppen. Het werkt `ontwerp.md` §5 ("volgende stap: InputRouter") en C5 uit, en dekt het invoerdeel van R19 (`docs/productie/risico.md`). Wat er in het spel gebeurt bij meedoen of stoppen (plaatsing, de echo die overneemt) is gameplay: dat bouwt T16c op de signalen hieronder.
 
@@ -13,7 +13,8 @@ Dit document beschrijft de `InputRouter`: welk apparaat bij welke speler hoort, 
 | W3 | **Plaats 1 neemt elke knop** op elk apparaat (titelscherm: "druk op een knop"). Plaats 1 stopt nooit via de router; terug naar het menu is UX. | eigen aanname, niet in de gdd |
 | W4 | Een plaats waarvan het apparaat weg is, **wacht**. Komt dezelfde GUID terug, dan krijgt die pad de plaats terug zonder knop. Een **ander** apparaat mag een wachtende plaats overnemen (lege batterij, andere pad gepakt): elke knop voor plaats 1, meedoen voor plaats 2. Plaats 1 wacht onbeperkt (pauze is UX/gameplay). | eigen aanname |
 | W5 | De knop die liet meedoen, doet in het spel niets tot hij is losgelaten (Enter is ook springen). | eigen aanname |
-| W6 | De bits blijven die van de spike (`input_bits.gd`). De volledige bitset uit gdd §2.5 (T16a) voegt alleen regels toe aan `KEYS` en `PAD_BUTTONS` in `input_setup.gd`. | gdd §2.5 |
+| W6 | De router geeft de volledige bitset uit gdd §2.5 (`input_bits.gd`): LEFT, RIGHT, JUMP, ATTACK, INTERACT, ECHO, DASH. Elk apparaat geeft alle bits, ook ECHO op een P2-apparaat: de router weet niet welke rol een plaats speelt, gameplay negeert wat niet telt. Een nieuwe besturing is één regel in `KEYS`, `PAD_BUTTONS` en `BUTTON_BITS` (`input_setup.gd`). | gdd §2.5 |
+| W7 | Knoppen die de gdd niet noemt (§2a, *cursief*) zijn een voorstel van Engine & Platform; het rebindscherm is van de UX Designer. Toetsen zijn **fysiek** (positie), dus op AZERTY ligt "Q" op de plek van de A. D-pad omhoog/omlaag en W/S blijven vrij voor UP/DOWN (bit 6 en 7, Combat Designer). | gdd §2.5 |
 
 ## 2. Model
 
@@ -32,6 +33,21 @@ Dit document beschrijft de `InputRouter`: welk apparaat bij welke speler hoort, 
 | Pad met een plaats ontkoppeld | plaats wacht, bits 0 | `slot_suspended(slot)` |
 | Zelfde GUID sluit aan (ook op een andere index) | plaats terug | `slot_resumed(slot, device)` |
 | Pad van de partner 179 / 180 ticks weg | wacht / plaats 2 vrij | `slot_left(2, "apparaat weg")` |
+
+## 2a. Knoppen
+
+| Besturing | Bit | Toetsenbord helft 1 (`kb1`) | Toetsenbord helft 2 (`kb2`) | Joypad (elke pad) |
+|---|---|---|---|---|
+| Links / rechts | LEFT, RIGHT | A / D | ← / → | linker stick, d-pad ← / → |
+| Springen | JUMP | Spatie | Enter | A (Xbox) / ✕ |
+| Aanval | ATTACK | *E* | *Rechter Ctrl* | *X / ▢* |
+| Interactie | INTERACT | *F* | */ (naast rechter Shift)* | *Y / △* |
+| Echo-knop | ECHO | Q | *. (punt)* | linker schouderknop |
+| Dash | DASH | linker Shift | rechter Shift | rechter schouderknop |
+| Meedoen (geen bit) | — | — | Enter | Start/Menu |
+| Stoppen (geen bit) | — | — | Backspace | Select/View |
+
+Linker en rechter Shift en Ctrl zijn gescheiden (`KEY_LOCATIONS`), zodat de helften elkaar niet sturen. `DeviceInput` (spike, vaste joypad 0 en 1) leest dezelfde besturingen.
 
 ## 3. Gebruik in code
 
@@ -79,6 +95,10 @@ De resultaten van een hardwarerun komen in deze sectie, met datum, modus en de g
 | `test_autoload_exists_and_viewport_events_reach_router` | Het autoload staat in `project.godot`; echte events via de viewport komen aan |
 | `test_pause_and_focus_loss_leave_no_stuck_controls` | Loslaten tijdens een pauze komt aan; de stopknop telt niet door tijdens de pauze; focusverlies zet alle knoppen los |
 | `test_debug_scene_shows_both_slots` | Het controlescherm van §4 laadt zonder fouten |
+| `test_attack_interact_echo_dash_bits_for_both_slots` | §2a: elke knop van ATTACK, INTERACT, ECHO en DASH geeft op `kb1`/`kb2` en op twee pads het juiste bit aan de juiste plaats, laat niets hangen, en de bits tellen op; de alias ACTION is weg |
+| `test_join_press_is_swallowed_and_dpad_up_down_give_no_bits` | W5 ook voor een schouderknop; d-pad omhoog/omlaag geeft geen bit (W7) |
+
+In `test_input.gd`: `test_dash_shift_is_split_per_keyboard_half` (linker Shift = P1, rechter = P2) en `test_every_control_has_key_pad_and_bit_for_both_players` (elke besturing heeft voor P1 en P2 een toets, een joypad-event en een bit; geen gedeelde toets tussen de helften).
 
 ## Open punten
 
@@ -87,3 +107,5 @@ De resultaten van een hardwarerun komen in deze sectie, met datum, modus en de g
 - W4 laat een wachtende plaats 1 vóór een vrije plaats 2 gaan: valt de pad van een solospeler weg en drukt een vriend op Start, dan wordt die vriend P1 en moet de teruggekeerde pad als P2 meedoen. Keuze voor UX Designer en LGD.
 - Bindings staan nog in code (`ontwerp.md` R3); herbinden en opslaan horen bij het rebindscherm (UX) en het save-systeem.
 - `ontwerp.md` §5 en de testtabel in §9 kunnen naar dit document verwijzen (Technical Director).
+- De cursieve knoppen in §2a (aanval, interactie, P2-echo) bevestigen of herbinden: UX Designer, met het rebindscherm. Op een laptop zonder losse rechter Ctrl heeft `kb2` geen aanval.
+- gdd §2.5 noemt bit 3 nog "heet `ACTION` in de spike en wordt hernoemd"; in code heet het nu alleen `ATTACK` (Lead Game Designer).

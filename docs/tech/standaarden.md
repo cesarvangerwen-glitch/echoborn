@@ -25,7 +25,7 @@ Geldt voor alle code in `game/`. De Technical Director reviewt alle code van pro
 | Enums | `PascalCase` | `Mode` |
 | Gepreloade scripts (als type) | `PascalCase` | `const EchoRecorder = preload(...)` |
 | Nodes in een scène | `PascalCase` | `Player1`, `ShadowLayer` |
-| Input-acties | `p<n>_<actie>` | `p1_jump`, `p2_action` |
+| Input-acties | `p<n>_<actie>` | `p1_jump`, `p2_attack` |
 | Physics-lagen | Nederlands, klein | `wereld`, `licht`, `schaduw` |
 
 ## 3. `preload` in plaats van `class_name`

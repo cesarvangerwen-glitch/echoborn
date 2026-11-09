@@ -89,7 +89,7 @@ res://tests/test_sim.gd
   PASS test_p1_sees_shadow_of_same_tick_and_is_recorded_after_step (5 checks)
 
 res://tests/test_input.gd
-  PASS test_p2_action_only_on_right_ctrl (4 checks)
+  PASS test_p2_attack_only_on_right_ctrl (4 checks)
 
 Resultaat: 16 geslaagd, 0 mislukt (0.66 s)
 ```
