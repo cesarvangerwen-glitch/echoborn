@@ -300,6 +300,19 @@ func drop_out(echo_color: Color = Color(0.1, 0.1, 0.1)) -> TailEcho:
 	return echo
 
 
+## Wissel van D (E-02, E-04c) tussen twee ticks: telt als reset op deze
+## tick. `geldig_vanaf` staat op P1, dus ook in co-op, zonder echo (C-04);
+## een echo die afspeelt, wisselt mee.
+func set_tail_ticks(p_tail_ticks: int) -> void:
+	combat.tail_ticks = p_tail_ticks
+	var p1 := get_player(1)
+	if p1:
+		p1.echo_valid_from = tick
+	for echo in echoes:
+		if echo is TailEcho:
+			echo.set_tail_ticks(p_tail_ticks, tick)
+
+
 ## Plaatsingsregel (C-03): de positie van P1, tenzij die in laag 1 of 5
 ## bezet is; dan de dichtstbijzijnde vrije plek binnen 64 px (stappen van
 ## 4 px), anders de laatste vloerpositie van P1.

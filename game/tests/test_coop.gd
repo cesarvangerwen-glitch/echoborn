@@ -554,6 +554,32 @@ func test_c05_drop_out_after_release_all_d(t) -> void:
 		await t.cleanup()
 
 
+func test_c04_d_switch_in_coop_then_drop_out(t) -> void:
+	# C-04: een wissel van D in co-op zet geldig_vanaf op P1 (er is geen echo);
+	# een drop-out 20 ticks later geeft een echo die Leeg is tot t1 + D.
+	for d in ALL_D:
+		var sim = Fx.world(t)
+		var p1 := Fx.manual_player(sim, 1, Vector2(200, Fx.STAND_Y))
+		Fx.tail_echo(sim, p1, 120)
+		await t.run_ticks(sim, 5)
+		sim.drop_in(_new_p2())
+		_bits(p1, R)
+		await t.run_ticks(sim, 300)
+		var t1: int = sim.tick
+		sim.set_tail_ticks(d)
+		t.check(p1.echo_valid_from == t1 and sim.echoes.is_empty(),
+			"D = %d: wissel in co-op zette geldig_vanaf %d (%d)" % [d, p1.echo_valid_from, t1])
+		await t.run_ticks(sim, 20)
+		var echo: TailEcho = sim.drop_out()
+		var present := {}
+		sim.tick_finished.connect(func(tick: int) -> void: present[tick] = echo.is_present())
+		await t.run_ticks(sim, d)
+		t.check(echo != null and echo.tail_ticks == d, "D = %d: echo na drop-out met D %d" % [d, echo.tail_ticks if echo else -1])
+		t.check(not present[t1 + 20] and not present[t1 + d - 1] and present[t1 + d],
+			"D = %d: echo niet Leeg tot t1 + D, Actief op t1 + D" % d)
+		await t.cleanup()
+
+
 func test_c05_drop_out_long_after_reset_is_active_at_once(t) -> void:
 	var sim = Fx.world(t)
 	var p1 := Fx.manual_player(sim, 1, Vector2(200, Fx.STAND_Y))

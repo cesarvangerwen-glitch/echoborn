@@ -300,7 +300,9 @@ func test_e07a_2_landing_keeps_speed_and_returns_dash(t) -> void:
 	var sim = Fx.world(t)
 	_still_echo(t, sim, 300.0)
 	# Lage val (20 px): een gewone landing; vanaf ± 32 px vallen is het een
-	# vang (C-13), zie test_coop.gd.
+	# vang (C-13), zie test_coop.gd. Start-x 276 in plaats van 260: de val van
+	# 20 px duurt ± 13 ticks (± 26 px bij 2,0 px/tick), dus P1 komt zo midden
+	# op de echo (x = 300) uit, net als de oude val van 55 px vanaf x = 260.
 	var p1 := Fx.p1(sim, [[200, R]], Vector2(276, 335))
 	var rows := _log(sim, p1)
 	await t.run_ticks(sim, 60)

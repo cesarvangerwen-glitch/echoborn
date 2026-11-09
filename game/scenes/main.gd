@@ -63,8 +63,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			and DEBUG_TAIL_KEYS.has(event.physical_keycode):
 		var options: Array = Tuning.echo()["tail_options"]
 		_tail = int(options[DEBUG_TAIL_KEYS[event.physical_keycode]])
-		if _echo:
-			_echo.set_tail_ticks(_tail, _sim.tick)
+		_sim.set_tail_ticks(_tail)
 	elif event.is_action_pressed("p2_join") and _p2 == null:
 		_p2 = PlayerActor.new()
 		_p2.setup(2, DeviceInput.new(2), PLAYER_COLORS[1])
