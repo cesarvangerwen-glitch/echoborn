@@ -16,6 +16,8 @@ Hoort bij: besluit #96 (1C) · Bron: `docs/business/naamkandidaten.md` §3.3 en 
 
 **Wat dit betekent:** in wat we konden zien, geen reden voor een CEO-vraag of een nieuwe naamronde. De formele merkcheck door een specialist kan op *Polderlight* starten, met de raming van besluit #51 deel 1 (3A: € 3.750, worstcase ≈ € 4.800 excl. btw). Of het bij € 3.750 blijft, weten we niet: de registers zelf zijn onbekend, het Benelux-register (BOIP) is de grootste blinde vlek, en de worstcase van ≈ € 4.800 blijft dus reëel. Vragen voor de specialist staan in §6.
 
+**Kalibratie:** bij *Wraithstep* gaven we 🟠, met "groen pas na de EU/Benelux-check" (`naamcheck-wraithstep.md` §3). Hier is hetzelfde gat open; "voorlopig groen" betekent alleen dat *Polderlight*, anders dan *Wraithstep*, geen vindbaarheidsprobleem met een game-item heeft. Definitief groen wordt het pas na de EU/Benelux-check door de specialist.
+
 ## 2. Merken
 
 Peildatum: **2026-11-09**. Klassen van Nice: 9 (software, games), 28 (spellen, speelgoed), 41 (entertainment, online games).
@@ -74,12 +76,13 @@ Content die een tool weigerde, is **niet** via een andere weg (curl, scripts) op
 
 - **Starten op *Polderlight*, voorlopig geen extra naamronde nodig.** Kost: raming van besluit #51 deel 1 (3A): € 3.750, worstcase ≈ € 4.800 excl. btw, in de begroting van de fase met de eerste publicatie. Omdat de registers niet bevraagd zijn, blijft de worstcase reëel. Deze korte check kostte € 0.
 - **Vragen voor de specialist** (meegeven bij de opdracht):
-  1. **Eerste prioriteit: het Benelux-register (BOIP)** op *Polderlight* en gelijkende tekens in klassen 9, 28 en 41, met *Polders* (bordspel, klasse 28) als bekende lookalike.
-  2. Daarna volledig zoeken naar identieke en gelijkende tekens (*Polderlight*, *Polder Light*, *Polderlicht*, *Polder*-samenstellingen, *Polar Light(s)*) in klassen 9, 28 en 41, in EUIPO en USPTO (en zo nodig WIPO/Madrid voor UK en andere Steam-markten).
+  1. **Eerste prioriteit: het Benelux-register (BOIP)** op *Polderlight* en gelijkende tekens in klassen 9, 28, 41 en 42 (de scope van de raming #51, 3A), met *Polders* (bordspel, klasse 28) als bekende lookalike.
+  2. Daarna volledig zoeken naar identieke en gelijkende tekens (*Polderlight*, *Polder Light*, *Polderlicht*, *Polder*-samenstellingen, *Polar Light(s)*) in klassen 9, 28, 41 en 42, in EUIPO en USPTO (en zo nodig WIPO/Madrid voor UK en andere Steam-markten).
   3. Weegt het beschrijvende element *polder* tegen ons, zowel bij verwarringsgevaar met *Polders* (bordspel, klasse 28) als bij de onderscheidende kracht van een eigen merk *Polderlight*?
   4. Zijn de levende merken *POLDER* (Polder, Inc., klasse 9, M2) en *POLDR* (EUIPO, M5) een probleem? Voorlopig verwachten we van niet (andere waren).
-- **Open punt vóór de formele check:** een handmatige TMview-zoekopdracht op *Polderlight* in een gewone browser (€ 0, klassen 9, 28, 41), zodat de specialist niet blind start.
-- **Wat verder openstaat buiten de specialist:** domeinen en handles echt opvragen (Marketing, alleen kijken) zodra er een besluit is om iets vast te leggen.
+- **Open punt vóór de formele check:** een handmatige TMview-zoekopdracht op *Polderlight* (en *Polder Light*) in een gewone browser (€ 0, ± 15 minuten, klassen 9, 28, 41, 42), zodat de specialist niet blind start. **Eigenaar:** de CEO (de agents bereiken TMview niet); de EP zet de stap klaar. **Moment:** vóór de offerte-aanvraag bij de specialist. De uitkomst (treffers of "0", met datum) komt in #97 of het offerte-issue; de BLA verwerkt die in dit document.
+- **Herhaalcheck vóór de eerste publicatie:** de vaste stap uit `naamcheck-wraithstep.md` §5.1 geldt ook voor *Polderlight* (games, registers 9/28/41/42 op nieuwe aanvragen, domeinen en handles, ≤ 2 weken vóór publicatie), als DoD-punt dat de eerste publicatie blokkeert.
+- **Domeinen en handles:** eigenaar volgens §5.1 van `naamcheck-wraithstep.md`: domeinen via RDAP door de **BLA** (nu door de tool geweigerd, §5), **.gg** en handles door de **CEO** in een gewone browser, gebundeld met het besluit over de eerste publicatie. Registreren is een aparte beslissing.
 
 ## 7. Definition of Done (#97)
 
