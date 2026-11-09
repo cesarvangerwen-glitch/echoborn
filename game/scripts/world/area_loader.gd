@@ -12,7 +12,14 @@ extends Node
 ##   net als respawn en Loslaten.
 ## - Geladen zijn de kamer van P1 en al zijn buren (E-04a, minimum), behalve
 ##   kamers die een test of het debugmenu geforceerd uit zet.
-## - P2 en de echo veroorzaken nooit een kamerwissel (E-04e).
+## - P2 en de echo veroorzaken nooit een kamerwissel (E-04e). Staat het
+##   middelpunt van P2 in een kamer die niet geladen is, dan meldt de loader
+##   dat één keer (`partner_in_ontladen_kamer`); keuze (c) in ontwerp.md §3a:
+##   dat telt als "uit de kamer vallen" (C-06).
+## - Objecten (`SimObject`) in de `inhoud` van een kamer worden bij het laden
+##   bij de Sim aangemeld en bij het ontladen afgemeld (R10). Een object met
+##   een blijvende stand (een hendel) bewaart die als vlag in `game_state`
+##   (`<kamer_id>/<pad in de inhoud>`), zodat hij na opnieuw laden terugkomt.
 ##
 ## Geen eigen `_physics_process`: de Sim roept `sim_track` aan na stap (3)
 ## van E-07b, vóór de echo de resets van P1 verwerkt. Een wijziging in wat
@@ -22,18 +29,34 @@ extends Node
 
 const Kamer = preload("res://scripts/world/kamer.gd")
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
+const SimObject = preload("res://scripts/objects/sim_object.gd")
 
 ## P1 ging van kamer `van` naar `naar`. `reset` = geen buur (E-04a).
 signal kamer_gewisseld(tick: int, van: StringName, naar: StringName, reset: bool)
 ## Een kamer werd geladen of niet meer geladen.
 signal geladen_gewijzigd(tick: int, kamer: StringName, geladen: bool)
+## Het middelpunt van P2 kwam deze tick in een kamer die niet geladen is
+## (keuze (c), §3a). Eén keer per keer; weer in een geladen kamer of weg uit
+## het spel = opnieuw gewapend. De Gameplay Programmer koppelt hier C-06 aan.
+signal partner_in_ontladen_kamer(tick: int, p2: PlayerActor, kamer: StringName)
 
 ## Alle kamers op id, in de volgorde van toevoegen.
 var kamers: Dictionary = {}
 ## De kamer van P1 (E-04e), of &"" vóór `start`.
 var huidige: StringName = &""
 
+## De Sim (gezet door `Sim.set_area_loader`). Zonder Sim worden objecten in
+## gestreamde inhoud niet aangemeld en wordt P2 niet gevolgd.
+var sim: Node = null
+## Waar blijvende standen van objecten in gestreamde inhoud heen gaan
+## (`GameState`, R10). Null = niet bewaren: na opnieuw laden begint een
+## object dan in zijn standaardstand.
+var game_state: RefCounted = null
+
 var _order: Array[StringName] = []
+## Per kamer de aangemelde objecten uit zijn inhoud, in boomvolgorde.
+var _objects: Dictionary = {}
+var _partner_outside := false
 var _forced_unloaded: Dictionary = {}
 var _last_tick := -1
 
@@ -84,16 +107,42 @@ func validate() -> PackedStringArray:
 	return errors
 
 
-## Begint in de kamer van `position` (of in `kamer_id` als die gegeven is,
-## bv. uit een save). Geen kamerwissel en geen reset: de echo begint toch
-## Leeg. Geeft de fouten van `validate` terug en logt ze.
+## Begint in `start_room(position, kamer_id)`: de kamer uit de save, of de
+## kamer van `position`. Geen kamerwissel en geen reset: de echo begint toch
+## Leeg. Geeft de fouten van `start_errors` terug en logt ze.
 func start(tick: int, position: Vector2, kamer_id: StringName = &"") -> PackedStringArray:
-	var errors := validate()
+	var errors := start_errors(position, kamer_id)
 	for error in errors:
 		push_error("AreaLoader: %s" % error)
-	huidige = kamer_id if kamer_id != &"" and kamers.has(kamer_id) else room_at(position)
+	huidige = start_room(position, kamer_id)
 	_last_tick = tick
 	_apply_loaded(tick)
+	return errors
+
+
+## De startkamer: `kamer_id` als die bestaat, anders de kamer van
+## `position` (&"" als die in geen enkele kamer ligt).
+func start_room(position: Vector2, kamer_id: StringName = &"") -> StringName:
+	if kamer_id != &"" and kamers.has(kamer_id):
+		return kamer_id
+	for id in _order:
+		if (kamers[id] as Kamer).contains(position):
+			return id
+	return &""
+
+
+## Fouten bij het starten, zonder iets te veranderen: die van `validate`,
+## plus een onbekende `kamer_id` (dan geldt de kamer van de positie), een
+## `position` die niet in `kamer_id` ligt, en geen startkamer (dan is niets
+## geladen). Leeg = in orde.
+func start_errors(position: Vector2, kamer_id: StringName = &"") -> PackedStringArray:
+	var errors := validate()
+	if kamer_id != &"" and not kamers.has(kamer_id):
+		errors.append("startkamer '%s' bestaat niet; de kamer van de positie geldt" % kamer_id)
+	elif kamer_id != &"" and not (kamers[kamer_id] as Kamer).contains(position):
+		errors.append("startpositie %s ligt niet in startkamer '%s'" % [position, kamer_id])
+	if start_room(position, kamer_id) == &"":
+		errors.append("startpositie %s ligt in geen enkele kamer: niets geladen" % [position])
 	return errors
 
 
@@ -101,6 +150,12 @@ func start(tick: int, position: Vector2, kamer_id: StringName = &"") -> PackedSt
 ## deze tick een kamerwissel was.
 func sim_track(tick: int, p1: PlayerActor) -> bool:
 	_last_tick = tick
+	var switched := _track_p1(tick, p1)
+	_track_partner(tick)
+	return switched
+
+
+func _track_p1(tick: int, p1: PlayerActor) -> bool:
 	var naar := room_at(p1.global_position)
 	if naar == &"" or naar == huidige:
 		return false
@@ -115,6 +170,38 @@ func sim_track(tick: int, p1: PlayerActor) -> bool:
 	kamer_gewisseld.emit(tick, van, naar, reset)
 	_apply_loaded(tick)
 	return true
+
+
+## Keuze (c), §3a: P2 in een kamer die niet geladen is. Een P2 in geen enkele
+## kamer (een gat, keuze (a)) of een opgeloste P2 telt niet.
+func _track_partner(tick: int) -> void:
+	var p2: PlayerActor = sim.get_player(2) if sim != null else null
+	var kamer := &""
+	if p2 != null and not p2.dissolved:
+		kamer = room_at(p2.global_position)
+	var outside := kamer != &"" and not is_loaded(kamer)
+	if outside and not _partner_outside:
+		partner_in_ontladen_kamer.emit(tick, p2, kamer)
+	_partner_outside = outside
+
+
+## Staat P2 nu in een kamer die niet geladen is (stand van de laatste tick)?
+func is_partner_outside() -> bool:
+	return _partner_outside
+
+
+## Schrijft de blijvende standen van de objecten in alle geladen kamers naar
+## `game_state` (R10). Aanroepen vlak vóór een save; bij het ontladen van
+## een kamer gebeurt het vanzelf.
+func store_objects() -> void:
+	for id in _order:
+		if _objects.has(id):
+			_store(id)
+
+
+## De vlag in `GameState` voor een object in de inhoud van kamer `id`.
+static func object_flag(id: StringName, path_in_inhoud: NodePath) -> StringName:
+	return StringName("%s/%s" % [id, path_in_inhoud])
 
 
 func is_neighbour(a: StringName, b: StringName) -> bool:
@@ -181,11 +268,52 @@ func _apply_loaded(tick: int) -> void:
 		if want and kamer.inhoud != null:
 			kamer.inhoud_node = kamer.inhoud.instantiate()
 			kamer.add_child(kamer.inhoud_node)
+			_attach_objects(kamer)
 		elif not want and kamer.inhoud_node != null:
+			_detach_objects(kamer)
 			kamer.remove_child(kamer.inhoud_node)
 			kamer.inhoud_node.queue_free()
 			kamer.inhoud_node = null
 		geladen_gewijzigd.emit(tick, id, want)
+
+
+## R10: de objecten in de inhoud krijgen hun bewaarde stand terug en gaan
+## daarna, in boomvolgorde, bij de Sim. Ze doen dus in dezelfde tick al mee
+## in stap (4) en (5).
+func _attach_objects(kamer: Kamer) -> void:
+	var found: Array[SimObject] = []
+	for node in _walk(kamer.inhoud_node):
+		if node is SimObject:
+			found.append(node)
+	_objects[kamer.id()] = found
+	for object in found:
+		if game_state != null and object.has_persistent_state():
+			object.set_persistent_state(game_state.has_flag(_flag_of(kamer, object)))
+		if sim != null:
+			sim.add_object(object)
+
+
+func _detach_objects(kamer: Kamer) -> void:
+	if not _objects.has(kamer.id()):
+		return
+	_store(kamer.id())
+	for object: SimObject in _objects[kamer.id()]:
+		if sim != null:
+			sim.remove_object(object)
+	_objects.erase(kamer.id())
+
+
+func _store(id: StringName) -> void:
+	if game_state == null:
+		return
+	var kamer: Kamer = kamers[id]
+	for object: SimObject in _objects[id]:
+		if object.has_persistent_state():
+			game_state.set_flag(_flag_of(kamer, object), object.get_persistent_state())
+
+
+func _flag_of(kamer: Kamer, object: Node) -> StringName:
+	return object_flag(kamer.id(), kamer.inhoud_node.get_path_to(object))
 
 
 func _walk(node: Node) -> Array[Node]:

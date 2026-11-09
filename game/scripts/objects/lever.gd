@@ -7,7 +7,7 @@ signal changed(tick: int, on: bool, by: Node2D)
 
 enum Kind { WISSEL, EENMALIG }
 
-var kind: Kind = Kind.WISSEL
+@export var kind: Kind = Kind.WISSEL
 var on := false
 var _used := false
 
@@ -26,3 +26,18 @@ func interact(actor: Node2D, tick: int) -> void:
 			on = true
 			_used = true
 	changed.emit(tick, on, actor)
+
+
+## R10: de stand van een hendel blijft bewaard als zijn kamer ontlaadt; een
+## Eenmalige hendel die om is, blijft vast.
+func has_persistent_state() -> bool:
+	return true
+
+
+func get_persistent_state() -> bool:
+	return on
+
+
+func set_persistent_state(p_on: bool) -> void:
+	on = p_on
+	_used = p_on and kind == Kind.EENMALIG

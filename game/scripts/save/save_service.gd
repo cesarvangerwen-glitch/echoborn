@@ -7,7 +7,9 @@ extends RefCounted
 ##   `user://` is de map die Steam Cloud synchroniseert.
 ## - Schrijven is atomair: eerst `<pad>.tmp`, dan wordt de vorige save
 ##   `<pad>.bak`, dan wordt `.tmp` de save. Een crash halverwege laat altijd
-##   een leesbare save of back-up achter; `read` valt terug op `.bak`.
+##   een leesbare save of back-up achter; `read` valt terug op `.bak`. Is de
+##   vorige save zelf kapot, dan blijft de bestaande `.bak` staan (een
+##   kapotte save vervangt nooit een goede back-up).
 ## - Oudere versies gaan stap voor stap door `migrate` (versie n → n + 1).
 ##   Een save van een nieuwere versie wordt geweigerd, nooit half gelezen.
 ## - Deterministisch: gesorteerde sleutels, getallen op volle precisie, geen
@@ -56,7 +58,12 @@ static func write(path: String, state: GameState) -> Error:
 	if dir == null:
 		return DirAccess.get_open_error()
 	var bak := path + ".bak"
-	if FileAccess.file_exists(path):
+	if FileAccess.file_exists(path) and FileAccess.file_exists(bak) and not _is_good(path):
+		# De vorige save is kapot: weg ermee, de goede back-up blijft.
+		var dropped := dir.remove(path)
+		if dropped != OK:
+			return dropped
+	elif FileAccess.file_exists(path):
 		if FileAccess.file_exists(bak):
 			var removed := dir.remove(bak)
 			if removed != OK:
@@ -106,6 +113,13 @@ static func migrate(data: Dictionary, errors: PackedStringArray,
 		version += 1
 		current["version"] = version
 	return current
+
+
+## Is de save op `path` leesbaar tot een GameState (met de vaste migraties)?
+## Een save van een nieuwere versie telt als goed: die gooien we niet weg.
+static func _is_good(path: String) -> bool:
+	var result := _read_one(path, {}, VERSION)
+	return result["state"] != null or int(result["version"]) > VERSION
 
 
 static func _read_one(path: String, migrations: Dictionary, target: int) -> Dictionary:

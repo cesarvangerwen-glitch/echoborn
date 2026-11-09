@@ -55,10 +55,11 @@ Gebieden zijn losse scènes, zodat World & Level Designers parallel kunnen werke
 
 ## 3a. Kamers en AreaLoader (T5b, #82)
 
-**Werkaanname** (fasekader §5): de regels E-04, E-04a en E-04e en FK-3 uit `gdd.md` v0.4 (T3a, #67); co-op volgens besluit #51 (7A): P2 veroorzaakt nooit een kamerwissel; de staart D = 90 / 120 / 180 ticks (#51, 8A). Waar de gdd niets zegt, kiest de TD, ter bevestiging door de Lead Game Designer:
+**Werkaanname** (fasekader §5): de regels E-04, E-04a en E-04e en FK-3 uit `gdd.md` v0.4 (T3a, #67); co-op volgens besluit #51 (7A): P2 veroorzaakt nooit een kamerwissel; de staart D = 90 / 120 / 180 ticks (#51, 8A). Waar de gdd niets zegt, kiest de TD; de Lead Game Designer bevestigde (a) en (b) ([#82](https://github.com/cesarvangerwen-glitch/echoborn/issues/82)), (c) wacht op zijn bevestiging:
 
 - **(a)** Ligt het middelpunt van P1 in geen enkele kamer (een gat in de indeling), dan blijft de vorige kamer gelden: geen wissel. Ligt frame `p` in geen enkele kamer, dan is de echo níét Buiten. De indeling hoort alle looppaden te dekken; een doorgang hoort bij één van beide kamers.
 - **(b)** Wat geladen is, verandert in de AreaLoader-stap direct na stap (3) van E-07b. In stap (1) en (2) van die tick gold nog de vorige stand; de echo controleert direct na de wissel opnieuw, zodat hij in stap (4) en (5) al Buiten is.
+- **(c)** (deel 2) Ligt het middelpunt van P2 na stap (3) in een kamer die niet geladen is, dan telt dat als "uit de kamer vallen" (C-06): P2 lost op die tick op en verschijnt 120 ticks later naast P1 (C-03). Zonder deze regel zou P2 in een kamer zonder geometrie vallen tot de leiband (C-07) na 60 ticks ingrijpt. P2 in geen enkele kamer (een gat) volgt (a): niets. De AreaLoader meldt het (signaal `partner_in_ontladen_kamer`, één keer per keer); het oplossen zelf hoort bij C-06 (Gameplay Programmer, zie §12).
 
 ### Onderdelen
 
@@ -67,7 +68,8 @@ Gebieden zijn losse scènes, zodat World & Level Designers parallel kunnen werke
 | `scripts/world/kamer.gd` | Een `Kamer` (E-04e): een `Area2D` met een rechthoek uit zijn eerste `CollisionShape2D` met een `RectangleShape2D`, een `kamer_id`, een lijst `buren` en optioneel `inhoud` (een `PackedScene` die meestreamt). De rechthoek is ook de camerazone. De Area2D staat op geen laag en monitort niets: gameplay gebruikt alleen de puntcontrole `contains`, halfopen (linker- en bovenrand horen bij de kamer), dus elk punt hoort bij hooguit één kamer. |
 | `scripts/world/area_loader.gd` | Kamer van P1, kamerwissel, welke kamers geladen zijn, de inhoud laden en ontladen, en `validate()`. Geen eigen `_physics_process`. |
 | `scripts/echo/tail_echo.gd` | Buiten (`is_outside()`) en de reset bij een kamerwissel naar een kamer die geen buur is (`EchoReset.ROOM`). |
-| `scripts/sim.gd` | `set_area_loader()`; roept `area_loader.sim_track(tick, P1)` aan na stap (3). Zonder loader is alles één geladen kamer, zoals vóór T5b. |
+| `scripts/sim.gd` | `set_area_loader()` (geeft de loader ook de Sim); roept `area_loader.sim_track(tick, P1)` aan na stap (3). `add_object` laat een object dat al in de boom staat waar het is; `remove_object` meldt af (ook uit Combat; een merk op een vijand dooft). Zonder loader is alles één geladen kamer, zoals vóór T5b. |
+| `scripts/objects/sim_object.gd` | `owner_layers` en `shape` zijn geëxporteerd, zodat een object in een scène kan staan. `has_persistent_state()` / `get_persistent_state()` / `set_persistent_state()`: een stand die bewaard blijft als de kamer ontlaadt (standaard geen; de hendel bewaart `on`). |
 
 ### Per tick
 
@@ -82,7 +84,12 @@ Gebieden zijn losse scènes, zodat World & Level Designers parallel kunnen werke
             buur       -> geen reset
             geen buur  -> P1.echo_reset = ROOM (als er nog geen reset was)
         geladen = kamer van P1 + zijn buren, min geforceerd ontladen;
-                  inhoud erin of eruit, in de volgorde van toevoegen
+                  inhoud erin of eruit, in de volgorde van toevoegen:
+                  erin  -> objecten krijgen hun stand uit GameState en
+                           gaan (in boomvolgorde) bij de Sim
+                  eruit -> stand naar GameState, objecten uit de Sim,
+                           dan de inhoud weg
+        P2 nu in een kamer die niet geladen is -> partner_in_ontladen_kamer
     echo.sim_after_source(t): RELEASE breekt, RESPAWN/ROOM reset (E-04a–c);
         frame p nu in een ontladen kamer -> meteen Buiten
 (4) events   (5) objecten
@@ -95,10 +102,18 @@ Gebieden zijn losse scènes, zodat World & Level Designers parallel kunnen werke
 - **Validatie**: `validate()` geeft de fouten terug (dubbele id's, geen rechthoek, overlap, onbekende buur, buren die niet wederzijds zijn, een kamer die zijn eigen buur is); `start()` logt ze met `push_error`. Een kapotte indeling is dus bij het starten meteen zichtbaar, en in een test een FAIL.
 - **Streamen is in v1 synchroon**: de inhoud wordt in de tick zelf gemaakt (`instantiate`) of weggehaald (`remove_child` + `queue_free`), in vaste volgorde. Dat is deterministisch en genoeg voor de flow-kamer en de slice. In de flow-kamer zijn K1, K2 en K3 elkaars buren (FK-3), dus alles is altijd geladen en komt Buiten niet voor.
 - **Debugmenu en tests**: `force_unloaded(id, true)` zet een kamer uit (gdd §4.6, E-04a (4)).
+- **Startcontrole**: `start_errors(positie, kamer_id)` meldt naast `validate()` een onbekende startkamer (dan geldt de kamer van de positie), een positie die niet in de startkamer ligt, en een positie in geen enkele kamer (dan is niets geladen). `start` logt die fouten en geeft ze terug; `start_room` zegt welke kamer geldt.
+
+### Objecten in gestreamde kamers (deel 2, R10)
+
+- **Aan- en afmelden**: na het `instantiate` van de inhoud zoekt de loader alle `SimObject`-nodes in boomvolgorde en meldt ze bij de Sim aan; ze doen in dezelfde tick al mee in stap (4) en (5). Bij ontladen meldt hij ze eerst af, daarna gaat de inhoud weg. De volgorde in `Sim.objects` hangt zo alleen af van de volgorde van laden, dus blijft deterministisch.
+- **Stand bewaren**: een object met een blijvende stand (nu de hendel, E-13) bewaart die als vlag in `loader.game_state` (een `GameState`, §7) onder `<kamer_id>/<pad in de inhoud>` (`AreaLoader.object_flag`). Schema v1 hoeft daarvoor niet te veranderen: vlaggen zijn al "alleen ware vlaggen". Bij laden zet de loader de stand terug vóór het aanmelden, zonder signaal; wie op een hendel reageert, leest `on` bij het laden. `store_objects()` schrijft de standen van de geladen kamers weg, vlak vóór een save. Zonder `game_state` begint een object na opnieuw laden in zijn standaardstand.
+- **Geen blijvende stand**: een drukplaat volgt de lichamen en begint na laden los. Vijanden (`CombatTarget`) mogen in de inhoud staan; afmelden haalt ze uit Combat en dooft hun merk, maar hun leven wordt niet bewaard (je laadt op een checkpoint, §7). Het gemaal bewaart zijn stand al apart in `GameState.gemalen` (LM-06) en hoort in de gebiedsscène, niet in gestreamde inhoud, tot T5b deel 3 het via de autoload koppelt.
+- **Niet tijdens stap (4) of (5)**: `force_unloaded` vanuit een signaal van een object (stap 4/5) zou de lijst objecten veranderen terwijl de Sim erdoor loopt. Het debugmenu roept het tussen twee ticks aan.
 
 ### Gebruik (World & Level Designer, #77)
 
-Zet per kamer een `Area2D` met `kamer.gd` en een `CollisionShape2D` met een `RectangleShape2D` in de gebiedsscène; vul `kamer_id` en `buren` in (altijd wederzijds). In het script van de scène: `loader.collect(gebied)`, `sim.set_area_loader(loader)` en `loader.start(sim.tick, p1.position)`, na het plaatsen van P1. Het resultaat van `start` is de lijst fouten (leeg = goed). Nog niet in v1: objecten (`SimObject`) in gestreamde inhoud; die horen voorlopig in de gebiedsscène zelf (zie §12).
+Zet per kamer een `Area2D` met `kamer.gd` en een `CollisionShape2D` met een `RectangleShape2D` in de gebiedsscène; vul `kamer_id` en `buren` in (altijd wederzijds). In het script van de scène: `loader.collect(gebied)`, `sim.set_area_loader(loader)` en `loader.start(sim.tick, p1.position)`, na het plaatsen van P1. Het resultaat van `start` is de lijst fouten (leeg = goed). Objecten (`SimObject`) mogen in de `inhoud` van een kamer staan (deel 2); zet `loader.game_state` als hun stand moet blijven, en geef elk object een vaste naam (die zit in de vlag).
 
 ## 4. Echo-systeem
 
@@ -258,8 +273,8 @@ De Sim laat hooguit één schaduwlichaam toe: een echo óf P2. `add_echo` weiger
 
 **Schrijven en lezen** (`scripts/save/save_service.gd`, statisch):
 
-- **Atomair**: eerst `<pad>.tmp`, dan wordt de vorige save `<pad>.bak`, dan wordt `.tmp` de save. Een crash halverwege laat altijd een leesbare save of back-up achter; `read` valt terug op `.bak` en meldt de fout van de save zelf. De volgorde werkt ook op Windows, waar hernoemen over een bestaand bestand niet mag.
-- **Versies**: `migrate` brengt een save stap voor stap van versie n naar n + 1 (`builtin_migrations()`, nu leeg). Een save van een nieuwere versie, zonder versie of met een ontbrekende migratie wordt geweigerd, nooit half gelezen. `GameState.from_dict` controleert elk veld en elk type.
+- **Atomair**: eerst `<pad>.tmp`, dan wordt de vorige save `<pad>.bak`, dan wordt `.tmp` de save. Een crash halverwege laat altijd een leesbare save of back-up achter; `read` valt terug op `.bak` en meldt de fout van de save zelf, en negeert een achtergebleven `.tmp` (die kan half zijn); de volgende save overschrijft hem. Is de vorige save zelf kapot en is er een back-up, dan wordt de kapotte save weggegooid en blijft de back-up staan: een kapotte save vervangt nooit een goede back-up. De volgorde werkt ook op Windows, waar hernoemen over een bestaand bestand niet mag.
+- **Versies**: `migrate` brengt een save stap voor stap van versie n naar n + 1 (`builtin_migrations()`, nu leeg). Een save van een nieuwere versie, zonder versie of met een ontbrekende migratie wordt geweigerd, nooit half gelezen. `GameState.from_dict` controleert elk veld, elk type en het bereik: LP en speeltijd hele getallen ≥ 0, een vulstand een heel getal 0–100, een positie eindig, een vlag `true`/`false`.
 - **Deterministisch**: gesorteerde sleutels en getallen op volle precisie (`JSON.stringify(…, full_precision = true)`): dezelfde inhoud geeft hetzelfde bestand, en een positie komt exact terug.
 - **Laden op een checkpoint**: `AreaLoader.start(tick, checkpoint.positie, checkpoint.kamer)` begint in die kamer met zijn buren geladen, zonder kamerwissel.
 - `user://` is de map die Steam Cloud synchroniseert (Engine & Platform Programmer, nog te controleren op de Deck in T7).
@@ -332,8 +347,8 @@ Spelers maskeren 1 + 4, echo's 1 + 5. Zo kan een echo door een lichtmuur heen en
 | `test_echo_v04.gd` (12 tests) | Staart-echo v0.4: E-01, E-02 en E-03 (alle D), elke reset-oorzaak E-04, breken E-08a–d met E-08b, Loslaten E-09 |
 | `test_combat.gd` (20 tests) | E-10 en E-10a met de staart, schaduwmerk E-14, merksprong E-02m (incl. INTERACTIE op de opgenomen positie), C-11e, C-12 |
 | `test_meetlog.gd` (2 tests) | Meetlog deterministisch en volledig; stilstand MP-1 |
-| `test_area_loader.gd` (6 tests) | E-04a (1)–(5) en E-04e uit gdd §4.6: wissel naar een buur zonder reset en de echo door dezelfde doorgang (alle D), teleport naar een kamer die geen buur is = reset (alle D), Buiten bij een ontladen kamer (P1 valt door de plank, geen INTERACTIE), validatie, P2 wisselt nooit; streamen van inhoud en een doorloop door drie kamers zonder reset (FK-3, alle D) |
-| `test_save.gd` (4 tests) | Opslaan → laden exact en bytegelijk; back-up bij een kapotte save; versies en migratie; laden op een checkpoint in de goede kamer met een Lege echo |
+| `test_area_loader.gd` (10 tests) | E-04a (1)–(5) en E-04e uit gdd §4.6: wissel naar een buur zonder reset en de echo door dezelfde doorgang (alle D), teleport naar een kamer die geen buur is = reset (alle D), Buiten bij een ontladen kamer (P1 valt door de plank, geen INTERACTIE), validatie, P2 wisselt nooit; streamen van inhoud en een doorloop door drie kamers zonder reset (FK-3, alle D). Deel 2: objecten in gestreamde inhoud doen mee vanaf de tick van laden en zijn weg na ontladen, een Eenmalige hendel komt via GameState terug (R10); `remove_object` voor een vijand; P2 in een ontladen kamer wordt één keer gemeld (keuze (c)); de startcontrole |
+| `test_save.gd` (7 tests) | Opslaan → laden exact en bytegelijk; back-up bij een kapotte save; versies en migratie; laden op een checkpoint in de goede kamer met een Lege echo; een kapotte save vervangt geen goede back-up; een achtergebleven `.tmp` na een crash (twee crashpunten); bereikcontrole in `from_dict` |
 | `test_localization.gd` (7 tests) | Lokalisatie §8a: CSV geldig met Engels per sleutel, NL met dezelfde opmaakcodes als EN, elke gebruikte sleutel bestaat, geen harde spelerstekst in code of scènes (en de lint vangt die echt), taalkeuze, taalwissel EN/NL |
 
 De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gaven dezelfde posities.
@@ -351,7 +366,7 @@ De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gave
 | R6 | Geen CI: tests draaien alleen als een agent of mens ze start. | Risico | GitHub Actions-workflow met dezelfde download en hetzelfde commando. Vraagt een besluit over Actions-minuten (EP). |
 | R7 | Spike-code (blokje, `spike_world.gd`) is geen productiecode. | Schuld | Vervangen in preproductie. `Motor` wordt de echte speler-controller van de Gameplay Programmer, met de regels uit §2. |
 | R9 | De AreaLoader streamt synchroon (§3a). Een grote kamer kan bij het laden een hapering geven op de Steam Deck. | Risico | Meten in T7 (Engine & Platform Programmer). Zo nodig de buren van de buren vooraf laden met `ResourceLoader.load_threaded_request`; de logische regel (wat geladen is) blijft gelijk, dus de echo-tests ook. |
-| R10 | Objecten (`SimObject`) in gestreamde inhoud worden nog niet bij de Sim aan- en afgemeld, en hun stand gaat bij ontladen verloren. | Schuld | T5b deel 2: aanmelden bij laden, afmelden bij ontladen, de stand via `GameState`-vlaggen. Tot dan staan objecten in de gebiedsscène zelf. |
+| R10 | ~~Objecten (`SimObject`) in gestreamde inhoud worden nog niet bij de Sim aan- en afgemeld, en hun stand gaat bij ontladen verloren.~~ | Afgelost | T5b deel 2 (§3a): aanmelden bij laden, afmelden bij ontladen, de stand via `GameState`-vlaggen; bewezen door `test_r10_objects_in_streamed_rooms`. Rest: het gemaal in gestreamde inhoud (deel 3). |
 
 ## 11. Open vragen
 
@@ -366,7 +381,8 @@ De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gave
 ## 12. Open punten
 
 - **Tools Programmer:** (1) de Node 20-waarschuwing van de `@v4`-actions in `tests.yml` oplossen; (2) in de meta-run (`.github/ci/test_meta_broken.gd`) een geval toevoegen voor een scriptfout in een script waar een test van afhangt, vóór de eerste test: de runner vangt dat sinds #82 op (§9), de meta-run bewaakt het nog niet.
-- **Lead Game Designer:** de keuzes (a) en (b) uit §3a bevestigen of wijzigen.
+- **Lead Game Designer:** de keuze (c) uit §3a (P2 in een ontladen kamer = C-06) bevestigen of wijzigen
+- **Gameplay Programmer (C-06):** het oplossen van P2 koppelen aan `AreaLoader.partner_in_ontladen_kamer` (keuze (c), §3a), samen met de andere oorzaken van C-06.
 - **Gameplay Programmer (T16c):** `valid_from` (`geldig_vanaf`) staat op de `TailEcho`-node en gaat verloren als C-01 hem weghaalt; E-09 in co-op en C-05 vragen dat hij bij P1 hoort.
-- **T5b, volgende delen** (Technical Director met de Engine & Platform Programmer): (2) objecten in gestreamde inhoud (R10) en een P2 in een kamer die niet geladen is (co-op, C6); (3) de autoloads `GameState` en `SaveService` met slots, checkpoint-objecten en autosave, Steam Cloud op de Deck, en zo nodig threaded laden (R9).
+- **T5b, volgend deel** (Technical Director met de Engine & Platform Programmer): (3) de autoloads `GameState` en `SaveService` met slots, checkpoint-objecten en autosave (met `AreaLoader.store_objects()` vlak vóór elke save), het gemaal in gestreamde inhoud, Steam Cloud op de Deck, en zo nodig threaded laden (R9).
 

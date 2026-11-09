@@ -155,3 +155,88 @@ func test_save_load_starts_in_saved_room(t) -> void:
 		"echo op tick 120 niet Actief op het checkpoint (%s)" % echo.position)
 	t.check(switches.is_empty(), "kamerwissel bij laden: %s" % [switches])
 	_clear()
+
+
+func _write_text(path: String, text: String) -> void:
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	file.store_string(text)
+	file.close()
+
+
+## SM-punt (#82): is de save kapot terwijl er een goede back-up is, dan
+## vervangt de volgende save die back-up níét door het kapotte bestand. Is
+## de vorige save goed, dan wordt die zoals altijd de back-up.
+func test_save_broken_save_keeps_good_backup(t) -> void:
+	_clear()
+	var path := SaveService.slot_path(4, DIR)
+	var a := _state()
+	var b := _state()
+	b.lichtmeter = 10
+	var c := _state()
+	c.lichtmeter = 20
+	SaveService.write(path, a)
+	SaveService.write(path, b)
+	_write_text(path, "{\"version\": 1, \"gebied\": ")
+	t.check(SaveService.write(path, c) == OK, "schrijven na een kapotte save mislukt")
+	var now := SaveService.read(path)
+	t.check(now["state"] != null and now["state"].equals(c) and not now["from_backup"], "nieuwe save niet geladen")
+	var bak := SaveService.read(path + ".bak")
+	t.check(bak["state"] != null and bak["state"].equals(a), "goede back-up vervangen: %s" % bak["errors"])
+	SaveService.write(path, a)
+	var rotated := SaveService.read(path + ".bak")
+	t.check(rotated["state"] != null and rotated["state"].equals(c), "goede vorige save werd geen back-up")
+	_clear()
+
+
+## Crashpad: een crash laat een `.tmp` achter. (1) Na het schrijven van .tmp
+## (half of heel): `read` negeert hem en geeft de save; de volgende save
+## overschrijft hem en laat hem niet staan. (2) Na "save → .bak", vóór
+## ".tmp → save": `read` geeft de back-up; de volgende save herstelt alles.
+func test_save_crash_leaves_tmp(t) -> void:
+	_clear()
+	var path := SaveService.slot_path(5, DIR)
+	var a := _state()
+	var b := _state()
+	b.lichtmeter = 10
+	SaveService.write(path, a)
+	_write_text(path + ".tmp", "{\"version\": 1, \"gebi")
+	var one := SaveService.read(path)
+	t.check(one["state"] != null and one["state"].equals(a) and not one["from_backup"], "(1) half .tmp stoorde het lezen")
+	t.check(SaveService.write(path, b) == OK and not FileAccess.file_exists(path + ".tmp"), "(1) .tmp bleef staan")
+	t.check(SaveService.read(path)["state"].equals(b), "(1) nieuwe save niet geladen na een oude .tmp")
+	# (2) toestand na een crash tussen de twee hernoemingen.
+	var dir := DirAccess.open(DIR)
+	dir.remove(path + ".bak")
+	dir.rename(path, path + ".bak")
+	_write_text(path + ".tmp", "{\"version\": 1}")
+	var two := SaveService.read(path)
+	t.check(two["state"] != null and two["state"].equals(b) and two["from_backup"], "(2) back-up niet geladen")
+	t.check(SaveService.write(path, a) == OK and not FileAccess.file_exists(path + ".tmp"), "(2) schrijven mislukt")
+	t.check(SaveService.read(path)["state"].equals(a) and SaveService.read(path + ".bak")["state"].equals(b),
+		"(2) na herstel klopt save of back-up niet")
+	_clear()
+
+
+## SM-punt (#82): `from_dict` controleert ook het bereik. Grenzen (0, 100)
+## zijn goed; daarbuiten, of een breuk, of een vlag die geen bool is: null.
+func test_save_from_dict_checks_range(t) -> void:
+	var edge := _state().to_dict()
+	edge["lichtmeter"] = 0
+	edge["speeltijd_ticks"] = 0
+	edge["gemalen"]["gemaal_k3"]["vulstand"] = 100
+	var errors := PackedStringArray()
+	t.check(GameState.from_dict(edge, errors) != null and errors.is_empty(), "grenswaarden geweigerd: %s" % errors)
+	var cases := {
+		"lichtmeter": func(d: Dictionary) -> void: d["lichtmeter"] = -1,
+		"lichtmeter ": func(d: Dictionary) -> void: d["lichtmeter"] = 1.5,
+		"speeltijd_ticks": func(d: Dictionary) -> void: d["speeltijd_ticks"] = -60,
+		"vulstand": func(d: Dictionary) -> void: d["gemalen"]["gemaal_k3"]["vulstand"] = 101,
+		"vulstand ": func(d: Dictionary) -> void: d["gemalen"]["gemaal_k3"]["vulstand"] = 37.5,
+		"vlag": func(d: Dictionary) -> void: d["vlaggen"]["sluis_k3_open"] = "ja",
+	}
+	for name: String in cases:
+		var data := _state().to_dict()
+		(cases[name] as Callable).call(data)
+		errors = PackedStringArray()
+		t.check(GameState.from_dict(data, errors) == null and errors.size() == 1 and errors[0].contains(name.strip_edges()),
+			"%s buiten bereik niet geweigerd: %s" % [name, errors])
