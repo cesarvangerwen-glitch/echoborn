@@ -154,7 +154,7 @@ De EP opent deze vraag na de Lead-review als `ceo-beslissing`-issue, letterlijk 
 > **Van:** Creative Director (met Marketing & Community Manager)
 >
 > ## Probleem
-> Na besluit #61 zoeken we een nieuwe werktitel. Drie kandidaten zijn op 2026-11-09 groen op alle toetsen van de vindbaarheidstoets: 0 games op Steam, geen game-item in de top 10 van Google en YouTube, ze passen bij licht/schaduw en de Lage Landen en werken in Engels en Nederlands; bij B en C geeft Marketing een oranje waarschuwing voor NL/BE (`docs/business/naamkandidaten.md`). Nu kiezen houdt de merkcheck en de werktitel-issues #37–#40 in beweging.
+> Na besluit #61 zoeken we een nieuwe werktitel. Drie kandidaten zijn op 2026-11-09 groen op alle §3-criteria van de vindbaarheidstoets: 0 games op Steam, geen game-item in de top 10 van Google en YouTube, ze passen bij licht/schaduw en de Lage Landen en werken in Engels en Nederlands; bij B en C geeft Marketing een oranje waarschuwing voor NL/BE (`docs/business/naamkandidaten.md`). Nu kiezen houdt de merkcheck en de werktitel-issues #37–#40 in beweging.
 >
 > ## Vragen
 >
