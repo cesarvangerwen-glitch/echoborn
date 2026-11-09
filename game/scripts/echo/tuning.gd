@@ -36,3 +36,8 @@ static func _section(section: String) -> Dictionary:
 		push_error("Tuning: groep '%s' ontbreekt in %s" % [section, PATH])
 		return {}
 	return _data[section]
+
+
+## De groep `combat` (E-10a, E-14, E-02m, basisvijand §4.3).
+static func combat() -> Dictionary:
+	return _section("combat")

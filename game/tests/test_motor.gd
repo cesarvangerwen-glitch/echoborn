@@ -130,6 +130,43 @@ func _landing_tick(t, at: Vector2, segments: Array, echo_x := -1.0) -> int:
 	return tick
 
 
+## Coyote op een wereldvloer (6 ticks, 7 te laat) en geen tweede sprong na
+## het verlaten van de vloer: een sprong gebruikt de coyote-tijd op.
+func test_coyote_on_world_floor_and_no_double_jump(t) -> void:
+	# Verhoogde vloer tot x = 250 (bovenkant 340); P1 loopt eraf.
+	var block := Rect2(100, 340, 150, 60)
+	var start := Vector2(200, 340 - 15)
+	var sim = Fx.world(t)
+	Fx.block(t, "Ledge", block, Layers.WORLD)
+	var p1 := Fx.p1(sim, [[5, 0], [60, R]], start)
+	var rows := _log(sim, p1)
+	await t.run_ticks(sim, 50)
+	var leave := -1
+	for row: Dictionary in rows:
+		if row["tick"] > 5 and not row["floor"]:
+			leave = row["tick"]
+			break
+	await t.cleanup()
+	t.check(leave > 5, "P1 liep niet van de richel af")
+	for late in [6, 7]:
+		sim = Fx.world(t)
+		Fx.block(t, "Ledge", block, Layers.WORLD)
+		p1 = Fx.p1(sim, [[5, 0], [leave + late - 5, R], [1, R | J], [30, R]], start)
+		rows = _log(sim, p1)
+		await t.run_ticks(sim, leave + late + 5)
+		var ev: int = rows[leave + late]["ev"]
+		t.check((ev & Motor.EV_JUMP != 0) == (late == 6) and ev & Motor.EV_BOUNCE == 0,
+			"JUMP %d ticks na het verlaten van de vloer: events %d" % [late, ev])
+		await t.cleanup()
+	# Sprong van de vloer, 3 ticks later opnieuw JUMP (binnen 6 ticks): geen tweede sprong.
+	sim = Fx.world(t)
+	p1 = Fx.p1(sim, [[10, 0], [1, J], [2, 0], [1, J], [60, 0]])
+	rows = _log(sim, p1)
+	await t.run_ticks(sim, 60)
+	t.check(_count(rows, Motor.EV_JUMP) == 1, "%d sprongen (1: geen dubbelsprong)" % _count(rows, Motor.EV_JUMP))
+	t.note("vloer verlaten op tick %d" % leave)
+
+
 # --- E-05 ----------------------------------------------------------------
 
 ## Lagen en maskers volgens de tabel; P1 tegen licht-, door schaduwmuur; P2 omgekeerd.
@@ -334,6 +371,15 @@ func test_e07a_3_bounce_buffer_and_coyote(t) -> void:
 	var above_floor := Fx.FLOOR_TOP - (Fx.ON_ECHO_Y + 15.0 - top)
 	t.check(above_floor >= 98.0, "onderkant %.1f px boven de vloer (≥ 98)" % above_floor)
 	t.check(rows[30]["vel"].x == 0.0, "v.x veranderde door de bounce")
+	await t.cleanup()
+	# v.x blijft: P1 loopt over de echo en bounct in het lopen (v.x = 2).
+	sim = Fx.world(t)
+	_still_echo(t, sim, 300.0)
+	p1 = Fx.p1(sim, [[26, 0], [4, R], [1, R | J], [10, R]], Vector2(296, Fx.ON_ECHO_Y))
+	rows = _log(sim, p1)
+	await t.run_ticks(sim, 35)
+	t.check(rows[30]["ev"] & Motor.EV_BOUNCE != 0 and rows[30]["vel"].x == 2.0 and rows[31]["vel"].x == 2.0,
+		"bounce in het lopen: events %d, v %s / %s (v.x = 2)" % [rows[30]["ev"], rows[30]["vel"], rows[31]["vel"]])
 	await t.cleanup()
 	# Buffer: landingstick bepalen, dan JUMP 10 en 11 ticks ervoor.
 	var landing := await _landing_tick(t, Vector2(300, 280), [], 300.0)

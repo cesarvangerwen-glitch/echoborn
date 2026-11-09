@@ -6,6 +6,8 @@ extends CharacterBody2D
 var tick_events := 0
 ## Klaar met afspelen; de Sim haalt hem dan na de tick uit zijn lijst.
 var finished := false
+## Het gevechtssysteem van de Sim (`combat.gd`), gezet door `Sim.add_echo`.
+var combat: RefCounted = null
 
 
 ## Bezet deze echo de plaats van de echo (C-01)?

@@ -16,6 +16,8 @@ const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 const EchoBody = preload("res://scripts/echo/echo_body.gd")
 const SimObject = preload("res://scripts/objects/sim_object.gd")
 const GameEvents = preload("res://scripts/events/game_events.gd")
+const Combat = preload("res://scripts/combat/combat.gd")
+const CombatTarget = preload("res://scripts/combat/combat_target.gd")
 
 ## Vlak vóór elke stap van een actor of object. `phase` is de stap uit E-07b:
 ## "1", "2", "3", "4" of "5". Bedoeld voor tests en debug-overlays; zonder
@@ -35,6 +37,8 @@ var tick := 0
 var players: Array[PlayerActor] = []
 var echoes: Array[EchoBody] = []
 var objects: Array[SimObject] = []
+## Aanval, schaduwmerk en kettingen (E-10a, E-14, E-02m, C-12).
+var combat := Combat.new()
 
 
 ## Voegt een speler toe als C-01 dat toelaat: één P1 en hooguit één andere
@@ -79,6 +83,9 @@ func add_echo(echo: EchoBody) -> bool:
 	if not can_add_echo():
 		return false
 	echoes.append(echo)
+	echo.combat = combat
+	if "tail_ticks" in echo:
+		combat.tail_ticks = echo.tail_ticks
 	add_child(echo)
 	return true
 
@@ -100,6 +107,9 @@ func remove_echo(echo: EchoBody) -> void:
 
 func add_object(object: SimObject) -> void:
 	objects.append(object)
+	if object is CombatTarget:
+		combat.add_target(object)
+		object.hit_player.connect(_on_enemy_hit_player)
 	add_child(object)
 
 
@@ -131,6 +141,8 @@ func shadow_bodies() -> Array[Node2D]:
 
 
 func _physics_process(delta: float) -> void:
+	# (0) merken die gedoofd zijn of op een dood doel zaten, gaan weg (E-14b).
+	combat.begin_tick(tick)
 	# (1) de schaduw. Echo's zetten hun frame; P2 stapt en wordt opgenomen.
 	for echo in echoes:
 		actor_stepping.emit(tick, "1", echo)
@@ -158,9 +170,14 @@ func _physics_process(delta: float) -> void:
 	for echo in echoes:
 		if echo.is_present():
 			_run_events(echo, echo.tick_events)
+			# E-02m: de echo laat op tick t + 3 zijn doelmerk ontploffen.
+			if "detonate_mark" in echo and echo.detonate_mark != null:
+				combat.detonate(tick, echo.detonate_mark)
 	for player in players:
 		if player.player_index != 1:
 			_run_events(player, player.tick_events)
+	# Kettingschakels van deze tick (E-14d), na alle events.
+	combat.after_events(tick)
 	# (5) objecten, in de volgorde van toevoegen, met de lichamen van deze tick.
 	var present := bodies()
 	for object in objects:
@@ -192,7 +209,24 @@ func _execute(kind: int, actor: Node2D) -> void:
 		target = _interaction_target(actor)
 		if target:
 			target.interact(actor, tick)
+	elif kind == GameEvents.ATTACK:
+		# E-10a: aanvalsvlak in de (opgenomen) kijkrichting, 1 tick actief.
+		var facing := 1
+		var attacker := "echo"
+		if actor is PlayerActor:
+			facing = (actor as PlayerActor).motor.facing
+			attacker = "p%d" % (actor as PlayerActor).player_index
+		elif "facing" in actor:
+			facing = actor.facing
+		combat.attack(tick, attacker, (actor as CollisionObject2D).collision_layer,
+			actor.global_position, facing)
 	event_executed.emit(tick, kind, actor, target)
+
+
+## Een aanvalsvlak van een vijand raakte P1 (§4.3, LM-05).
+func _on_enemy_hit_player(hit_tick: int, player: Node2D) -> void:
+	if player is PlayerActor:
+		(player as PlayerActor).take_hit(hit_tick)
 
 
 ## E-10b: het object waarvan het interactievlak het lichaam nu overlapt en dat

@@ -12,12 +12,15 @@ const SpikeWorld = preload("res://scripts/world/spike_world.gd")
 const Layers = preload("res://scripts/world/layers.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
 const Zone = preload("res://scripts/objects/zone.gd")
+const CombatTarget = preload("res://scripts/combat/combat_target.gd")
 
 const FLOOR_TOP := 400.0
 ## Middelpunt van een lichaam (16 × 30) dat op de vloer staat.
 const STAND_Y := FLOOR_TOP - 15.0
 ## Bovenkant van een echo die op de vloer staat = waar P1 erop staat.
 const ON_ECHO_Y := STAND_Y - 30.0
+## Middelpunt van een doel (16 × 24) op de vloer.
+const TARGET_Y := FLOOR_TOP - 12.0
 
 
 ## Lege wereld met een vloer van x = -1000 tot 3000.
@@ -95,3 +98,30 @@ static func trace(sim: Node, nodes: Array) -> Array:
 		for i in nodes.size():
 			rows[i][tick] = (nodes[i] as Node2D).position)
 	return rows
+
+
+## Inputbron die de test per tick zet (`bits`), voor P1 en P2 in gevechtstests.
+class ManualInput:
+	extends RefCounted
+	var bits := 0
+
+	func sample(_tick: int) -> int:
+		return bits
+
+
+static func manual_player(sim: Node, index: int, at: Vector2) -> PlayerActor:
+	var player := PlayerActor.new()
+	player.setup(index, ManualInput.new(), Color.WHITE)
+	player.position = at
+	sim.add_player(player)
+	return player
+
+
+## Doel op de vloer met middelpunt op x (hurtbox 16 × 24, middelpunt y 388).
+static func target(sim: Node, kind: int, x: float, walks := false) -> CombatTarget:
+	var target_node := CombatTarget.new()
+	target_node.setup_target(kind)
+	target_node.walks = walks and kind == CombatTarget.Kind.ENEMY
+	target_node.position = Vector2(x, TARGET_Y)
+	sim.add_object(target_node)
+	return target_node
