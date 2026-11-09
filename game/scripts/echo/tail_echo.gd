@@ -5,8 +5,9 @@ extends "res://scripts/echo/echo_body.gd"
 ## schaduwplank (E-07, laag 6) en controleert elke tick of het oude pad nog
 ## klopt met de schaduwwereld (E-08); zo niet, dan breekt hij. Resets: breken,
 ## Loslaten, respawn en een wissel van D (E-04b–d). De enige afwijking van
-## het opgenomen pad is de merksprong (E-02m). Kamerwissels (E-04a/e) volgen
-## met de AreaLoader (T5b).
+## het opgenomen pad is de merksprong (E-02m). Kamerwissels (E-04a/e): een
+## wissel naar een kamer die geen buur is, is een reset; ligt frame `p` in een
+## kamer die niet geladen is, dan is de echo Buiten (zie `is_outside`).
 
 ## Breek-effect op `at` (E-08, E-09). De Art Director maakt het beeld.
 signal broke(tick: int, at: Vector2)
@@ -32,7 +33,16 @@ var source: PlayerActor
 ## D, de staartlengte in ticks (E-02). Wisselen via `set_tail_ticks`.
 var tail_ticks := 120
 ## `geldig_vanaf` (E-03): frames van vóór deze tick worden nooit afgespeeld.
-var valid_from := 0
+## De waarde hoort bij P1 (`PlayerActor.echo_valid_from`), niet bij deze node:
+## zo zetten Loslaten en respawn hem ook in co-op, als er geen echo is, en
+## neemt een nieuwe echo bij een drop-out hem over (E-09, C-04, C-05; TD-noot
+## PR #100).
+var valid_from: int:
+	get:
+		return source.echo_valid_from if source else 0
+	set(value):
+		if source:
+			source.echo_valid_from = value
 ## Opgenomen kijkrichting, steunsoort en animatie van het frame van nu.
 var facing := 1
 var support := 0
@@ -50,8 +60,17 @@ var detonate_mark: Combat.Mark = null
 var in_merksprong := false
 ## De opgenomen positie van frame `p` (bij een merksprong wijkt `position` af).
 var recorded_position := Vector2.ZERO
+## De AreaLoader van het gebied (gezet door de Sim), of null: dan is alles
+## geladen en komt Buiten niet voor (E-04a).
+var area_loader: Node = null
 
+## De tick van het AANVAL-event waarvan de lanceerhouding al een lancering gaf
+## (C-11d); die houding telt niet meer.
+var _stance_used_event := -1
+## Frame-index van nu in de recorder van P1, of -1 als de echo Leeg is.
+var _index := -1
 var _active := false
+var _outside := false
 var _bad_run := 0
 var _body_size := Vector2.ZERO
 var _has_valid := false
@@ -69,10 +88,13 @@ var _ms_out := 4
 var _ms_back := 8
 
 
+## `start_tick` zet `geldig_vanaf`; met -1 blijft de waarde van P1 staan
+## (drop-out, C-05).
 func setup(p_source: PlayerActor, color: Color, p_tail_ticks: int = -1, start_tick: int = 0) -> void:
 	source = p_source
 	tail_ticks = p_tail_ticks if p_tail_ticks > 0 else int(Tuning.echo()["tail_ticks"])
-	valid_from = start_tick
+	if start_tick >= 0:
+		valid_from = start_tick
 	name = "Echo%d" % source.player_index
 	collision_layer = 0
 	collision_mask = 0
@@ -96,6 +118,14 @@ func is_present() -> bool:
 	return _active
 
 
+## Buiten (E-04a): frame `p` ligt in een kamer die nu niet geladen is. Voor
+## de wereld hetzelfde als Leeg (onzichtbaar, geen botsing, geen plank, geen
+## events, geen controles), maar zonder reset: `valid_from` blijft staan.
+## Voor de meting telt Buiten als Leeg (MP-4: `state_changed` meldt Leeg).
+func is_outside() -> bool:
+	return _outside
+
+
 func stop() -> void:
 	finished = true
 	tick_events = 0
@@ -110,10 +140,37 @@ func set_tail_ticks(p_tail_ticks: int, tick: int) -> void:
 	reset(tick)
 
 
+# --- drager (C-09, C-11, C-13): de solo-echo als tweede lichaam -------------
+
+## Draagt de plank nu (C-09)? Actief en niet in een merksprong (E-02m).
+func carrier_valid() -> bool:
+	return _active and not finished and not in_merksprong
+
+
+## Lanceerhouding (C-11a): frame `p` was in houding, en die houding gaf nog
+## geen lancering (C-11d).
+func carrier_in_stance(_tick: int) -> bool:
+	if not carrier_valid() or _index < 0:
+		return false
+	var event := source.recorder.stance_event_tick(_index, int(Tuning.coop()["stance_hold_ticks"]))
+	return event >= 0 and event != _stance_used_event
+
+
+## C-11d: de houding eindigt op de lanceertick.
+func consume_stance(_tick: int) -> void:
+	if _index >= 0:
+		_stance_used_event = source.recorder.stance_event_tick(_index, int(Tuning.coop()["stance_hold_ticks"]))
+
+
+func carrier_facing() -> int:
+	return facing
+
+
 ## Zet `geldig_vanaf = tick` (E-04): de echo is meteen Leeg en verschijnt
 ## D ticks later op de plek waar P1 op `tick` stond.
 func reset(tick: int) -> void:
 	valid_from = tick
+	_outside = false
 	_bad_run = 0
 	_has_valid = false
 	tick_events = 0
@@ -130,12 +187,17 @@ func sim_step(tick: int, _delta: float) -> void:
 		return
 	var p := tick - tail_ticks
 	var index := source.recorder.index_of_tick(p) if p >= valid_from else -1
+	_outside = false
+	_index = index
 	if index < 0:
 		_end_merksprong()
 		_set_active(false, tick)
 		return
 	var rec := source.recorder
 	recorded_position = rec.post_position(index)
+	if not _frame_loaded():
+		_go_outside(tick)
+		return
 	facing = rec.facing(index)
 	support = rec.support(index)
 	anim = rec.anim(index)
@@ -225,8 +287,27 @@ func sim_after_source(tick: int) -> void:
 			if _active:
 				broke.emit(tick, position)
 			reset(tick)
-		PlayerActor.EchoReset.RESPAWN:
+		PlayerActor.EchoReset.RESPAWN, PlayerActor.EchoReset.ROOM:
 			reset(tick)
+	# E-04a: is de kamer van frame `p` deze tick net niet meer geladen (de
+	# AreaLoader liep vlak hiervoor), dan is de echo meteen Buiten, zodat hij
+	# in stap (4) en (5) niet meer meedoet.
+	if _active and not _frame_loaded():
+		_go_outside(tick)
+
+
+func _frame_loaded() -> bool:
+	return area_loader == null or area_loader.is_loaded_at(recorded_position)
+
+
+## Buiten (E-04a): als Leeg, zonder reset. Een merksprong stopt; de
+## breektolerantie begint opnieuw, want er zijn geen controles gedaan.
+func _go_outside(tick: int) -> void:
+	_outside = true
+	_bad_run = 0
+	detonate_mark = null
+	_end_merksprong()
+	_set_active(false, tick)
 
 
 func sim_end_tick() -> void:
@@ -245,7 +326,7 @@ func _breaks(recorded_on_floor: bool, path_checks: bool = true) -> bool:
 		_bad_run = 0
 		return _in_zone(space, at)
 	_free_query.transform = Transform2D(0.0, at)
-	var free := space.intersect_shape(_free_query, 1).is_empty()
+	var free := _is_free(space)
 	var supported := true
 	# E-08b: stond P1 op een schaduwlichaam, dan geen steuncontrole (zweven).
 	if recorded_on_floor and (support == Motor.Support.WORLD or support == Motor.Support.LIGHT):
@@ -258,6 +339,20 @@ func _breaks(recorded_on_floor: bool, path_checks: bool = true) -> bool:
 		if _bad_run >= _tolerance_ticks:
 			return true
 	return _in_zone(space, at)
+
+
+## E-08a (a): de vorm overlapt geen wereld- of schaduwgeometrie. Een
+## eenrichtingsrichel (laag 1, `one_way_collision`, gdd §4.1) telt niet: P1
+## springt er van onder doorheen, dus de echo ook (T16b, #77).
+func _is_free(space: PhysicsDirectSpaceState2D) -> bool:
+	for hit in space.intersect_shape(_free_query, 8):
+		var body := hit["collider"] as CollisionObject2D
+		if body == null:
+			return false
+		var owner_id := body.shape_find_owner(int(hit["shape"]))
+		if not body.is_shape_owner_one_way_collision_enabled(owner_id):
+			return false
+	return true
 
 
 ## E-08c: middelpunt in fel licht; E-08d: vorm raakt een schaduwgevaar.
@@ -319,27 +414,13 @@ func _is_zone(collider: Object, kind: Zone.Kind) -> bool:
 
 
 func _build_plank() -> void:
-	var thickness := float(Tuning.echo()["plank_thickness_px"])
-	plank = StaticBody2D.new()
-	plank.name = "Plank"
-	plank.collision_mask = 0
-	var shape := CollisionShape2D.new()
-	var rect := RectangleShape2D.new()
-	rect.size = Vector2(_body_size.x, thickness)
-	shape.shape = rect
-	shape.one_way_collision = true
-	shape.position = Vector2(0, (thickness - _body_size.y) * 0.5)
-	plank.add_child(shape)
-	add_child(plank)
+	plank = BodyBuilder.add_plank(self, _body_size, float(Tuning.echo()["plank_thickness_px"]))
 
 
 ## De plank moet in déze tick op zijn nieuwe plek staan in de physics-ruimte,
-## want P1 botst er in stap (2) mee via `move_and_slide`. Een node-transform
-## bereikt de ruimte pas na `_physics_process` (ontwerp.md §4a, R8); daarom
-## zetten we hem ook rechtstreeks in de PhysicsServer.
+## want P1 botst er in stap (2) mee via `move_and_slide`.
 func _sync_plank() -> void:
-	PhysicsServer2D.body_set_state(plank.get_rid(), PhysicsServer2D.BODY_STATE_TRANSFORM,
-		plank.global_transform)
+	BodyBuilder.sync_plank(plank)
 
 
 func _set_active(active: bool, tick: int) -> void:

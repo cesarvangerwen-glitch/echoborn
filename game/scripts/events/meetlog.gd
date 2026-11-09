@@ -115,6 +115,12 @@ func _on_tick(tick: int) -> void:
 		_add(tick, "SPRINGPLANK", str(_chain), "echo", _p1.position)
 	if ev & Motor.EV_BOUNCE:
 		_add(tick, "BOUNCE", str(maxi(_chain, 1)), "echo", _p1.position)
+	# C-13: een vang telt voor `n` als springplank-landing; C-11b: lancering.
+	if ev & Motor.EV_CATCH:
+		_chain = mini(_chain + 1, CHAIN_MAX)
+		_add(tick, "VANGEN", str(_chain), "echo", _p1.position)
+	if ev & Motor.EV_LAUNCH:
+		_add(tick, "LANCERING", str(maxi(_chain, 1)), "echo", _p1.position)
 	if ev & (Motor.EV_JUMP | Motor.EV_DASH):
 		_last_move_tick = tick
 	_update_still(tick)
