@@ -93,7 +93,9 @@ var _camera: Camera2D
 const CAMERA_EASE := 8.0
 ## Het kleinste camerabeeld (maximaal ingezoomd) in wereldpixels: de
 ## pixel-art-maat van besluit #18. Hoe groot dat op het scherm wordt, volgt uit
-## de rendergrootte (`camera_zoom`), niet uit een vaste venstermaat.
+## de rendergrootte (`camera_zoom`), niet uit een vaste venstermaat. Houd dit
+## beeld en `leash_view_px` op 16:9 voor pc én Deck: dan valt het logische
+## beeld samen met de leiband (C-07, perf-doc §7 punt 14).
 const BASE_VIEW_PX := Vector2(640, 360)
 var _scores: Array = []
 var _k3_tint: Polygon2D

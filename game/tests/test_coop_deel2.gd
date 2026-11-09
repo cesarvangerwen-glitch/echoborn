@@ -315,6 +315,7 @@ func test_120_zoom_follows_render_size(t) -> void:
 
 ## #120, runtime-pad: `_render_size` → `_camera.zoom`. De flow-kamer in een
 ## SubViewport van 640 × 400 krijgt na `_ready` zoom 1, in 1280 × 720 zoom 2.
+## Test alleen de startzoom na `_ready`, niet de easing in `_process`.
 func test_120_scene_zoom_in_subviewport(t) -> void:
 	for case in [[Vector2i(640, 400), 1.0], [Vector2i(1280, 720), 2.0]]:
 		var vp := SubViewport.new()
