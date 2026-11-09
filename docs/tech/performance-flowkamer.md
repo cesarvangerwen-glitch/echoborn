@@ -9,8 +9,8 @@ Gebaseerd op `docs/productie/fase-2-kader.md` §2 (T7), §3 (F5), §5; besluit #
 
 **Gemeten (llvmpipe, géén Deck):**
 - De Deck-build bestaat: preset `Steam Deck (Linux)` in `game/export_presets.cfg`, met de feature `deck` (1280×800, schermvullend, vsync aan). Een export (`.pck`) start, zet de Deck-instellingen en speelt de flow-kamer 300 frames zonder fouten.
-- De flow-kamer zoals hij nu is (grijs, geen 2D-licht) kost op llvmpipe **±3,5 ms GPU op 640×400** en **±10,3 ms op 1280×800**, met 16–22 draw calls per frame en ±32 MB geheugen.
-- Met het lichtbudget van de Technical Artist erbij kost het licht in de flow-kamer **±20 ms (20 LE, "verlichte wijk") en ±26 ms (30 LE, piek) op 640×400**. Dat is **±1,3× meer** dan de rekenregel uit `lichtmeting.md` §5 voorspelt (15 en 22,5 ms). Op native 1280×800 is het licht nog eens **±3,3–4,6× duurder**.
+- De flow-kamer zoals hij nu is (grijs, geen 2D-licht) kost op llvmpipe **±3,5 ms GPU op 640×400** en **±10,8 ms op 1280×800**, met 16–22 draw calls per frame en ±32 MB geheugen.
+- Met het lichtbudget van de Technical Artist erbij kost het licht in de flow-kamer **±20 ms (20 LE, "verlichte wijk") en ±26 ms (30 LE, piek) op 640×400**. Dat is **±1,3× (wijk20) en ±1,14× (piek30) meer** dan de rekenregel uit `lichtmeting.md` §5 voorspelt (15 en 22,5 ms). Op native 1280×800 is het licht nog eens **±3,3–4,6× duurder**.
 
 **Knelpunt (gemeten):** de build rendert nu op **native 1280×800**, niet op 640×400. De camera van de flow-kamer heeft een vaste zoom 2 voor een venster van 1280×720; met de wereld op 640×400 zou je maar 320×200 wereldpixels zien (§3). Het lichtbudget van #21 gaat uit van 640×400.
 
@@ -105,7 +105,7 @@ De tabel komt op stdout, een CSV in `user://deck_meting_<res>.csv` (pad wordt ge
 | Vraag | Antwoord |
 |---|---|
 | Is de flow-kamer zelf zwaar? | Nee. Zonder licht ±3,5 ms GPU op llvmpipe (640×400) en ≤ 22 draw calls. Op een GPU verwacht ik ruim onder 1 ms (aanname). |
-| Klopt de rekenregel van #21 in een echte kamer? | Grofweg, maar hij schat hier ±1,3× te laag: 19,9 ms gemeten voor 20 LE, waar 20 × 0,75 = 15 ms verwacht is. Mogelijke oorzaken: de grote lichten bedekken in deze kamer meer schermvlak, de saturatiepass kost op llvmpipe vooral CPU, de machine was gedeeld. Niet uitgezocht. |
+| Klopt de rekenregel van #21 in een echte kamer? | Grofweg, maar hij schat hier te laag: ±1,3× bij wijk20 (19,9 ms gemeten, 20 × 0,75 = 15 ms verwacht) en ±1,14× bij piek30 (25,6 ms gemeten, 22,5 ms verwacht). Mogelijke oorzaken: de grote lichten bedekken in deze kamer meer schermvlak, de saturatiepass kost op llvmpipe vooral CPU, de machine was gedeeld. Niet uitgezocht. |
 | Native of 640×400? | Native kost het licht **3,3–4,6×** zoveel (TA: 3,1–3,3×). 640×400 is op de Deck dus geen luxe maar nodig om het budget te halen (§3). |
 | CPU-render ≈ GPU | Op llvmpipe rendert de CPU zelf; die CPU-tijd zegt niets over de Deck. Op de Deck moet `cpu_ms` klein blijven (§6). |
 
@@ -193,8 +193,12 @@ done; done
 | 2 | **Camera die de rendergrootte volgt** (§3). **Besluit TD:** de Gameplay Programmer leidt de camerazoom af van de rendergrootte, direct na de merge van #116 en vóór T8a. Daarna zet de Engine & Platform Programmer de 5 `.deck`-instellingen uit §3 en draait D1–D4 opnieuw. | Gameplay Programmer; daarna Engine & Platform Programmer |
 | 3 | Herhalen op de slice (T8a), zodra die er is: zelfde script, met `FLOW_SCENE` naar de slice-scène. | Engine & Platform Programmer |
 | 4 | **Besluit TD:** akkoord op D1–D8 als definitie van "draait op Deck-specificaties", en op het lichtbudget van 3 ms GPU per frame (20 LE normaal, 30 LE piek; `lichtmeting.md` §7 punt 3). | Technical Director (besloten) |
-| 5 | Waarom de rekenregel van #21 hier ±1,3× te laag schat (§4.3). | Technical Artist |
+| 5 | Waarom de rekenregel van #21 hier ±1,14–1,3× te laag schat (§4.3). | Technical Artist |
 | 6 | Volledige `.x86_64`-build met export templates 4.6.3 (en later een buildscript in CI). Niet gemaakt: geen templates in deze omgeving. | Engine & Platform Programmer (met Tools Programmer voor CI) |
 | 7 | Niet gemeten: Vulkan-renderers, Windows-build via Proton, Deck OLED (90 Hz), Steam Input-integratie. | Engine & Platform Programmer |
 | 8 | Release-preset maken die `tools/perf/` en `prototypes/lichtmeting/` uitsluit (de Deck-preset houdt ze voor de meting). | Engine & Platform Programmer |
 | 9 | Fullscreen-modus 3 (`mode.deck=3`) houden; exclusieve fullscreen (modus 4) is niet getest. | Engine & Platform Programmer |
+| 10 | Geen CI-rooktest voor de export (`--export-pack`) of voor `tools/perf/deck_meting.gd` (de testrunner laadt `tools/` niet). | Engine & Platform Programmer (met Tools Programmer) |
+| 11 | D5 sluit laden uit van de 33 ms-grens, maar hapers door shadercompilatie bij het eerste licht zijn reëel; apart noteren en een eigen drempel bepalen. | Engine & Platform Programmer (met Technical Artist) |
+| 12 | Run B speelt de kamer zonder 2D-licht; verlicht wordt alleen via het meetscript (run A) gemeten. | Engine & Platform Programmer |
+| 13 | De omrekenfactor 10–30× rust op één gedeelde 2-vCPU-machine met twee runs per modus. | Engine & Platform Programmer (met Technical Artist) |
