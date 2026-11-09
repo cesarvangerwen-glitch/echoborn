@@ -3,7 +3,7 @@
 Versie 0.5.1 · Eigenaar: Lead Game Designer · Issue [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (T3c) · vorige versies: #6
 Werktitel *Polderlight* (besluit #96); repo en mappen heten nog "echoborn", de mechaniek heet "echo".
 Bronnen: `docs/concept/pitch.md` **v0.4** (pillars P1–P3, puzzeldefinitie en normen §4, R-V4), `docs/beslissingen.md` (#2 randvoorwaarden, #18 stijl 2D, **#51 deel 2**: 1A, 7A, 8A), `docs/productie/fase-2-kader.md` v0.2.
-De exacte regels staan in `docs/design/gdd.md` v0.6.1; de wereldstructuur en de slice in `docs/design/wereld.md`, de boss van de slice in `docs/design/gemaalmeester.md`. Dit document laat zien hoe ze in de loop passen, legt de aantallen en de terugkeerregels vast, toetst alles aan de pillars (§6) en zet op een rij wat de partner in co-op van de echo houdt (§7).
+De exacte regels staan in `docs/design/gdd.md` v0.6.2; de wereldstructuur en de slice in `docs/design/wereld.md`, de boss van de slice in `docs/design/gemaalmeester.md`. Dit document laat zien hoe ze in de loop passen, legt de aantallen en de terugkeerregels vast, toetst alles aan de pillars (§6) en zet op een rij wat de partner in co-op van de echo houdt (§7).
 
 **Werkaanname** (kader §5): CEO-besluiten #2 (5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12) en #51 deel 2, fasekader v0.2. Daarnaast **werkaanname LGD**: alle aantallen in §5 zijn een **maximum** en startwaarden van vóór F0. **4 gebieden** is sinds v0.5 een keuze van de LGD binnen #2 (`wereld.md` WS-01); de terugvaloptie met 3 gebieden staat in `wereld.md` §1.7.
 
