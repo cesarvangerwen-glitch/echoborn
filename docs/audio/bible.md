@@ -157,7 +157,7 @@ De finisher speelt jullie laatste 10 s versneld ×5 af in 120 ticks. Elke finish
 | `f2_merk_aftelling_carillon_placeholder.ogg` | Hetzelfde in Vorbis (q6), zoals Godot het zou laden |
 | `f2_spectrogram_placeholder.png` | Golfvorm en spectrogram met de momenten erop |
 | `losse-sfx/*_placeholder.wav` | De bouwstenen los: slag P1, echo-slag, merk zetten (grijs/kleur), aftelling 1–4 (grijs/kleur), merksprong, ontploffing k1 (grijs/kleur) en k3, merk dooft |
-| `losse-sfx/merk_levensduur_zonder_echo_grijs_placeholder.wav` | **Nieuw in v2:** één merk zonder echo, van zetten tot doven: slagen op tick 90, 105, 120, de zachte slag 4 op 135 (D + 15) en **doven op 150 (D + 30)** (§6.1, E-14b) |
+| `losse-sfx/merk_levensduur_zonder_echo_grijs_placeholder.wav` | **Nieuw in v2:** één merk zonder echo, van zetten tot doven: slagen op tick 90, 105, 120, de zachte slag 4 op 135 (D + 15) en **doven op 150 (D + 30)** (§6.1, E-14b). **Tick 0 = 0,1 s in het bestand**: het doven valt in het bestand dus op 2,6 s |
 | `bron/genereer_f2.py` | Het script dat alles maakt (± 10 s), met vaste seed; het print de metingen hieronder, ook die van ffmpeg ebur128 |
 
 **Opnieuw maken:** `python3 docs/audio/f2-fragment/bron/genereer_f2.py` vanaf de repo-root. Nodig: numpy, scipy; optioneel ffmpeg met libvorbis (OGG en de ebur128-meting) en matplotlib (spectrogram). Geen externe samples. De **WAV-bestanden zijn byte-gelijk** opnieuw te maken (vaste seed; twee runs gaven dezelfde hashes). De **OGG** en de PNG kunnen per ffmpeg- of matplotlib-build verschillen. Controle: `sha256sum` van de fragment-WAV = `b09aa64310188f997e46dcddf7fea1c8af0e8ced74dccd34fc4606d0c9609057` (numpy 2.5, scipy 1.18).
