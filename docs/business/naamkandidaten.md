@@ -1,20 +1,20 @@
 # Naamkandidaten: nieuwe werktitel in plaats van *Wraithstep*
 
-Versie 1.0 · 2026-11-09 · Eigenaar: Creative Director (toon en verhaal) · Vindbaarheidstoets: uitgevoerd door de Creative Director volgens de methode van de Marketing & Community Manager (`vindbaarheid-wraithstep.md` §1 en §3) · Issue: [#93](https://github.com/cesarvangerwen-glitch/echoborn/issues/93) · Lead-review: Executive Producer
+Versie 1.1 · 2026-11-09 · Eigenaar: Creative Director (toon en verhaal) · Vindbaarheidstoets: eerste ronde door de Creative Director volgens de methode van `vindbaarheid-wraithstep.md` §1 en §3, getoetst door de Marketing & Community Manager ([naloop op PR #95](https://github.com/cesarvangerwen-glitch/echoborn/pull/95#issuecomment-6742534650), met NL/BE-steekproef) · Issue: [#93](https://github.com/cesarvangerwen-glitch/echoborn/issues/93) · Lead-review: Executive Producer
 Hoort bij: besluit #61 (1A) · Bron: `docs/concept/pitch.md` v0.4 §6, `docs/business/vindbaarheid-wraithstep.md` §3, `docs/business/naamcheck.md` · Risico's: R15 (toon), R24 (vindbaarheid)
 
 > **Geen merkonderzoek.** Alleen gezocht en gelezen; niets geregistreerd, gereserveerd of gepubliceerd. TMview/WIPO en de formele merkcheck door een specialist volgen pas op de naam die de CEO kiest (besluit #24, 3A; #61).
 
 ## 1. Samenvatting
 
-| Naam | Steam | Top 10 Google | Top 10 YouTube | Licht/schaduw + Lage Landen | EN en NL | Toon PEGI 12 | Oordeel |
-|---|---|---|---|---|---|---|---|
-| **Sluicelight** ⭐ | 🟢 0 | 🟢 | 🟢 | 🟢 sluis + licht | 🟢 | 🟢 | **Groen, aanbeveling** |
-| **Poldershade** | 🟢 0 | 🟢 | 🟢 | 🟢 polder + schaduw | 🟢 (zie §4.2) | 🟢 | **Groen** |
-| **Polderlight** | 🟢 0 | 🟢 | 🟢 | 🟢 polder + licht | 🟢 | 🟢 | **Groen** |
-| Lowshade | 🟢 0 | 🟠 | 🟠 | 🟠 "Low" = Lage Landen alleen voor wie het weet | 🟠 | 🟢 | Oranje, niet in de CEO-vraag |
+| Naam | Steam | Top 10 Google | Top 10 YouTube | NL/BE (Marketing) | Licht/schaduw + Lage Landen | EN en NL | Toon PEGI 12 | Oordeel |
+|---|---|---|---|---|---|---|---|---|
+| **Sluicelight** ⭐ | 🟢 0 | 🟢 | 🟢 | 🟢 geen treffer met de naam | 🟢 sluis + licht | 🟢 | 🟢 | **Groen, aanbeveling** |
+| **Poldershade** | 🟢 0 | 🟢 | 🟢 | 🟠 bordspel *Polders: Flip & Write* bovenaan bij "polder… game" | 🟢 polder + schaduw | 🟢 (zie §4.2) | 🟢 | **Groen op §3, oranje waarschuwing NL/BE** |
+| **Polderlight** | 🟢 0 | 🟢 | 🟢 | 🟠 idem | 🟢 polder + licht | 🟢 | 🟢 | **Groen op §3, oranje waarschuwing NL/BE** |
+| Lowshade | 🟢 0 | 🟠 | 🟠 | niet getoetst | 🟠 "Low" = Lage Landen alleen voor wie het weet | 🟠 | 🟢 | Oranje op §3, niet in de CEO-vraag |
 
-Alleen de drie groene namen staan in de CEO-vraag (§6).
+Alle drie de namen in de CEO-vraag (§6) zijn groen op elk §3-criterium. Bij B en C staat de oranje NL/BE-waarschuwing expliciet in de optie; waarom dat geen §3-rood is, staat in §4.4.
 
 ## 2. Toetscriteria en werkwijze
 
@@ -47,11 +47,12 @@ Werkwijze: brainstorm van 23 namen (§5), geschrapt op toon en verhaal, daarna 1
 | | `"Sluice Light"` (twee woorden): het gebouw *Sluice* uit *Timberborn* (wiki) staat in de top 10. | 🟠 alleen bij twee woorden |
 | YouTube | `sluicelight`: 4 video's over lampen (Radlight, LuxeLight), geen game. `sluicelight game` / `sluicelight steam`: algemene gamevideo's (*007 First Light*, *Light Odyssey*), geen *Sluicelight*. | 🟢 |
 | itch.io | geen titel; zoekmachine verbetert naar *Slidelight*/*SlimeLight*. Bij `sluice`: o.a. *SLUICEKEEP — The Last Evacuation*, *Sluice That Goose!* | info |
+| NL/BE (Marketing) | Steam `cc=nl` en `cc=be`: 0, ook "Sluice Light"; zoekopdracht met NL/BE-sites: geen treffer met de naam. | 🟢 |
 | Lage Landen, licht/schaduw | sluis = de poldermachine; licht = de kernloop. Schaduw zit niet in het woord, wel in het verhaal. | 🟢 |
 | EN en NL | EN: *sluice* is een gewoon woord ("sloos-lait"). NL: *sluis* ligt er dichtbij; geen ongewenste betekenis. | 🟢 |
 | Toon PEGI 12 | rustig en hoopvol, geen water-ramp, geen spook. | 🟢 |
 
-**Aandachtspunten:** altijd **één woord** schrijven (Sluicelight), anders lekt het zoeken naar *Timberborn*. *Slylighter* en *SLUICEKEEP* meegeven aan Business/Legal voor de merkcheck.
+**Aandachtspunten:** altijd **één woord** schrijven (Sluicelight), anders lekt het zoeken naar *Timberborn*. Dat is een voorwaarde bij de keuze (zie optie A in §6). Gelijkende namen voor Business/Legal: zie §7.
 
 ### 3.2 Poldershade
 
@@ -63,6 +64,7 @@ Werkwijze: brainstorm van 23 namen (§5), geschrapt op toon en verhaal, daarna 1
 | Google | `Poldershade`: alleen uitleg over polders (Batavialand, Wikipedia, NH Nieuws). `"Poldershade" OR "Polder Shade" game`: bordspellen *Polders* (2011) en *Polders: Flip & Write* (2021), geen *Poldershade*. `"Polder Light" OR "Polder Shade"`: meubels (Vitra *Polder*-bank), lampenkappen. | 🟢 (lookalike bordspel bij "game", zie §4.1) |
 | YouTube | `poldershade`: muziek (*Poldoore - Shade*), verf, zonneschermen. `poldershade game`: willekeurige gamevideo's, geen *Poldershade*. `poldershade steam`: Steam-deals. | 🟢 |
 | itch.io | geen resultaten | info |
+| NL/BE (Marketing) | Steam `cc=nl`/`cc=be`: 0. Bij "polder… game" staat het bordspel *Polders: Flip & Write* bovenaan op NL/BE-sites (Lotana.be, Spellenwinkel.nl). Geen game met de naam *Poldershade*. | 🟠 waarschuwing |
 | Lage Landen, licht/schaduw | polder = de Lage Landen in één woord; *shade* = schaduw en schim (de sluiswachter). Vertelt de draai (de schaduw) het best. | 🟢 |
 | EN en NL | EN: duidelijk. NL: *polder* is eigen; een Nederlandse lezer kan *-shade* even als *schade* lezen ("polderschade"), zie §4.2. | 🟢, met kanttekening |
 | Toon PEGI 12 | *shade* is zachter dan *wraith*: een schim, geen wraakgeest. | 🟢 |
@@ -77,6 +79,7 @@ Werkwijze: brainstorm van 23 namen (§5), geschrapt op toon en verhaal, daarna 1
 | Google | `Polderlight`: alleen polder-uitleg (Wikipedia, Britannica, OpenStreetMap, Komoot). `"Polderlight" game`: bordspellen *Polders* en *Polders: Flip & Write*, *LD48 - Dikes & Polders*, *Dikes and Polders* (itch), *Farms and Polders Tycoon*; geen *Polderlight*. | 🟢 (lookalikes bij "game", zie §4.1) |
 | YouTube | `polderlight`: funderingen in Amsterdam, tulpen, *Polderburn* (Nederlands festival, geen game). `polderlight game`: andere games met "light" (*Radiolight*, *Anchor Light*). | 🟢 |
 | itch.io | geen titel (alleen *Posterlight*, *PolterFights*) | info |
+| NL/BE (Marketing) | Steam `cc=nl`/`cc=be`: 0; hetzelfde *Polders*-bordspel bovenaan bij "polder… game". Geen game met de naam *Polderlight*. | 🟠 waarschuwing |
 | Lage Landen, licht/schaduw | polder + licht: setting en kernloop. Geen schaduw in het woord. | 🟢 |
 | EN en NL | werkt in beide; NL-spelers herkennen het meteen. | 🟢 |
 | Toon PEGI 12 | warm en hoopvol; misschien te zonnig voor "duister maar niet gruwelijk". | 🟢 |
@@ -108,6 +111,9 @@ Wie `polder… game` zoekt, ziet bordspellen *Polders*. Dat is geen game-item of
 - **Sluicelight** vertelt de machine, de kernloop (licht oppompen) en de sluiswachter in één woord, en klinkt hoopvol zonder zoet te zijn. Beste balans tussen setting, verhaal en vindbaarheid.
 - **Poldershade** vertelt de draai (je schaduw) het best en blijft het dichtst bij de oude lezing van *Wraithstep* ("een schim die jouw stap zet"), maar mist het licht en heeft de *schade*-kanttekening.
 - **Polderlight** is het warmst en het meest Nederlands, maar het minst duister en vertelt de schaduw niet.
+
+### 4.4 Waarom B en C in de vraag blijven
+Het §3-criterium is "geen bestaand game-item of -personage, en geen game met die naam, in de top 10". *Polders: Flip & Write* is een bordspel met een andere naam; het gemeenschappelijke stuk is het gewone woord *polder*. Dat is dezelfde soort ruis als *Slylighter* bij A: een lookalike, geen bezetting. B en C halen §3 dus wel, en het oranje van Marketing is een waarschuwing over het thuispubliek, geen afkeuring. Ik houd ze in de vraag omdat de CEO zo kan kiezen tussen drie richtingen (machine en licht, schaduw, polder en licht). De lijst heeft geen vierde groene naam als vervanger: *Polderglow* viel af op toon en zou dezelfde *polder*-waarschuwing krijgen, en een nieuwe ronde kost een extra run. De waarschuwing staat letterlijk bij optie B en C, zodat de CEO er niet overheen leest. Ze steunt ook de ⭐ voor A.
 
 ## 5. Brainstorm en schrappen
 
@@ -141,21 +147,21 @@ Wie `polder… game` zoekt, ziet bordspellen *Polders*. Dat is geen game-item of
 
 ## 6. CEO-vraag (concept)
 
-De Executive Producer (of de CD na de Lead-review) opent deze vraag als `ceo-beslissing`-issue, letterlijk in dit format.
+De EP opent deze vraag na de Lead-review als `ceo-beslissing`-issue, letterlijk in dit format (zoals in `vindbaarheid-wraithstep.md` §3).
 
 > **Titel:** [CEO] Nieuwe werktitel in plaats van *Wraithstep*
 >
 > **Van:** Creative Director (met Marketing & Community Manager)
 >
 > ## Probleem
-> Na besluit #61 zoeken we een nieuwe werktitel. Drie kandidaten zijn op 2026-11-09 groen op alle toetsen: 0 games op Steam, geen game-item in de top 10 van Google en YouTube, ze passen bij licht/schaduw en de Lage Landen en werken in Engels en Nederlands (`docs/business/naamkandidaten.md`). Nu kiezen houdt de merkcheck en de werktitel-issues #37–#40 in beweging.
+> Na besluit #61 zoeken we een nieuwe werktitel. Drie kandidaten zijn op 2026-11-09 groen op alle toetsen van de vindbaarheidstoets: 0 games op Steam, geen game-item in de top 10 van Google en YouTube, ze passen bij licht/schaduw en de Lage Landen en werken in Engels en Nederlands; bij B en C geeft Marketing een oranje waarschuwing voor NL/BE (`docs/business/naamkandidaten.md`). Nu kiezen houdt de merkcheck en de werktitel-issues #37–#40 in beweging.
 >
 > ## Vragen
 >
 > **1. Welke naam wordt de nieuwe werktitel?**
-> - **A. Sluicelight** ⭐ Aanbevolen: licht door de sluis; vertelt de poldermachine, het licht oppompen en de sluiswachter; altijd als één woord; € 0.
-> - **B. Poldershade**: de schim van de polder; vertelt je schaduw het best, mist het licht, NL-lezers kunnen even "polderschade" lezen; € 0.
-> - **C. Polderlight**: het licht dat terugkomt in de polder; het warmst en meest Nederlands, het minst duister; € 0.
+> - **A. Sluicelight** ⭐ Aanbevolen: licht door de sluis (poldermachine, licht oppompen, sluiswachter); voorwaarde: altijd als één woord, anders lekt het zoeken naar *Timberborn*; € 0.
+> - **B. Poldershade**: de schim van de polder, vertelt je schaduw het best; 🟠 in NL/BE staat het bordspel *Polders* bovenaan bij "polder… game", en NL-lezers kunnen "polderschade" lezen; € 0.
+> - **C. Polderlight**: het licht dat terugkomt in de polder, het warmst en minst duister; 🟠 in NL/BE staat het bordspel *Polders* bovenaan bij "polder… game"; € 0.
 > - **D. Geen van drieën**: nieuwe ronde met jouw richting; ≈ 1–2 runs, € 0.
 >
 > ## Waarom deze aanbeveling
@@ -177,15 +183,14 @@ De Executive Producer (of de CD na de Lead-review) opent deze vraag als `ceo-bes
 
 ## 7. Beperkingen
 
-- **Google** is niet direct bevraagd; WebSearch draait vanuit de VS. Nederlandse en Belgische rankings kunnen afwijken. Een tweede zoekmachine met NL-regio (DuckDuckGo `kl=nl-nl`) gaf een verbindingsfout of geen uitvoer; die check kon dus niet.
-- **YouTube** via de publieke zoekpagina zonder account; volgorde kan per kijker verschillen. Bij sommige termen gaf YouTube minder dan 10 video's (bv. `sluicelight`: 4); dan zijn alle getoonde titels bekeken.
+- **Google** is niet direct bevraagd; WebSearch draait vanuit de VS. **NL/BE is deels gedaan** door Marketing: Steam met `cc=nl` en `cc=be`, en zoekopdrachten met `site:`-termen voor NL/BE. Het `site:`-filter werd niet strikt toegepast en een domeinfilter werd door de proxy geweigerd, dus er is geen echte NL/BE-ranking. Ook DuckDuckGo met `kl=nl-nl` gaf een verbindingsfout.
+- **YouTube** via de publieke zoekpagina zonder account; volgorde kan per kijker verschillen. Bij sommige termen gaf YouTube minder dan 10 video's (bv. `sluicelight`: 4); dan zijn alle getoonde titels bekeken. YouTube met NL/BE-regio leverde weinig of onbetrouwbare titels; daar geldt alleen "geen game-item gezien".
 - **Steam-API** toont max. 10 items; voor de finalisten was het resultaat 0, dus dat speelt niet.
 - Geen socials, Reddit, Twitch, domeinen of merkregisters doorzocht; dat hoort bij de stap ná de keuze (Business/Legal, Marketing).
-- De vindbaarheidstoets is door de Creative Director gedaan volgens de methode van Marketing; de Marketing & Community Manager kan hem in de review nalopen.
+- **Open punt voor Business/Legal (korte merkcheck):** de NL/BE-ranking op Google is niet volledig bekeken; neem die mee, met deze gelijkende namen: *Slylighter*, *SLUICEKEEP — The Last Evacuation*, *Sluice That Goose!*, *Timberborn* "Sluice" (bij A), *Polders* / *Polders: Flip & Write* (bij B en C).
 
 ## 8. Definition of Done (#93)
 
-- [x] Elke kandidaat getoetst met §3 van de vindbaarheidstoets; alleen groene namen in de vraag (§1, §3, §6)
-- [x] Vindbaarheid getoetst volgens de Marketing-methode, toon en verhaal door de CD (§3, §4.3)
-- [x] Naamvraag aan de CEO staat klaar als concept (§6); het issue volgt na de Lead-review
-- [x] TMview/WIPO en de merkcheck pas daarna (§6, "Wat wacht hierop")
+- [x] Elke kandidaat getoetst met §3 van de vindbaarheidstoets; alleen groene namen in de vraag (§1, §3, §4.4, §6)
+- [x] Marketing toetst de vindbaarheid, de CD de toon en het verhaal ([naloop Marketing](https://github.com/cesarvangerwen-glitch/echoborn/pull/95#issuecomment-6742534650); §3, §4.3)
+- [x] Naamvraag aan de CEO staat klaar; TMview/WIPO en de merkcheck pas daarna (§6, "Wat wacht hierop")
