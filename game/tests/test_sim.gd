@@ -210,6 +210,8 @@ func test_c01_never_more_than_two_bodies(t) -> void:
 	for i in 30:
 		walk.append_array([[50, R], [50, L]])
 	var p1 := _spawn_player(sim, PlayerActor.new(), 1, walk)
+	t.check(not sim.can_add_player(3) and not sim.can_add_player(0),
+		"index buiten 1–2 hoort altijd geweigerd te worden, ook solo (C-01)")
 	var stats := {"ticks": 0, "worst_shadow": 0, "worst_total": 0, "echo_in_coop": 0,
 		"solo_echo_ticks": 0, "coop_ticks": 0}
 	var on_tick := func(_tick: int) -> void:
@@ -250,6 +252,7 @@ func test_c01_never_more_than_two_bodies(t) -> void:
 			"uit":
 				sim.remove_player(p2)
 	sim.tick_finished.disconnect(on_tick)
+	t.check(sim.echoes.is_empty(), "%d afgespeelde echo's bleven in Sim.echoes" % sim.echoes.size())
 	t.check(stats["ticks"] == 3000, "sessie duurde %d ticks, verwacht 3000" % stats["ticks"])
 	t.check(stats["worst_shadow"] <= 1, "%d schaduwlichamen op één tick" % stats["worst_shadow"])
 	t.check(stats["worst_total"] <= 2, "%d lichamen op één tick" % stats["worst_total"])

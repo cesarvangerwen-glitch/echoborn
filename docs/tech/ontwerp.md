@@ -141,7 +141,7 @@ Een tick vertraging accepteren had gekund, maar dan loopt alles wat de echo bedi
 
 `test_objects.gd` legt alle drie vast: `test_plates_follow_bodies_on_the_same_tick` (0 ticks verschil) en `test_physics_space_lags_behind_direct_test` (1 en 2 ticks). Wordt die laatste rood na een engine-update, dan is de volgorde van Godot veranderd: dan herbekijkt de TD deze keuze.
 
-**Gevolg voor E-07a (schaduwplank, T16a):** P1 botst met de plank via `move_and_slide`, dus via de physics-ruimte. Een plank als `AnimatableBody2D` staat daar één tick achter. Advies: maak de plank een `StaticBody2D` en zet zijn positie in stap (1) ook met `PhysicsServer2D.body_set_state(rid, BODY_STATE_TRANSFORM, …)`; een statisch lichaam staat dan meteen goed (gemeten). De Gameplay Programmer bewijst dit met de E-07a-test.
+**Gevolg voor E-07a (schaduwplank, T16a):** P1 botst met de plank via `move_and_slide`, dus via de physics-ruimte. Een plank als `AnimatableBody2D` staat daar één tick achter. Advies, **te bewijzen in T16a**: maak de plank een `StaticBody2D` en zet zijn positie in stap (1) ook met `PhysicsServer2D.body_set_state(rid, BODY_STATE_TRANSFORM, …)`. In een losse probe (buiten de testsuite, Godot 4.6.3) vond een ruimte-query een zo verplaatst `StaticBody2D` in dezelfde tick, en een `AnimatableBody2D` pas de tick erna. Dat is nog niet bewezen met `move_and_slide` van P1 op de plank; dat doet de Gameplay Programmer met de E-07a-test.
 
 ### Events
 
@@ -149,10 +149,11 @@ Een tick vertraging accepteren had gekund, maar dan loopt alles wat de echo bedi
 - **De recorder neemt het eventmasker op** (`clip.events[k]`), ongeacht of het event bij P1 iets raakte (E-10). De echo voert het event van frame `p` uit tegen de **huidige** wereld, met zijn eigen laag (E-06).
 - **De Sim voert events uit in stap (4)**: eerst van P1, dan van de schaduw; binnen één actor in oplopende bitvolgorde. INTERACTIE bedient het object waarvan het vlak het lichaam overlapt en dat dit lichaam mag bedienen; bij meerdere het dichtstbijzijnde middelpunt, bij gelijke afstand het eerst toegevoegde (E-10b). Elk uitgevoerd event gaat uit als signaal `Sim.event_executed(tick, soort, actor, doel)`.
 - **Waar nieuwe regels inhaken.** Een nieuwe eventsoort (bv. het schaduwmerk van E-14 of de merksprong van E-02, T16a) krijgt het volgende vrije bit en een regel in `FROM_INPUT` of wordt door zijn eigen systeem gezet, en een tak in `Sim._execute`. Een echo die breekt (E-08) zet `tick_events` op 0 voor die tick. Een nieuw object erft van `SimObject` en implementeert `interact` en/of `sim_update`. Aanvallen (E-10a, E-14) zijn nog niet gebouwd: het event bestaat en wordt opgenomen, maar raakt nog niets.
+- **Open:** het bit `INTERACT` heeft nog geen InputMap-actie of toets; alleen gescripte input gebruikt het. Dat volgt met de volledige bitset in T16a.
 
 ### C-01 in de Sim
 
-De Sim laat hooguit één schaduwlichaam toe: een echo óf P2. `add_echo` weigert (`false`) zolang P2 meedoet of er al een echo speelt; doet P2 mee, dan haalt de Sim een spelende echo meteen weg. Een echo die niet afspeelt, heeft geen laag, is onzichtbaar en telt niet mee voor objecten (`EchoActor.is_present()`). Na zijn laatste frame blijft hij tot het einde van die tick, zodat objecten dat frame nog zien. Waar P2 verschijnt en wanneer de echo terugkomt (C-03, C-05), regelt de drop-in/drop-out (T16c), niet de Sim. Komt de co-op-finisher als derde lichaam (T3b), dan is `Sim.can_add_echo` de ene plek die verandert.
+De Sim laat hooguit één schaduwlichaam toe: een echo óf P2. `add_echo` weigert (`false`) zolang P2 meedoet of er al een echo speelt; doet P2 mee, dan haalt de Sim een spelende echo meteen weg. Een echo die niet afspeelt, heeft geen laag, is onzichtbaar en telt niet mee voor objecten (`EchoActor.is_present()`). Na zijn laatste frame blijft hij tot het einde van die tick, zodat objecten dat frame nog zien; daarna haalt de Sim hem uit `echoes`. De node zelf ruimt de eigenaar op (`remove_echo` of `queue_free`), zodat die het resultaat nog kan lezen. Waar P2 verschijnt en wanneer de echo terugkomt (C-03, C-05), regelt de drop-in/drop-out (T16c), niet de Sim. Komt de co-op-finisher als derde lichaam (T3b), dan is `Sim.can_add_echo` de ene plek die verandert.
 
 ## 5. Input-laag voor 2 lokale spelers
 

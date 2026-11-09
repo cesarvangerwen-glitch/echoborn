@@ -38,8 +38,8 @@ var objects: Array[SimObject] = []
 
 
 ## Voegt een speler toe als C-01 dat toelaat: één P1 en hooguit één andere
-## speler (P2). Een derde lichaam (een tweede P1, een tweede P2 of een P3)
-## wordt geweigerd met `false`; de aanroeper ruimt de speler dan zelf op.
+## speler (P2). Een derde lichaam (een tweede P1, een tweede P2, of een
+## index buiten 1–2 zoals P3) wordt geweigerd met `false`; de aanroeper ruimt de speler dan zelf op.
 func add_player(player: PlayerActor) -> bool:
 	if not can_add_player(player.player_index):
 		return false
@@ -56,6 +56,9 @@ func add_player(player: PlayerActor) -> bool:
 
 
 func can_add_player(player_index: int) -> bool:
+	# Alleen P1 en P2 bestaan (C-01); een P3 of hoger komt er nooit bij.
+	if player_index < 1 or player_index > 2:
+		return false
 	for other in players:
 		if (other.player_index == 1) == (player_index == 1):
 			return false
@@ -160,9 +163,13 @@ func _physics_process(delta: float) -> void:
 		actor_stepping.emit(tick, "5", object)
 		object.sim_update(tick, present)
 	tick_finished.emit(tick)
-	# Een echo die deze tick zijn laatste frame speelde, verdwijnt nu pas.
-	for echo in echoes:
+	# Een echo die deze tick zijn laatste frame speelde, verdwijnt nu pas en
+	# gaat uit `echoes`. De node blijft bestaan tot zijn eigenaar hem opruimt
+	# (`remove_echo` of `queue_free`), zodat die het resultaat nog kan lezen.
+	for echo in echoes.duplicate():
 		echo.sim_end_tick()
+		if echo.finished and not echo.is_present():
+			echoes.erase(echo)
 	tick += 1
 
 
