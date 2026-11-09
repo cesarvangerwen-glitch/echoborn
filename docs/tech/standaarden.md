@@ -56,7 +56,8 @@ game/
 │   ├── events/        # eventsoorten, events uit input (E-10)
 │   ├── input/         # inputbronnen, input-acties
 │   ├── objects/       # SimObject en objecten: drukplaat, hendel
-│   ├── world/         # lagen, level-hulpmiddelen
+│   ├── save/          # GameState (schema) en SaveService (ontwerp §7)
+│   ├── world/         # lagen, kamers, AreaLoader, level-hulpmiddelen
 │   └── sim.gd         # simulatieklok
 ├── assets/            # (later) art/, audio/, fonts/ – eigendom van art/audio-rollen
 └── tests/
@@ -79,7 +80,7 @@ game/
 - Vergelijk posities **exact** (`==`) waar exactheid de eis is (de echo). Gebruik een tolerantie alleen met reden in de test.
 - Een test die een bekende beperking vastlegt (zoals de input-echo die afwijkt), zegt dat in zijn docstring.
 - Elke test ruimt zijn wereld op (de context doet dat automatisch na de test).
-- Elke test doet minstens één `check()`. Een test zonder checks, met een scriptfout of die blijft hangen, is FAIL.
+- Elke test doet minstens één `check()`. Een test zonder checks, met een scriptfout of die blijft hangen, is FAIL. Een script dat niet laadt, is altijd FAIL, ook als geen test het direct gebruikt (`ontwerp.md` §9). Preload in `run_tests.gd` daarom geen gamecode.
 - Geen testhaken (vlaggen, logvariabelen) in gameplay- of systeemcode. Wil een test iets volgen, dan biedt de code een signaal aan.
 
 ## 7. Review en git

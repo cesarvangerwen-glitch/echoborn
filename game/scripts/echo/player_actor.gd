@@ -14,7 +14,9 @@ const InputBits = preload("res://scripts/input/input_bits.gd")
 const Layers = preload("res://scripts/world/layers.gd")
 const Tuning = preload("res://scripts/echo/tuning.gd")
 
-enum EchoReset { NONE, RELEASE, RESPAWN }
+## ROOM: kamerwissel naar een kamer die geen buur is (E-04a), gezet door de
+## AreaLoader na stap (3).
+enum EchoReset { NONE, RELEASE, RESPAWN, ROOM }
 
 ## Een vijandelijke treffer kostte een levenspunt (LM-05). Bij 0 volgt de
 ## respawn in de flow-kamer (T16b).
@@ -32,7 +34,8 @@ var tick_events := 0
 var move_events := 0
 ## Verborgen bewegingstoestand (snelheid in px/tick, dash, buffers).
 var motor := Motor.State.new()
-## Vraagt deze tick een reset van de echo (E-04b respawn, E-04c Loslaten)?
+## Vraagt deze tick een reset van de echo (E-04a kamerwissel, E-04b respawn,
+## E-04c Loslaten)?
 ## De echo leest dit na stap (3) van dezelfde tick (`sim_after_source`).
 var echo_reset: EchoReset = EchoReset.NONE
 ## Levenspunten (LM-05: 5 in de flow-kamer). P2 heeft er geen (C-02).

@@ -5,8 +5,9 @@ extends "res://scripts/echo/echo_body.gd"
 ## schaduwplank (E-07, laag 6) en controleert elke tick of het oude pad nog
 ## klopt met de schaduwwereld (E-08); zo niet, dan breekt hij. Resets: breken,
 ## Loslaten, respawn en een wissel van D (E-04b–d). De enige afwijking van
-## het opgenomen pad is de merksprong (E-02m). Kamerwissels (E-04a/e) volgen
-## met de AreaLoader (T5b).
+## het opgenomen pad is de merksprong (E-02m). Kamerwissels (E-04a/e): een
+## wissel naar een kamer die geen buur is, is een reset; ligt frame `p` in een
+## kamer die niet geladen is, dan is de echo Buiten (zie `is_outside`).
 
 ## Breek-effect op `at` (E-08, E-09). De Art Director maakt het beeld.
 signal broke(tick: int, at: Vector2)
@@ -50,8 +51,12 @@ var detonate_mark: Combat.Mark = null
 var in_merksprong := false
 ## De opgenomen positie van frame `p` (bij een merksprong wijkt `position` af).
 var recorded_position := Vector2.ZERO
+## De AreaLoader van het gebied (gezet door de Sim), of null: dan is alles
+## geladen en komt Buiten niet voor (E-04a).
+var area_loader: Node = null
 
 var _active := false
+var _outside := false
 var _bad_run := 0
 var _body_size := Vector2.ZERO
 var _has_valid := false
@@ -96,6 +101,14 @@ func is_present() -> bool:
 	return _active
 
 
+## Buiten (E-04a): frame `p` ligt in een kamer die nu niet geladen is. Voor
+## de wereld hetzelfde als Leeg (onzichtbaar, geen botsing, geen plank, geen
+## events, geen controles), maar zonder reset: `valid_from` blijft staan.
+## Voor de meting telt Buiten als Leeg (MP-4: `state_changed` meldt Leeg).
+func is_outside() -> bool:
+	return _outside
+
+
 func stop() -> void:
 	finished = true
 	tick_events = 0
@@ -114,6 +127,7 @@ func set_tail_ticks(p_tail_ticks: int, tick: int) -> void:
 ## D ticks later op de plek waar P1 op `tick` stond.
 func reset(tick: int) -> void:
 	valid_from = tick
+	_outside = false
 	_bad_run = 0
 	_has_valid = false
 	tick_events = 0
@@ -130,12 +144,16 @@ func sim_step(tick: int, _delta: float) -> void:
 		return
 	var p := tick - tail_ticks
 	var index := source.recorder.index_of_tick(p) if p >= valid_from else -1
+	_outside = false
 	if index < 0:
 		_end_merksprong()
 		_set_active(false, tick)
 		return
 	var rec := source.recorder
 	recorded_position = rec.post_position(index)
+	if not _frame_loaded():
+		_go_outside(tick)
+		return
 	facing = rec.facing(index)
 	support = rec.support(index)
 	anim = rec.anim(index)
@@ -225,8 +243,27 @@ func sim_after_source(tick: int) -> void:
 			if _active:
 				broke.emit(tick, position)
 			reset(tick)
-		PlayerActor.EchoReset.RESPAWN:
+		PlayerActor.EchoReset.RESPAWN, PlayerActor.EchoReset.ROOM:
 			reset(tick)
+	# E-04a: is de kamer van frame `p` deze tick net niet meer geladen (de
+	# AreaLoader liep vlak hiervoor), dan is de echo meteen Buiten, zodat hij
+	# in stap (4) en (5) niet meer meedoet.
+	if _active and not _frame_loaded():
+		_go_outside(tick)
+
+
+func _frame_loaded() -> bool:
+	return area_loader == null or area_loader.is_loaded_at(recorded_position)
+
+
+## Buiten (E-04a): als Leeg, zonder reset. Een merksprong stopt; de
+## breektolerantie begint opnieuw, want er zijn geen controles gedaan.
+func _go_outside(tick: int) -> void:
+	_outside = true
+	_bad_run = 0
+	detonate_mark = null
+	_end_merksprong()
+	_set_active(false, tick)
 
 
 func sim_end_tick() -> void:
