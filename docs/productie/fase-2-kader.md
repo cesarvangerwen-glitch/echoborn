@@ -25,13 +25,13 @@ Elke regel is **één issue** voor de Producer (T1 en T12 bestaan al: #20, #44).
 |---|---|---|---|---|---|---|
 | T1 | **Art bible v0 + assetlijst** (#20) met **één scène op eindkwaliteit** | art-director (met environment-artist) | Art bible met setting (polder, gemaal, water als beeld, geen speellaag), de drie aandachtspunten uit PR #17, en als leesbaarheidseis: grijze beginstaat, schaduwmerk en finisher-echo (pitch §12, R-V6). Scène: SM-rubric Kwaliteit ≥ 7 + `Visie-review: past` op P2 | — | 4–6 | F1, R2, R5 |
 | T2 | **Audiorichting + één referentiefragment** (bv. echo of merk-aftelling met het carillon) | audio-director (met composer-sound-designer) | Eerste stap: AD bevestigt de eis van F2 (A10). Fragment: Kwaliteit ≥ 7 | — | 2–3 | F2, R22 |
-| T3a | **Echo-regels v0.4 + flow-kamer-spec** in `gdd.md` | lead-game-designer (met combat-designer) | E-02 (staart ± 120 ticks, bereik 90–180; merksprong), E-04a, E-07a (springplank), E-08b, E-14 (schaduwmerk), testkamers → flow-kamer (sprongketen, merk-arena, één gemaal), waarden voor de flownormen (1)–(3), tests per regel. E-14 en de merksprong nemen de afwijkpunten 1–6 van de ideecheck over of motiveren een afwijking (`docs/business/ideecheck-v0-4.md` §2) | ideecheck #58 | 3–4 | F0, R9, R12, R-V9 |
+| T3a | **Echo-regels v0.4 + flow-kamer-spec** in `gdd.md` | lead-game-designer (met combat-designer) | E-02 (staart ± 120 ticks, bereik 90–180; merksprong), E-04a, E-07a (springplank), E-08b, E-14 (schaduwmerk), testkamers → flow-kamer (sprongketen, merk-arena, één gemaal), waarden voor de flownormen (1)–(3), een **minimale lichtmeter met één gemaal** (vullen, ook via de echo; oppompen zonder stilstand), tests per regel. E-14 en de merksprong nemen de afwijkpunten 1–6 van de ideecheck over of motiveren een afwijking (`docs/business/ideecheck-v0-4.md` §2) | ideecheck #58 | 3–4 | F0, R9, R12, R-V9 |
 | T3b | **Co-op 7A**: C-01–C-05 herzien | lead-game-designer (met combat-designer) | Max. twee lichamen; bounce, lancering, merk-combo, vangen in co-op (partner) en solo (echo); optioneel op de route, verplicht bij bosses; gedeelde echo alleen als finisher (laatste 10 s, 8A); tests per regel; C-06 en C-07 blijven | T3a | 2–3 | F0, F3, R10, R-V5 |
 | T4 | **Event-systeem + objectdetectie (A2)** | technical-director (met gameplay-programmer) | Keuze `intersect_shape` of één tick vertraging, met de test voor E-07b stap 4–5 en C-01 als DoD-regel (#30) | — | 1–2 | F5, R11 |
 | T5a | **Input voor 2 controllers + drop-in/drop-out** | engine-platform-programmer | InputRouter op apparaat-GUID; drop-in/out met test | — | 1–2 | F0, F3, R19 |
 | T6 | **CI met headless tests** + Windows-run | tools-programmer | Gecachete download, SHA-512-check, echo-tests groen op Linux en Windows | — | 1–2 | F5, R1, R18 |
-| T9 | **Narratief V2** ("het gemaal van herinneringen", pitch §6) | narrative-designer | Wereld, verhaalboog op hoofdlijnen, toon duister maar niet gruwelijk, melancholisch, PEGI 12; water langs de toonregels (R-V7) | — | 2–3 | F3, F7, R-V7 |
-| T12 | **Vindbaarheidstoets** (#44); vervolg werktitel in #61 | marketing-community-manager | Volgens #44 | — | 0 (al gepland) | R24 |
+| T9 | **Narratief V2** ("het gemaal van herinneringen", pitch §6) | narrative-designer | Wereld, verhaalboog op hoofdlijnen, toon duister maar niet gruwelijk, melancholisch, PEGI 12; de 10 s blijven in het verhaal (bevroren echo's, einde; #51: 8A); water langs de toonregels (R-V7) | — | 2–3 | F3, F7, R-V7 |
+| T12 | **Vindbaarheidstoets** (#44); vervolg werktitel in #61 | marketing-community-manager | Afgerond (#44) | — | 0 | R24 |
 | T13 | **VAF-dossier productiesteun fase 3** voorbereiden, **niet indienen** (#51 deel 1: 6B), met het tweede criterium uit categorie I (verzonken stad in de Lage Landen) | business-legal-advisor (met creative-director, executive-producer, marketing-community-manager) | Dossier klaar tot indienen; VAF-deadlines 2027 ingepland (A16) door de Producer | — | 2 | R6, R23 |
 | T14 | **Lokalisatie inbouwen** (NL in principe ja, #51 deel 1: 5A) | engine-platform-programmer | Vertaalbestanden, geen tekst in code | T5a | 1 | — |
 | T18 | **`risico.md` bijwerken** naar pitch v0.4 | producer | R10 herzien; R-V2, R-V4, R-V7, R-V9, R-V12 opgenomen | — | 1 | — |
@@ -41,8 +41,8 @@ Elke regel is **één issue** voor de Producer (T1 en T12 bestaan al: #20, #44).
 | # | Taak | Eigenaar | DoD | Na | Runs | Raakt |
 |---|---|---|---|---|---|---|
 | T16a | **Echo-regels in code** | gameplay-programmer | E-02 (staart als parameter 1,5 / 2 / 3 s), E-07a, E-08b, E-14, merksprong; tests herschreven en groen | T3a, T4 | 3–4 | F0, R1 |
-| T16b | **Flow-kamer bouwen** (grijs, placeholder) | world-level-designer (met gameplay-programmer) | Sprongketen, merk-arena, één gemaal met een basis-lichtmeter; meetpunten voor normen (1)–(3) en R-V12 gelogd | T3a, T16a | 2–3 | F0, R-V2, R-V12 |
-| T16c | **Co-op 7A in code** | gameplay-programmer | C-01–C-05 volgens T3b; bounce en lancering eerst; tests groen | T3b, T4, T5a | 1–2 | F0, R10 |
+| T16b | **Flow-kamer bouwen** (grijs, placeholder) | world-level-designer (met gameplay-programmer) | Sprongketen, merk-arena, één gemaal met de minimale lichtmeter uit T3a; meetpunten voor normen (1)–(3) en R-V12 gelogd | T3a, T16a | 2–3 | F0, R-V2, R-V12 |
+| T16c | **Co-op 7A in code** | gameplay-programmer | C-01–C-05 volgens T3b; bounce en lancering eerst; tests groen | T3b, T4, T5a, T16a | 1–2 | F0, R10 |
 | T7 | **Build op Steam Deck-specificaties** met het lichtbudget uit #21 | engine-platform-programmer (met technical-artist) | Flow-kamer draait op Deck-specificaties; herhaald op de slice (T8a) | #21, T16b | 1–2 | F5, R17 |
 | T17 | **Flow-test** | qa-lead (met lead-game-designer) | Plan + rapport: normen (1)–(3) solo en co-op; staart 1,5 / 2 / 3 s; echo ≤ 40 % Leeg; co-op ≤ 2× zo snel als solo; R-V12 (springplank per minuut, aandeel zonder stilstand); de *Nine Sols*-check (ideecheck §2, slotzin). Spelers: scripted runs + de CEO (± 20 min, score norm 3) | T16a–c | 2–3 | F0 |
 
@@ -81,7 +81,7 @@ Fase 2 sluit pas als **alle** criteria F0–F8 (inclusief F4b) gehaald zijn; "bi
 
 | # | Exit-criterium | Toets | Bewijs |
 |---|---|---|---|
-| F0 | **Flow-kamer geslaagd** (mijlpaal 1) | In de grijze flow-kamer (T16) haalt T17, solo én co-op, de normen van pillar 1: (1) geoefende speler nergens > ± 5 s stil; (2) echo als springplank of merk-afmaker ≥ ± 1× per 20 s; (3) score "vloeiend/satisfying" ≥ 4 op 5. Staartduur gekozen binnen 1,5–3 s. CD zet `Visie-review: past` op P1 en P3. Pas daarna start T8. **Mislukt**: herontwerp door de LGD en een tweede flow-test; haalt die norm (2) niet, dan een `ceo-beslissing` (pitch R-V12). | testrapport QA in een gemergde PR + visie-review |
+| F0 | **Flow-kamer geslaagd** (mijlpaal 1) | In de grijze flow-kamer (T16) haalt T17, solo én co-op, de normen van pillar 1: (1) geoefende speler nergens > ± 5 s stil; (2) echo als springplank of merk-afmaker ≥ ± 1× per 20 s; (3) score "vloeiend/satisfying" ≥ 4 op 5. Oppompen bij het gemaal haalt norm (1) (≤ ± 5 s stilstand), en de echo telt mee bij het vullen van de lichtmeter. Staartduur gekozen binnen 1,5–3 s. CD zet `Visie-review: past` op P1 en P3. Pas daarna start T8. **Mislukt**: herontwerp door de LGD en een tweede flow-test; haalt die norm (2) niet, dan een `ceo-beslissing` (pitch R-V12). | testrapport QA in een gemergde PR + visie-review |
 | F1 | **Art op eindkwaliteit bewezen** | De scène uit T1 scoort Kwaliteit ≥ 7 én krijgt `Visie-review: past` van de CD op pillar 2: de laag is zichtbaar zonder icoon of uitleg, "vol = levend, hol = echo" (A9), met grijze beginstaat. Beide **vóór** slice-art (T8c, die ook F0 nodig heeft). Daarna haalt de slice-art zelf ook ≥ 7. | gemergde PR + SM-score + visie-review |
 | F2 | **Audio op eindkwaliteit bewezen** | Het fragment uit T2 scoort Kwaliteit ≥ 7 vóór slice-audio (T8d); daarna haalt de slice-audio ook ≥ 7. De eis is concept tot de AD hem bevestigt (A10). | gemergde PR + SM-score + akkoord AD |
 | F3 | **Verticale slice speelbaar** | Polderwijk met het eerste gemaal en de Gemaalmeester, van begin tot eind speelbaar solo én in lokale co-op met drop-in/drop-out, op de inhoud uit T3c. | gemergde PR in `game/` + SM-review |
@@ -170,6 +170,7 @@ Zelfde procedure als in fase 1 (`fase-1-kader.md` §6): een issue voor de EP met
 - T1 en T9 werken de setting uit; de BLA toetst de formulering aan art. 4 in T13.
 - De VAF-deadlines 2027 (A16) volgen van de CEO; de Producer plant T13 daarop.
 - De co-op-balans met de korte staart (solo-echo ± 2 s naast een live partner, finisher van 10 s) toetst de LGD in de flow-kamer (T17), naast R-V12.
+- Vóór F0 levert T10 alleen de UX-spec; de HUD wordt na F0 bijgesteld.
 - De tokens per maak-taak in fase 2 (vooral code) zijn nog niet gemeten; de EP stelt §8 bij na F0 met het tokenlog.
 
 ### Logboek
