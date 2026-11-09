@@ -13,6 +13,7 @@ config/features=PackedStringArray("4.6")
 [autoload]
 
 InputRouter="*res://scripts/input/input_router.gd"
+Localization="*res://scripts/locale/localization.gd"
 
 [display]
 
@@ -22,6 +23,10 @@ window/size/viewport_width.deck=1280
 window/size/viewport_height.deck=800
 window/size/mode.deck=3
 window/vsync/vsync_mode.deck=1
+
+[internationalization]
+
+locale/fallback="en"
 
 [layer_names]
 

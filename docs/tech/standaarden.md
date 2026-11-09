@@ -12,6 +12,7 @@ Geldt voor alle code in `game/`. De Technical Director reviewt alle code van pro
 - Volgorde in een script: `extends` → `##`-docstring → `signal` → `enum` → `const` → `@export` → publieke `var` → private `var` (`_naam`) → `_init`/`_ready` → publieke functies → private functies.
 - Elk script begint met een `##`-docstring van 1–3 regels: wat het is en waarom het bestaat.
 - Commentaar en docstrings in het **Nederlands**; code-identifiers in het **Engels** (Godot-API is Engels; gemengde namen lezen slecht).
+- **Geen spelerstekst in code**: tekst die de speler ziet, staat als sleutel in `game/locale/strings.csv` en komt via `tr("SLEUTEL")` op het scherm (`ontwerp.md` §8a). Log- en foutmeldingen voor ontwikkelaars mogen gewoon in de code.
 - Geen code uitgecommentarieerd laten staan; daarvoor is git.
 
 ## 2. Naamgeving
