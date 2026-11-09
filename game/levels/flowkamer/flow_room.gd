@@ -491,20 +491,20 @@ func _build_hud() -> void:
 
 func _update_hud() -> void:
 	_hud_fill.size.x = 2.0 * meter.value
-	var echo_state := "uit"
+	# Tekst via sleutels uit locale/strings.csv (T14, docs/tech/ontwerp.md §8a).
+	var echo_state := tr("HUD_ECHO_OFF")
 	if p2:
-		echo_state = "P2 doet mee"
+		echo_state = tr("HUD_ECHO_P2")
 	elif echo:
-		echo_state = "Actief" if echo.is_present() else "Leeg"
+		echo_state = tr("HUD_ECHO_ACTIVE") if echo.is_present() else tr("HUD_ECHO_EMPTY")
 	var lines := PackedStringArray([
-		"Licht %d / 100   Gemaal G %d / 100   Leven %d" % [meter.value, gemaal.fill, p1.health],
-		"Kamer %s   D = %d   echo %s   tijd %.1f s" % [room, tail, echo_state, run_ticks() / 60.0],
-		"F1/F2/F3 D 90/120/180 · F4 echo aan/uit · F5 meetlog %s · F6 herstart" % ("aan" if autosave else "uit"),
+		tr("HUD_STATUS") % [meter.value, gemaal.fill, p1.health],
+		tr("HUD_ROOM") % [room, tail, echo_state, run_ticks() / 60.0],
+		tr("HUD_DEBUG_KEYS") % (tr("COMMON_ON") if autosave else tr("COMMON_OFF")),
 	])
 	if run_over:
 		if _scores.size() < 3:
-			lines.append("Run klaar in %.1f s. Voelde %s vloeiend/satisfying? Druk 1–5." % [
-				run_ticks() / 60.0, ["K1", "K2", "K3"][_scores.size()]])
+			lines.append(tr("HUD_RUN_DONE") % [run_ticks() / 60.0, ["K1", "K2", "K3"][_scores.size()]])
 		else:
-			lines.append("Bedankt. Meetlog: %s" % csv_path)
+			lines.append(tr("HUD_THANKS") % csv_path)
 	_hud_label.text = "\n".join(lines)

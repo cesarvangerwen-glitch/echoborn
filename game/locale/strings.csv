@@ -1,0 +1,13 @@
+keys,en,nl,_context
+GAME_TITLE,Polderlight,Polderlight,"Werktitel (#96), ook de venstertitel. Niet vertalen."
+COMMON_ON,on,aan,Schakelaar staat aan.
+COMMON_OFF,off,uit,Schakelaar staat uit.
+HUD_STATUS,Light %d / 100   Pumping station G %d / 100   Health %d,Licht %d / 100   Gemaal G %d / 100   Leven %d,"Placeholder-HUD flow-kamer (T10 maakt de eindvorm). %d = lichtmeter, vulstand gemaal, leven P1."
+HUD_ROOM,Room %s   D = %d   echo %s   time %.1f s,Kamer %s   D = %d   echo %s   tijd %.1f s,"%s = kamer (K1–K3), %d = staartduur D in ticks, %s = echo-toestand (HUD_ECHO_*), %.1f = speeltijd in s."
+HUD_ECHO_OFF,off,uit,Echo-toestand: echo uitgezet (F4).
+HUD_ECHO_P2,P2 has joined,P2 doet mee,"Echo-toestand: P2 speelt mee, dus geen echo (C-01)."
+HUD_ECHO_ACTIVE,Active,Actief,Echo-toestand Actief (gdd E-03).
+HUD_ECHO_EMPTY,Empty,Leeg,Echo-toestand Leeg (gdd E-03).
+HUD_DEBUG_KEYS,F1/F2/F3 D 90/120/180 · F4 echo on/off · F5 measurement log %s · F6 restart,F1/F2/F3 D 90/120/180 · F4 echo aan/uit · F5 meetlog %s · F6 herstart,"Debugtoetsen van de flow-kamer. %s = COMMON_ON of COMMON_OFF."
+HUD_RUN_DONE,Run finished in %.1f s. Did %s feel smooth/satisfying? Press 1–5.,Run klaar in %.1f s. Voelde %s vloeiend/satisfying? Druk 1–5.,"Scorevraag na de run (F0). %.1f = runtijd in s, %s = kamer K1–K3."
+HUD_THANKS,Thank you. Measurement log: %s,Bedankt. Meetlog: %s,%s = pad van het meetlog (CSV).

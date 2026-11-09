@@ -283,6 +283,22 @@ Spelers maskeren 1 + 4, echo's 1 + 5. Zo kan een echo door een lichtmuur heen en
 
 **Visueel**: `CanvasItem.light_mask` en `PointLight2D`/`LightOccluder2D` voor de lichtlaag, en een aparte `CanvasLayer` of shader voor de schaduwwereld. De pipeline (en of 2D of 2.5D) is aan de Art Director (#7) en de Technical Artist; de physics-lagen hierboven werken in beide gevallen.
 
+## 8a. Lokalisatie (T14, #74)
+
+**Werkaannames** (kader §5): Engels is de brontaal en de standaard; Nederlands komt erbij, "in principe ja" (#51 deel 1: 5A; pitch §6). De talen zijn `en` en `nl`; de NL-vertaling zelf is fase 4, in fase 2 alleen de infrastructuur. Spelerstekst die de titel noemt, gebruikt de werktitel *Polderlight* (#96).
+
+- **Eén bestand**: `game/locale/strings.csv`, kolommen `keys,en,nl,_context`. Een sleutel is `HOOFDLETTERS_MET_UNDERSCORE` met een prefix per scherm (`HUD_`, `MENU_`, `COMMON_`). `_context` is een notitie voor de vertaler (wat `%d` en `%s` zijn); kolommen met `_` laadt het spel niet. Opmaak met `%d`/`%s`/`%.1f` werkt zoals in GDScript.
+- **Laden**: de autoload `Localization` (`scripts/locale/localization.gd`) leest het CSV-bestand zelf en geeft de vertalingen aan de `TranslationServer`. Er is dus geen import nodig (een verse clone werkt headless); `strings.csv.import` zet de importer op `keep`, zodat de editor geen `.translation`-bestanden maakt en de export het CSV-bestand ongewijzigd meeneemt. Een lege NL-cel valt terug op Engels (`locale/fallback="en"`).
+- **Taal**: `--lang=nl` na `--` (`godot --path game -- --lang=nl`), anders de systeemtaal (`nl_BE`, `nl_NL` → `nl`), anders Engels. In code: `Localization.set_language("nl")`. De venstertitel volgt `GAME_TITLE`.
+- **Tekst toevoegen (elke rol)**: (1) zet een regel in `strings.csv` met de Engelse tekst, waar het kan ook de Nederlandse, en context; (2) gebruik in code `tr("SLEUTEL")` (in een `static func`: `TranslationServer.translate("SLEUTEL")`), met `% [...]` erachter voor waarden; (3) in een `.tscn` zet je de sleutel zelf als `text` van een Label of Button; Godot vertaalt die. Draai de tests.
+- **Wat de test bewaakt** (`tests/test_localization.gd`, met `tests/text_lint.gd`): het CSV-bestand laadt, elke sleutel heeft Engels; elke vertaling heeft dezelfde opmaakcodes in dezelfde volgorde als het Engels; elke sleutel in `tr()` of in een scène bestaat; in `scripts/`, `scenes/` en `levels/` staat geen tekst rechtstreeks in een tekstveld (`.text =`, `set_text(` …) en geen tekst van twee of meer woorden buiten `tr()`. Logregels en validatiefouten (`print`, `push_error`, `errors.append` …) zijn ontwikkelaarstekst en blijven Nederlands. Uitgezonderd: `scenes/debug/`, `prototypes/`, de bestanden in `EXEMPT_FILES` en de losse teksten in `EXEMPT_TEXTS` (elk met een reden).
+- **Beperkingen**: de lint dekt alleen `.gd` en `.tscn`; tekst via `draw_string`, in `.tres` of in `.json` valt erbuiten. Een los woord in een variabele (`"Leeg"`) ziet de lint ook niet; de reviewer let op beide. Ontbrekende NL-vertalingen geeft de test alleen als notitie. Meervoud (`tr_n`) en lettertypen voor andere schriften zijn niet nodig zolang het bij EN en NL blijft.
+- **Open punten**: de taalkeuze bewaren en een taalmenu (UX Designer en UI in T10, opslag van instellingen bij de TD, §7); `config/name` in `project.godot` heet nog "Echoborn": hernoemen verandert de map van `user://` (saves), dus pas samen met een vaste `custom_user_dir_name` (TD, build #79).
+  - Steam-clienttaal (`Steam.getCurrentGameLanguage`) vóór de systeemtaal kiezen, zodra Steam erin zit (T7).
+  - Bij de eerste exportbuild (#79) controleren dat `locale/strings.csv` in de `.pck` zit.
+  - Bij de eerste editor- of importrun controleren dat de handgeschreven `strings.csv.import` (`importer="keep"`) ongewijzigd blijft (headless `--import` liet hem ongewijzigd).
+  - Benoemde plaatshouders (`{room}` in plaats van `%s`) pas als een taal een andere woordvolgorde nodig heeft; tot dan bewaakt de test dat elke vertaling dezelfde opmaakcodes in dezelfde volgorde heeft.
+
 ## 9. Tests
 
 - Minimale eigen testrunner (`game/tests/run_tests.gd`), geen plug-in nodig. Elke `test_*`-methode krijgt een context met `make_sim()`, `run_ticks()`, `check()` en `note()`.
@@ -318,6 +334,7 @@ Spelers maskeren 1 + 4, echo's 1 + 5. Zo kan een echo door een lichtmuur heen en
 | `test_meetlog.gd` (2 tests) | Meetlog deterministisch en volledig; stilstand MP-1 |
 | `test_area_loader.gd` (6 tests) | E-04a (1)–(5) en E-04e uit gdd §4.6: wissel naar een buur zonder reset en de echo door dezelfde doorgang (alle D), teleport naar een kamer die geen buur is = reset (alle D), Buiten bij een ontladen kamer (P1 valt door de plank, geen INTERACTIE), validatie, P2 wisselt nooit; streamen van inhoud en een doorloop door drie kamers zonder reset (FK-3, alle D) |
 | `test_save.gd` (4 tests) | Opslaan → laden exact en bytegelijk; back-up bij een kapotte save; versies en migratie; laden op een checkpoint in de goede kamer met een Lege echo |
+| `test_localization.gd` (7 tests) | Lokalisatie §8a: CSV geldig met Engels per sleutel, NL met dezelfde opmaakcodes als EN, elke gebruikte sleutel bestaat, geen harde spelerstekst in code of scènes (en de lint vangt die echt), taalkeuze, taalwissel EN/NL |
 
 De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gaven dezelfde posities.
 
