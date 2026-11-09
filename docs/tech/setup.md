@@ -112,3 +112,15 @@ Besturing: P1 A/D + spatie, E = echo. P2 pijltjes + Enter, rechter Ctrl = echo. 
 | Tests hangen | `--fixed-fps` vergeten en wachten op echte tijd (±2 min), of een test wacht op een tick die nooit komt. Draai met `--fixed-fps 60`. |
 | Test FAIL met `fout tijdens de test: ...` | De test crashte of de engine gaf een fout. Het bericht noemt bestand en regel. |
 | `Parse Error` op een script | Draai `godot --headless --path game --check-only -s <script>` voor het precieze bericht. |
+
+## 6. CI (GitHub Actions)
+
+Toegevoegd door de Tools Programmer (#70, fasekader fase 2 T6). Workflow: `.github/workflows/tests.yml`.
+
+- **Wanneer**: bij elke PR en elke push naar `main` die `game/**`, de workflow of `.github/ci/**` raakt, en met de hand (*Run workflow*). Een PR met alleen documenten start geen run (scheelt minuten; de repo is privé en Windows-minuten tellen dubbel).
+- **Waar**: twee jobs naast elkaar, `tests (linux)` op `ubuntu-24.04` en `tests (windows)` op `windows-2022` (met `Godot_v4.6.3-stable_win64_console.exe`, die stdout en de exitcode doorgeeft).
+- **Download**: de officiële zip uit §2 staat in de Actions-cache (sleutel: versie + zip + hash). Zonder cache downloadt de job hem en controleert hij dat de vastgepinde hash gelijk is aan `SHA512-SUMS.txt` van de release. **Elke run** controleert de zip met `sha512sum -c` tegen de hash in de workflow, ook bij een cache-hit.
+- **Stappen**: (1) het commando uit §3; (2) een **meta-run**: de job zet `.github/ci/test_meta_broken.gd` (een scriptfout en een test zonder checks) tijdelijk in `TEST_SCRIPTS` en verwacht exitcode 1 met precies die 2 FAIL's. Zo blijft de suite niet stil groen als `OS.add_logger()` of het 0-checks-oordeel verdwijnt (`ontwerp.md` §9, R18).
+- **Uitvoer**: `tests.log` en `meta.log` per OS als artifact `testuitvoer-<os>` (14 dagen).
+- **Andere Godot-patch** (TD-besluit, §1): pas `GODOT_VERSION`, `SHA512_LINUX` en `SHA512_WINDOWS` bovenaan de workflow aan, met de waarden uit `SHA512-SUMS.txt` van die release. De oude cache vervalt vanzelf.
+- **Werkaanname**: Godot 4.6.3-stable (standaard, niet mono) volgens §1, onder het CEO-besluit "Godot 4.6"; de CI kost € 0 extern binnen de gratis Actions-minuten (fase 2 € 0 extern, besluit #51 deel 1).

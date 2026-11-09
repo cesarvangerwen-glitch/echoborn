@@ -1,0 +1,129 @@
+# Headless tests op Linux en Windows (#70, fasekader fase 2 T6; F5, R1, R18).
+# Eigenaar: Tools Programmer. Uitleg: docs/tech/setup.md §6.
+#
+# Werkaanname: Godot 4.6.3-stable, officieel, standaard (niet mono), zoals
+# vastgepind door de TD in docs/tech/setup.md §1 onder het CEO-besluit
+# "Godot 4.6". Een andere patch = TD-besluit: pas GODOT_VERSION en beide
+# hashes aan, uit SHA512-SUMS.txt van die release.
+name: tests
+
+on:
+  push:
+    branches: [main]
+    paths: ["game/**", ".github/workflows/tests.yml", ".github/ci/**"]
+  pull_request:
+    paths: ["game/**", ".github/workflows/tests.yml", ".github/ci/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GODOT_VERSION: "4.6.3"
+  # Uit https://github.com/godotengine/godot/releases/download/4.6.3-stable/SHA512-SUMS.txt
+  SHA512_LINUX: "a035258da32b77f966a5376f9fa29c30a6adde826a85ba918e1605bd1fc9823eba7d85f1dd5e748956bd2ba72827c0025ffa11bb82aec91128c407a2e723c99c"
+  SHA512_WINDOWS: "d44ea7ef5bab754cacd49d581b6062836b2eea12a82e1d183aebfad9cd8c7db2bd82513337bd657d6d2d5c04d46239c0570b029faf1343e81e8a2fa7b85dd83b"
+
+jobs:
+  tests:
+    name: tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: linux
+            runner: ubuntu-24.04
+            zip: linux.x86_64.zip
+            exe: linux.x86_64
+            sha_var: SHA512_LINUX
+          - os: windows
+            runner: windows-2022
+            zip: win64.exe.zip
+            # De console-variant geeft stdout en de exitcode door.
+            exe: win64_console.exe
+            sha_var: SHA512_WINDOWS
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash   # ook op Windows (Git Bash); bash draait met -eo pipefail
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Godot-download uit de cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/godot-dl
+          key: godot-${{ env.GODOT_VERSION }}-${{ matrix.zip }}-${{ env[matrix.sha_var] }}
+
+      - name: Godot downloaden (alleen zonder cache)
+        if: steps.cache.outputs.cache-hit != 'true'
+        env:
+          ZIP: Godot_v${{ env.GODOT_VERSION }}-stable_${{ matrix.zip }}
+          EXPECTED: ${{ env[matrix.sha_var] }}
+        run: |
+          DL="$RUNNER_TEMP/godot-dl"
+          mkdir -p "$DL" && cd "$DL"
+          BASE="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
+          curl -fsSL --retry 3 -o "$ZIP" "$BASE/$ZIP"
+          curl -fsSL --retry 3 -o SHA512-SUMS.txt "$BASE/SHA512-SUMS.txt"
+          # De vastgepinde hash moet gelijk zijn aan de officiële lijst.
+          OFFICIAL=$(grep " $ZIP\$" SHA512-SUMS.txt | cut -d' ' -f1)
+          if [ "$OFFICIAL" != "$EXPECTED" ]; then
+            echo "::error::SHA-512 in de workflow wijkt af van SHA512-SUMS.txt ($OFFICIAL)"
+            exit 1
+          fi
+
+      - name: SHA-512 controleren en uitpakken
+        env:
+          ZIP: Godot_v${{ env.GODOT_VERSION }}-stable_${{ matrix.zip }}
+          EXE: Godot_v${{ env.GODOT_VERSION }}-stable_${{ matrix.exe }}
+          EXPECTED: ${{ env[matrix.sha_var] }}
+        run: |
+          DL="$RUNNER_TEMP/godot-dl"
+          # Elke run, ook bij een cache-hit: de zip moet de vastgepinde hash hebben.
+          echo "$EXPECTED  $DL/$ZIP" | sha512sum -c -
+          BIN="$RUNNER_TEMP/godot-bin"
+          python3 -m zipfile -e "$DL/$ZIP" "$BIN" 2>/dev/null || python -m zipfile -e "$DL/$ZIP" "$BIN"
+          chmod +x "$BIN/$EXE" || true
+          echo "GODOT=$BIN/$EXE" >> "$GITHUB_ENV"
+          "$BIN/$EXE" --headless --version
+
+      - name: Tests (headless)
+        run: |
+          "$GODOT" --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd 2>&1 | tee tests.log
+
+      - name: Meta-run (kapotte tests moeten de suite rood maken)
+        # ontwerp.md §9 "Schuld" en R18: bewijst dat de runner een scriptfout
+        # en een test met 0 checks als FAIL telt en exitcode 1 geeft.
+        run: |
+          cp .github/ci/test_meta_broken.gd game/tests/
+          sed -i 's|^const TEST_SCRIPTS := \[|&"res://tests/test_meta_broken.gd", |' game/tests/run_tests.gd
+          grep -q 'res://tests/test_meta_broken.gd' game/tests/run_tests.gd || { echo "::error::meta-test niet in TEST_SCRIPTS gezet"; exit 1; }
+          set +e
+          "$GODOT" --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd > meta.log 2>&1
+          CODE=$?
+          set -e
+          git checkout -- game/tests/run_tests.gd && rm game/tests/test_meta_broken.gd
+          grep -E 'FAIL test_meta_|Resultaat' meta.log
+          [ "$CODE" -eq 1 ] || { echo "::error::meta-run gaf exitcode $CODE, verwacht 1"; exit 1; }
+          grep -q 'FAIL test_meta_script_error_must_fail' meta.log || { echo "::error::scriptfout niet als FAIL geteld"; exit 1; }
+          grep -q 'FAIL test_meta_zero_checks_must_fail' meta.log || { echo "::error::0 checks niet als FAIL geteld"; exit 1; }
+          grep -q ' 2 mislukt' meta.log || { echo "::error::verwacht precies 2 mislukte tests"; exit 1; }
+          echo "Meta-run OK: runner geeft FAIL en exitcode 1"
+
+      - name: Uitvoer bewaren
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testuitvoer-${{ matrix.os }}
+          path: |
+            tests.log
+            meta.log
+          if-no-files-found: ignore
+          retention-days: 14
