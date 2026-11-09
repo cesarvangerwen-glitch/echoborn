@@ -190,7 +190,7 @@ done; done
 | # | Punt | Wie |
 |---|---|---|
 | 1 | **Echte Deck-meting** volgens §6. Geen Deck in de agent-omgeving. | CEO of tester met een Deck; Engine & Platform Programmer verwerkt |
-| 2 | **Camera die de rendergrootte volgt** (§3). **Camera klaar** ([#120](https://github.com/cesarvangerwen-glitch/echoborn/issues/120), PR #121): `FlowRoom.camera_zoom` leidt de zoom af van de rendergrootte (640×400 → 1, 1280×720/800 → 2). **Volgende stap:** de Engine & Platform Programmer zet de 5 `.deck`-instellingen uit §3 en draait D1–D4 opnieuw ([#79](https://github.com/cesarvangerwen-glitch/echoborn/issues/79)). | Engine & Platform Programmer |
+| 2 | **Camera die de rendergrootte volgt** (§3), [#120](https://github.com/cesarvangerwen-glitch/echoborn/issues/120): `FlowRoom.camera_zoom` leidt de zoom af van de rendergrootte (640×400 → 1, 1280×720/800 → 2). **Volgende stap:** de Engine & Platform Programmer zet de 5 `.deck`-instellingen uit §3 en draait D1–D4 opnieuw ([#79](https://github.com/cesarvangerwen-glitch/echoborn/issues/79)). | Engine & Platform Programmer |
 | 3 | Herhalen op de slice (T8a), zodra die er is: zelfde script, met `FLOW_SCENE` naar de slice-scène. | Engine & Platform Programmer |
 | 4 | **Besluit TD:** akkoord op D1–D8 als definitie van "draait op Deck-specificaties", en op het lichtbudget van 3 ms GPU per frame (20 LE normaal, 30 LE piek; `lichtmeting.md` §7 punt 3). | Technical Director (besloten) |
 | 5 | Waarom de rekenregel van #21 hier ±1,14–1,3× te laag schat (§4.3). | Technical Artist |
