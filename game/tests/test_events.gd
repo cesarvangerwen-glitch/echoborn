@@ -13,7 +13,7 @@ const Lever = preload("res://scripts/objects/lever.gd")
 const Layers = preload("res://scripts/world/layers.gd")
 const SpikeWorld = preload("res://scripts/world/spike_world.gd")
 
-const A := InputBits.ACTION
+const A := InputBits.ATTACK
 const I := InputBits.INTERACT
 
 

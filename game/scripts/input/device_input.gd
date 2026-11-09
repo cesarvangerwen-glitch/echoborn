@@ -5,7 +5,7 @@ extends RefCounted
 ## Spelcode leest nooit rechtstreeks `Input`; alleen een inputbron doet dat.
 ## Zo kunnen tests en de echo dezelfde code voeden met andere bronnen.
 
-const InputBits = preload("res://scripts/input/input_bits.gd")
+const InputSetup = preload("res://scripts/input/input_setup.gd")
 
 var player_index: int
 
@@ -19,17 +19,7 @@ func _init(p_player_index: int) -> void:
 func sample(_tick: int) -> int:
 	var prefix := "p%d_" % player_index
 	var bits := 0
-	if Input.is_action_pressed(prefix + "left"):
-		bits |= InputBits.LEFT
-	if Input.is_action_pressed(prefix + "right"):
-		bits |= InputBits.RIGHT
-	if Input.is_action_pressed(prefix + "jump"):
-		bits |= InputBits.JUMP
-	if Input.is_action_pressed(prefix + "action"):
-		bits |= InputBits.ATTACK
-	# Dash en echo-knop (gdd §2.5) bestaan alleen voor P1 op het toetsenbord.
-	if InputMap.has_action(prefix + "dash") and Input.is_action_pressed(prefix + "dash"):
-		bits |= InputBits.DASH
-	if InputMap.has_action(prefix + "echo") and Input.is_action_pressed(prefix + "echo"):
-		bits |= InputBits.ECHO
+	for control: String in InputSetup.BUTTON_BITS:
+		if Input.is_action_pressed(prefix + control):
+			bits |= InputSetup.BUTTON_BITS[control]
 	return bits

@@ -1,39 +1,59 @@
 extends RefCounted
 ## Zet de acties voor 2 lokale spelers in de InputMap en legt de joypadknoppen vast.
 ##
-## Toetsenbord: helft 1 = WASD + spatie + E (+ linker Shift = dash, Q = echo-knop,
-## gdd §2.5; de InputRouter zet die nog niet om in bits), helft 2 = pijltjes + Enter + rechter Ctrl,
-## met meedoen (Enter) en stoppen (Backspace) op helft 2 (gdd §2.5). Later komt dit uit
-## een rebind-scherm (UX Designer) en een opgeslagen config; de actienamen blijven gelijk.
+## Toetsenbord en joypad volgens gdd §2.5; de volledige tabel en de werkaannames staan in
+## `docs/tech/input.md` §2a. Helft 1 = WASD-kant, helft 2 = pijltjeskant, met meedoen (Enter)
+## en stoppen (Backspace) op helft 2. Later komt dit uit een rebind-scherm (UX Designer) en
+## een opgeslagen config; de actienamen blijven gelijk.
+
+const InputBits = preload("res://scripts/input/input_bits.gd")
 
 const ALL_DEVICES := -1
 ## Drempel voor stick en acties, voor de InputMap en de InputRouter gelijk.
 const DEADZONE := 0.3
 
 ## Spelbesturing (worden bits). Meedoen en stoppen zijn géén bits (gdd §2.5).
-const CONTROLS: PackedStringArray = ["left", "right", "jump", "action"]
+const CONTROLS: PackedStringArray = ["left", "right", "jump", "attack", "interact", "echo", "dash"]
 
+## Knopbesturing -> inputbit (left en right komen ook van de stick, zie de InputRouter).
+const BUTTON_BITS := {
+	"left": InputBits.LEFT,
+	"right": InputBits.RIGHT,
+	"jump": InputBits.JUMP,
+	"attack": InputBits.ATTACK,
+	"interact": InputBits.INTERACT,
+	"echo": InputBits.ECHO,
+	"dash": InputBits.DASH,
+}
+
+## Fysieke toetsen (positie, niet het teken): op AZERTY en QWERTZ liggen ze op dezelfde plek.
 const KEYS := {
-	1: {"left": KEY_A, "right": KEY_D, "jump": KEY_SPACE, "action": KEY_E,
-		"dash": KEY_SHIFT, "echo": KEY_Q},
-	2: {"left": KEY_LEFT, "right": KEY_RIGHT, "jump": KEY_ENTER, "action": KEY_CTRL,
+	1: {"left": KEY_A, "right": KEY_D, "jump": KEY_SPACE, "attack": KEY_E,
+		"interact": KEY_F, "echo": KEY_Q, "dash": KEY_SHIFT},
+	2: {"left": KEY_LEFT, "right": KEY_RIGHT, "jump": KEY_ENTER, "attack": KEY_CTRL,
+		"interact": KEY_SLASH, "echo": KEY_PERIOD, "dash": KEY_SHIFT,
 		"join": KEY_ENTER, "leave": KEY_BACKSPACE},
 }
 ## Toetsen waarvan alleen de linker- of rechtervariant telt. Zonder `location`
 ## matcht KEY_CTRL beide Ctrl-toetsen, en dan start linker Ctrl ook de echo
 ## van P2 (#14).
 const KEY_LOCATIONS := {
-	"p2_action": KEY_LOCATION_RIGHT,
+	"p2_attack": KEY_LOCATION_RIGHT,
 	"p1_dash": KEY_LOCATION_LEFT,
+	"p2_dash": KEY_LOCATION_RIGHT,
 }
 
 ## Joypadknoppen per besturing, voor elke pad gelijk (de InputRouter kiest de speler).
-## Meedoen = Start/Menu, stoppen = Select/View (gdd §2.5).
+## Meedoen = Start/Menu, stoppen = Select/View, echo = linker en dash = rechter schouderknop
+## (gdd §2.5). D-pad omhoog/omlaag blijft vrij voor UP/DOWN (bit 6 en 7, Combat Designer).
 const PAD_BUTTONS := {
 	JOY_BUTTON_DPAD_LEFT: "left",
 	JOY_BUTTON_DPAD_RIGHT: "right",
 	JOY_BUTTON_A: "jump",
-	JOY_BUTTON_X: "action",
+	JOY_BUTTON_X: "attack",
+	JOY_BUTTON_Y: "interact",
+	JOY_BUTTON_LEFT_SHOULDER: "echo",
+	JOY_BUTTON_RIGHT_SHOULDER: "dash",
 	JOY_BUTTON_START: "join",
 	JOY_BUTTON_BACK: "leave",
 }
