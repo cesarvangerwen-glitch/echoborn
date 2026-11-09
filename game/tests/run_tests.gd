@@ -21,9 +21,11 @@ const TEST_SCRIPTS := [
 	"res://tests/test_sim.gd",
 	"res://tests/test_input.gd",
 	"res://tests/test_input_router.gd",
+	"res://tests/test_events.gd",
+	"res://tests/test_objects.gd",
 ]
 
-## 2 minuten speltijd bij 60 Hz. De langste test duurt ±1000 ticks.
+## 2 minuten speltijd bij 60 Hz. De langste test duurt ±3000 ticks (C-01).
 const MAX_FRAMES_PER_TEST := 7200
 
 var _errors := ErrorLog.new()

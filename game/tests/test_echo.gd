@@ -41,11 +41,22 @@ func _spawn_player(sim: Node, index: int, segments: Array, offset := Vector2.ZER
 	return player
 
 
+## C-01: de Sim laat hooguit één echo tegelijk toe. Vergelijkingen van twee
+## echo's draaien daarom na elkaar, in dezelfde wereld.
 func _spawn_echo(sim: Node, clip, mode: EchoActor.Mode) -> EchoActor:
 	var echo := EchoActor.new()
 	echo.setup(Color.BLACK)
-	sim.add_echo(echo)
+	if not sim.add_echo(echo):
+		echo.free()
+		return null
 	echo.start(clip, mode)
+	return echo
+
+
+## Speelt een clip helemaal af en geeft de (klare) echo terug.
+func _play(t, sim: Node, clip, mode: EchoActor.Mode) -> EchoActor:
+	var echo := _spawn_echo(sim, clip, mode)
+	await t.run_ticks(sim, clip.size())
 	return echo
 
 
@@ -107,28 +118,32 @@ func test_ring_buffer_keeps_last_10_seconds(t) -> void:
 	t.check(gaps == 0, "%d gaten in de opname" % gaps)
 
 
-## Co-op: twee spelers tegelijk, elk een eigen recorder en echo; de spelers
-## blijven live bewegen terwijl hun echo's afspelen.
-func test_two_players_each_get_exact_echo(t) -> void:
+## Co-op: twee spelers tegelijk, elk een eigen recorder. Na de drop-out van
+## P2 geven beide opnames een exacte echo (toestand en input), na elkaar
+## afgespeeld (C-01). P1 blijft live bewegen terwijl de echo's afspelen.
+func test_coop_recorders_each_give_exact_echo(t) -> void:
 	var sim = t.make_sim()
-	var p1 := _spawn_player(sim, 1, SCRIPT_P1 + SCRIPT_LIVE)
+	var p1 := _spawn_player(sim, 1, SCRIPT_P1 + SCRIPT_LIVE + SCRIPT_LIVE)
 	var p2 := _spawn_player(sim, 2, SCRIPT_P2 + SCRIPT_LIVE, Vector2(400, 0))
 	await t.run_ticks(sim, TEN_SECONDS)
 	var end1 := p1.position
 	var end2 := p2.position
-	var echo1_state := _spawn_echo(sim, p1.recorder.snapshot(), EchoActor.Mode.STATE)
-	var echo2_state := _spawn_echo(sim, p2.recorder.snapshot(), EchoActor.Mode.STATE)
-	var echo1_input := _spawn_echo(sim, p1.recorder.snapshot(), EchoActor.Mode.INPUT)
-	var echo2_input := _spawn_echo(sim, p2.recorder.snapshot(), EchoActor.Mode.INPUT)
-	await t.run_ticks(sim, TEN_SECONDS)
+	var clip1 = p1.recorder.snapshot()
+	var clip2 = p2.recorder.snapshot()
+	t.check(_spawn_echo(sim, clip1, EchoActor.Mode.STATE) == null, "echo toegelaten terwijl P2 meedoet (C-01)")
+	sim.remove_player(p2)
+	var echo2_state: EchoActor = await _play(t, sim, clip2, EchoActor.Mode.STATE)
+	var echo2_input: EchoActor = await _play(t, sim, clip2, EchoActor.Mode.INPUT)
+	var echo1_state: EchoActor = await _play(t, sim, clip1, EchoActor.Mode.STATE)
+	var echo1_input: EchoActor = await _play(t, sim, clip1, EchoActor.Mode.INPUT)
 	t.check(echo1_state.position == end1, "P1 state-echo %s != %s" % [_fmt(echo1_state.position), _fmt(end1)])
 	t.check(echo2_state.position == end2, "P2 state-echo %s != %s" % [_fmt(echo2_state.position), _fmt(end2)])
 	t.check(echo1_input.position == end1, "P1 input-echo %s != %s" % [_fmt(echo1_input.position), _fmt(end1)])
 	t.check(echo2_input.position == end2, "P2 input-echo %s != %s" % [_fmt(echo2_input.position), _fmt(end2)])
 	t.check(end1.distance_to(end2) > 1.0, "P1 en P2 eindigen op dezelfde plek; test zegt dan weinig")
-	t.check(p1.position != end1 and p2.position != end2, "spelers bewogen niet live tijdens het afspelen")
-	t.note("P1 eind %s, P2 eind %s; spelers live verder naar %s / %s" % [
-		_fmt(end1), _fmt(end2), _fmt(p1.position), _fmt(p2.position)])
+	t.check(p1.position != end1, "P1 bewoog niet live tijdens het afspelen")
+	t.note("P1 eind %s, P2 eind %s; P1 live verder naar %s" % [
+		_fmt(end1), _fmt(end2), _fmt(p1.position)])
 
 
 ## Grens van input-opname: verandert de wereld, dan wijkt de input-echo af.
@@ -141,9 +156,8 @@ func test_world_change_breaks_input_echo_not_state_echo(t) -> void:
 	# Er verschijnt een blok op het pad (bv. een deur die dichtging).
 	SpikeWorld.add_block(t.world_root(), "Obstacle", Vector2(330, SpikeWorld.FLOOR_Y - 20), Vector2(20, 40))
 	await t.run_ticks(sim, 1)
-	var state_echo := _spawn_echo(sim, clip, EchoActor.Mode.STATE)
-	var input_echo := _spawn_echo(sim, clip, EchoActor.Mode.INPUT)
-	await t.run_ticks(sim, TEN_SECONDS)
+	var state_echo: EchoActor = await _play(t, sim, clip, EchoActor.Mode.STATE)
+	var input_echo: EchoActor = await _play(t, sim, clip, EchoActor.Mode.INPUT)
 	t.check(state_echo.max_deviation() == 0.0, "state-echo week af: %f px" % state_echo.max_deviation())
 	t.check(input_echo.max_deviation() > 10.0,
 		"input-echo zou moeten afwijken door het obstakel, afwijking %f px" % input_echo.max_deviation())
@@ -162,9 +176,8 @@ func test_hidden_state_breaks_input_echo_at_clip_start(t) -> void:
 	await t.run_ticks(sim, TEN_SECONDS)
 	var clip = player.recorder.snapshot()
 	t.check(clip.pre_on_floor[0] == 1 and clip.inputs[0] & J, "clip moet beginnen met een sprong vanaf de vloer")
-	var state_echo := _spawn_echo(sim, clip, EchoActor.Mode.STATE)
-	var input_echo := _spawn_echo(sim, clip, EchoActor.Mode.INPUT)
-	await t.run_ticks(sim, TEN_SECONDS)
+	var state_echo: EchoActor = await _play(t, sim, clip, EchoActor.Mode.STATE)
+	var input_echo: EchoActor = await _play(t, sim, clip, EchoActor.Mode.INPUT)
 	t.check(state_echo.max_deviation() == 0.0, "state-echo week af: %f px" % state_echo.max_deviation())
 	t.check(input_echo.max_deviation() > 10.0,
 		"input-echo zou de eerste sprong missen, afwijking %f px" % input_echo.max_deviation())

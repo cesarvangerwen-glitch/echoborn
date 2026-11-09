@@ -13,6 +13,7 @@ var capacity: int
 
 var _ticks := PackedInt32Array()
 var _inputs := PackedInt32Array()
+var _events := PackedInt32Array()
 var _pre_pos := PackedVector2Array()
 var _pre_vel := PackedVector2Array()
 var _pre_on_floor := PackedByteArray()
@@ -26,6 +27,7 @@ func _init(p_capacity: int = DEFAULT_CAPACITY) -> void:
 	capacity = p_capacity
 	_ticks.resize(capacity)
 	_inputs.resize(capacity)
+	_events.resize(capacity)
 	_pre_pos.resize(capacity)
 	_pre_vel.resize(capacity)
 	_pre_on_floor.resize(capacity)
@@ -33,10 +35,14 @@ func _init(p_capacity: int = DEFAULT_CAPACITY) -> void:
 	_post_vel.resize(capacity)
 
 
+## `events` is het eventmasker van die tick (GameEvents, E-10). Events worden
+## opgenomen ongeacht of ze bij de speler iets raakten.
 func push(tick: int, bits: int, pre_position: Vector2, pre_velocity: Vector2,
-		pre_floor: bool, post_position: Vector2, post_velocity: Vector2) -> void:
+		pre_floor: bool, post_position: Vector2, post_velocity: Vector2,
+		events: int = 0) -> void:
 	_ticks[_head] = tick
 	_inputs[_head] = bits
+	_events[_head] = events
 	_pre_pos[_head] = pre_position
 	_pre_vel[_head] = pre_velocity
 	_pre_on_floor[_head] = 1 if pre_floor else 0
@@ -61,6 +67,7 @@ func snapshot(max_frames: int = -1) -> EchoClip:
 	var clip := EchoClip.new()
 	clip.ticks.resize(n)
 	clip.inputs.resize(n)
+	clip.events.resize(n)
 	clip.pre_pos.resize(n)
 	clip.pre_vel.resize(n)
 	clip.pre_on_floor.resize(n)
@@ -71,6 +78,7 @@ func snapshot(max_frames: int = -1) -> EchoClip:
 		var src := (first + i) % capacity
 		clip.ticks[i] = _ticks[src]
 		clip.inputs[i] = _inputs[src]
+		clip.events[i] = _events[src]
 		clip.pre_pos[i] = _pre_pos[src]
 		clip.pre_vel[i] = _pre_vel[src]
 		clip.pre_on_floor[i] = _pre_on_floor[src]

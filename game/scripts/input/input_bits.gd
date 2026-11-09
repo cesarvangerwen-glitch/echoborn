@@ -8,6 +8,9 @@ const LEFT := 1
 const RIGHT := 2
 const JUMP := 4
 const ACTION := 8
+## INTERACTIE uit gdd §2.5 (bit 4). Alleen nog als bit; een toets volgt met
+## de volledige bitset van de Gameplay Programmer (T16a).
+const INTERACT := 16
 
 
 static func describe(bits: int) -> String:
@@ -20,4 +23,6 @@ static func describe(bits: int) -> String:
 		parts.append("J")
 	if bits & ACTION:
 		parts.append("A")
+	if bits & INTERACT:
+		parts.append("I")
 	return "-" if parts.is_empty() else "".join(parts)
