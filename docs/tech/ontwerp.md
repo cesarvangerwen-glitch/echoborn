@@ -1,6 +1,6 @@
 # Technisch ontwerp v0
 
-Eigenaar: Technical Director · Versie 0 (conceptfase) · Issue #5 · Engine: Godot 4.6.3, GDScript
+Eigenaar: Technical Director · Versie 0.1 · Issues #5, #68 (event-systeem, A2) · Engine: Godot 4.6.3, GDScript
 
 Dit is het eerste technisch ontwerp. Het legt de architectuur vast die nodig is om het grootste risico, de echo, te bewijzen, en schetst de systemen die daarna komen. Gameplay-regels staan hier niet; die komen van de Lead Game Designer (issue #6). Waar een technische keuze afhangt van een gameplay-regel, staat dat bij **Open vragen**.
 
@@ -8,12 +8,13 @@ Dit is het eerste technisch ontwerp. Het legt de architectuur vast die nodig is 
 
 - **De spike werkt.** Een blokje beweegt 10 s (600 ticks bij 60 Hz), wordt opgenomen, en de echo eindigt op exact dezelfde positie, op 0,000000 px nauwkeurig. Dat geldt ook met 2 spelers tegelijk, terwijl de spelers live doorbewegen. 7 automatische tests draaien headless in minder dan 1 s.
 - **Aanbeveling: neem toestand op, niet alleen input.** Afspelen gebeurt op basis van de opgenomen toestand (positie, snelheid, later animatie en acties). Input wordt per tick meegeschreven voor acties, debugging en eventueel later gebruik. Onderbouwing in §4.
+- **Event-systeem en objecten (A2, #68):** events uit de input worden opgenomen en door de echo afgespeeld; objecten zien de lichamen van dezelfde tick met een directe vormtest, zonder tick vertraging. De Sim bewaakt C-01 (hooguit twee lichamen). Zie §4a.
 - **Co-op vanaf dag één:** inputbron per speler, een Sim die alle actors in vaste volgorde stapt, een recorder per speler. De grootste co-op-risico's staan in §6.
 
 ## 2. Kernprincipes
 
 1. **Eén vaste simulatietick: 60 Hz.** Alle gameplay draait in `_physics_process` (`physics_ticks_per_second = 60`, `physics_jitter_fix = 0`). Niets dat de echo beïnvloedt draait in `_process`. Rendering mag interpoleren; de simulatie niet.
-2. **Eén klok, vaste volgorde.** De `Sim`-node is de enige met een gameplay-`_physics_process`. Per tick geldt de volgorde van **E-07b** (`docs/design/gdd.md`, door de TD bevestigd in #14): (1) de schaduw: echo's (in spawnvolgorde) zetten hun frame, of P2 stapt; (2) P1 stapt; (3) P1 wordt opgenomen; (4) events, eerst van P1, dan van de schaduw; (5) objecten werken hun stand bij. Daarna telt de Sim `tick`. Zo staat de schaduwplank al op zijn plek van tick `t` als P1 stapt (nodig voor E-07a), en hangt de volgorde niet af van de scèneboom. De spike doet (1) t/m (3); (4) en (5) komen met het event-systeem (R5). Test: `test_sim.gd`.
+2. **Eén klok, vaste volgorde.** De `Sim`-node is de enige met een gameplay-`_physics_process`. Per tick geldt de volgorde van **E-07b** (`docs/design/gdd.md`, door de TD bevestigd in #14): (1) de schaduw: echo's (in spawnvolgorde) zetten hun frame, of P2 stapt; (2) P1 stapt; (3) P1 wordt opgenomen; (4) events, eerst van P1, dan van de schaduw; (5) objecten werken hun stand bij. Daarna telt de Sim `tick`. Zo staat de schaduwplank al op zijn plek van tick `t` als P1 stapt (nodig voor E-07a), en hangt de volgorde niet af van de scèneboom. Alle vijf de stappen zijn gebouwd (§4a, #68). Test: `test_sim.gd`.
 3. **Input komt alleen uit een inputbron.** Gameplay-code roept nooit `Input` aan. Een inputbron (`DeviceInput`, `ScriptedInput`, later bv. een `AIInput` voor demo's) geeft per tick een bitmasker. Daardoor kunnen tests, de echo en twee spelers dezelfde code voeden.
 4. **Eén bewegingsfunctie.** `Motor.step(body, bits, delta)` is de enige plek waar beweging berekend wordt. Speler en input-echo gebruiken exact hetzelfde codepad.
 5. **Geen verborgen bronnen van verschil.** Geen `randf()` zonder seed uit de Sim, geen echte tijd (`Time`, `OS`), geen logica in signalen die afhangt van de volgorde waarin Godot ze afvuurt.
@@ -26,8 +27,9 @@ Dit is het eerste technisch ontwerp. Het legt de architectuur vast die nodig is 
 Main (Node2D, scenes/main.tscn)
 ├── Floor, WallLeft, WallRight, Platform (StaticBody2D, laag "wereld")
 ├── Sim (scripts/sim.gd)  ← enige gameplay-_physics_process
-│   ├── Player1, Player2 (PlayerActor, laag "licht")
-│   └── Echo1, Echo2 (EchoActor, laag "schaduw")
+│   ├── Player1 (PlayerActor, laag "licht")
+│   ├── Player2 (PlayerActor, laag "schaduw"; alleen in co-op)
+│   └── Echo1 (EchoActor, laag "schaduw"; alleen solo, C-01)
 └── Camera2D
 ```
 
@@ -64,7 +66,9 @@ Gebieden zijn losse scènes, zodat World & Level Designers parallel kunnen werke
 | `scripts/echo/echo_clip.gd` | Bevroren, chronologische kopie voor afspelen |
 | `scripts/echo/player_actor.gd` | Speler: input → Motor → recorder |
 | `scripts/echo/echo_actor.gd` | Echo: speelt een clip af in modus STATE of INPUT |
-| `scripts/sim.gd` | Klok en vaste stapvolgorde |
+| `scripts/sim.gd` | Klok en vaste stapvolgorde (E-07b, stap 1–5); bewaakt C-01 |
+| `scripts/events/game_events.gd`, `event_detector.gd` | Eventsoorten en events uit inputflanken (E-10), §4a |
+| `scripts/objects/sim_object.gd`, `pressure_plate.gd`, `lever.gd` | Objecten met eigenaarslaag (E-06) en directe detectie (A2), §4a |
 
 ### Datastroom per tick
 
@@ -76,13 +80,16 @@ tick t:                                   (volgorde E-07b)
           INPUT: Motor.step(echo, clip.inputs[frame], 1/60)
           frame += 1
       for speler in spelers met index >= 2:  (P2; stapt en neemt op zoals P1)
-  (2)+(3) P1
-      bits = P1.inputbron.sample(t)
+  (2) P1 stapt
+      bits = P1.inputbron.sample(t);  events = detector.detect(t, bits)
       pre  = (positie, snelheid, op_vloer)
       Motor.step(P1, bits, 1/60)
-      P1.recorder.push(t, bits, pre, post=(positie, snelheid))
-  (4) events, (5) objecten               (nog niet in de spike)
-  t += 1
+  (3) P1.recorder.push(t, bits, pre, post=(positie, snelheid), events)
+  (4) events: eerst P1, dan de schaduw (echo: clip.events[frame], of P2)
+      INTERACTIE -> dichtstbijzijnde object dat het lichaam overlapt en het mag bedienen
+  (5) for object in objecten (volgorde van toevoegen):
+          object.sim_update(t, sim.bodies())   # directe vormtest, posities van tick t
+  tick_finished(t);  echo na laatste frame weg;  t += 1
 ```
 
 Een echo start met `recorder.snapshot()`: een kopie van de laatste 600 frames. De recorder schrijft daarna gewoon door, dus de speler kan direct een nieuwe opname maken terwijl de echo afspeelt. Een "altijd 10 s achter je aan"-echo is dezelfde buffer, uitgelezen op `head − 600`; die variant is technisch triviaal en hangt af van de regel die de Lead Game Designer kiest.
@@ -112,7 +119,41 @@ Per frame: tick (4 B), input (4 B), 4 × Vector2 (32 B), vloervlag (1 B) = 41 B.
 
 **Wat dit betekent voor gameplay** (beslissing van de Lead Game Designer, niet van TD): bij toestand-opname botst een echo niet vanzelf met dingen die na de opname veranderd zijn. Er is een regel nodig voor wat er gebeurt als het pad geblokkeerd is: door de muur heen (schaduw), verdwijnen, of stoppen. Technisch zijn alle drie eenvoudig: een `ShapeCast2D` op de schaduwlaag kan elke tick controleren of het opgenomen punt vrij is.
 
-**Acties van de echo**: aanvallen, schakelaars en interacties worden niet als positie opgenomen maar als event (`ACTION`-bit, later een eigen eventlijst per frame). Bij afspelen voert de echo het event op die tick uit, met een hitbox/`Area2D` op de schaduwlaag. Schakelaars die door de echo bediend kunnen worden, luisteren naar de schaduwlaag.
+**Acties van de echo**: aanvallen, schakelaars en interacties worden niet als positie opgenomen maar als event: een eventmasker per frame (`GameEvents`, `clip.events`), gemaakt uit de inputflanken (E-10). Bij afspelen voert de Sim het event van dat frame uit in stap (4), tegen de huidige wereld en met de schaduwlaag van de echo. Objecten bepalen wie ze raakt of bedient met een directe vormtest, niet met een `Area2D` of een ruimte-query (§4a, `standaarden.md` regel 8). Schakelaars die door de echo bediend kunnen worden, hebben de schaduwlaag als eigenaarslaag (E-06).
+
+## 4a. Event-systeem en objectdetectie (A2, #68)
+
+**Werkaannames** (fasekader §5): de regels E-06, E-07b, E-10, E-10b en E-13 uit `gdd.md` v0.2, zolang T3a (#67) ze herschrijft; co-op volgens besluit #51 (7A): hooguit twee lichamen (C-01), P2 is in co-op de partner op de schaduwlaag (C-02 v0.2) en heeft geen eigen echo; de staartduur (± 2 s, #51) is een parameter van de echo en raakt dit systeem niet. De co-op-finisher (gedeelde echo, 8A) is nog niet gebouwd; die komt met T3b en T16c.
+
+### Keuze A2: een directe vormtest in de tick, géén tick vertraging
+
+Objecten (drukplaten, hendels, later zones en het schild) zien in stap (5) de lichamen van **dezelfde** tick. Een object vergelijkt zijn vlak met de vorm van elk lichaam dat de Sim doorgeeft (`Shape2D.collide` op de `global_transform` van de nodes). Dat zijn hooguit twee lichamen (C-01), dus de kosten zijn verwaarloosbaar.
+
+Waarom niet de twee opties uit SM-punt 2 op PR #16:
+
+| Optie | Wat het meet (Godot 4.6.3, headless) | Oordeel |
+|---|---|---|
+| `Area2D` met `body_entered` / `get_overlapping_bodies()` | Loopt **2 ticks** achter: de overlap wordt in de physics-stap ná `_physics_process` berekend en pas de frame daarna gemeld. | Verworpen. E-13 ("plaat precies die 30 ticks aan") klopt dan alleen verschoven. |
+| `intersect_shape`-query op de physics-ruimte | Loopt **1 tick** achter. Een kinematisch lichaam (`CharacterBody2D`, `AnimatableBody2D`) krijgt zijn nieuwe positie pas in de physics-stap; ook `PhysicsServer2D.body_set_state` of `force_update_transform` verandert dat niet. | Verworpen voor bewegende lichamen. Bruikbaar tegen statische geometrie (E-08a/b: de vorm van de echo tegen laag 1 en 5). |
+| **Directe vormtest** | **0 ticks**: dezelfde posities als P1 en de echo in stap 1–2 kregen. | **Gekozen.** |
+
+Een tick vertraging accepteren had gekund, maar dan loopt alles wat de echo bedient één tick achter op wat de speler ziet, en elke regel- en testwaarde krijgt een "+1". Dat is foutgevoelig voor elke volgende regel (T3a, T3b) en voor levelontwerp; de vormtest is even goedkoop en exact.
+
+`test_objects.gd` legt alle drie vast: `test_plates_follow_bodies_on_the_same_tick` (0 ticks verschil) en `test_physics_space_lags_behind_direct_test` (1 en 2 ticks). Wordt die laatste rood na een engine-update, dan is de volgorde van Godot veranderd: dan herbekijkt de TD deze keuze.
+
+**Gevolg voor E-07a (schaduwplank, T16a):** P1 botst met de plank via `move_and_slide`, dus via de physics-ruimte. Een plank als `AnimatableBody2D` staat daar één tick achter. Advies, **te bewijzen in T16a**: maak de plank een `StaticBody2D` en zet zijn positie in stap (1) ook met `PhysicsServer2D.body_set_state(rid, BODY_STATE_TRANSFORM, …)`. In een losse probe (buiten de testsuite, Godot 4.6.3) vond een ruimte-query een zo verplaatst `StaticBody2D` in dezelfde tick, en een `AnimatableBody2D` pas de tick erna. Dat is nog niet bewezen met `move_and_slide` van P1 op de plank; dat doet de Gameplay Programmer met de E-07a-test.
+
+### Events
+
+- **Een event is één bit per tick per actor** (`GameEvents`: `ATTACK`, `INTERACT`), net als de input. `EventDetector` maakt ze uit de input: op de flank 0 → 1, met een herhaaltijd per soort (E-10: AANVAL 20 ticks). De tabel `FROM_INPUT` houdt bit, soort en herhaaltijd bij elkaar; T3a kan waarden wijzigen zonder code te raken.
+- **De recorder neemt het eventmasker op** (`clip.events[k]`), ongeacht of het event bij P1 iets raakte (E-10). De echo voert het event van frame `p` uit tegen de **huidige** wereld, met zijn eigen laag (E-06).
+- **De Sim voert events uit in stap (4)**: eerst van P1, dan van de schaduw; binnen één actor in oplopende bitvolgorde. INTERACTIE bedient het object waarvan het vlak het lichaam overlapt en dat dit lichaam mag bedienen; bij meerdere het dichtstbijzijnde middelpunt, bij gelijke afstand het eerst toegevoegde (E-10b). Elk uitgevoerd event gaat uit als signaal `Sim.event_executed(tick, soort, actor, doel)`.
+- **Waar nieuwe regels inhaken.** Een nieuwe eventsoort (bv. het schaduwmerk van E-14 of de merksprong van E-02, T16a) krijgt het volgende vrije bit en een regel in `FROM_INPUT` of wordt door zijn eigen systeem gezet, en een tak in `Sim._execute`. Een echo die breekt (E-08) zet `tick_events` op 0 voor die tick. Een nieuw object erft van `SimObject` en implementeert `interact` en/of `sim_update`. Aanvallen (E-10a, E-14) zijn nog niet gebouwd: het event bestaat en wordt opgenomen, maar raakt nog niets.
+- **Open:** het bit `INTERACT` heeft nog geen InputMap-actie of toets; alleen gescripte input gebruikt het. Dat volgt met de volledige bitset in T16a.
+
+### C-01 in de Sim
+
+De Sim laat hooguit één schaduwlichaam toe: een echo óf P2. `add_echo` weigert (`false`) zolang P2 meedoet of er al een echo speelt; doet P2 mee, dan haalt de Sim een spelende echo meteen weg. Een echo die niet afspeelt, heeft geen laag, is onzichtbaar en telt niet mee voor objecten (`EchoActor.is_present()`). Na zijn laatste frame blijft hij tot het einde van die tick, zodat objecten dat frame nog zien; daarna haalt de Sim hem uit `echoes`. De node zelf ruimt de eigenaar op (`remove_echo` of `queue_free`), zodat die het resultaat nog kan lezen. Waar P2 verschijnt en wanneer de echo terugkomt (C-03, C-05), regelt de drop-in/drop-out (T16c), niet de Sim. Komt de co-op-finisher als derde lichaam (T3b), dan is `Sim.can_add_echo` de ene plek die verandert.
 
 ## 5. Input-laag voor 2 lokale spelers
 
@@ -177,12 +218,17 @@ Spelers maskeren 1 + 4, echo's 1 + 5. Zo kan een echo door een lichtmuur heen en
 | `test_state_echo_reaches_same_position` | Kern-DoD: echo eindigt exact op de positie van het origineel na 10 s |
 | `test_input_echo_reaches_same_position` | Input-replay is exact in een ongewijzigde wereld |
 | `test_ring_buffer_keeps_last_10_seconds` | Buffer houdt precies tick 300–899 vast na 900 ticks, zonder gaten |
-| `test_two_players_each_get_exact_echo` | 2 spelers, elk een exacte echo (beide modi), terwijl de spelers live doorbewegen |
+| `test_coop_recorders_each_give_exact_echo` | Co-op: beide spelers nemen tegelijk op; na de drop-out van P2 geeft elke opname een exacte echo (beide modi, na elkaar, C-01) terwijl P1 live doorbeweegt |
 | `test_world_change_breaks_input_echo_not_state_echo` | Legt het risico van input-opname vast |
 | `test_hidden_state_breaks_input_echo_at_clip_start` | Legt het risico van verborgen toestand vast |
 | `test_recorder_snapshot_is_independent_copy` | Een clip verandert niet als de recorder doorschrijft |
 | `test_zero_checks_is_fail` e.a. (`test_runner.gd`, 6 tests) | Runner-oordeel: 0 checks, scriptfout of niet afgerond = FAIL; schone test met checks = PASS |
-| `test_tick_order_shadow_before_p1` (`test_sim.gd`) | Logtest E-07b: per tick echo → P2 → P1, ongeacht de volgorde van toevoegen |
+| `test_tick_order_solo_steps_1_to_5`, `test_tick_order_coop_steps_1_to_5` (`test_sim.gd`) | Logtest E-07b stap 1–5: schaduw → P1 stapt → P1 opgenomen → events P1 → events schaduw → objecten, solo en co-op, ongeacht de volgorde van toevoegen |
+| `test_events_p1_before_shadow_then_objects_same_tick` (`test_sim.gd`) | E-07b stap 4–5 met inhoud: P1 en echo bedienen op dezelfde tick dezelfde Wissel-hendel (eerst P1, dan de echo); een schaduwplaat ziet de echo op zijn eerste en laatste tick |
+| `test_c01_never_more_than_two_bodies` (`test_sim.gd`) | C-01: 3000 ticks met twee keer meedoen en stoppen van P2: elke tick ≤ 1 schaduwlichaam en ≤ 2 lichamen, geen echo zichtbaar of botsend in co-op, nieuwe echo geweigerd in co-op |
+| `test_events_on_rising_edge_with_attack_cooldown` e.a. (`test_events.gd`, 3 tests) | E-10 (flank, herhaaltijd AANVAL), echo voert een opgenomen INTERACTIE uit tegen de huidige wereld (E-06), E-10b (dichtstbijzijnde object) |
+| `test_plates_follow_bodies_on_the_same_tick` (`test_objects.gd`) | A2 + E-06 + E-13: schaduw-, licht- en gedeelde plaat volgen P1 en de echo op elke tick zonder vertraging |
+| `test_physics_space_lags_behind_direct_test` (`test_objects.gd`) | Legt vast waarom niet via de physics-ruimte: `intersect_shape` 1 tick, `Area2D` 2 ticks achter |
 | `test_p1_sees_shadow_of_same_tick_and_is_recorded_after_step` (`test_sim.gd`) | Als P1 stapt, staat de echo al op zijn frame van dezelfde tick; P1 wordt na zijn stap opgenomen |
 | `test_p2_action_only_on_right_ctrl` (`test_input.gd`) | P2-echo alleen op rechter Ctrl, niet op linker |
 
@@ -196,7 +242,8 @@ De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gave
 | R2 | Eigen testrunner in plaats van GUT of gdUnit4. | Schuld | Volstaat voor nu. Bij meer dan ±30 tests overstappen op GUT (MIT). Daarvoor eerst opname in `docs/licenties.md` door de Business/Legal Advisor. |
 | R3 | Acties in `input_setup.gd` staan in code, niet in een rebindbare config. | Schuld | Vervangen door InputRouter + opgeslagen bindings (preproductie). |
 | R4 | `preload()` in plaats van `class_name` (geen globale klassennamen). | Bewuste keuze | Werkt op een verse clone zonder importcache. Heroverwegen als CI `--import` draait. |
-| R5 | Echo-acties (aanval, schakelaar) zijn alleen een bit; er is nog geen event-systeem. | Schuld | Eventlijst per frame zodra combat- en puzzelregels bekend zijn (#6). |
+| R5 | ~~Echo-acties zijn alleen een bit; er is nog geen event-systeem.~~ | Afgelost | Event-systeem en objecten gebouwd (§4a, #68). Rest: aanvallen raken nog niets (E-10a, E-14: T16a). |
+| R8 | De physics-ruimte ziet kinematische lichamen één tick te laat (§4a). Objecten omzeilen dat, maar de schaduwplank (E-07a) botst via de ruimte. | Risico | Plank als `StaticBody2D` met `body_set_state` in stap (1); bewijzen met de E-07a-test (T16a, Gameplay Programmer). |
 | R6 | Geen CI: tests draaien alleen als een agent of mens ze start. | Risico | GitHub Actions-workflow met dezelfde download en hetzelfde commando. Vraagt een besluit over Actions-minuten (EP). |
 | R7 | Spike-code (blokje, `spike_world.gd`) is geen productiecode. | Schuld | Vervangen in preproductie. `Motor` wordt de echte speler-controller van de Gameplay Programmer, met de regels uit §2. |
 

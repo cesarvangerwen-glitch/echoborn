@@ -1,12 +1,14 @@
 extends RefCounted
 ## Een bevroren, chronologische opname (oudste frame eerst).
 ##
-## Frame k bevat: de tick, de input die in die tick is toegepast, de
-## toestand vóór de tick (pre_*) en de toestand ná de tick (post_*).
+## Frame k bevat: de tick, de input die in die tick is toegepast, de events
+## van die tick (E-10), de toestand vóór de tick (pre_*) en de toestand ná
+## de tick (post_*).
 ## Een clip verandert niet meer; de recorder kan intussen doorschrijven.
 
 var ticks := PackedInt32Array()
 var inputs := PackedInt32Array()
+var events := PackedInt32Array()
 var pre_pos := PackedVector2Array()
 var pre_vel := PackedVector2Array()
 var pre_on_floor := PackedByteArray()
