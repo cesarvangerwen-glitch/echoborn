@@ -1,9 +1,9 @@
 # Kernloop *Polderlight*
 
-Versie 0.4 · Eigenaar: Lead Game Designer · Issue [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (T3c) · vorige versies: #6
+Versie 0.4.1 · Eigenaar: Lead Game Designer · Issue [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (T3c) · vorige versies: #6
 Werktitel *Polderlight* (besluit #96); repo en mappen heten nog "echoborn", de mechaniek heet "echo".
 Bronnen: `docs/concept/pitch.md` **v0.4** (pillars P1–P3, puzzeldefinitie en normen §4, R-V4), `docs/beslissingen.md` (#2 randvoorwaarden, #18 stijl 2D, **#51 deel 2**: 1A, 7A, 8A), `docs/productie/fase-2-kader.md` v0.2.
-De exacte regels staan in `docs/design/gdd.md` v0.5. Dit document laat zien hoe ze in de loop passen, legt de aantallen en de terugkeerregels vast, toetst alles aan de pillars (§6) en zet op een rij wat de partner in co-op van de echo houdt (§7).
+De exacte regels staan in `docs/design/gdd.md` v0.5.1. Dit document laat zien hoe ze in de loop passen, legt de aantallen en de terugkeerregels vast, toetst alles aan de pillars (§6) en zet op een rij wat de partner in co-op van de echo houdt (§7).
 
 **Werkaanname** (kader §5): CEO-besluiten #2 (5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12) en #51 deel 2, fasekader v0.2. Daarnaast **werkaanname LGD**: 4 gebieden (de bovengrens van #2) en alle aantallen in §5 als **maximum**; de wereldstructuur in GDD v1 (T3c) bevestigt of kiest 3 gebieden, met de gevolgen uit §5.
 
@@ -22,7 +22,7 @@ De loop draait op vier tijdschalen. Alle vier leunen ze op de echo (P1), lezen z
 | **Moment** | ± 2 s (D, gdd E-02) | Springen, dashen, slaan, merken | Komt een tel later vóór of onder je uit: springplank, vang, tweede slag die je merk laat knallen |
 | **Keten** | 20–60 s | Een sprongketen of een merk-arena in één beweging | Minstens één echo-actie per ± 20 s (norm 2, L-11); vult de meter het snelst |
 | **Wijk** | ± 10–20 min | Door een donkere, grijze wijk naar het gemaal, oppompen, de geopende route nemen | Pompt mee (LM-03); zonder echo kan het ook, hooguit 2× zo lang (LM-09) |
-| **Gebied** | 60–70 min eerste bezoek | 2–4 wijken, een vaardigheid, een minibaas en een boss, daarna terugkeren | Krijgt bij elke vaardigheid een nieuwe betekenis (gdd §3); verplicht bij de boss |
+| **Gebied** | 60–70 min eerste bezoek, **exclusief minibaas, boss en terugkeren** (die tellen apart, §5) | 2–4 wijken en een vaardigheid; daarna een minibaas, een boss en terugkeren | Krijgt bij elke vaardigheid een nieuwe betekenis (gdd §3); verplicht bij de boss |
 
 ## 2. Diagram: macro-loop (gebied en spel)
 
@@ -87,7 +87,7 @@ Randvoorwaarden (besluit #2): 5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12. 
 
 | Onderdeel | Maximum / richtgetal |
 |---|---|
-| Gebieden | Max. **4**, elk **60–70 min** bij een eerste bezoek; plus een proloog van 10–15 min |
+| Gebieden | Max. **4**, elk **60–70 min** bij een eerste bezoek, **exclusief minibaas, boss en terugkeren**; plus een proloog van 10–15 min |
 | Wijken | **2–4 per gebied**, elk met één gemaal van 1–2 trappen (gdd L-14, LM-08) |
 | Vaardigheden | **4**, één per gebied (gdd §3: Neerslag, Snijlijn, Wandgreep, Meerlijn); geen vaardigheid zonder echo-betekenis |
 | Bosses | Max. **5**: 4 gebiedsbosses + 1 eindboss, 8–12 min per boss inclusief pogingen; elke boss vraagt samenwerken (C-16) |
@@ -97,7 +97,7 @@ Randvoorwaarden (besluit #2): 5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12. 
 | Terugkeerpoorten | **2–4 per gebied** in gebied 1–3 (max. 12), zie de terugkeerregels hieronder |
 | Toon (PEGI 12) | Echo en vijanden lossen op in licht of schaduw; geen bloed. Water is een droom, geen ramp in beeld (pitch §6). De "breek" van de echo is een oplossing in schaduwdeeltjes, geen sterfscène |
 
-**Rekensom** (inclusief terugkeren, A3: SM-punt 4 op PR #16). Terugkeren valt **niet** binnen de 60–70 min van een gebied: het telt apart, met **2–3 min per terugkeerpoort** (heen vanaf het dichtstbijzijnde gemaal en terug, K-05).
+**Rekensom** (inclusief terugkeren, A3: SM-punt 4 op PR #16). De 60–70 min van een gebied zijn **exclusief** minibaas, boss en terugkeren: die drie tellen apart (kolommen hieronder). Terugkeren kost **2–3 min per terugkeerpoort**: ≤ 2 min lopen (heen vanaf het dichtstbijzijnde gemaal en terug, elk ≤ 1 min, K-05) plus ≤ 1 min voor de poort en wat erachter ligt.
 
 | | Proloog | Gebieden | Bosses | Minibazen | Terugkeren | Totaal |
 |---|---|---|---|---|---|---|
@@ -105,6 +105,8 @@ Randvoorwaarden (besluit #2): 5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12. 
 | Bovengrens | 15 | 4 × 70 = 280 | 5 × 12 = 60 | 4 × 5 = 20 | 12 × 3 = 36 | **411 min ≈ 6,9 uur** |
 
 Beide binnen 5–7 uur. **Met 3 gebieden** (4 bosses, terugkeerpoorten alleen in gebied 1–2) haalt de ondergrens de 5 uur pas als een gebied **± 85 min** duurt (10 + 3 × 85 + 4 × 8 + 3 × 3 + 4 × 2 = 314 min). Dat zijn grotere gebieden met meer wijken; de wereldstructuur kiest (gdd §8).
+
+**Open punt (wereldstructuur, gdd §8 punt 1):** met 3 gebieden haalt de ondergrens de 5 uur pas bij ± 85 min per gebied; de wereldstructuur kiest dat expliciet, met het aantal wijken per gebied en de kost in kamers (max. 30 per gebied).
 
 ### Terugkeerregels (backtracking)
 
@@ -116,7 +118,7 @@ Voor de World & Level Designer. Gebied *n* is het gebied waar vaardigheid *n* li
 | **K-02** | De ingang van gebied *n + 1* (n = 1–3) ligt in gebied 1 t/m *n* achter een poort die vaardigheid *n* vraagt. Zo is terugkeren de brug naar het volgende gebied (diagram §2). |
 | **K-03** | **Gebied 4 heeft geen terugkeerpoorten**: alles in gebied 4 is te openen met vaardigheid 1–4 tijdens het eerste bezoek. Gebied 4 rondt het terugkeren af: met vaardigheid 4 gaan de laatste terugkeerpoorten in gebied 1–3 open (K-01). |
 | **K-04** | De **eindboss-poort** is **geen echo-puzzel** maar een **route in beweging** die elke vaardigheid minstens één keer vraagt (een luik, een rietgordijn, een greep-schacht, een kloof met meerringen), met een echolijn en een langzame lijn per stuk (gdd L-08) en zonder stap waarin je stilstaat om iets te bedenken (FK-1). De eindboss vraagt samenwerken (C-16) en mag alle vier vaardigheden gebruiken. Achter terugkeerpoorten ligt verder alleen optionele inhoud (verzamelobjecten, snelkoppelingen); de kritieke route gaat alleen door de poorten uit K-02 en K-04. |
-| **K-05** | **Terugkeren gaat door open wijken.** Elke terugkeerpoort ligt binnen **2 min lopen** van een gemaal (checkpoint, LM-08) via wijken die al zijn opgepompt (lussen en snelkoppelingen, L-12, L-14f). Zo blijft terugkeren in flow en klopt de rekensom hierboven. |
+| **K-05** | **Terugkeren gaat door open wijken.** Elke terugkeerpoort ligt binnen **≤ 1 min lopen, enkele reis,** van een gemaal (checkpoint, LM-08) via wijken die al zijn opgepompt (lussen en snelkoppelingen, L-12, L-14f); heen en terug dus ≤ 2 min. Zo blijft terugkeren in flow en klopt de rekensom hierboven (2–3 min per poort). Gemeten bij een eerste speler zonder omwegen; de World & Level Designer toetst het met de wereldkaart. |
 
 Toetsing: checklist bij de wereldkaart (World & Level Designer, review LGD), in T3c.
 
@@ -199,4 +201,5 @@ Iedereen kan alles ook alleen, alleen langzamer (C-15), dus niemand hoeft op de 
 | 0.1 | Eerste versie (PR #16). |
 | 0.2 | Lead-review EP (PR #16): terugkeerregels K-01–K-04 (gebied 4 en eindboss), aantallen als maximum met rekensom 5,1–6,6 uur, toestandsdiagram met Leeg → Overgenomen, macro-diagram met eindboss-poort. Fasekader v1.1: pillartoets per groep echo-regels (§6.1, E2a) en overzicht wat P2 van de echo houdt (§7, E2b). Stijlbesluit 2D verwerkt. |
 | 0.2.1 | Werktitel *Polderlight* (besluit #96, [#37](https://github.com/cesarvangerwen-glitch/echoborn/issues/37)); verwijzing naar gdd v0.4 voor staart en co-op 7A. |
+| 0.4.1 | Herstel na de Lead-review van de EP (PR #108): de 60–70 min per gebied zijn **exclusief** minibaas, boss en terugkeren (§1, §5); **K-05** ≤ 1 min lopen enkele reis (heen en terug ≤ 2 min), passend bij 2–3 min per terugkeerpoort in de rekensom (5,2–6,9 uur blijft); open punt 3 gebieden (± 85 min per gebied) naar de wereldstructuur. |
 | 0.4 | Herschreven naar pitch v0.4 en `gdd.md` v0.5 (T3c, [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81)); het versienummer volgt de pitch. Loop in één zin met licht oppompen en **0 puzzels op de kritieke route** (§1); vier tijdschalen met de staart D (moment, keten, wijk, gebied); macro-loop met wijken en gemalen, kamerloop zonder plannen/oplossen, toestandsdiagram met Buiten, Merksprong en Partner (§2–§4). §5: wijken, vaardigheden bij naam, **scopeplafond combat (R-V4)**, 0 puzzelkamers, optionele echo-uitdagingen max. 2 per gebied; rekensom met minibazen en **terugkeertijd** (A3: SM-punt 4 op PR #16), 5,2–6,9 uur, en het gevolg van 3 gebieden. **K-04** zonder echo-puzzel (route in beweging met alle vier vaardigheden), nieuw **K-05** (terugkeren door open wijken). §6 pillartoets op de pillars van v0.4; §7 co-op 7A; §8 flow-kamer en slice. |
