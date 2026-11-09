@@ -246,14 +246,13 @@ func _device_bits(key: String) -> int:
 		return 0
 	var axis_x: float = _devices[key]["axis_x"]
 	var bits := 0
-	if _is_pressed(key, "left") or axis_x < -InputSetup.DEADZONE:
+	if axis_x < -InputSetup.DEADZONE:
 		bits |= InputBits.LEFT
-	if _is_pressed(key, "right") or axis_x > InputSetup.DEADZONE:
+	elif axis_x > InputSetup.DEADZONE:
 		bits |= InputBits.RIGHT
-	if _is_pressed(key, "jump"):
-		bits |= InputBits.JUMP
-	if _is_pressed(key, "action"):
-		bits |= InputBits.ACTION
+	for control: String in InputSetup.BUTTON_BITS:
+		if _is_pressed(key, control):
+			bits |= InputSetup.BUTTON_BITS[control]
 	return bits
 
 

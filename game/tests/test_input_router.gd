@@ -41,10 +41,12 @@ func _stick(router: InputRouter, device: int, value: float) -> void:
 	router.handle_event(event)
 
 
-func _key(keycode: Key, pressed: bool, device: int = 0) -> InputEventKey:
+func _key(keycode: Key, pressed: bool, device: int = 0,
+		location: KeyLocation = KEY_LOCATION_UNSPECIFIED) -> InputEventKey:
 	var event := InputEventKey.new()
 	event.device = device
 	event.physical_keycode = keycode
+	event.location = location
 	event.pressed = pressed
 	return event
 
@@ -302,3 +304,82 @@ func test_debug_scene_shows_both_slots(t) -> void:
 	t.check(text.contains("Plaats 1:") and text.contains("Plaats 2:"),
 		"controlescherm toont de plaatsen niet")
 	debug.free()
+
+
+## #101: ATTACK, INTERACT, ECHO en DASH komen per apparaat als bit door, voor beide plaatsen en
+## voor toetsenbord en joypad, zonder door elkaar te lopen (gdd §2.5, `input.md` §2a).
+func test_attack_interact_echo_dash_bits_for_both_slots(t) -> void:
+	var bits_script: Script = load("res://scripts/input/input_bits.gd")
+	var constants := bits_script.get_script_constant_map()
+	t.check(constants.has("ATTACK") and not constants.has("ACTION"), "de alias ACTION bestaat nog")
+	# [apparaat, [knop, bit], ...]: kb1 = P1, kb2 = P2; joy0 = P1, joy1 = P2.
+	var kb_cases := [
+		[[KEY_E, KEY_LOCATION_UNSPECIFIED], [KEY_CTRL, KEY_LOCATION_RIGHT], InputBits.ATTACK],
+		[[KEY_F, KEY_LOCATION_UNSPECIFIED], [KEY_SLASH, KEY_LOCATION_UNSPECIFIED],
+			InputBits.INTERACT],
+		[[KEY_Q, KEY_LOCATION_UNSPECIFIED], [KEY_PERIOD, KEY_LOCATION_UNSPECIFIED],
+			InputBits.ECHO],
+		[[KEY_SHIFT, KEY_LOCATION_LEFT], [KEY_SHIFT, KEY_LOCATION_RIGHT], InputBits.DASH],
+	]
+	var kb := _router({})
+	kb.handle_event(_key(KEY_SPACE, true))
+	kb.handle_event(_key(KEY_SPACE, false))
+	kb.handle_event(_key(KEY_ENTER, true))
+	kb.handle_event(_key(KEY_ENTER, false))
+	t.check(kb.slot_device(1) == "kb1" and kb.slot_device(2) == "kb2", "helften niet gekoppeld")
+	for case: Array in kb_cases:
+		var bit: int = case[2]
+		for slot: int in [1, 2]:
+			var k: Array = case[slot - 1]
+			kb.handle_event(_key(k[0], true, 0, k[1]))
+			t.check(kb.slot_bits(slot) == bit, "toets %s gaf plaats %d %s, verwacht %s" % [
+				OS.get_keycode_string(k[0]), slot, InputBits.describe(kb.slot_bits(slot)),
+				InputBits.describe(bit)])
+			t.check(kb.slot_bits(3 - slot) == 0, "toets %s stuurt ook plaats %d"
+				% [OS.get_keycode_string(k[0]), 3 - slot])
+			kb.handle_event(_key(k[0], false, 0, k[1]))
+			t.check(kb.slot_bits(slot) == 0, "toets %s blijft hangen" % OS.get_keycode_string(k[0]))
+	# Alles tegelijk: de bits tellen op.
+	for case: Array in kb_cases:
+		kb.handle_event(_key(case[0][0], true, 0, case[0][1]))
+	t.check(kb.slot_bits(1) == InputBits.ATTACK | InputBits.INTERACT | InputBits.ECHO
+		| InputBits.DASH, "samen ingedrukt: %s" % InputBits.describe(kb.slot_bits(1)))
+	kb.free()
+
+	var pad_cases := [
+		[JOY_BUTTON_X, InputBits.ATTACK],
+		[JOY_BUTTON_Y, InputBits.INTERACT],
+		[JOY_BUTTON_LEFT_SHOULDER, InputBits.ECHO],
+		[JOY_BUTTON_RIGHT_SHOULDER, InputBits.DASH],
+	]
+	var pads := _router({0: GUID_XBOX, 1: GUID_DS4})
+	_tap(pads, 0, JOY_BUTTON_A)
+	_tap(pads, 1, JOY_BUTTON_START)
+	for case: Array in pad_cases:
+		for slot: int in [1, 2]:
+			_pad(pads, slot - 1, case[0], true)
+			t.check(pads.slot_bits(slot) == case[1], "knop %d gaf plaats %d %s" % [case[0], slot,
+				InputBits.describe(pads.slot_bits(slot))])
+			t.check(pads.slot_bits(3 - slot) == 0, "knop %d stuurt ook plaats %d"
+				% [case[0], 3 - slot])
+			_pad(pads, slot - 1, case[0], false)
+			t.check(pads.slot_bits(slot) == 0, "knop %d blijft hangen" % case[0])
+	pads.free()
+
+
+## #101: de knop die liet meedoen, doet niets tot hij los is (W5), ook als het een
+## schouderknop is; en d-pad omhoog/omlaag geeft geen bit (bit 6/7 zijn gereserveerd).
+func test_join_press_is_swallowed_and_dpad_up_down_give_no_bits(t) -> void:
+	var router := _router({0: GUID_XBOX})
+	_pad(router, 0, JOY_BUTTON_RIGHT_SHOULDER, true)
+	t.check(router.slot_device(1) == "joy0", "schouderknop gaf plaats 1 niet")
+	t.check(router.slot_bits(1) == 0, "de meedoen-druk dashte ook")
+	_pad(router, 0, JOY_BUTTON_RIGHT_SHOULDER, false)
+	_pad(router, 0, JOY_BUTTON_RIGHT_SHOULDER, true)
+	t.check(router.slot_bits(1) == InputBits.DASH, "tweede druk dasht niet")
+	_pad(router, 0, JOY_BUTTON_RIGHT_SHOULDER, false)
+	_pad(router, 0, JOY_BUTTON_DPAD_UP, true)
+	_pad(router, 0, JOY_BUTTON_DPAD_DOWN, true)
+	t.check(router.slot_bits(1) == 0, "d-pad omhoog/omlaag gaf %s"
+		% InputBits.describe(router.slot_bits(1)))
+	router.free()

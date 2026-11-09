@@ -9,9 +9,6 @@ const RIGHT := 2
 const JUMP := 4
 ## AANVAL (gdd §2.5, bit 3). Heette ACTION in de spike.
 const ATTACK := 8
-## Oude naam van ATTACK. Blijft tot de InputRouter (T5a) de nieuwe acties
-## kent; nieuwe code gebruikt ATTACK.
-const ACTION := ATTACK
 ## INTERACTIE (bit 4): hendel, deur, oppakken.
 const INTERACT := 16
 ## Echo-knop (bit 5): Loslaten na 30 ticks vasthouden (E-09). Nooit een event.

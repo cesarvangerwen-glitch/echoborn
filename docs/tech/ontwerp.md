@@ -58,7 +58,7 @@ Gebieden zijn losse scènes, zodat World & Level Designers parallel kunnen werke
 
 | Bestand | Rol |
 |---|---|
-| `scripts/input/input_bits.gd` | Bitmasker per tick: LEFT, RIGHT, JUMP, ACTION |
+| `scripts/input/input_bits.gd` | Bitmasker per tick (gdd §2.5): LEFT, RIGHT, JUMP, ATTACK, INTERACT, ECHO, DASH |
 | `scripts/input/device_input.gd` | Leest `p<n>_*`-acties voor speler n |
 | `scripts/input/scripted_input.gd` | Speelt een vast script af (tests) |
 | `scripts/echo/motor.gd` | Gedeelde beweging (statisch, deterministisch) |
@@ -157,7 +157,7 @@ De Sim laat hooguit één schaduwlichaam toe: een echo óf P2. `add_echo` weiger
 
 ## 5. Input-laag voor 2 lokale spelers
 
-- Acties per speler: `p1_left`, `p1_right`, `p1_jump`, `p1_action`, en hetzelfde voor `p2_`. In de spike worden ze in code gezet (`input_setup.gd`): P1 toetsenbord WASD + spatie + E en joypad 0; P2 pijltjes + Enter + rechter Ctrl en joypad 1.
+- Acties per speler: `p1_left`, `p1_right`, `p1_jump`, `p1_attack`, `p1_interact`, `p1_echo`, `p1_dash`, en hetzelfde voor `p2_`. Ze worden in code gezet (`input_setup.gd`); de knoppen staan in `input.md` §3a.
 - Godot-acties zijn standaard voor alle apparaten. Joypad-events krijgen daarom een vast `device`; toetsenbord-events gelden voor alle apparaten en zijn per speler verdeeld over verschillende toetsen.
 - **Volgende stap (preproductie): `InputRouter`-autoload.** Die kent apparaten dynamisch toe aan spelers ("druk op een knop om mee te doen"), regelt drop-in/drop-out, en houdt rekening met joypads die tijdens het spel (los)gekoppeld worden (`Input.joy_connection_changed`). De gameplay-code verandert daarvoor niet: die leest alleen inputbronnen.
 - Rebinding en opgeslagen besturing: UX Designer bepaalt het scherm, Engine & Platform Programmer bouwt het, opslag via SaveService.
@@ -230,7 +230,7 @@ Spelers maskeren 1 + 4, echo's 1 + 5. Zo kan een echo door een lichtmuur heen en
 | `test_plates_follow_bodies_on_the_same_tick` (`test_objects.gd`) | A2 + E-06 + E-13: schaduw-, licht- en gedeelde plaat volgen P1 en de echo op elke tick zonder vertraging |
 | `test_physics_space_lags_behind_direct_test` (`test_objects.gd`) | Legt vast waarom niet via de physics-ruimte: `intersect_shape` 1 tick, `Area2D` 2 ticks achter |
 | `test_p1_sees_shadow_of_same_tick_and_is_recorded_after_step` (`test_sim.gd`) | Als P1 stapt, staat de echo al op zijn frame van dezelfde tick; P1 wordt na zijn stap opgenomen |
-| `test_p2_action_only_on_right_ctrl` (`test_input.gd`) | P2-echo alleen op rechter Ctrl, niet op linker |
+| `test_p2_attack_only_on_right_ctrl` (`test_input.gd`) | P2-aanval alleen op rechter Ctrl, niet op linker |
 
 De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gaven dezelfde posities.
 

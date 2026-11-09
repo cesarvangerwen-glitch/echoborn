@@ -56,13 +56,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		_tail = int(options[DEBUG_TAIL_KEYS[event.physical_keycode]])
 		if _echo:
 			_echo.set_tail_ticks(_tail, _sim.tick)
-	elif event.is_action_pressed("p2_action") and _p2 == null:
+	elif event.is_action_pressed("p2_attack") and _p2 == null:
 		_p2 = PlayerActor.new()
 		_p2.setup(2, DeviceInput.new(2), PLAYER_COLORS[1])
 		_p2.position = _p1.position
 		_sim.add_player(_p2)
 		_echo = null  # de Sim heeft hem weggehaald (C-01)
-	elif event.is_action_pressed("p2_action") and _p2 != null:
+	elif event.is_action_pressed("p2_attack") and _p2 != null:
 		_sim.remove_player(_p2)
 		_p2 = null
 		_add_echo()

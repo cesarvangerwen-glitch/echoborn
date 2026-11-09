@@ -17,7 +17,7 @@ const TEN_SECONDS := 600
 const L := InputBits.LEFT
 const R := InputBits.RIGHT
 const J := InputBits.JUMP
-const A := InputBits.ACTION
+const A := InputBits.ATTACK
 
 ## 600 ticks lopen, springen, omkeren en stilstaan (P1).
 const SCRIPT_P1 := [
