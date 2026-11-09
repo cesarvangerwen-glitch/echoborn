@@ -106,6 +106,7 @@ func _ready() -> void:
 	sim = Sim.new()
 	sim.name = "Sim"
 	add_child(sim)
+	sim.combat.tail_ticks = tail  # merk-levensduur D + 30, ook zonder echo (C-12e)
 	p1 = PlayerActor.new()
 	p1.setup(1, input_override if input_override else _router_source(1), P1_COLOR)
 	p1.position = Layout.RUN_START
@@ -125,6 +126,13 @@ func _ready() -> void:
 		if _k3_tint:
 			_k3_tint.color = Color(0.45, 0.35, 0.2, 0.35))
 	sim.tick_finished.connect(_on_tick)
+	# C-06: werkaanname T16c: de onderrand is die van het hele gebied (K2 gaat
+	# open over in K3, dus een val van K2 naar K3 is geen val uit de kamer).
+	sim.room_bottom = Layout.K1.end.y
+	sim.partner_dissolved.connect(func(t: int, at: Vector2, cause: String) -> void:
+		meetlog.add_row(t, "P2_OPGELOST", "", cause, at))
+	sim.partner_returned.connect(func(t: int, at: Vector2) -> void:
+		meetlog.add_row(t, "P2_TERUG", "", "", at))
 	var router := _router()
 	if router and input_override == null:
 		router.slot_joined.connect(_on_slot_joined)
@@ -150,8 +158,17 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if _camera and is_instance_valid(p1):
 		var focus := p1.position
-		if p2 and is_instance_valid(p2):
+		var zoom := 2.0
+		if p2 and is_instance_valid(p2) and not p2.dissolved:
+			# C-07: beide in beeld tot de maximale zoom-uit (leash_view_px,
+			# werkaanname); daarbuiten volgt de camera P1 en loopt de leiband.
+			var view: Array = Tuning.coop()["leash_view_px"]
+			var gap := (p2.position - p1.position).abs() + Vector2(64, 64)
+			zoom = clampf(minf(1280.0 / gap.x, 720.0 / gap.y), 1280.0 / float(view[0]), 2.0)
+			var half := Vector2(640, 360) / zoom
 			focus = (p1.position + p2.position) * 0.5
+			focus = focus.clamp(p1.position - half + Vector2(32, 32), p1.position + half - Vector2(32, 32))
+		_camera.zoom = Vector2(zoom, zoom)
 		_camera.position = focus
 	if _hud_label:
 		_update_hud()
@@ -306,7 +323,7 @@ func _all_dead(list: Array[CombatTarget]) -> bool:
 ## LM-05: 0 levenspunten = respawn op het begin van de kamer, L en G gelijk.
 func _on_health_changed(_tick: int, health: int) -> void:
 	if health <= 0:
-		p1.respawn_at(Layout.ROOM_START[room])
+		p1.respawn_at(Layout.ROOM_START[room], true)  # C-08: P2 respawnt mee
 		p1.health = int(Tuning.combat()["p1_health"])
 
 
@@ -334,33 +351,51 @@ func save_log() -> Error:
 	return err
 
 
-# --- Co-op (minimaal; T16c bouwt C-03/C-05) ---
+# --- Co-op: InputRouter -> drop-in en drop-out (C-03, C-05) ---
 
 func _on_slot_joined(slot: int, _device: String) -> void:
 	if slot != 2 or p2 != null:
 		return
-	p2 = PlayerActor.new()
-	p2.setup(2, _router_source(2), P2_COLOR)
-	p2.position = echo.position if echo and echo.is_present() else p1.position
-	if not sim.add_player(p2):
-		p2.free()
-		p2 = null
-		return
-	echo = null  # de Sim heeft hem weggehaald (C-01)
-	meter.coop = true
-	coop_seen = true
-	meetlog.add_row(sim.tick, "DROP_IN", "", "", p2.position)
+	join_partner(_router_source(2))
 
 
 func _on_slot_left(slot: int, reason: String) -> void:
 	if slot != 2 or p2 == null:
 		return
+	leave_partner("apparaat" if reason.begins_with("apparaat") else reason)
+
+
+## C-03: P2 doet mee met deze inputbron (ook voor headless tests). Neemt de
+## echo over als die afspeelt, anders de plaatsingsregel. Tussen twee ticks.
+func join_partner(source: RefCounted) -> bool:
+	if p2 != null:
+		return false
+	var partner := PlayerActor.new()
+	partner.setup(2, source, P2_COLOR)
+	if not sim.drop_in(partner):
+		partner.free()
+		return false
+	p2 = partner
+	echo = null  # de Sim heeft hem weggehaald (C-01)
+	meter.coop = true
+	coop_seen = true
+	meetlog.add_row(sim.tick, "DROP_IN", "", "", p2.position)
+	return true
+
+
+## C-05: P2 lost op; de echo van P1 neemt over (als de echo aan staat).
+func leave_partner(reason: String) -> void:
+	if p2 == null:
+		return
 	meetlog.add_row(sim.tick, "DROP_OUT", "", reason, p2.position)
-	sim.remove_player(p2)
+	var new_echo: TailEcho = sim.drop_out(ECHO_COLOR)
 	p2 = null
 	meter.coop = false
-	if echo_on:
-		_add_echo()
+	if new_echo and not echo_on:
+		sim.remove_echo(new_echo)
+		new_echo = null
+	echo = new_echo
+	if echo:
 		meetlog.watch_echo(echo)
 
 

@@ -230,8 +230,9 @@ func test_c11a_stance_after_12_ticks(t) -> void:
 
 
 func test_c11a_launch_on_landing_tick(t) -> void:
-	# P2 houdt 200 ticks vast; P1 landt (laag, geen vang) op x + 150.
-	var a := _pair(t, Vector2(300, -2000), Vector2(300, Fx.STAND_Y))
+	# P2 houdt 200 ticks vast; P1 landt (laag, geen vang) op x + 150. P1 wacht
+	# opzij op de vloer, binnen het camerabeeld (anders lost P2 op, C-07).
+	var a := _pair(t, Vector2(500, Fx.STAND_Y), Vector2(300, Fx.STAND_Y))
 	var p1: PlayerActor = a["p1"]
 	var rows := _log(a["sim"], p1)
 	_bits(a["p2"], A)

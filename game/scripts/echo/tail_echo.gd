@@ -142,9 +142,13 @@ func set_tail_ticks(p_tail_ticks: int, tick: int) -> void:
 
 # --- drager (C-09, C-11, C-13): de solo-echo als tweede lichaam -------------
 
-## Draagt de plank nu (C-09)? Actief en niet in een merksprong (E-02m).
+## Draagt de plank nu (C-09)? Actief, niet in een merksprong (E-02m), en in
+## frame `p` stond P1 sinds zijn laatste grondcontact niet op een plank en
+## werd hij niet gevangen (E-07c, geen echo-toren). Een echo die niet draagt,
+## blijft Actief en zichtbaar; alleen zijn plank staat uit.
 func carrier_valid() -> bool:
-	return _active and not finished and not in_merksprong
+	return _active and not finished and not in_merksprong \
+		and _index >= 0 and not source.recorder.plank_since_ground(_index)
 
 
 ## Lanceerhouding (C-11a): frame `p` was in houding, en die houding gaf nog
@@ -216,8 +220,9 @@ func sim_step(tick: int, _delta: float) -> void:
 		_break(tick)
 		return
 	_set_active(true, tick)
-	# E-02m: tijdens de merksprong staat de plank uit.
-	plank.collision_layer = 0 if in_merksprong else Layers.PLANK
+	# E-02m: tijdens de merksprong staat de plank uit; E-07c: ook op een frame
+	# waarop P1 sinds zijn grondcontact op een plank stond.
+	plank.collision_layer = Layers.PLANK if carrier_valid() else 0
 	# Alleen een tick waarop (a) en (b) slaagden, is geldig: faalt er een
 	# binnen de tolerantie G, dan komt het breek-effect op de tick ervoor.
 	if _bad_run == 0:
@@ -435,6 +440,6 @@ func _apply_presence(active: bool) -> void:
 	visible = active
 	collision_layer = Layers.SHADOW if active else 0
 	if plank:
-		plank.collision_layer = Layers.PLANK if active else 0
+		plank.collision_layer = Layers.PLANK if active and carrier_valid() else 0
 	if not active:
 		tick_events = 0

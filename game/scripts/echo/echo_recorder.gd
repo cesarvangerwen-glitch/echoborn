@@ -9,6 +9,8 @@ extends RefCounted
 const EchoClip = preload("res://scripts/echo/echo_clip.gd")
 
 const DEFAULT_CAPACITY := 600
+## Het AANVAL-event (GameEvents.ATTACK) dat een lanceerhouding begint (C-11a).
+const STANCE_EVENT := 1 << 0
 
 var capacity: int
 
@@ -25,6 +27,11 @@ var _facing := PackedByteArray()      ## 0 = links (-1), 1 = rechts (+1)
 var _support := PackedByteArray()     ## Motor.Support
 var _anim := PackedByteArray()        ## Motor.Anim
 var _attack_held := PackedByteArray() ## `aanval_vast` (E-01, voor C-11)
+var _plank_since_ground := PackedByteArray() ## `plank_sinds_grond` (E-01, E-07c)
+## Cache voor C-11a: de tick van het AANVAL-event waarop de aaneengesloten
+## AANVAL-reeks van dit frame begon, of -1 (geen reeks). Bij `push` in O(1)
+## bijgewerkt, zodat `stance_event_tick` per tick niet terug hoeft te lopen.
+var _stance_start := PackedInt32Array()
 var _head := 0
 var _count := 0
 
@@ -45,6 +52,8 @@ func _init(p_capacity: int = DEFAULT_CAPACITY) -> void:
 	_support.resize(capacity)
 	_anim.resize(capacity)
 	_attack_held.resize(capacity)
+	_plank_since_ground.resize(capacity)
+	_stance_start.resize(capacity)
 
 
 ## `events` is het eventmasker van die tick (GameEvents, E-10). Events worden
@@ -54,7 +63,20 @@ func _init(p_capacity: int = DEFAULT_CAPACITY) -> void:
 func push(tick: int, bits: int, pre_position: Vector2, pre_velocity: Vector2,
 		pre_floor: bool, post_position: Vector2, post_velocity: Vector2,
 		events: int = 0, post_floor: bool = false, facing: int = 1,
-		support: int = 0, anim: int = 0, attack_held: bool = false) -> void:
+		support: int = 0, anim: int = 0, attack_held: bool = false,
+		plank_since_ground: bool = false) -> void:
+	# C-11a-cache: een AANVAL-event met AANVAL ingedrukt begint een reeks; een
+	# frame dat direct volgt en AANVAL nog vasthoudt, zet hem voort.
+	var stance := -1
+	if attack_held:
+		if events & STANCE_EVENT:
+			stance = tick
+		elif _count > 0:
+			var prev := (_head - 1 + capacity) % capacity
+			if _ticks[prev] == tick - 1 and _attack_held[prev] == 1:
+				stance = _stance_start[prev]
+	_stance_start[_head] = stance
+	_plank_since_ground[_head] = 1 if plank_since_ground else 0
 	_ticks[_head] = tick
 	_inputs[_head] = bits
 	_events[_head] = events
@@ -125,15 +147,19 @@ func attack_held(index: int) -> bool:
 ## C-11a voor de echo: was frame `index` in lanceerhouding? Dan de tick van het
 ## AANVAL-event waarop die houding begon, anders -1. Houding = AANVAL sinds dat
 ## event aaneengesloten ingedrukt, en het event is ≥ `hold_ticks` geleden.
-func stance_event_tick(index: int, hold_ticks: int, attack_event: int = 1 << 0) -> int:
-	var tick := _ticks[index]
-	for back in _count:
-		var i := (index - back + capacity) % capacity
-		if _ticks[i] != tick - back or _attack_held[i] != 1:
-			return -1
-		if _events[i] & attack_event:
-			return _ticks[i] if back >= hold_ticks else -1
-	return -1
+## O(1): leest de cache die `push` bijhoudt (SM-punt PR #113; de staart-echo
+## roept dit elke tick aan). Een reeks die ouder is dan de buffer blijft geldig.
+func stance_event_tick(index: int, hold_ticks: int) -> int:
+	var start := _stance_start[index]
+	if start < 0 or _ticks[index] - start < hold_ticks:
+		return -1
+	return start
+
+
+## E-07c: stond P1 in dit frame sinds zijn laatste grondcontact op een plank
+## (of werd hij gevangen)? Dan draagt de echo op dit frame niet.
+func plank_since_ground(index: int) -> bool:
+	return _plank_since_ground[index] == 1
 
 
 func events(index: int) -> int:

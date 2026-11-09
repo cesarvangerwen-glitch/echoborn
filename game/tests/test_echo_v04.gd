@@ -296,25 +296,31 @@ func test_e08b_echo_floats_where_p1_stood_on_it_all_d(t) -> void:
 
 
 ## E-08b met een spookbron: een zwevende echo (steun schaduwlichaam) breekt
-## niet en P1 landt erop; staat er een schaduwmuur, dan breekt hij wel (E-08a).
+## niet; staat er een schaduwmuur, dan breekt hij wel (E-08a). Sinds E-07c
+## (gdd v0.5) draagt een zwevende echo niet meer: stond P1 in het frame op een
+## plank (`plank_sinds_grond`), dan valt een P1 erdoor; zonder die vlag landt hij.
 func test_e08b_floating_echo_carries_p1_but_walls_still_break(t) -> void:
-	for wall in [false, true]:
+	for variant in ["muur", "zweeft", "vanaf_grond"]:
 		var sim = Fx.world(t)
-		if wall:
+		if variant == "muur":
 			Fx.block(t, "ShadowWall", Rect2(290, 280, 30, 40), Layers.SHADOW_GEOMETRY)
 		var ghost := Fx.ghost(t)
 		Fx.ghost_path(ghost, 0, 100, func(_k: int) -> Vector2: return Vector2(300, 300),
-			true, Motor.Support.SHADOW_BODY)
+			true, Motor.Support.SHADOW_BODY, variant != "vanaf_grond")
 		var echo := Fx.tail_echo(sim, ghost, 1)
 		var broke := _breaks(echo)
 		var p1 := Fx.p1(sim, [], Vector2(300, 250))
 		await t.run_ticks(sim, 40)
-		if wall:
+		if variant == "muur":
 			t.check(not broke.is_empty() and broke[0] == 3, "schaduwmuur: breuk op %s (tick 3)" % str(broke))
-		else:
+		elif variant == "zweeft":
 			t.check(broke.is_empty() and echo.is_present(), "zwevende echo brak: %s" % str(broke))
+			t.check(p1.motor.support != Motor.Support.SHADOW_BODY and p1.position.y > 300.0,
+				"E-07c: P1 viel niet door de zwevende echo: %s" % p1.position)
+		else:
+			t.check(broke.is_empty() and echo.is_present(), "echo brak: %s" % str(broke))
 			t.check(p1.motor.support == Motor.Support.SHADOW_BODY and absf(p1.position.y - 270.0) < 0.1,
-				"P1 landde niet op de zwevende echo: %s" % p1.position)
+				"P1 landde niet op de dragende echo: %s" % p1.position)
 		await t.cleanup()
 
 

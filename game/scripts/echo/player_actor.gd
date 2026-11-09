@@ -57,9 +57,11 @@ var caught_this_airphase := false
 var invulnerable_until := -1
 ## Laatste positie op eigen vloer (laag 1, 4 of 5), voor de plaatsingsregel (C-03).
 var last_floor_position := Vector2.ZERO
-## Opgelost (C-06): het lichaam staat niet in de wereld. Nog niet in gebruik
-## in deze versie (deel 2 van T16c), wel al meegenomen in `carrier_valid`.
+## Opgelost (C-06): het lichaam staat niet in de wereld (geen laag, geen
+## plank, onzichtbaar, stapt niet). Alleen P2; de Sim zet en wist het.
 var dissolved := false
+## Stierf P1 bij de laatste respawn (C-08)? Dan zet de Sim P2 naast hem.
+var died := false
 
 ## De plank waarop dit lichaam aan het begin van deze tick stond (of null).
 var started_on_plank: CollisionObject2D = null
@@ -71,6 +73,7 @@ var _pre_floor := false
 var _echo_held := 0
 var _respawn_requested := false
 var _respawn_position := Vector2.ZERO
+var _respawn_death := false
 var _stance_event := -1000000   ## tick van het laatste AANVAL-event (C-11a)
 var _stance_held := false        ## AANVAL sindsdien aaneengesloten ingedrukt
 
@@ -134,10 +137,12 @@ func carrier_facing() -> int:
 
 
 ## Zet de speler op de volgende tick terug op `at` (respawn, E-04b). Dat
-## telt als reset van de echo op die tick.
-func respawn_at(at: Vector2) -> void:
+## telt als reset van de echo op die tick. `death`: P1 stierf (LM-05); in
+## co-op respawnt P2 dan mee naast P1 (C-08).
+func respawn_at(at: Vector2, death := false) -> void:
 	_respawn_requested = true
 	_respawn_position = at
+	_respawn_death = death
 
 
 ## Een vijandelijk aanvalsvlak raakt dit lichaam (alleen laag 2, E-14h).
@@ -151,8 +156,11 @@ func take_hit(tick: int) -> void:
 ## Stap (2) voor P1, (1) voor P2: input lezen, events bepalen, bewegen.
 func sim_step(tick: int, _delta: float) -> void:
 	echo_reset = EchoReset.NONE
+	died = false
 	if _respawn_requested:
 		_respawn_requested = false
+		died = _respawn_death
+		_respawn_death = false
 		position = _respawn_position
 		motor = Motor.State.new()
 		velocity = Vector2.ZERO
@@ -185,7 +193,7 @@ func pre_velocity() -> Vector2:
 func record(tick: int) -> void:
 	recorder.push(tick, last_input, _pre_position, _pre_velocity, _pre_floor,
 		position, motor.velocity, tick_events, motor.on_floor, motor.facing,
-		motor.support, motor.anim, last_input & InputBits.ATTACK != 0)
+		motor.support, motor.anim, last_input & InputBits.ATTACK != 0, plank_since_ground)
 
 
 func _update_stance(tick: int, bits: int) -> void:

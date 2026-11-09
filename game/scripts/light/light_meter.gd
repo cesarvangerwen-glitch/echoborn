@@ -4,8 +4,8 @@ extends RefCounted
 ## Eén geheel getal `value` van 0 tot 100 LP. Lekt niet, verliest niets bij
 ## respawn, breken of Loslaten (LM-01). Luistert naar de Sim: treffers en
 ## ontploffingen uit `Combat`, springplank-landingen en bounces uit de
-## bewegingsevents van P1 (Motor.EV_*), ook lancering (+4) en vang (+3)
-## uit co-op 7A (T16c, #78).
+## bewegingsevents van P1 en in co-op ook van P2 (Motor.EV_*), ook lancering
+## (+4) en vang (+3) uit co-op 7A (T16c, #78). `who` is dan de drager.
 ##
 ## Elk vullen geeft `filled`; het meetlog maakt er een LP-regel van (§4.5).
 
@@ -33,6 +33,8 @@ var value := 0
 ## `n` van LM-02 voor P1: springplank-landingen sinds P1 voor het laatst
 ## wereld of licht-geometrie raakte.
 var chain := 0
+## `n` van LM-02 voor P2 (co-op: elk lichaam een eigen `n`).
+var chain_p2 := 0
 ## Is het co-op? Bepaalt wie een ontploffing ontstak (C-12).
 var coop := false
 ## Opgeteld per `who` (echt toegevoegd), voor MP-6.
@@ -86,24 +88,33 @@ func _on_exploded(tick: int, mark: RefCounted, _link: int) -> void:
 func _on_tick(tick: int) -> void:
 	if _p1 == null or not is_instance_valid(_p1):
 		return
-	var motor = _p1.motor
+	chain = _fill_from(tick, _p1, chain, "p2" if coop else "echo")
+	# LM-02 co-op: springplank-landingen, bounces, lanceringen en vangen tellen
+	# ook voor P2 als springer, met zijn eigen `n`; de drager is dan P1.
+	var p2: Node = _sim.get_player(2) if _sim.has_method("get_player") else null
+	if p2 != null and not p2.dissolved:
+		chain_p2 = _fill_from(tick, p2, chain_p2, "p1")
+	elif p2 == null:
+		chain_p2 = 0
+
+
+## LP voor één springer; `who` is de drager (bron in het meetlog, §4.5).
+## Geeft de nieuwe `n` terug.
+func _fill_from(tick: int, springer: Node, n: int, who: String) -> int:
+	var motor = springer.motor
 	if motor.on_floor and motor.support != Motor.Support.SHADOW_BODY:
-		chain = 0
-	var ev: int = _p1.move_events
+		n = 0
+	var ev: int = springer.move_events
 	if ev & Motor.EV_SPRINGPLANK:
-		chain = mini(chain + 1, PLANK_MAX_N)
-		add(tick, PLANK_BASE + PLANK_STEP * (chain - 1), "springplank", _carrier())
+		n = mini(n + 1, PLANK_MAX_N)
+		add(tick, PLANK_BASE + PLANK_STEP * (n - 1), "springplank", who)
 	if ev & Motor.EV_BOUNCE:
-		add(tick, BOUNCE, "bounce", _carrier())
+		add(tick, BOUNCE, "bounce", who)
 	# C-11, C-13: lancering +4, vang +3 (voor de springer). Een vang telt voor
 	# `n` als springplank-landing (C-13).
 	if ev & Motor.EV_CATCH:
-		chain = mini(chain + 1, PLANK_MAX_N)
-		add(tick, CATCH, "vang", _carrier())
+		n = mini(n + 1, PLANK_MAX_N)
+		add(tick, CATCH, "vang", who)
 	if ev & Motor.EV_LAUNCH:
-		add(tick, LAUNCH, "lancering", _carrier())
-
-
-## De drager onder P1: de echo (solo) of P2 (co-op, T16c).
-func _carrier() -> String:
-	return "p2" if coop else "echo"
+		add(tick, LAUNCH, "lancering", who)
+	return n
