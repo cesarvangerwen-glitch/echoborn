@@ -233,17 +233,26 @@ func test_e04a_validation_errors(t) -> void:
 # --- E-04e ------------------------------------------------------------------
 
 ## P2 gaat in co-op naar kamer B terwijl P1 in A blijft: geen kamerwissel.
+## Daarna zet een wissel van P1 naar een kamer die geen buur is, geldig_vanaf.
 func test_e04e_p2_never_switches_room(t) -> void:
 	var sim = Fx.world(t)
 	var p1 := Fx.manual_player(sim, 1, Vector2(500, Fx.STAND_Y))
 	var p2 := Fx.manual_player(sim, 2, Vector2(560, Fx.STAND_Y))
 	p2.input_source.bits = R
-	var loader := _loader(t, sim, [_room("A", -1000, 640, ["B"]), _room("B", 640, 1280, ["A"])])
+	var loader := _loader(t, sim, [
+		_room("A", -1000, 640, ["B"]), _room("B", 640, 1280, ["A"]), _room("C", 1280, 2280, [])])
 	loader.start(sim.tick, p1.position)
 	var switches := _switches(loader)
 	await t.run_ticks(sim, 200)
 	t.check(p2.position.x > 700.0, "P2 kwam niet in B (x %s)" % p2.position.x)
 	t.check(switches.is_empty() and loader.huidige == &"A", "kamerwissel door P2: %s" % [switches])
+	# C-04: een kamerwissel van P1 naar een kamer die geen buur is, zet ook
+	# in co-op (zonder echo) geldig_vanaf bij P1.
+	var t0: int = sim.tick
+	p1.position = Vector2(1500, Fx.STAND_Y)
+	await t.run_ticks(sim, 2)
+	t.check(loader.huidige == &"C" and p1.echo_valid_from == t0,
+		"co-op: teleport naar C zette geldig_vanaf %d (%d)" % [p1.echo_valid_from, t0])
 
 
 # --- Streamen en FK-3 -------------------------------------------------------

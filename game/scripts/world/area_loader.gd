@@ -107,8 +107,11 @@ func sim_track(tick: int, p1: PlayerActor) -> bool:
 	var van := huidige
 	var reset := van == &"" or not is_neighbour(van, naar)
 	huidige = naar
-	if reset and p1.echo_reset == PlayerActor.EchoReset.NONE:
-		p1.echo_reset = PlayerActor.EchoReset.ROOM
+	if reset:
+		# C-04: ook in co-op (zonder echo) zet de wissel geldig_vanaf bij P1.
+		p1.echo_valid_from = tick
+		if p1.echo_reset == PlayerActor.EchoReset.NONE:
+			p1.echo_reset = PlayerActor.EchoReset.ROOM
 	kamer_gewisseld.emit(tick, van, naar, reset)
 	_apply_loaded(tick)
 	return true
