@@ -326,7 +326,7 @@ func _breaks(recorded_on_floor: bool, path_checks: bool = true) -> bool:
 		_bad_run = 0
 		return _in_zone(space, at)
 	_free_query.transform = Transform2D(0.0, at)
-	var free := space.intersect_shape(_free_query, 1).is_empty()
+	var free := _is_free(space)
 	var supported := true
 	# E-08b: stond P1 op een schaduwlichaam, dan geen steuncontrole (zweven).
 	if recorded_on_floor and (support == Motor.Support.WORLD or support == Motor.Support.LIGHT):
@@ -339,6 +339,20 @@ func _breaks(recorded_on_floor: bool, path_checks: bool = true) -> bool:
 		if _bad_run >= _tolerance_ticks:
 			return true
 	return _in_zone(space, at)
+
+
+## E-08a (a): de vorm overlapt geen wereld- of schaduwgeometrie. Een
+## eenrichtingsrichel (laag 1, `one_way_collision`, gdd §4.1) telt niet: P1
+## springt er van onder doorheen, dus de echo ook (T16b, #77).
+func _is_free(space: PhysicsDirectSpaceState2D) -> bool:
+	for hit in space.intersect_shape(_free_query, 8):
+		var body := hit["collider"] as CollisionObject2D
+		if body == null:
+			return false
+		var owner_id := body.shape_find_owner(int(hit["shape"]))
+		if not body.is_shape_owner_one_way_collision_enabled(owner_id):
+			return false
+	return true
 
 
 ## E-08c: middelpunt in fel licht; E-08d: vorm raakt een schaduwgevaar.
