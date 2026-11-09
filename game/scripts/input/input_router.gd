@@ -36,6 +36,8 @@ var _devices: Dictionary = {}
 
 
 func _init() -> void:
+	# Ook tijdens een pauze events lezen, anders blijft een knop die je dan loslaat hangen.
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	InputSetup.ensure_actions()
 	for i in MAX_SLOTS:
 		_slots.append(_empty_slot())
@@ -50,7 +52,15 @@ func _input(event: InputEvent) -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	step()
+	# Stoppen en apparaat-weg tellen in speltijd: niet tijdens een pauze.
+	if not get_tree().paused:
+		step()
+
+
+## Bij focusverlies (alt-tab, Steam-overlay) komen geen losgelaten events binnen: alles los.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		release_all_controls()
 
 
 ## Verwerkt één InputEvent. Markeert het event niet als afgehandeld.
@@ -139,6 +149,15 @@ func slot_of_device(key: String) -> int:
 ## Inputbron voor een plaats, voor `PlayerActor.setup` (zelfde interface als DeviceInput).
 func source_for(slot: int) -> RouterInput:
 	return RouterInput.new(self, slot)
+
+
+## Zet alle knoppen en sticks van alle apparaten op los. Plaatsen blijven bezet.
+func release_all_controls() -> void:
+	for key: String in _devices:
+		var state: Dictionary = _devices[key]
+		state["pressed"].clear()
+		state["swallowed"].clear()
+		state["axis_x"] = 0.0
 
 
 ## Maakt een plaats vrij, bv. bij terug naar het titelscherm (gameplay of UX beslist).

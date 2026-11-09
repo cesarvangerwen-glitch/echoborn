@@ -241,6 +241,35 @@ func test_autoload_exists_and_viewport_events_reach_router(t) -> void:
 	router.free()
 
 
+## Loslaten tijdens een pauze komt aan, en de stopknop telt niet door tijdens de pauze.
+## Focusverlies (alt-tab) zet alle knoppen los (review TD op PR #90).
+func test_pause_and_focus_loss_leave_no_stuck_controls(t) -> void:
+	var router := _router({1: GUID_DS4})
+	t.tree.root.add_child(router)
+	_tap(router, 1, JOY_BUTTON_A)
+	router.handle_event(_key(KEY_ENTER, true))
+	router.handle_event(_key(KEY_ENTER, false))
+	router.handle_event(_key(KEY_RIGHT, true))
+	router.handle_event(_key(KEY_BACKSPACE, true))
+	t.tree.paused = true
+	t.tree.root.push_input(_key(KEY_RIGHT, false))
+	for i in 70:
+		await t.tree.physics_frame
+	t.tree.paused = false
+	t.check(router.slot_state(2) == InputRouter.SlotState.ACTIVE,
+		"stopknop telde door tijdens de pauze")
+	t.check(router.slot_bits(2) == 0, "pijltje losgelaten tijdens pauze blijft hangen: %s"
+		% InputBits.describe(router.slot_bits(2)))
+	_stick(router, 1, 1.0)
+	_pad(router, 1, JOY_BUTTON_A, true)
+	router.notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	t.check(router.slot_bits(1) == 0, "knoppen blijven hangen na focusverlies")
+	t.check(router.slot_device(1) == "joy1" and router.slot_device(2) == "kb2",
+		"focusverlies kostte een plaats")
+	router.handle_event(_key(KEY_BACKSPACE, false))
+	router.free()
+
+
 ## Het controlescherm voor echte hardware laadt zonder fouten en toont beide plaatsen.
 func test_debug_scene_shows_both_slots(t) -> void:
 	var scene: PackedScene = load("res://scenes/debug/input_debug.tscn")

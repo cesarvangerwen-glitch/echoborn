@@ -13,6 +13,8 @@ var _router: Node
 var _label: Label
 var _log: PackedStringArray = []
 var _frame := 0
+## Index -> GUID, bewaard terwijl de pad aangesloten is: na ontkoppelen geeft Godot "".
+var _guids: Dictionary = {}
 
 
 func _ready() -> void:
@@ -28,9 +30,7 @@ func _ready() -> void:
 		_add_log("plaats %d: apparaat weg, wacht" % slot))
 	_router.slot_resumed.connect(func(slot: int, device: String) -> void:
 		_add_log("plaats %d: terug met %s" % [slot, device]))
-	Input.joy_connection_changed.connect(func(device: int, connected: bool) -> void:
-		_add_log("joy%d %s: %s" % [device, "aan" if connected else "los",
-			Input.get_joy_guid(device)]))
+	Input.joy_connection_changed.connect(_on_joy_connection_changed)
 	_refresh()
 
 
@@ -46,6 +46,7 @@ func _refresh() -> void:
 	if pads.is_empty():
 		lines.append("  geen")
 	for device in pads:
+		_guids[device] = Input.get_joy_guid(device)
 		lines.append("  joy%d  %s  GUID %s  %s" % [device, Input.get_joy_name(device),
 			Input.get_joy_guid(device), Input.get_joy_info(device)])
 	lines.append("")
@@ -57,6 +58,15 @@ func _refresh() -> void:
 	lines.append("Log:")
 	lines.append_array(_log)
 	_label.text = "\n".join(lines)
+
+
+func _on_joy_connection_changed(device: int, connected: bool) -> void:
+	if connected:
+		_guids[device] = Input.get_joy_guid(device)
+	_add_log("joy%d %s: GUID %s" % [device, "aan" if connected else "los",
+		_guids.get(device, "?")])
+	if not connected:
+		_guids.erase(device)
 
 
 func _add_log(line: String) -> void:

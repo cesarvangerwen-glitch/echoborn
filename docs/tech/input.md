@@ -20,6 +20,7 @@ Dit document beschrijft de `InputRouter`: welk apparaat bij welke speler hoort, 
 - **Apparaat**: `kb1` (WASD-helft), `kb2` (pijltjeshelft) of `joy<index>`. Toetsenbord en joypad 0 hebben in Godot allebei `device == 0`; de router onderscheidt ze op het type event, niet op het nummer.
 - **GUID**: `Input.get_joy_guid(index)`. Een GUID hoort bij een **model**, niet bij één exemplaar: twee identieke pads hebben dezelfde GUID. Daarom stuurt de router op index (welk apparaat speelt nu) en gebruikt hij de GUID alleen om een teruggekeerde pad te herkennen. Bij twee wachtende plaatsen met dezelfde GUID krijgt de laagste plaats de eerste pad terug.
 - **Plaats**: `FREE` (vrij), `ACTIVE` (speelt) of `SUSPENDED` (apparaat weg, wacht). Een vrije of wachtende plaats geeft bits 0.
+- **Pauze en focus**: het autoload draait met `PROCESS_MODE_ALWAYS`, zodat een knop die je tijdens de pauze loslaat niet blijft hangen; `step()` telt niet zolang de boom gepauzeerd is. Bij focusverlies (alt-tab, Steam-overlay) zet `release_all_controls()` alle knoppen los.
 - **Ticks**: `step()` telt de stopknop en de tijd dat een apparaat weg is. Standaard loopt dat in `_physics_process` van het autoload (in de boom vóór de Sim). Moet het exact op de Sim-tick vallen, dan zet T16c `InputRouter.set_physics_process(false)` en roept de Sim `step()` aan.
 
 | Situatie | Gevolg | Signaal |
@@ -75,11 +76,13 @@ De resultaten van een hardwarerun komen in deze sectie, met datum, modus en de g
 | `test_other_device_takes_over_a_waiting_slot` | W4: een ander apparaat neemt een wachtende plaats over |
 | `test_drop_in_and_out_drive_player_in_sim` | In een draaiende Sim staat een `PlayerActor` op een vrije plaats stil, beweegt na meedoen en stopt na stoppen |
 | `test_autoload_exists_and_viewport_events_reach_router` | Het autoload staat in `project.godot`; echte events via de viewport komen aan |
+| `test_pause_and_focus_loss_leave_no_stuck_controls` | Loslaten tijdens een pauze komt aan; de stopknop telt niet door tijdens de pauze; focusverlies zet alle knoppen los |
 | `test_debug_scene_shows_both_slots` | Het controlescherm van §4 laadt zonder fouten |
 
 ## Open punten
 
 - Hardwarerun op een Steam Deck met een 2e pad (§4) is nog niet gedaan; er is geen hardware in de werkomgeving.
 - `kb1` (WASD) kan niet als partner meedoen: de gdd geeft alleen Enter op de P2-helft. Speelt P1 met een pad, dan moet een toetsenbordspeler de pijltjes gebruiken. Keuze voor de UX Designer.
+- W4 laat een wachtende plaats 1 vóór een vrije plaats 2 gaan: valt de pad van een solospeler weg en drukt een vriend op Start, dan wordt die vriend P1 en moet de teruggekeerde pad als P2 meedoen. Keuze voor UX Designer en LGD.
 - Bindings staan nog in code (`ontwerp.md` R3); herbinden en opslaan horen bij het rebindscherm (UX) en het save-systeem.
 - `ontwerp.md` §5 en de testtabel in §9 kunnen naar dit document verwijzen (Technical Director).
