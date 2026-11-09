@@ -81,6 +81,8 @@ Wat dit wel en niet zegt:
 | 3 | **Het meetlog meet MP-1 alleen voor P1** (`meetlog.gd`) | MP-7 (b) vraagt P2 ook. In de scripted runs rekent de testcode het uit; voor de CSV's van de CEO-sessie ontbreekt het, dus MP-7 (b) is bij mensen alleen te observeren (zelfde issue als punt 1) | gameplay-programmer |
 | 4 | **Een tweede speler voor co-op** met de CEO | Zonder P2 geen co-op-score voor norm (3), en F0 vraagt solo én co-op. Vraag aan de CEO: [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) | CEO |
 | 5 | MP-4 in co-op en MP-7 (b)/(c) hebben in de gdd geen uitgewerkte telling; QA rekent met W4–W6 (testplan §6) | **De LGD bevestigt W4–W6 vóór deel 2** | lead-game-designer |
+| 6 | **P2 krijgt geen oefenrun** vóór de getelde co-op-runs (de kaart geeft alleen de CEO twee oefenruns) | P2 is in co-op dus niet "geoefend" volgens gdd §4.5; QA weegt de co-op-scores daarop in deel 2 | qa-lead |
+| 7 | **MP-7 (a) is in de gdd de mediane runtijd**; de CEO-sessie geeft één co-op- en één solo-run per D | Eén waarde per D is geen mediaan: in deel 2 rapporteert QA het als enkele meting, niet als oordeel over MP-7 (a) | qa-lead, lead-game-designer |
 
 ## 7. Werkaannames
 

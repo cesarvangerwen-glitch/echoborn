@@ -1,14 +1,17 @@
 # CEO-kaart F0: de flow-kamer spelen en scoren (T17)
 
-Versie 0.1 · 2026-11-09 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Plan: `docs/qa/testplan-f0.md`
+Versie 0.1 · 2026-11-09 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA (lees je pas na het spelen, zoals §5): het testplan in `docs/qa/`
 
 **Tijd: ± 20 min spelen + ± 5 min luisteren.** Je hoeft alleen te spelen, te scoren en het antwoordblok (§4) als comment in #80 te zetten. **Lees tot en met §4; lees §5 pas na het spelen** (anders kleurt het je antwoorden).
 
-Wie P2 speelt in de co-op-runs, beslis je vooraf in [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124).
+Wie P2 speelt in de co-op-runs, beslis je vooraf in [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124). Bij **A** speel je de kaart zoals hij staat. Bij **B** vervalt blok 4 (co-op) en in het antwoordblok alles onder "Co-op" en de regels voor P2; F0 wacht dan op een aanpassing van het fasekader door de EP. Bij **C** speel je blok 4 zelf met beide helften van het toetsenbord; vul alleen de CEO-scores in, laat C1 en de P2-velden leeg (die zeggen dan niets).
 
 ## 1. Wat je nodig hebt
 
-- Godot 4.6.3 (`docs/tech/setup.md` §1–2). Open de map `game/` en start het project (F5): de flow-kamer start meteen.
+- Godot 4.6.3, standaard (niet .NET/mono):
+  - **Windows**: download `Godot_v4.6.3-stable_win64.exe.zip` van https://github.com/godotengine/godot/releases/tag/4.6.3-stable, pak uit en start `Godot_v4.6.3-stable_win64.exe`. Kies *Importeren*, wijs `game/project.godot` in je clone van de repo aan en open het project.
+  - **Linux**: zie `docs/tech/setup.md` §2; daarna `godot --path game`.
+- Druk in de editor op **F5** (project starten): de flow-kamer start meteen.
 - Voor co-op: een tweede speler (volgens [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124)) met de pijltjeshelft van het toetsenbord of een tweede controller.
 - Voor de luistercheck: een koptelefoon én de tv-luidsprekers.
 
