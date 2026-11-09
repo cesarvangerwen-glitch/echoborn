@@ -20,6 +20,7 @@ const TEST_SCRIPTS := [
 	"res://tests/test_echo.gd",
 	"res://tests/test_sim.gd",
 	"res://tests/test_input.gd",
+	"res://tests/test_input_router.gd",
 ]
 
 ## 2 minuten speltijd bij 60 Hz. De langste test duurt ±1000 ticks.
