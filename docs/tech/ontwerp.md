@@ -383,7 +383,7 @@ De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gave
 
 - **Tools Programmer:** (1) de Node 20-waarschuwing van de `@v4`-actions in `tests.yml` oplossen; (2) in de meta-run (`.github/ci/test_meta_broken.gd`) een geval toevoegen voor een scriptfout in een script waar een test van afhangt, vóór de eerste test: de runner vangt dat sinds #82 op (§9), de meta-run bewaakt het nog niet.
 - **Lead Game Designer:** de keuzes (c) (P2 in een ontladen kamer = C-06) en (d) (vijanden in gestreamde inhoud komen bij elk opnieuw laden terug) uit §3a bevestigen of wijzigen.
-- **Gameplay Programmer (C-06):** het oplossen van P2 koppelen aan `AreaLoader.partner_in_ontladen_kamer` (keuze (c), §3a), samen met de andere oorzaken van C-06.
+- **Gameplay Programmer (C-06):** `AreaLoader.partner_in_ontladen_kamer` (keuze (c), §3a) koppelen aan `Sim.dissolve_partner`, met een eigen oorzaak naast `fellicht`, `gevaar`, `val` en `leiband`.
 - **Gameplay Programmer (T16c):** `valid_from` (`geldig_vanaf`) staat op de `TailEcho`-node en gaat verloren als C-01 hem weghaalt; E-09 in co-op en C-05 vragen dat hij bij P1 hoort.
 - **T5b deel 3, vlag van een object:** de vlag `<kamer_id>/<nodepad>` (§3a) verliest zijn stand als een level designer de kamer of het object hernoemt; een controle (bekende vlaggen tegen de inhoud) of een migratie hoort bij deel 3.
 - **T5b deel 3, kapotte back-up:** zijn de save én de `.bak` allebei kapot, dan geeft `read` alleen de fouten; deel 3 beslist wat het spel dan toont (melding, slot leeg of herstel) en test dat geval.

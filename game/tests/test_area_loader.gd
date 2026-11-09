@@ -452,8 +452,10 @@ func test_r10_remove_combat_target(t) -> void:
 ## Buiten; terug naar A meldt opnieuw.
 func test_c06_partner_in_unloaded_room(t) -> void:
 	var sim = Fx.world(t)
-	var p1 := Fx.manual_player(sim, 1, Vector2(300, Fx.STAND_Y))
-	var p2 := Fx.manual_player(sim, 2, Vector2(560, Fx.STAND_Y))
+	# P1 en P2 dicht bij elkaar, en P2 stopt net in C: zo grijpt de leiband
+	# (C-07, 60 ticks buiten beeld) niet in.
+	var p1 := Fx.manual_player(sim, 1, Vector2(600, Fx.STAND_Y))
+	var p2 := Fx.manual_player(sim, 2, Vector2(620, Fx.STAND_Y))
 	p2.input_source.bits = R
 	var loader := _loader(t, sim, [
 		_room("A", -1000, 640, ["B"]), _room("B", 640, 840, ["A", "C"]), _room("C", 840, 2840, ["B"])])
@@ -463,21 +465,24 @@ func test_c06_partner_in_unloaded_room(t) -> void:
 		reports.append([tick, who == p2, String(kamer)]))
 	var switches := _switches(loader)
 	var p2_x := {}
-	sim.tick_finished.connect(func(tick: int) -> void: p2_x[tick] = p2.position.x)
-	await t.run_ticks(sim, 400)
+	sim.tick_finished.connect(func(tick: int) -> void:
+		p2_x[tick] = p2.position.x
+		if p2.position.x >= 860.0:
+			p2.input_source.bits = 0)
+	await t.run_ticks(sim, 200)
 	var t_c := -1
-	for tick in range(400):
+	for tick in range(200):
 		if p2_x.has(tick) and p2_x[tick] >= 840.0:
 			t_c = tick
 			break
 	t.check(t_c > 0 and reports == [[t_c, true, "C"]],
 		"melding P2 in ontladen C: %s (verwacht op tick %d)" % [reports, t_c])
-	t.check(switches.is_empty() and loader.huidige == &"A" and loader.is_partner_outside(), "P2 wisselde de kamer")
-	p2.input_source.bits = 0
+	t.check(switches.is_empty() and loader.huidige == &"A" and loader.is_partner_outside() and not p2.dissolved,
+		"P2 wisselde de kamer, of is niet meer Buiten (opgelost: %s)" % p2.dissolved)
 	p1.position = Vector2(700, Fx.STAND_Y)
 	await t.run_ticks(sim, 1)
 	t.check(loader.is_loaded(&"C") and not loader.is_partner_outside(), "C geladen, P2 nog Buiten")
-	p1.position = Vector2(300, Fx.STAND_Y)
+	p1.position = Vector2(600, Fx.STAND_Y)
 	await t.run_ticks(sim, 1)
 	t.check(reports.size() == 2 and reports[1][2] == "C", "tweede melding ontbreekt: %s" % [reports])
 	await t.cleanup()
