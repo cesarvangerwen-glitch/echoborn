@@ -18,6 +18,10 @@ InputRouter="*res://scripts/input/input_router.gd"
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
+window/size/viewport_width.deck=1280
+window/size/viewport_height.deck=800
+window/size/mode.deck=3
+window/vsync/vsync_mode.deck=1
 
 [layer_names]
 

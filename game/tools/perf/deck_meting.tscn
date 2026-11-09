@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tools/perf/deck_meting.gd" id="1_meet"]
+
+[node name="DeckMeting" type="Node"]
+script = ExtResource("1_meet")
