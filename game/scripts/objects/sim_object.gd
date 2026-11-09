@@ -21,10 +21,11 @@ extends Node2D
 const Layers = preload("res://scripts/world/layers.gd")
 
 ## Wie het object mag voelen of bedienen (E-06): Layers.LIGHT, Layers.SHADOW
-## of beide (gedeeld).
-var owner_layers := Layers.LIGHT | Layers.SHADOW
+## of beide (gedeeld). Geëxporteerd, zodat een object ook in een scène kan
+## staan (gestreamde inhoud van een kamer, ontwerp.md §3a).
+@export var owner_layers: int = Layers.LIGHT | Layers.SHADOW
 ## Het vlak: belasting voor een drukplaat, interactievlak voor een hendel.
-var shape: Shape2D
+@export var shape: Shape2D
 
 
 func setup(p_owner_layers: int, size: Vector2) -> void:
@@ -80,4 +81,23 @@ func interact(_actor: Node2D, _tick: int) -> void:
 ## Stap (5): het object werkt zijn stand bij. `bodies` zijn de lichamen van
 ## deze tick (`Sim.bodies()`, C-01: hooguit twee).
 func sim_update(_tick: int, _bodies: Array[Node2D]) -> void:
+	pass
+
+
+## R10 (ontwerp.md §3a): heeft het object een stand die terug moet komen als
+## zijn kamer ontlaadt en weer laadt? Dan bewaart de AreaLoader die stand als
+## vlag in `GameState` (schema v1: alleen ware vlaggen). Standaard niet: een
+## drukplaat volgt de lichamen en begint na laden gewoon los.
+func has_persistent_state() -> bool:
+	return false
+
+
+## De stand om te bewaren (true = vlag aan).
+func get_persistent_state() -> bool:
+	return false
+
+
+## Zet de bewaarde stand terug, vóór het object bij de Sim komt. Zonder
+## signalen: luisteraars lezen de stand bij het laden zelf.
+func set_persistent_state(_on: bool) -> void:
 	pass
