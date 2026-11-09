@@ -157,7 +157,7 @@ De Sim laat hooguit één schaduwlichaam toe: een echo óf P2. `add_echo` weiger
 
 ## 5. Input-laag voor 2 lokale spelers
 
-- Acties per speler: `p1_left`, `p1_right`, `p1_jump`, `p1_attack`, `p1_interact`, `p1_echo`, `p1_dash`, en hetzelfde voor `p2_`. Ze worden in code gezet (`input_setup.gd`); de knoppen staan in `input.md` §3a.
+- Acties per speler: `p1_left`, `p1_right`, `p1_jump`, `p1_attack`, `p1_interact`, `p1_echo`, `p1_dash`, en hetzelfde voor `p2_`. Ze worden in code gezet (`input_setup.gd`); de knoppen staan in `input.md` §2a.
 - Godot-acties zijn standaard voor alle apparaten. Joypad-events krijgen daarom een vast `device`; toetsenbord-events gelden voor alle apparaten en zijn per speler verdeeld over verschillende toetsen.
 - **Volgende stap (preproductie): `InputRouter`-autoload.** Die kent apparaten dynamisch toe aan spelers ("druk op een knop om mee te doen"), regelt drop-in/drop-out, en houdt rekening met joypads die tijdens het spel (los)gekoppeld worden (`Input.joy_connection_changed`). De gameplay-code verandert daarvoor niet: die leest alleen inputbronnen.
 - Rebinding en opgeslagen besturing: UX Designer bepaalt het scherm, Engine & Platform Programmer bouwt het, opslag via SaveService.

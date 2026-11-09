@@ -5,8 +5,9 @@ extends Node2D
 ## P1: A/D lopen, spatie springen, linker Shift dash, E aanval, Q 0,5 s
 ## vasthouden = Loslaten (E-09). Spring op je echo: landen geeft je dash
 ## terug, springen vanaf de echo is een bounce (E-07a). Debug: F1/F2/F3 zet
-## D op 90/120/180 ticks (1,5/2/3 s; telt als reset). Rechter Ctrl laat P2
-## meedoen of stoppen (pijltjes + Enter); zolang P2 meedoet, is er geen echo
+## D op 90/120/180 ticks (1,5/2/3 s; telt als reset). Enter laat P2 meedoen,
+## Backspace laat P2 stoppen (pijltjes + Enter + rechter Ctrl, `input.md`
+## §2a); zolang P2 meedoet, is er geen echo
 ## (C-01). De echte drop-in en drop-out (C-03, C-05) komen in T16c; de
 ## flow-kamer in T16b.
 
@@ -56,13 +57,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		_tail = int(options[DEBUG_TAIL_KEYS[event.physical_keycode]])
 		if _echo:
 			_echo.set_tail_ticks(_tail, _sim.tick)
-	elif event.is_action_pressed("p2_attack") and _p2 == null:
+	elif event.is_action_pressed("p2_join") and _p2 == null:
 		_p2 = PlayerActor.new()
 		_p2.setup(2, DeviceInput.new(2), PLAYER_COLORS[1])
 		_p2.position = _p1.position
 		_sim.add_player(_p2)
 		_echo = null  # de Sim heeft hem weggehaald (C-01)
-	elif event.is_action_pressed("p2_attack") and _p2 != null:
+	elif event.is_action_pressed("p2_leave") and _p2 != null:
 		_sim.remove_player(_p2)
 		_p2 = null
 		_add_echo()
