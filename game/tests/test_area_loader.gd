@@ -311,3 +311,198 @@ func _content_scene(id: StringName) -> PackedScene:
 	scene.pack(node)
 	node.free()
 	return scene
+
+
+# --- T5b deel 2: objecten in gestreamde kamers (R10) ------------------------
+
+const PressurePlate = preload("res://scripts/objects/pressure_plate.gd")
+const GameState = preload("res://scripts/save/game_state.gd")
+const CombatTarget = preload("res://scripts/combat/combat_target.gd")
+
+
+## Inhoud voor kamer `room` met een Eenmalige hendel, een Wissel-hendel en
+## een gedeelde drukplaat, alle met middelpunt op wereld-x `x` (op de vloer).
+func _object_scene(room: Kamer, x: float) -> PackedScene:
+	var root := Node2D.new()
+	root.name = "Inhoud"
+	var at := Vector2(x, Fx.STAND_Y) - room.position
+	var lever := Lever.new()
+	lever.name = "Hendel"
+	lever.kind = Lever.Kind.EENMALIG
+	lever.setup(Layers.LIGHT | Layers.SHADOW, Vector2(40, 40))
+	lever.position = at
+	var toggle := Lever.new()
+	toggle.name = "Wissel"
+	toggle.kind = Lever.Kind.WISSEL
+	toggle.setup(Layers.LIGHT | Layers.SHADOW, Vector2(40, 40))
+	toggle.position = at
+	var plate := PressurePlate.new()
+	plate.name = "Plaat"
+	plate.setup(Layers.LIGHT | Layers.SHADOW, Vector2(40, 40))
+	plate.position = at
+	for node: Node2D in [lever, toggle, plate]:
+		root.add_child(node)
+		node.owner = root
+	var scene := PackedScene.new()
+	scene.pack(root)
+	root.free()
+	return scene
+
+
+func _in_sim(sim: Node, room: Kamer) -> Array:
+	var found: Array = []
+	for object in sim.objects:
+		if room.is_ancestor_of(object):
+			found.append(String(object.name))
+	return found
+
+
+## R10: objecten in de inhoud van een kamer doen mee zolang de kamer geladen
+## is, in de tick van het laden al (stap 5), en zijn weg uit de Sim als hij
+## ontlaadt. De stand van een Eenmalige hendel komt via GameState terug in
+## de nieuwe instantie, en `store_objects` schrijft de stand van een geladen
+## kamer weg (vóór een save). Zonder GameState begint de hendel weer los.
+func test_r10_objects_in_streamed_rooms(t) -> void:
+	var sim = Fx.world(t)
+	var p1 := Fx.manual_player(sim, 1, Vector2(500, Fx.STAND_Y))
+	var rooms := [_room("A", -1000, 640, ["B"]), _room("B", 640, 840, ["A", "C"]), _room("C", 840, 2840, ["B"])]
+	var c: Kamer = rooms[2]
+	c.inhoud = _object_scene(c, 1000)
+	var loader := _loader(t, sim, rooms)
+	var state := GameState.new()
+	loader.game_state = state
+	loader.start(sim.tick, p1.position)
+	t.check(_in_sim(sim, c).is_empty() and c.inhoud_node == null, "C niet geladen, toch objecten: %s" % [_in_sim(sim, c)])
+	# P1 naar B: C laadt, beide objecten bij de Sim in boomvolgorde.
+	p1.position = Vector2(700, Fx.STAND_Y)
+	await t.run_ticks(sim, 1)
+	t.check(_in_sim(sim, c) == ["Hendel", "Wissel", "Plaat"], "C geladen, objecten in de Sim: %s" % [_in_sim(sim, c)])
+	# P1 op de plaat in C: de plaat volgt hem in dezelfde tick (stap 5).
+	var plate_ticks: Array = []
+	var plate: PressurePlate = c.inhoud_node.get_node("Plaat")
+	plate.changed.connect(func(tick: int, on: bool) -> void: plate_ticks.append([tick, on]))
+	var t_on: int = sim.tick
+	p1.position = Vector2(1000, Fx.STAND_Y)
+	await t.run_ticks(sim, 2)
+	t.check(plate.active and plate_ticks.size() == 1 and plate_ticks[0][0] == t_on,
+		"plaat in gestreamde inhoud volgt P1 niet in dezelfde tick: %s (tick %d)" % [plate_ticks, t_on])
+	var lever: Lever = c.inhoud_node.get_node("Hendel")
+	var toggle: Lever = c.inhoud_node.get_node("Wissel")
+	lever.interact(p1, sim.tick)
+	toggle.interact(p1, sim.tick)
+	loader.store_objects()
+	var flag := AreaLoader.object_flag(&"C", ^"Hendel")
+	var toggle_flag := AreaLoader.object_flag(&"C", ^"Wissel")
+	t.check(lever.on and toggle.on and state.has_flag(flag) and state.has_flag(toggle_flag),
+		"store_objects schreef de vlaggen niet (%s)" % [state.vlaggen])
+	# Wis de vlaggen: dan moet het ontladen ze zelf opnieuw schrijven.
+	state.set_flag(flag, false)
+	state.set_flag(toggle_flag, false)
+	# P1 terug naar A: C ontlaadt; objecten uit de Sim, stand in GameState.
+	p1.position = Vector2(500, Fx.STAND_Y)
+	await t.run_ticks(sim, 1)
+	t.check(c.inhoud_node == null and sim.objects.is_empty(), "C ontladen, nog %d objecten in de Sim" % sim.objects.size())
+	t.check(state.has_flag(flag) and state.has_flag(toggle_flag),
+		"stand van de hendels niet bewaard bij ontladen: %s" % [state.vlaggen])
+	# Weer naar B: nieuwe instanties, met hun stand uit GameState vóór elke
+	# bediening. De Eenmalige blijft daarna vast (E-13); de Wissel staat aan.
+	p1.position = Vector2(700, Fx.STAND_Y)
+	await t.run_ticks(sim, 1)
+	var again: Lever = c.inhoud_node.get_node("Hendel")
+	var toggle_again: Lever = c.inhoud_node.get_node("Wissel")
+	t.check(not is_instance_valid(lever) and not is_instance_valid(toggle) and sim.objects.has(again),
+		"na opnieuw laden geen nieuwe instanties in de Sim")
+	t.check(again.on and toggle_again.on, "stand niet terug na opnieuw laden: Eenmalig %s, Wissel %s" % [again.on, toggle_again.on])
+	again.interact(p1, sim.tick)
+	t.check(again.on, "Eenmalige hendel ging na opnieuw laden weer om (niet vast)")
+	# Zonder GameState: na opnieuw laden de standaardstand.
+	loader.game_state = null
+	p1.position = Vector2(500, Fx.STAND_Y)
+	await t.run_ticks(sim, 1)
+	p1.position = Vector2(700, Fx.STAND_Y)
+	await t.run_ticks(sim, 1)
+	t.check(not (c.inhoud_node.get_node("Hendel") as Lever).on and not (c.inhoud_node.get_node("Wissel") as Lever).on,
+		"zonder GameState toch een stand bewaard")
+	await t.cleanup()
+
+
+## `Sim.remove_object` voor een vijand (gestreamde inhoud kan vijanden
+## bevatten): weg uit de objecten en uit Combat, zijn merk dooft, en het
+## signaal is los. De volgende tick loopt zonder fout door.
+func test_r10_remove_combat_target(t) -> void:
+	var sim = Fx.world(t)
+	Fx.manual_player(sim, 1, Vector2(200, Fx.STAND_Y))
+	var target := Fx.target(sim, CombatTarget.Kind.ENEMY, 400)
+	sim.combat._set_mark(sim.tick, target, "P1")
+	var mark = sim.combat.mark_on(target)
+	sim.remove_object(target)
+	t.check(not sim.objects.has(target) and not sim.combat.targets.has(target), "vijand nog aangemeld")
+	t.check(mark != null and not mark.alive, "merk op een afgemelde vijand leeft nog")
+	t.check(not target.hit_player.is_connected(sim._on_enemy_hit_player), "hit_player nog verbonden")
+	target.queue_free()
+	await t.run_ticks(sim, 2)
+	await t.cleanup()
+
+
+# --- T5b deel 2: P2 in een kamer die niet geladen is (keuze (c), §3a) -------
+
+## P1 blijft in A (buur B, C geen buur van A). P2 loopt van A via B naar C:
+## in B niets, op de tick waarop zijn middelpunt in C komt één melding en
+## geen kamerwissel. Gaat P1 naar B, dan is C geladen en P2 niet meer
+## Buiten; terug naar A meldt opnieuw.
+func test_c06_partner_in_unloaded_room(t) -> void:
+	var sim = Fx.world(t)
+	# P1 en P2 dicht bij elkaar, en P2 stopt net in C: zo grijpt de leiband
+	# (C-07, 60 ticks buiten beeld) niet in.
+	var p1 := Fx.manual_player(sim, 1, Vector2(600, Fx.STAND_Y))
+	var p2 := Fx.manual_player(sim, 2, Vector2(620, Fx.STAND_Y))
+	p2.input_source.bits = R
+	var loader := _loader(t, sim, [
+		_room("A", -1000, 640, ["B"]), _room("B", 640, 840, ["A", "C"]), _room("C", 840, 2840, ["B"])])
+	loader.start(sim.tick, p1.position)
+	var reports: Array = []
+	loader.partner_in_ontladen_kamer.connect(func(tick: int, who: PlayerActor, kamer: StringName) -> void:
+		reports.append([tick, who == p2, String(kamer)]))
+	var switches := _switches(loader)
+	var p2_x := {}
+	sim.tick_finished.connect(func(tick: int) -> void:
+		p2_x[tick] = p2.position.x
+		if p2.position.x >= 860.0:
+			p2.input_source.bits = 0)
+	await t.run_ticks(sim, 200)
+	var t_c := -1
+	for tick in range(200):
+		if p2_x.has(tick) and p2_x[tick] >= 840.0:
+			t_c = tick
+			break
+	t.check(t_c > 0 and reports == [[t_c, true, "C"]],
+		"melding P2 in ontladen C: %s (verwacht op tick %d)" % [reports, t_c])
+	t.check(switches.is_empty() and loader.huidige == &"A" and loader.is_partner_outside() and not p2.dissolved,
+		"P2 wisselde de kamer, of is niet meer Buiten (opgelost: %s)" % p2.dissolved)
+	p1.position = Vector2(700, Fx.STAND_Y)
+	await t.run_ticks(sim, 1)
+	t.check(loader.is_loaded(&"C") and not loader.is_partner_outside(), "C geladen, P2 nog Buiten")
+	p1.position = Vector2(600, Fx.STAND_Y)
+	await t.run_ticks(sim, 1)
+	t.check(reports.size() == 2 and reports[1][2] == "C", "tweede melding ontbreekt: %s" % [reports])
+	await t.cleanup()
+
+
+# --- SM-punt: AreaLoader.start controleert de startkamer --------------------
+
+func test_start_checks_start_room(t) -> void:
+	var loader := AreaLoader.new()
+	for room: Kamer in [_room("A", 0, 100, ["B"]), _room("B", 100, 200, ["A"])]:
+		loader.add_kamer(room)
+	t.check(loader.start_errors(Vector2(150, 0), &"B").is_empty() and loader.start_room(Vector2(150, 0), &"B") == &"B",
+		"geldige start geeft fouten: %s" % loader.start_errors(Vector2(150, 0), &"B"))
+	var unknown := loader.start_errors(Vector2(50, 0), &"Z")
+	t.check(unknown.size() == 1 and unknown[0].contains("'Z' bestaat niet") and loader.start_room(Vector2(50, 0), &"Z") == &"A",
+		"onbekende startkamer: %s" % unknown)
+	var elsewhere := loader.start_errors(Vector2(50, 0), &"B")
+	t.check(elsewhere.size() == 1 and elsewhere[0].contains("niet in startkamer 'B'"), "positie buiten de kamer: %s" % elsewhere)
+	var nowhere := loader.start_errors(Vector2(500, 0))
+	t.check(nowhere.size() == 1 and nowhere[0].contains("geen enkele kamer"), "positie in geen kamer: %s" % nowhere)
+	for id in loader.kamers:
+		loader.kamers[id].free()
+	loader.free()

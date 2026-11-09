@@ -67,8 +67,16 @@ func to_dict() -> Dictionary:
 	}
 
 
+## Grenzen per veld (SM-punt #82): LP en speeltijd zijn hele getallen 0–2^53,
+## een vulstand een heel getal 0–100 (LM-03), een positie eindig.
+const VULSTAND_MAX := 100
+## Bovengrens voor hele getallen zonder eigen grens (2^53).
+const WHOLE_MAX := 9007199254740992.0
+
+
 ## Leest een Dictionary van de huidige versie. Geeft null en vult `errors`
-## bij een ontbrekend veld of een verkeerd type; laat niets half ingevuld.
+## bij een ontbrekend veld, een verkeerd type of een waarde buiten zijn
+## bereik; laat niets half ingevuld.
 static func from_dict(data: Dictionary, errors: PackedStringArray) -> RefCounted:
 	var start := errors.size()
 	var cp: Variant = data.get("checkpoint")
@@ -85,11 +93,21 @@ static func from_dict(data: Dictionary, errors: PackedStringArray) -> RefCounted
 		_need(cp, "y", -1, errors)
 	if errors.size() > start:
 		return null
+	_need_whole(data["lichtmeter"], "lichtmeter", 0, -1, errors)
+	_need_whole(data["speeltijd_ticks"], "speeltijd_ticks", 0, -1, errors)
+	for axis in ["x", "y"]:
+		if not is_finite(float(cp[axis])):
+			errors.append("veld 'checkpoint.%s' is geen eindig getal" % axis)
 	for id in data["gemalen"]:
 		var entry: Variant = data["gemalen"][id]
 		if typeof(entry) != TYPE_DICTIONARY or not _is_number(entry.get("vulstand")) \
 				or typeof(entry.get("vol")) != TYPE_BOOL:
 			errors.append("gemaal '%s' heeft geen geldige vulstand/vol" % id)
+		else:
+			_need_whole(entry["vulstand"], "gemalen.%s.vulstand" % id, 0, VULSTAND_MAX, errors)
+	for flag in data["vlaggen"]:
+		if typeof(data["vlaggen"][flag]) != TYPE_BOOL:
+			errors.append("vlag '%s' is geen true/false" % flag)
 	if errors.size() > start:
 		return null
 	var state: RefCounted = load("res://scripts/save/game_state.gd").new()
@@ -120,6 +138,17 @@ static func _need(data: Dictionary, key: String, type: int, errors: PackedString
 		errors.append("veld '%s' is geen getal" % key)
 	elif type != -1 and typeof(data[key]) != type:
 		errors.append("veld '%s' heeft het verkeerde type" % key)
+
+
+## Een heel getal in [low, high] (high -1 = geen bovengrens).
+## Zonder eigen bovengrens geldt WHOLE_MAX (2^53): tot daar is elk heel getal
+## exact als float (JSON), en `int()` loopt niet over. INF en NaN vallen af.
+static func _need_whole(value: Variant, key: String, low: int, high: int, errors: PackedStringArray) -> void:
+	var number := float(value)
+	var top := float(high) if high >= 0 else WHOLE_MAX
+	if not is_finite(number) or number != floorf(number) or number < low or number > top:
+		var range_text := "%d–%d" % [low, high] if high >= 0 else "%d–2^53" % low
+		errors.append("veld '%s' = %s, verwacht een heel getal %s" % [key, value, range_text])
 
 
 static func _is_number(value: Variant) -> bool:
