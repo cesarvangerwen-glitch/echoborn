@@ -1,7 +1,7 @@
 # Wereld en slice *Polderlight*
 
-Versie 0.1 (GDD v1, deel 2) · Eigenaar: Lead Game Designer (met World & Level Designer voor §1–§2, Systems Designer voor de lichtbalans, Combat Designer voor de vijandtypes) · Issue [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (T3c), `docs/productie/fase-2-kader.md` §2
-Hoort bij `docs/design/gdd.md` v0.6 (regels E-, C-, L-, LM-, V-) en `docs/design/kernloop.md` v0.5 (aantallen, rekensom, terugkeerregels K-01–K-05). De boss van de slice staat apart in `docs/design/gemaalmeester.md`.
+Versie 0.1.1 (GDD v1, deel 2) · Eigenaar: Lead Game Designer (met World & Level Designer voor §1–§2, Systems Designer voor de lichtbalans, Combat Designer voor de vijandtypes) · Issue [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (T3c), `docs/productie/fase-2-kader.md` §2
+Hoort bij `docs/design/gdd.md` v0.6.1 (regels E-, C-, L-, LM-, V-) en `docs/design/kernloop.md` v0.5.1 (aantallen, rekensom, terugkeerregels K-01–K-05). De boss van de slice staat apart in `docs/design/gemaalmeester.md`.
 Bronnen: `docs/concept/pitch.md` v0.4 (P1–P3, §4 puzzeldefinitie en normen, §5 rondgangen, R-V4), `docs/narrative/verhaal-v2.md` (gebieden, bosses, bevroren echo's, logboeken), `docs/beslissingen.md`.
 
 **Werkaanname** (kader §5): CEO-besluiten #2 (5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12), #18 (2D, 640×360) en #51 deel 2 (1A: geen puzzels op de kritieke route, gating via vaardigheden en routes, water geen speellaag; 2A: slice-art pas na F0; 7A; 8A), fasekader fase 2 v0.2 (F3, F4b, R-V4, T8a–d). Daarnaast **werkaanname LGD**: alle tijden, aantallen en maten in dit document zijn **startwaarden van vóór de flow-test (F0, [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80))**; ze worden bijgesteld na F0 (gdd §8) en gemeten in de slice (T11). D = 120 ticks tot F0 een staart kiest; maten die van D afhangen, staan in de gdd als formule. Geen andere aannames.
@@ -87,14 +87,15 @@ De echte kaart (kamers, deuren, gemalen, snelkoppelingen) maakt de World & Level
 
 ### 1.6 Rekensom
 
-Volgens `kernloop.md` §5 (v0.5), met de finale erbij en max. 9 terugkeerpoorten (het plan heeft er 7):
+Volgens `kernloop.md` §5 (v0.5), met dezelfde kolommen; de grenzen gaan uit van 6 en 9 terugkeerpoorten (K-01), het plan van 7:
 
 | | Proloog | Gebieden | Finale-route | Bosses | Minibazen | Terugkeren | Totaal |
 |---|---|---|---|---|---|---|---|
-| Ondergrens | 10 | 4 × 60 = 240 | 5 | 5 × 8 = 40 | 4 × 3 = 12 | 6 × 2 = 12 | **319 min ≈ 5,3 uur** |
-| Bovengrens | 15 | 4 × 70 = 280 | 8 | 5 × 12 = 60 | 4 × 5 = 20 | 9 × 3 = 27 | **410 min ≈ 6,8 uur** |
+| Ondergrens (6 poorten) | 10 | 4 × 60 = 240 | 5 | 5 × 8 = 40 | 4 × 3 = 12 | 6 × 2 = 12 | **319 min ≈ 5,3 uur** |
+| Bovengrens (9 poorten) | 15 | 4 × 70 = 280 | 8 | 5 × 12 = 60 | 4 × 5 = 20 | 9 × 3 = 27 | **410 min ≈ 6,8 uur** |
+| **Plan** (7 poorten, `wereld.md` §1.4) | 10–15 | 240–280 | 5–8 | 40–60 | 12–20 | 7 × 2–3 = 14–21 | **321–404 min ≈ 5,4–6,7 uur** |
 
-Met het plan (7 poorten): 5,3–6,8 uur. Binnen 5–7 uur. Het einde na Wards tien seconden (`verhaal-v2.md` §7.4–7.5, ± 2 min) is een tussenscène en telt niet mee.
+Het plan haalt 5,4–6,7 uur, binnen 5–7 uur. Het einde na Wards tien seconden (`verhaal-v2.md` §7.4–7.5, ± 2 min) is een tussenscène en telt niet mee.
 
 ### 1.7 Terugvaloptie: 3 gebieden
 
@@ -185,6 +186,9 @@ Alle drie zijn `Merkbaar`. De kost per type (runs, animaties) meet de EP in F6 t
 | OW-2 | Namen van wijken zijn werknamen; afstemmen met het verhaal (`verhaal-v2.md` §10, punt 1) | Narrative Designer | Bij het splitsen in `gebieden.md` |
 | OW-3 | De waterstand in het belfort (torenbakken, §1.3) leest misschien niet als "water zakt, wijk gaat aan" | Art Director, World & Level Designer | Fase 3, bij gebied 4 |
 | OW-4 | Of de 4e vijandtype-plek in de slice nodig is | Combat Designer | T8b, na de eerste playtest |
+| OW-5 | Bovengrens 410 van 420 min, dus na F0 nog ± 10 min marge: gaat WS-05 omhoog, dan eerst minder kamers per wijk, geen extra wijk | LGD, World & Level Designer | Na F0 |
+| OW-6 | De 4 minibazen komen bovenop de 5 bosses: hun kost apart meten in F6, naast R-V4 | Executive Producer | T15 |
+| OW-7 | C-17 wijkt af van de rolverdeling uit 7A (max. twee lichamen blijft); geen CEO-vraag (8A legt de 10 s bij het einde), wel een melding in het fase-2-statusrapport | Executive Producer | T15 |
 
 ---
 
@@ -192,4 +196,5 @@ Alle drie zijn `Merkbaar`. De kost per type (runs, animaties) meet de EP in F6 t
 
 | Versie | Wat |
 |---|---|
-| 0.1 | Eerste versie (GDD v1, deel 2; T3c, [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81)). Wereldstructuur: 4 gebieden van 3 wijken, proloog en finale (WS-01–WS-11), gebieden en ingangen, 7 terugkeerpoorten, wereldkaart, rekensom 5,3–6,8 uur, terugvaloptie 3 gebieden. Verzamelobjecten: lampglas en logbladzijde (LM-11). Slice: de Kadewijk, kamers S1–S9, SL-01–SL-06, 3 vijandtypes binnen het plafond van 4 (R-V4), wat T8a–d bouwen, checklist. |
+| 0.1.1 | Herstel na de Lead-review van de EP (PR #123): rekensom met het plan als aparte regel (321–404 min ≈ 5,4–6,7 uur) en dezelfde kolommen als `kernloop.md`; open punten OW-5–OW-7. |
+| 0.1 | Eerste versie (GDD v1, deel 2; T3c, [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81)). Wereldstructuur: 4 gebieden van 3 wijken, proloog en finale (WS-01–WS-11), gebieden en ingangen, 7 terugkeerpoorten, wereldkaart, rekensom 5,3–6,8 uur (plan 5,4–6,7), terugvaloptie 3 gebieden. Verzamelobjecten: lampglas en logbladzijde (LM-11). Slice: de Kadewijk, kamers S1–S9, SL-01–SL-06, 3 vijandtypes binnen het plafond van 4 (R-V4), wat T8a–d bouwen, checklist. |

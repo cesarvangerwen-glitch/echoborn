@@ -1,9 +1,9 @@
 # Kernloop *Polderlight*
 
-Versie 0.5 · Eigenaar: Lead Game Designer · Issue [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (T3c) · vorige versies: #6
+Versie 0.5.1 · Eigenaar: Lead Game Designer · Issue [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (T3c) · vorige versies: #6
 Werktitel *Polderlight* (besluit #96); repo en mappen heten nog "echoborn", de mechaniek heet "echo".
 Bronnen: `docs/concept/pitch.md` **v0.4** (pillars P1–P3, puzzeldefinitie en normen §4, R-V4), `docs/beslissingen.md` (#2 randvoorwaarden, #18 stijl 2D, **#51 deel 2**: 1A, 7A, 8A), `docs/productie/fase-2-kader.md` v0.2.
-De exacte regels staan in `docs/design/gdd.md` v0.6; de wereldstructuur en de slice in `docs/design/wereld.md`, de boss van de slice in `docs/design/gemaalmeester.md`. Dit document laat zien hoe ze in de loop passen, legt de aantallen en de terugkeerregels vast, toetst alles aan de pillars (§6) en zet op een rij wat de partner in co-op van de echo houdt (§7).
+De exacte regels staan in `docs/design/gdd.md` v0.6.1; de wereldstructuur en de slice in `docs/design/wereld.md`, de boss van de slice in `docs/design/gemaalmeester.md`. Dit document laat zien hoe ze in de loop passen, legt de aantallen en de terugkeerregels vast, toetst alles aan de pillars (§6) en zet op een rij wat de partner in co-op van de echo houdt (§7).
 
 **Werkaanname** (kader §5): CEO-besluiten #2 (5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12) en #51 deel 2, fasekader v0.2. Daarnaast **werkaanname LGD**: alle aantallen in §5 zijn een **maximum** en startwaarden van vóór F0. **4 gebieden** is sinds v0.5 een keuze van de LGD binnen #2 (`wereld.md` WS-01); de terugvaloptie met 3 gebieden staat in `wereld.md` §1.7.
 
@@ -100,12 +100,13 @@ Randvoorwaarden (besluit #2): 5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12. 
 
 **Rekensom** (inclusief terugkeren, A3: SM-punt 4 op PR #16). De 60–70 min van een gebied zijn **exclusief** minibaas, boss en terugkeren: die drie tellen apart (kolommen hieronder). Terugkeren kost **2–3 min per terugkeerpoort**: ≤ 2 min lopen (heen vanaf het dichtstbijzijnde gemaal en terug, elk ≤ 1 min, K-05) plus ≤ 1 min voor de poort en wat erachter ligt.
 
-| | Proloog | Gebieden | Bosses | Minibazen | Terugkeren | Totaal |
-|---|---|---|---|---|---|---|
-| Ondergrens | 10 | 4 × 60 + 5 (finale) = 245 | 5 × 8 = 40 | 4 × 3 = 12 | 6 × 2 = 12 | **319 min ≈ 5,3 uur** |
-| Bovengrens | 15 | 4 × 70 + 8 (finale) = 288 | 5 × 12 = 60 | 4 × 5 = 20 | 9 × 3 = 27 | **410 min ≈ 6,8 uur** |
+| | Proloog | Gebieden | Finale-route | Bosses | Minibazen | Terugkeren | Totaal |
+|---|---|---|---|---|---|---|---|
+| Ondergrens (6 poorten) | 10 | 4 × 60 = 240 | 5 | 5 × 8 = 40 | 4 × 3 = 12 | 6 × 2 = 12 | **319 min ≈ 5,3 uur** |
+| Bovengrens (9 poorten) | 15 | 4 × 70 = 280 | 8 | 5 × 12 = 60 | 4 × 5 = 20 | 9 × 3 = 27 | **410 min ≈ 6,8 uur** |
+| **Plan** (7 poorten, `wereld.md` §1.4) | 10–15 | 240–280 | 5–8 | 40–60 | 12–20 | 7 × 2–3 = 14–21 | **321–404 min ≈ 5,4–6,7 uur** |
 
-Beide binnen 5–7 uur (de finale-route zit in de kolom Gebieden). **Met 3 gebieden** (alleen als terugvaloptie, `wereld.md` §1.7) (4 bosses, terugkeerpoorten alleen in gebied 1–2) haalt de ondergrens de 5 uur pas als een gebied **± 85 min** duurt (10 + 3 × 85 + 4 × 8 + 3 × 3 + 4 × 2 = 314 min). Dat zijn grotere gebieden met meer wijken (4 per gebied).
+Alle drie binnen 5–7 uur; dezelfde kolommen als `wereld.md` §1.6. **Marge:** de bovengrens ligt maar 10 min onder 7 uur; gaat de duur per wijk na F0 omhoog (WS-05), dan eerst minder kamers per wijk, geen extra wijk. **Met 3 gebieden** (alleen als terugvaloptie, `wereld.md` §1.7) (4 bosses, terugkeerpoorten alleen in gebied 1–2) haalt de ondergrens de 5 uur pas als een gebied **± 85 min** duurt (10 + 3 × 85 + 4 × 8 + 3 × 3 + 4 × 2 = 314 min). Dat zijn grotere gebieden met meer wijken (4 per gebied).
 
 **Gekozen (v0.5):** 4 gebieden van 3 wijken; met 3 wijken van gemiddeld ± 22 min en max. 30 kamers per gebied komt een wijk op ≤ 10 kamers van ± 2 min (`wereld.md` WS-01, WS-05).
 
@@ -204,4 +205,5 @@ Iedereen kan alles ook alleen, alleen langzamer (C-15), dus niemand hoeft op de 
 | 0.2.1 | Werktitel *Polderlight* (besluit #96, [#37](https://github.com/cesarvangerwen-glitch/echoborn/issues/37)); verwijzing naar gdd v0.4 voor staart en co-op 7A. |
 | 0.4.1 | Herstel na de Lead-review van de EP (PR #108): de 60–70 min per gebied zijn **exclusief** minibaas, boss en terugkeren (§1, §5); **K-05** ≤ 1 min lopen enkele reis (heen en terug ≤ 2 min), passend bij 2–3 min per terugkeerpoort in de rekensom (5,2–6,9 uur blijft); open punt 3 gebieden (± 85 min per gebied) naar de wereldstructuur. Na de SM-review: K-02-poort telt niet als terugkeerpoort. |
 | 0.4 | Herschreven naar pitch v0.4 en `gdd.md` v0.5 (T3c, [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81)); het versienummer volgt de pitch. Loop in één zin met licht oppompen en **0 puzzels op de kritieke route** (§1); vier tijdschalen met de staart D (moment, keten, wijk, gebied); macro-loop met wijken en gemalen, kamerloop zonder plannen/oplossen, toestandsdiagram met Buiten, Merksprong en Partner (§2–§4). §5: wijken, vaardigheden bij naam, **scopeplafond combat (R-V4)**, 0 puzzelkamers, optionele echo-uitdagingen max. 2 per gebied; rekensom met minibazen en **terugkeertijd** (A3: SM-punt 4 op PR #16), 5,2–6,9 uur, en het gevolg van 3 gebieden. **K-04** zonder echo-puzzel (route in beweging met alle vier vaardigheden), nieuw **K-05** (terugkeren door open wijken). §6 pillartoets op de pillars van v0.4; §7 co-op 7A; §8 flow-kamer en slice. |
-| 0.5 | GDD v1, deel 2 (T3c, [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81)): 4 gebieden gekozen (`wereld.md`); wijken 3 per gebied met duur en trappen; terugkeerpoorten 2–3 per gebied (K-01, max. 9); rekensom met de finale-route: 5,3–6,8 uur; open punt 3 gebieden gesloten (terugvaloptie in `wereld.md` §1.7); macro-diagram met Wards tien seconden (gdd C-17). |
+| 0.5.1 | Herstel na de Lead-review van de EP (PR #123): rekensom met de finale-route als eigen kolom (zoals `wereld.md` §1.6), plan met 7 poorten als aparte regel: 321–404 min ≈ 5,4–6,7 uur; marge van 10 min aan de bovenkant. |
+| 0.5 | GDD v1, deel 2 (T3c, [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81)): 4 gebieden gekozen (`wereld.md`); wijken 3 per gebied met duur en trappen; terugkeerpoorten 2–3 per gebied (K-01, max. 9); rekensom met de finale-route als eigen kolom: 5,3–6,8 uur (grenzen), plan met 7 poorten 5,4–6,7 uur (na Lead-review EP); open punt 3 gebieden gesloten (terugvaloptie in `wereld.md` §1.7); macro-diagram met Wards tien seconden (gdd C-17). |
