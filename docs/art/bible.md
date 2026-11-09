@@ -242,7 +242,7 @@ Huiswerk uit de visie-review op P2 ([#98](https://github.com/cesarvangerwen-glit
 | loopbrug (looprand; onderrand onderbroken) | 11,6 | 9,4 | 38 px |
 | deur met stoep | 11,6 | 10,8 | 0–10 px |
 
-Ook met de contouren valt 90 % van het kanaal onder water nog in tint 1: het water blijft donker en diep, de vormen zijn te raden, niet te zien. Water-tint 2 (ΔL* 4,9) is te zwak voor een contour; die gebruiken we alleen voor een vlak (het lijf van de loopbrug). De opgepompte toestand verandert niet: daar staat niets hiervan onder.
+De loopbrug ligt 38 px diep: te raden, niet "net onder" het oppervlak, omdat hij in de opgepompte toestand niet mag verschuiven. Ook met de contouren valt 90 % van het kanaal onder water nog in tint 1: het water blijft donker en diep, de vormen zijn te raden, niet te zien. Water-tint 2 (ΔL* 4,9) is te zwak voor een contour; die gebruiken we alleen voor een vlak (het lijf van de loopbrug). De opgepompte toestand verandert niet: daar staat niets hiervan onder.
 
 ---
 
@@ -281,7 +281,7 @@ De markt voor pixel-metroidvania's is vol. Deze eisen maken een screenshot herke
 |---|---|---|
 | Paletten per gebied (slice: polderwijk met het eerste gemaal; daarna de andere 2–3 gebieden) en hun grijs-kleur-varianten | Art Director met Concept Artist | Bible v1, na T3 (gebiedsthema's van de Narrative Designer) |
 | Banden-licht in Godot 4.6: 2D-licht kwantiseren in 5 banden, harde schaduw, saturatiepass per wijk, stippel-laaggrens als shader of als lijn | Technical Artist | Vóór T7; deze bible geeft de visuele norm |
-| Ware Deck-test op een echte Steam Deck: flikkering van de arcering en de nabeelden in beweging | Technical Artist (met Engine & Platform Programmer) | Bij de eerste Deck-build (T7) |
+| Ware Deck-test op een echte Steam Deck: flikkering van de arcering en de nabeelden in beweging; onderwatercontouren in grijs (ΔL* 9,4–10,8 gesimuleerd, §7.5) | Technical Artist (met Engine & Platform Programmer) | Bij de eerste Deck-build (T7) |
 | Animatienormen (loopcyclus, sprong, landing, merk, ontploffing), frames en timing; de loopcyclus in de bewegingstest is placeholder | Animator | Na de flow-test, vóór de slice-art |
 | Hoe zichtbaar zijn vijanden die alleen in de schaduwlaag bestaan | Art Director met Combat Designer | Bible v1 |
 | Combat-leesbaarheid in één frame: schaduwmerk, ontploffing, parade, met twee spelers en de finisher | Art Director met Combat Designer | Bible v1, na T3 |
