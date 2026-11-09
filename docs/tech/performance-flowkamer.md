@@ -190,7 +190,7 @@ done; done
 | # | Punt | Wie |
 |---|---|---|
 | 1 | **Echte Deck-meting** volgens §6. Geen Deck in de agent-omgeving. | CEO of tester met een Deck; Engine & Platform Programmer verwerkt |
-| 2 | **Camera die de rendergrootte volgt** (§3). **Besluit TD:** de Gameplay Programmer leidt de camerazoom af van de rendergrootte, direct na de merge van #116 en vóór T8a. Daarna zet de Engine & Platform Programmer de 5 `.deck`-instellingen uit §3 en draait D1–D4 opnieuw. | Gameplay Programmer; daarna Engine & Platform Programmer |
+| 2 | **Camera die de rendergrootte volgt** (§3), [#120](https://github.com/cesarvangerwen-glitch/echoborn/issues/120): `FlowRoom.camera_zoom` leidt de zoom af van de rendergrootte (640×400 → 1, 1280×720/800 → 2). **Volgende stap:** de Engine & Platform Programmer zet de 5 `.deck`-instellingen uit §3 en draait D1–D4 opnieuw ([#79](https://github.com/cesarvangerwen-glitch/echoborn/issues/79)). | Engine & Platform Programmer |
 | 3 | Herhalen op de slice (T8a), zodra die er is: zelfde script, met `FLOW_SCENE` naar de slice-scène. | Engine & Platform Programmer |
 | 4 | **Besluit TD:** akkoord op D1–D8 als definitie van "draait op Deck-specificaties", en op het lichtbudget van 3 ms GPU per frame (20 LE normaal, 30 LE piek; `lichtmeting.md` §7 punt 3). | Technical Director (besloten) |
 | 5 | Waarom de rekenregel van #21 hier ±1,14–1,3× te laag schat (§4.3). | Technical Artist |
@@ -202,3 +202,5 @@ done; done
 | 11 | D5 sluit laden uit van de 33 ms-grens, maar hapers door shadercompilatie bij het eerste licht zijn reëel; apart noteren en een eigen drempel bepalen. | Engine & Platform Programmer (met Technical Artist) |
 | 12 | Run B speelt de kamer zonder 2D-licht; verlicht wordt alleen via het meetscript (run A) gemeten. | Engine & Platform Programmer |
 | 13 | De omrekenfactor 10–30× rust op één gedeelde 2-vCPU-machine met twee runs per modus. | Engine & Platform Programmer (met Technical Artist) |
+| 14 | **16:10 (C-07), besluit TD: geen blokkade.** De leiband blijft 16:9 (`leash_view_px`) voor pc én Deck, zodat sim, echo en replays op dezelfde tick oplossen; geen aparte Deck-waarde. Op 640×400 toont de camera per rand 20–30 wereldpx extra; UX beslist alleen of die band gedimd wordt. | UX Designer |
+| 15 | Zoom-uit op 640×400 geeft een niet-gehele schaal (bv. 0,667), dus ongelijke pixels; zichtbaarder dan bij een render van 1280. Vaste zoomtrappen of niet. Ook een venster kleiner dan 640×360 geeft ongelijke pixels (zoom < 1). | Technical Artist en UX Designer |
