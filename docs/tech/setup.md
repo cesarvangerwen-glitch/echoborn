@@ -54,7 +54,7 @@ godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd
 ```
 
 - Exitcode `0` = alle tests geslaagd, `1` = minstens één test mislukt.
-- Een test is ook FAIL bij 0 checks, bij een `SCRIPT ERROR` of enginefout tijdens de test, of als hij niet binnen 7200 frames klaar is. Een testscript dat niet laadt of geen `test_*`-methoden heeft, telt als mislukt (#30). De runner vangt fouten op met een `Logger` (`tests/error_log.gd`, Godot 4.5+).
+- Een test is ook FAIL bij 0 checks, bij een `SCRIPT ERROR` of enginefout tijdens de test, of als hij niet binnen 7200 frames klaar is. Een testscript dat niet laadt of geen `test_*`-methoden heeft, telt als mislukt (#30). De runner vangt fouten op met een `Logger` (`tests/error_log.gd`, Godot 4.5+). Vóór de eerste test laadt de runner elk script onder `scripts/`, `scenes/`, `prototypes/` en `tests/` en controleert hij de autoloads; een script dat niet laadt, of een fout buiten een test, is ook een FAIL (#82, `ontwerp.md` §9).
 - Bekende beperkingen van de runner:
   - Een test die na 7200 frames niet klaar is, wordt als FAIL gemeld, maar zijn coroutine blijft bestaan tot de runner stopt. Geeft die vastgelopen test later nog een fout, dan kan die op naam van een volgende test komen. Los bij een time-out dus eerst de hangende test op en draai de suite dan opnieuw.
   - Waarschuwingen (`push_warning`) maken een test niet rood, alleen fouten.

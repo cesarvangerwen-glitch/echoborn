@@ -4,7 +4,8 @@ extends Node2D
 ## Volgorde per tick volgens E-07b (docs/design/gdd.md, ontwerp.md §2 en §4a):
 ##   (1) de schaduw: de echo zet zijn frame, óf P2 stapt (en wordt opgenomen)
 ##   (2) P1 stapt
-##   (3) P1 wordt opgenomen; de echo verwerkt een reset van P1 (E-09, E-04b)
+##   (3) P1 wordt opgenomen; de AreaLoader volgt P1 (E-04e); de echo verwerkt
+##       een reset van P1 (E-04a kamerwissel, E-04b respawn, E-09 Loslaten)
 ##   (4) events: eerst van P1, dan van de schaduw (E-10)
 ##   (5) objecten werken hun stand bij (drukplaten, hendels, later zones)
 ## Zo hangt het resultaat niet af van de volgorde van nodes in de boom.
@@ -49,6 +50,9 @@ var echoes: Array[EchoBody] = []
 var objects: Array[SimObject] = []
 ## Aanval, schaduwmerk en kettingen (E-10a, E-14, E-02m, C-12).
 var combat := Combat.new()
+## Optioneel: de AreaLoader van het gebied (E-04a, E-04e; ontwerp.md §3a).
+## Zonder loader is alles één geladen kamer (zoals vóór T5b).
+var area_loader: Node = null
 
 
 ## Voegt een speler toe als C-01 dat toelaat: één P1 en hooguit één andere
@@ -94,6 +98,8 @@ func add_echo(echo: EchoBody) -> bool:
 		return false
 	echoes.append(echo)
 	echo.combat = combat
+	if "area_loader" in echo:
+		echo.area_loader = area_loader
 	if "tail_ticks" in echo:
 		combat.tail_ticks = echo.tail_ticks
 	add_child(echo)
@@ -107,6 +113,14 @@ func can_add_echo() -> bool:
 		if echo.is_active() or echo.is_present():
 			return false
 	return true
+
+
+## Koppelt de AreaLoader aan de Sim en aan de echo's die er al zijn.
+func set_area_loader(loader: Node) -> void:
+	area_loader = loader
+	for echo in echoes:
+		if "area_loader" in echo:
+			echo.area_loader = loader
 
 
 func remove_echo(echo: EchoBody) -> void:
@@ -170,8 +184,12 @@ func _physics_process(delta: float) -> void:
 		_step_player(p1, p2 if p2 else _carrier_echo(), "2", delta)
 	if p2 and p1_first:
 		_step_player(p2, p1, "1", delta)
-	# Na (3): een echo reageert in dezelfde tick op Loslaten of respawn van
-	# P1 (E-04b/c, E-09), zodat zijn events in (4) dan niet meer uitgaan.
+	# Na (3): de AreaLoader volgt P1 (E-04e); een kamerwissel naar een kamer
+	# die geen buur is, vraagt een reset aan (E-04a). P2 wisselt nooit.
+	if area_loader and p1:
+		area_loader.sim_track(tick, p1)
+	# Een echo reageert in dezelfde tick op Loslaten, respawn of kamerwissel
+	# van P1 (E-04a–c, E-09), zodat zijn events in (4) dan niet meer uitgaan.
 	for echo in echoes:
 		echo.sim_after_source(tick)
 	# (4) events, eerst van P1, dan van de schaduw.
