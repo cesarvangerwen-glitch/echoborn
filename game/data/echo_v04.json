@@ -61,5 +61,18 @@
 		"enemy_windup_ticks": 30,
 		"enemy_attack_ticks": 6,
 		"p1_health": 5
+	},
+	"coop": {
+		"_uitleg": "Co-op 7A (gdd §2.7, C-03, C-09–C-13; §2.9). Startwaarden LGD voor de flow-kamer.",
+		"stance_hold_ticks": 12,
+		"launch_speed_x": 4.0,
+		"launch_velocity_y": -7.5,
+		"launch_ticks": 30,
+		"catch_min_fall_speed": 4.0,
+		"catch_half_width_px": 24.0,
+		"catch_swing_velocity": -6.0,
+		"catch_invulnerable_ticks": 12,
+		"dropin_radius_px": 64.0,
+		"dropin_step_px": 4.0
 	}
 }
