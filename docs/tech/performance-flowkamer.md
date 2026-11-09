@@ -111,7 +111,7 @@ De tabel komt op stdout, een CSV in `user://deck_meting_<res>.csv` (pad wordt ge
 
 ### 4.4 Omrekening naar de Deck (aanname)
 
-De TA stelt 3 ms GPU per frame voor licht voor (`lichtmeting.md` §5.3; akkoord van de TD staat daar nog open). Nodige versnelling Deck t.o.v. deze llvmpipe = lichtkosten / 3 ms:
+De TA stelt 3 ms GPU per frame voor licht voor (`lichtmeting.md` §5.3; akkoord TD). Nodige versnelling Deck t.o.v. deze llvmpipe = lichtkosten / 3 ms:
 
 | | 640×400 | native 1280×800 |
 |---|---:|---:|
@@ -124,12 +124,13 @@ De TA stelt 3 ms GPU per frame voor licht voor (`lichtmeting.md` §5.3; akkoord 
 
 | Werkaanname | Bron |
 |---|---|
+| Drempels D1–D8 en 3 ms GPU voor licht (20/30 LE) | Besluit TD bij de review |
 | Minimumspecificatie = Steam Deck (LCD, 1280×800, 60 Hz) | Randvoorwaarde "Steam Deck verified als doel" (#2); besluit #18 |
 | Godot 4.6.3-stable, `gl_compatibility` | `setup.md` §1; lichtbudget #21 is met deze renderer gemeten |
-| Licht ≤ 3 ms GPU per frame; normaal 20 LE, piek 30 LE | Voorstel TA, `lichtmeting.md` §5 (framebudget van de TD nog open) |
+| Licht ≤ 3 ms GPU per frame; normaal 20 LE, piek 30 LE | Voorstel TA, `lichtmeting.md` §5; akkoord TD |
 | Deck-GPU 10–30× sneller dan llvmpipe op 2 Xeon-kernen | Schatting TA, `lichtmeting.md` §5.3; niet gemeten |
 | Linux-native build (geen Windows-build via Proton) op de Deck | Deze PR; Proton is niet getest |
-| "Draait op Deck-specificaties" = de drempels van §6.3 | Deze PR; voorstel aan de TD |
+| "Draait op Deck-specificaties" = de drempels van §6.3 | Akkoord TD |
 
 ## 6. Meetprotocol voor een echte Steam Deck
 
@@ -162,7 +163,8 @@ done; done
 7. Voeg `godot` toe als niet-Steam-game met startopties `--main-pack /home/deck/echoborn/builds/deck/polderlight.pck`. Start in Gamemodus.
 8. Snelmenu (…) → Prestaties: overlay niveau 4, framelimiet 60. Speel de flow-kamer 10 min (K1 → K2 → K3 → gemaal), solo met de ingebouwde knoppen, en 2 min met een tweede controller (P2 erbij via Start).
 9. Noteer: fps, frametijd (grafiek vlak of pieken), GPU-klok, verbruik (W), temperatuur. Foto of screenshot van de overlay in K2 tijdens een golf.
-10. Herhaal stap 8 kort (2 min) met **TDP-limiet 8 W** (batterijsituatie).
+10. **Co-op oplossen en terugkomen:** laat P2 in K2 meedoen (Start), houd Select 1 s vast zodat P2 oplost, en laat P2 meteen weer meedoen. Doe dat 3×. Noteer per keer de hoogste frametijd in de overlay rond het oplossen en terugkomen (verwacht: een piek door ± 800 shape-queries van `Sim.placement`).
+11. Herhaal stap 8 kort (2 min) met **TDP-limiet 8 W** (batterijsituatie).
 
 ### 6.3 Drempels: wanneer geslaagd
 
@@ -172,7 +174,7 @@ done; done
 | D2 | Run A, wijk20 − grijs-eind (lichtkosten GPU) | ≤ 3 ms op 640×400 (budget TA). Op native: noteren; > 3 ms bevestigt dat §3 nodig is |
 | D3 | Run A, wijk20 en piek30, 640×400 | frame p95 ≤ 16,7 ms |
 | D4 | Run A, `CPU-render ms` (alle scenario's) | ≤ 4 ms (anders is de saturatiepass of het licht een CPU-probleem, zie `lichtmeting.md` §7 punt 5) |
-| D5 | Run B, 10 min spelen | 60 fps gehouden; geen frametijd > 33 ms behalve bij het laden; geen crash |
+| D5 | Run B, 10 min spelen, en de co-opstap (stap 10) | 60 fps gehouden; geen frametijd > 33 ms behalve bij het laden, ook niet bij P2 oplossen of terugkomen; geen crash |
 | D6 | Run B, TDP 8 W | 60 fps gehouden in de grijze kamer |
 | D7 | Run B, input | ingebouwde knoppen werken als P1 zonder configuratie; een tweede controller kan meedoen |
 | D8 | Run A, laadtijd en geheugen | laden ≤ 1 s, geheugen ≤ 1 GB |
@@ -181,16 +183,18 @@ done; done
 
 ### 6.4 Opleveren
 
-11. Zet in issue #79 (of een vervolgissue): de 6 uitvoerbestanden `deck_*.txt`, de CSV's (`~/.local/share/godot/app_userdata/Echoborn/deck_meting_*.csv`), de overlayfoto's, Deck-model, SteamOS-versie, commit-hash, en per drempel D1–D8 geslaagd/niet.
+12. Zet in issue #79 (of een vervolgissue): de 6 uitvoerbestanden `deck_*.txt`, de CSV's (`~/.local/share/godot/app_userdata/Echoborn/deck_meting_*.csv`), de overlayfoto's, Deck-model, SteamOS-versie, commit-hash, en per drempel D1–D8 geslaagd/niet.
 
 ## 7. Open punten
 
 | # | Punt | Wie |
 |---|---|---|
 | 1 | **Echte Deck-meting** volgens §6. Geen Deck in de agent-omgeving. | CEO of tester met een Deck; Engine & Platform Programmer verwerkt |
-| 2 | **Camera die de rendergrootte volgt** (§3), zodat de Deck-build op 640×400 rendert. Daarna de 5 `.deck`-instellingen uit §3 toevoegen en opnieuw meten. | Eigenaar flow-kamer (Gameplay Programmer), met TD; daarna Engine & Platform Programmer |
+| 2 | **Camera die de rendergrootte volgt** (§3). **Besluit TD:** de Gameplay Programmer leidt de camerazoom af van de rendergrootte, direct na de merge van #116 en vóór T8a. Daarna zet de Engine & Platform Programmer de 5 `.deck`-instellingen uit §3 en draait D1–D4 opnieuw. | Gameplay Programmer; daarna Engine & Platform Programmer |
 | 3 | Herhalen op de slice (T8a), zodra die er is: zelfde script, met `FLOW_SCENE` naar de slice-scène. | Engine & Platform Programmer |
-| 4 | Drempels D1–D8 als definitie van "draait op Deck-specificaties": akkoord? Ook het framebudget van 3 ms voor licht (`lichtmeting.md` §7 punt 3). | Technical Director |
+| 4 | **Besluit TD:** akkoord op D1–D8 als definitie van "draait op Deck-specificaties", en op het lichtbudget van 3 ms GPU per frame (20 LE normaal, 30 LE piek; `lichtmeting.md` §7 punt 3). | Technical Director (besloten) |
 | 5 | Waarom de rekenregel van #21 hier ±1,3× te laag schat (§4.3). | Technical Artist |
 | 6 | Volledige `.x86_64`-build met export templates 4.6.3 (en later een buildscript in CI). Niet gemaakt: geen templates in deze omgeving. | Engine & Platform Programmer (met Tools Programmer voor CI) |
 | 7 | Niet gemeten: Vulkan-renderers, Windows-build via Proton, Deck OLED (90 Hz), Steam Input-integratie. | Engine & Platform Programmer |
+| 8 | Release-preset maken die `tools/perf/` en `prototypes/lichtmeting/` uitsluit (de Deck-preset houdt ze voor de meting). | Engine & Platform Programmer |
+| 9 | Fullscreen-modus 3 (`mode.deck=3`) houden; exclusieve fullscreen (modus 4) is niet getest. | Engine & Platform Programmer |
