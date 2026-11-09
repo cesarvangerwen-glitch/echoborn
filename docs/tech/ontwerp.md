@@ -119,7 +119,7 @@ Per frame: tick (4 B), input (4 B), 4 × Vector2 (32 B), vloervlag (1 B) = 41 B.
 
 **Wat dit betekent voor gameplay** (beslissing van de Lead Game Designer, niet van TD): bij toestand-opname botst een echo niet vanzelf met dingen die na de opname veranderd zijn. Er is een regel nodig voor wat er gebeurt als het pad geblokkeerd is: door de muur heen (schaduw), verdwijnen, of stoppen. Technisch zijn alle drie eenvoudig: een `ShapeCast2D` op de schaduwlaag kan elke tick controleren of het opgenomen punt vrij is.
 
-**Acties van de echo**: aanvallen, schakelaars en interacties worden niet als positie opgenomen maar als event (`ACTION`-bit, later een eigen eventlijst per frame). Bij afspelen voert de echo het event op die tick uit, met een hitbox/`Area2D` op de schaduwlaag. Schakelaars die door de echo bediend kunnen worden, luisteren naar de schaduwlaag.
+**Acties van de echo**: aanvallen, schakelaars en interacties worden niet als positie opgenomen maar als event: een eventmasker per frame (`GameEvents`, `clip.events`), gemaakt uit de inputflanken (E-10). Bij afspelen voert de Sim het event van dat frame uit in stap (4), tegen de huidige wereld en met de schaduwlaag van de echo. Objecten bepalen wie ze raakt of bedient met een directe vormtest, niet met een `Area2D` of een ruimte-query (§4a, `standaarden.md` regel 8). Schakelaars die door de echo bediend kunnen worden, hebben de schaduwlaag als eigenaarslaag (E-06).
 
 ## 4a. Event-systeem en objectdetectie (A2, #68)
 

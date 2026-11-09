@@ -227,6 +227,7 @@ func test_c01_never_more_than_two_bodies(t) -> void:
 			stats["solo_echo_ticks"] += 1
 	sim.tick_finished.connect(on_tick)
 	var refused := 0
+	var extra_players := 0
 	var p2: PlayerActor = null
 	# [ticks wachten, actie]: echo = echo starten, in = P2 meedoen, uit = P2 stopt.
 	var plan := [[600, "echo"], [200, "in"], [300, "echo"], [300, "uit"], [100, "echo"],
@@ -239,6 +240,13 @@ func test_c01_never_more_than_two_bodies(t) -> void:
 					refused += 1
 			"in":
 				p2 = _spawn_player(sim, PlayerActor.new(), 2, walk, Vector2(300, 0))
+				# Een derde lichaam (P3) mag er niet bij (C-01).
+				var p3 := PlayerActor.new()
+				p3.setup(3, ScriptedInput.new(walk), Color.WHITE)
+				if sim.add_player(p3):
+					extra_players += 1
+				else:
+					p3.free()
 			"uit":
 				sim.remove_player(p2)
 	sim.tick_finished.disconnect(on_tick)
@@ -246,6 +254,7 @@ func test_c01_never_more_than_two_bodies(t) -> void:
 	t.check(stats["worst_shadow"] <= 1, "%d schaduwlichamen op één tick" % stats["worst_shadow"])
 	t.check(stats["worst_total"] <= 2, "%d lichamen op één tick" % stats["worst_total"])
 	t.check(stats["echo_in_coop"] == 0, "%d keer een zichtbare of botsende echo in co-op" % stats["echo_in_coop"])
+	t.check(extra_players == 0, "%d keer een derde speler toegelaten naast P1 en P2 (C-01)" % extra_players)
 	t.check(refused == 2, "%d echo's geweigerd, verwacht 2 (de twee pogingen tijdens co-op)" % refused)
 	t.check(stats["coop_ticks"] == 1200, "co-op duurde %d ticks, verwacht 1200" % stats["coop_ticks"])
 	# Echo's spelen 600-799, 1500-1699 en 2400-2999 (afgebroken door P2 of aan het einde).

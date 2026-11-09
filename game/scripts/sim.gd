@@ -37,7 +37,12 @@ var echoes: Array[EchoActor] = []
 var objects: Array[SimObject] = []
 
 
-func add_player(player: PlayerActor) -> void:
+## Voegt een speler toe als C-01 dat toelaat: één P1 en hooguit één andere
+## speler (P2). Een derde lichaam (een tweede P1, een tweede P2 of een P3)
+## wordt geweigerd met `false`; de aanroeper ruimt de speler dan zelf op.
+func add_player(player: PlayerActor) -> bool:
+	if not can_add_player(player.player_index):
+		return false
 	players.append(player)
 	players.sort_custom(func(a: PlayerActor, b: PlayerActor) -> bool:
 		return a.player_index < b.player_index)
@@ -47,6 +52,14 @@ func add_player(player: PlayerActor) -> void:
 	if player.player_index != 1:
 		for echo in echoes.duplicate():
 			remove_echo(echo)
+	return true
+
+
+func can_add_player(player_index: int) -> bool:
+	for other in players:
+		if (other.player_index == 1) == (player_index == 1):
+			return false
+	return true
 
 
 func remove_player(player: PlayerActor) -> void:
