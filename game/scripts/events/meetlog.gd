@@ -6,9 +6,9 @@ extends RefCounted
 ## Luistert alleen naar signalen en leest na elke tick de toestand van P1
 ## (standaarden §6: geen testhaken in gameplaycode). Deterministisch: dezelfde
 ## `ScriptedInput` en dezelfde D geven dezelfde regels. Kolommen:
-## `tick, kamer, event, waarde, bron, x, y`. Nog niet in deze versie: kamers
-## (KAMER, `buiten`, T5b), lichtmeter en gemaal (LP, POMP, T16b) en co-op
-## (DROP_IN … P2_TERUG, LANCERING, VANGEN; T16c).
+## `tick, kamer, event, waarde, bron, x, y`. Kamers, LP, POMP en
+## DROP_IN … P2_TERUG schrijft de flow-kamer (`flow_meetlog.gd`); hier staan
+## de springplank-events van P1 en, in co-op, van P2 (bron = de drager).
 
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
@@ -35,6 +35,7 @@ var _last_move_tick := -1_000_000
 var _grace_until := 0
 var _still_since := -1
 var _chain := 0
+var _chain_p2 := 0
 var _closed := false
 
 
@@ -108,22 +109,37 @@ func _on_tick(tick: int) -> void:
 		PlayerActor.EchoReset.RESPAWN:
 			_add(tick, "RESPAWN", "", "p1", _p1.position)
 			_grace_until = tick + RESPAWN_GRACE
-	if ev & Motor.EV_LAND:
-		_chain = 0
-	if ev & Motor.EV_SPRINGPLANK:
-		_chain = mini(_chain + 1, CHAIN_MAX)
-		_add(tick, "SPRINGPLANK", str(_chain), "echo", _p1.position)
-	if ev & Motor.EV_BOUNCE:
-		_add(tick, "BOUNCE", str(maxi(_chain, 1)), "echo", _p1.position)
-	# C-13: een vang telt voor `n` als springplank-landing; C-11b: lancering.
-	if ev & Motor.EV_CATCH:
-		_chain = mini(_chain + 1, CHAIN_MAX)
-		_add(tick, "VANGEN", str(_chain), "echo", _p1.position)
-	if ev & Motor.EV_LAUNCH:
-		_add(tick, "LANCERING", str(maxi(_chain, 1)), "echo", _p1.position)
+	var p2: PlayerActor = _sim.get_player(2) if _sim.has_method("get_player") else null
+	# Bron = de drager (§4.5): solo de echo, in co-op het andere lichaam.
+	_chain = _plank_rows(tick, ev, _chain, "p2" if p2 != null else "echo", _p1.position)
+	if p2 != null and not p2.dissolved:
+		if p2.motor.on_floor and p2.motor.support != Motor.Support.SHADOW_BODY:
+			_chain_p2 = 0
+		_chain_p2 = _plank_rows(tick, p2.move_events, _chain_p2, "p1", p2.position)
+	elif p2 == null:
+		_chain_p2 = 0
 	if ev & (Motor.EV_JUMP | Motor.EV_DASH):
 		_last_move_tick = tick
 	_update_still(tick)
+
+
+## SPRINGPLANK, BOUNCE, VANGEN en LANCERING van één springer; `n` (LM-02) per
+## springer, `source` is de drager. Geeft de nieuwe `n` terug.
+func _plank_rows(tick: int, ev: int, n: int, source: String, at: Vector2) -> int:
+	if ev & Motor.EV_LAND:
+		n = 0
+	if ev & Motor.EV_SPRINGPLANK:
+		n = mini(n + 1, CHAIN_MAX)
+		_add(tick, "SPRINGPLANK", str(n), source, at)
+	if ev & Motor.EV_BOUNCE:
+		_add(tick, "BOUNCE", str(maxi(n, 1)), source, at)
+	# C-13: een vang telt voor `n` als springplank-landing; C-11b: lancering.
+	if ev & Motor.EV_CATCH:
+		n = mini(n + 1, CHAIN_MAX)
+		_add(tick, "VANGEN", str(n), source, at)
+	if ev & Motor.EV_LAUNCH:
+		_add(tick, "LANCERING", str(maxi(n, 1)), source, at)
+	return n
 
 
 ## MP-1: tick t is stil als P1 in t − 30 … t binnen 24 px van zijn positie

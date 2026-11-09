@@ -88,6 +88,9 @@ var _hud_label: Label
 var _hud_bar: ColorRect
 var _hud_fill: ColorRect
 var _camera: Camera2D
+## Hoe snel de camera naar zijn doel (zoom en plek) beweegt, per seconde. Zo
+## springt de zoom niet in één frame bij P2_OPGELOST of P2_TERUG.
+const CAMERA_EASE := 8.0
 var _scores: Array = []
 var _k3_tint: Polygon2D
 var _overlay: Node2D
@@ -106,6 +109,7 @@ func _ready() -> void:
 	sim = Sim.new()
 	sim.name = "Sim"
 	add_child(sim)
+	sim.combat.tail_ticks = tail  # merk-levensduur D + 30, ook zonder echo (C-12e)
 	p1 = PlayerActor.new()
 	p1.setup(1, input_override if input_override else _router_source(1), P1_COLOR)
 	p1.position = Layout.RUN_START
@@ -125,6 +129,13 @@ func _ready() -> void:
 		if _k3_tint:
 			_k3_tint.color = Color(0.45, 0.35, 0.2, 0.35))
 	sim.tick_finished.connect(_on_tick)
+	# C-06: werkaanname T16c: de onderrand is die van het hele gebied (K2 gaat
+	# open over in K3, dus een val van K2 naar K3 is geen val uit de kamer).
+	sim.room_bottom = Layout.K1.end.y
+	sim.partner_dissolved.connect(func(t: int, at: Vector2, cause: String) -> void:
+		meetlog.add_row(t, "P2_OPGELOST", "", cause, at))
+	sim.partner_returned.connect(func(t: int, at: Vector2) -> void:
+		meetlog.add_row(t, "P2_TERUG", "", "", at))
 	var router := _router()
 	if router and input_override == null:
 		router.slot_joined.connect(_on_slot_joined)
@@ -147,16 +158,40 @@ func _ready() -> void:
 		add_child(_overlay)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if _camera and is_instance_valid(p1):
-		var focus := p1.position
-		if p2 and is_instance_valid(p2):
-			focus = (p1.position + p2.position) * 0.5
-		_camera.position = focus
+		var with_p2 := p2 != null and is_instance_valid(p2) and not p2.dissolved
+		var view := camera_view(p1.position, p2.position if with_p2 else p1.position)
+		# Easen op de zoom; het middelpunt volgt het doelbeeld, zodat P1 en P2
+		# tijdens het easen in beeld blijven (uitzoomen gaat even snel).
+		var target_zoom := 1280.0 / view.size.x
+		var w := 1.0 - exp(-CAMERA_EASE * delta)
+		var zoom := lerpf(_camera.zoom.x, target_zoom, w)
+		if target_zoom < _camera.zoom.x:
+			zoom = target_zoom  # uitzoomen meteen: niemand valt buiten beeld
+		_camera.zoom = Vector2(zoom, zoom)
+		_camera.position = _camera.position.lerp(view.get_center(), w)
 	if _hud_label:
 		_update_hud()
 	if _overlay:
 		_overlay.queue_redraw()
+
+
+## C-07: het beeld van de gedeelde camera in wereldpixels. Zoomt uit tot
+## `leash_view_px` om P1 en P2 in beeld te houden; P1 blijft altijd minstens
+## `leash_margin_px` van de rand. Dezelfde maten als de leiband in
+## `Sim._check_partner`: P2 staat in dit beeld precies als de leiband niet telt.
+## (Vaste venstermaat 1280 × 720; de zoom uit de rendergrootte volgt na #119.)
+static func camera_view(p1_at: Vector2, p2_at: Vector2) -> Rect2:
+	var c: Dictionary = Tuning.coop()
+	var max_view := Vector2(float(c["leash_view_px"][0]), float(c["leash_view_px"][1]))
+	var margin := float(c["leash_margin_px"])
+	var gap := (p2_at - p1_at).abs() + Vector2(2.0 * margin, 2.0 * margin)
+	var zoom := clampf(minf(1280.0 / gap.x, 720.0 / gap.y), 1280.0 / max_view.x, 2.0)
+	var half := Vector2(640, 360) / zoom
+	var inner := half - Vector2(margin, margin)
+	var focus := ((p1_at + p2_at) * 0.5).clamp(p1_at - inner, p1_at + inner)
+	return Rect2(focus - half, half * 2.0)
 
 
 ## Duur van de run in ticks (tot nu, of tot RUN_EIND).
@@ -306,7 +341,7 @@ func _all_dead(list: Array[CombatTarget]) -> bool:
 ## LM-05: 0 levenspunten = respawn op het begin van de kamer, L en G gelijk.
 func _on_health_changed(_tick: int, health: int) -> void:
 	if health <= 0:
-		p1.respawn_at(Layout.ROOM_START[room])
+		p1.respawn_at(Layout.ROOM_START[room], true)  # C-08: P2 respawnt mee
 		p1.health = int(Tuning.combat()["p1_health"])
 
 
@@ -334,33 +369,51 @@ func save_log() -> Error:
 	return err
 
 
-# --- Co-op (minimaal; T16c bouwt C-03/C-05) ---
+# --- Co-op: InputRouter -> drop-in en drop-out (C-03, C-05) ---
 
 func _on_slot_joined(slot: int, _device: String) -> void:
 	if slot != 2 or p2 != null:
 		return
-	p2 = PlayerActor.new()
-	p2.setup(2, _router_source(2), P2_COLOR)
-	p2.position = echo.position if echo and echo.is_present() else p1.position
-	if not sim.add_player(p2):
-		p2.free()
-		p2 = null
-		return
-	echo = null  # de Sim heeft hem weggehaald (C-01)
-	meter.coop = true
-	coop_seen = true
-	meetlog.add_row(sim.tick, "DROP_IN", "", "", p2.position)
+	join_partner(_router_source(2))
 
 
 func _on_slot_left(slot: int, reason: String) -> void:
 	if slot != 2 or p2 == null:
 		return
+	leave_partner("apparaat" if reason.begins_with("apparaat") else reason)
+
+
+## C-03: P2 doet mee met deze inputbron (ook voor headless tests). Neemt de
+## echo over als die afspeelt, anders de plaatsingsregel. Tussen twee ticks.
+func join_partner(source: RefCounted) -> bool:
+	if p2 != null:
+		return false
+	var partner := PlayerActor.new()
+	partner.setup(2, source, P2_COLOR)
+	if not sim.drop_in(partner):
+		partner.free()
+		return false
+	p2 = partner
+	echo = null  # de Sim heeft hem weggehaald (C-01)
+	meter.coop = true
+	coop_seen = true
+	meetlog.add_row(sim.tick, "DROP_IN", "", "", p2.position)
+	return true
+
+
+## C-05: P2 lost op; de echo van P1 neemt over (als de echo aan staat).
+func leave_partner(reason: String) -> void:
+	if p2 == null:
+		return
 	meetlog.add_row(sim.tick, "DROP_OUT", "", reason, p2.position)
-	sim.remove_player(p2)
+	var new_echo: TailEcho = sim.drop_out(ECHO_COLOR)
 	p2 = null
 	meter.coop = false
-	if echo_on:
-		_add_echo()
+	if new_echo and not echo_on:
+		sim.remove_echo(new_echo)
+		new_echo = null
+	echo = new_echo
+	if echo:
 		meetlog.watch_echo(echo)
 
 

@@ -63,7 +63,7 @@
 		"p1_health": 5
 	},
 	"coop": {
-		"_uitleg": "Co-op 7A (gdd §2.7, C-03, C-09–C-13; §2.9). Startwaarden LGD voor de flow-kamer.",
+		"_uitleg": "Co-op 7A (gdd §2.7, C-03, C-06–C-13; §2.9). Startwaarden LGD voor de flow-kamer. leash_view_px is een werkaanname van de Gameplay Programmer (T16c): het beeld van de gedeelde camera op maximale zoom-uit, in wereldpixels (1,5 × 640 × 360); de echte waarde zetten de UX Designer en de Technical Director (C-07). leash_margin_px: zo ver blijft P1 minstens van de beeldrand; de leiband telt vanaf leash_view_px − marge.",
 		"stance_hold_ticks": 12,
 		"launch_speed_x": 4.0,
 		"launch_velocity_y": -7.5,
@@ -73,6 +73,13 @@
 		"catch_swing_velocity": -6.0,
 		"catch_invulnerable_ticks": 12,
 		"dropin_radius_px": 64.0,
-		"dropin_step_px": 4.0
+		"dropin_step_px": 4.0,
+		"dissolve_return_ticks": 120,
+		"leash_offscreen_ticks": 60,
+		"leash_margin_px": 32,
+		"leash_view_px": [
+			960,
+			540
+		]
 	}
 }

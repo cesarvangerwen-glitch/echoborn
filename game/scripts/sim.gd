@@ -24,6 +24,7 @@ const TailEcho = preload("res://scripts/echo/tail_echo.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
 const Layers = preload("res://scripts/world/layers.gd")
 const Tuning = preload("res://scripts/echo/tuning.gd")
+const Zone = preload("res://scripts/objects/zone.gd")
 
 ## Vlak vóór elke stap van een actor of object. `phase` is de stap uit E-07b:
 ## "1", "2", "3", "4" of "5". Bedoeld voor tests en debug-overlays; zonder
@@ -42,6 +43,11 @@ signal tick_finished(tick: int)
 signal partner_left(tick: int, at: Vector2)
 ## P2 doet mee (C-03), op positie `at`.
 signal partner_joined(tick: int, at: Vector2)
+## P2 lost op (C-06) op `at`; `cause` is `fellicht`, `gevaar`, `val` of
+## `leiband` (C-07), zoals de bron van `P2_OPGELOST` in het meetlog (§4.5).
+signal partner_dissolved(tick: int, at: Vector2, cause: String)
+## P2 is terug naast P1 (C-06 na 120 ticks, of C-08 bij een respawn van P1).
+signal partner_returned(tick: int, at: Vector2)
 
 ## Aantal verwerkte ticks sinds de start.
 var tick := 0
@@ -53,6 +59,16 @@ var combat := Combat.new()
 ## Optioneel: de AreaLoader van het gebied (E-04a, E-04e; ontwerp.md §3a).
 ## Zonder loader is alles één geladen kamer (zoals vóór T5b).
 var area_loader: Node = null
+## C-06: de onderrand van de kamer van P1 (wereld-y). P2 lost op als zijn
+## middelpunt eronder komt. INF = geen rand (tests zonder kamer).
+var room_bottom := INF
+
+## C-06/C-07: tick waarop een opgeloste P2 terugkomt, en hoeveel ticks het
+## middelpunt van P2 aaneengesloten buiten het beeld van de camera stond.
+var _p2_return_tick := -1
+var _p2_offscreen := 0
+var _light_query: PhysicsPointQueryParameters2D
+var _danger_query: PhysicsShapeQueryParameters2D
 
 
 ## Voegt een speler toe als C-01 dat toelaat: één P1 en hooguit één andere
@@ -148,7 +164,8 @@ func is_coop() -> bool:
 func bodies() -> Array[Node2D]:
 	var result: Array[Node2D] = []
 	for player in players:
-		result.append(player)
+		if not player.dissolved:
+			result.append(player)
 	for echo in echoes:
 		if echo.is_present():
 			result.append(echo)
@@ -173,21 +190,32 @@ func _physics_process(delta: float) -> void:
 		echo.sim_step(tick, delta)
 	var p1 := get_player(1)
 	var p2 := get_player(2)
+	# C-06: een opgeloste P2 komt 120 ticks later terug naast P1, vóór stap 1.
+	if p2 and p2.dissolved and tick >= _p2_return_tick:
+		_return_partner(p2, p1)
 	# C-09 / E-07b: stond P2 aan het eind van t − 1 op de lichtplank van P1,
 	# dan stapt P1 eerst en daarna P2; anders eerst P2.
 	var p1_first := p1 != null and p2 != null and p2.motor.support == Motor.Support.SHADOW_BODY \
 		and p2.motor.plank == p1.plank
-	if p2 and not p1_first:
+	var p2_steps := p2 != null and not p2.dissolved
+	if p2_steps and not p1_first:
 		_step_player(p2, p1, "1", delta)
 	# (2) P1 stapt, (3) P1 wordt opgenomen.
 	if p1:
 		_step_player(p1, p2 if p2 else _carrier_echo(), "2", delta)
-	if p2 and p1_first:
+	if p2_steps and p1_first:
 		_step_player(p2, p1, "1", delta)
 	# Na (3): de AreaLoader volgt P1 (E-04e); een kamerwissel naar een kamer
 	# die geen buur is, vraagt een reset aan (E-04a). P2 wisselt nooit.
 	if area_loader and p1:
 		area_loader.sim_track(tick, p1)
+	# C-08: stierf P1 in co-op, dan respawnt P2 mee, naast P1. Anders: lost P2
+	# deze tick op (C-06, C-07)? Dan voert hij in (4) geen events meer uit.
+	if p1 and p2:
+		if p1.died:
+			_return_partner(p2, p1)
+		elif not p2.dissolved:
+			_check_partner(p2, p1)
 	# Een echo reageert in dezelfde tick op Loslaten, respawn of kamerwissel
 	# van P1 (E-04a–c, E-09), zodat zijn events in (4) dan niet meer uitgaan.
 	for echo in echoes:
@@ -203,7 +231,7 @@ func _physics_process(delta: float) -> void:
 			if "detonate_mark" in echo and echo.detonate_mark != null:
 				combat.detonate(tick, echo.detonate_mark)
 	for player in players:
-		if player.player_index != 1:
+		if player.player_index != 1 and not player.dissolved:
 			_run_events(player, player.tick_events)
 	# Kettingschakels van deze tick (E-14d), na alle events.
 	combat.after_events(tick)
@@ -305,6 +333,9 @@ func drop_out(echo_color: Color = Color(0.1, 0.1, 0.1)) -> TailEcho:
 	var at := p2.position
 	p2.plank.collision_layer = 0
 	remove_player(p2)
+	# C-06/C-07: geen oud oplossen of leibandteller voor een volgende P2.
+	_p2_return_tick = -1
+	_p2_offscreen = 0
 	partner_left.emit(tick, at)
 	var p1 := get_player(1)
 	if p1 == null:
@@ -329,6 +360,114 @@ func set_tail_ticks(p_tail_ticks: int) -> void:
 	for echo in echoes:
 		if echo is TailEcho:
 			echo.set_tail_ticks(p_tail_ticks, tick)
+
+
+# --- P2 lost op en komt terug (C-06, C-07, C-08) ------------------------------
+
+## C-06 en C-07, na de stappen van P1 en P2: fel licht (middelpunt), een
+## schaduwgevaar (vorm), onder de kamerrand (middelpunt) of 60 ticks
+## aaneengesloten buiten het camerabeeld (leiband).
+func _check_partner(p2: PlayerActor, p1: PlayerActor) -> void:
+	var c: Dictionary = Tuning.coop()
+	if not partner_in_view(p1.global_position, p2.global_position):
+		_p2_offscreen += 1
+	else:
+		_p2_offscreen = 0
+	var cause := ""
+	var space := get_world_2d().direct_space_state
+	if _light_query == null:
+		_build_partner_queries()
+	_light_query.position = p2.global_position
+	_danger_query.transform = Transform2D(0.0, p2.global_position)
+	if _zone_hit(space.intersect_point(_light_query, 8), Zone.Kind.FEL_LICHT):
+		cause = "fellicht"
+	elif _zone_hit(space.intersect_shape(_danger_query, 8), Zone.Kind.GEVAAR):
+		cause = "gevaar"
+	elif p2.global_position.y > room_bottom:
+		cause = "val"
+	elif _p2_offscreen >= int(c["leash_offscreen_ticks"]):
+		cause = "leiband"
+	if cause != "":
+		dissolve_partner(cause)
+
+
+## C-07: staat P2 in het camerabeeld op maximale zoom-uit? De camera houdt P1
+## `leash_margin_px` van de rand, dus P2 mag hooguit `leash_view_px − marge`
+## van P1 af staan (zelfde maten als `FlowRoom.camera_view`).
+static func partner_in_view(p1_at: Vector2, p2_at: Vector2) -> bool:
+	var c: Dictionary = Tuning.coop()
+	var view: Array = c["leash_view_px"]
+	var margin := float(c["leash_margin_px"])
+	var delta := (p2_at - p1_at).abs()
+	return delta.x <= float(view[0]) - margin and delta.y <= float(view[1]) - margin
+
+
+## C-06: P2 lost op deze tick op (breek-effect op zijn plek). Geen
+## checkpoint-reset; stond P1 op P2, dan valt hij vanaf deze tick (C-09).
+func dissolve_partner(cause: String) -> void:
+	var p2 := get_player(2)
+	if p2 == null or p2.dissolved:
+		return
+	var at := p2.position
+	p2.dissolved = true
+	p2.collision_layer = 0
+	p2.plank.collision_layer = 0
+	p2.visible = false
+	p2.tick_events = 0
+	p2.move_events = 0
+	p2.motor = Motor.State.new()
+	p2.velocity = Vector2.ZERO
+	_p2_return_tick = tick + int(Tuning.coop()["dissolve_return_ticks"])
+	_p2_offscreen = 0
+	var p1 := get_player(1)
+	if p1 and p1.motor.support == Motor.Support.SHADOW_BODY and p1.motor.plank == p2.plank:
+		p1.motor.on_floor = false
+		p1.motor.support = Motor.Support.NONE
+		p1.motor.plank = null
+	partner_dissolved.emit(tick, at, cause)
+
+
+## C-06 en C-08: P2 staat weer naast P1 volgens de plaatsingsregel (C-03).
+## Kost tot ± 800 shape-queries in het slechtste geval (geen vrije plek
+## binnen 64 px); `Sim.placement` meten op de Steam Deck (#79).
+func _return_partner(p2: PlayerActor, p1: PlayerActor) -> void:
+	var was_dissolved := p2.dissolved
+	p2.dissolved = false
+	p2.collision_layer = Layers.SHADOW
+	p2.visible = true
+	p2.motor = Motor.State.new()
+	p2.velocity = Vector2.ZERO
+	p2.plank_since_ground = false
+	p2.caught_this_airphase = false
+	_p2_return_tick = -1
+	_p2_offscreen = 0
+	if p1:
+		p2.position = placement(p1)
+	p2.refresh_plank(true)
+	if was_dissolved or (p1 and p1.died):
+		partner_returned.emit(tick, p2.position)
+
+
+func _build_partner_queries() -> void:
+	_light_query = PhysicsPointQueryParameters2D.new()
+	_light_query.collision_mask = Layers.ZONES
+	_light_query.collide_with_areas = true
+	_light_query.collide_with_bodies = false
+	var rect := RectangleShape2D.new()
+	rect.size = Tuning.body_size()
+	_danger_query = PhysicsShapeQueryParameters2D.new()
+	_danger_query.shape = rect
+	_danger_query.collision_mask = Layers.ZONES
+	_danger_query.collide_with_areas = true
+	_danger_query.collide_with_bodies = false
+
+
+func _zone_hit(hits: Array, kind: Zone.Kind) -> bool:
+	for hit in hits:
+		var z = hit["collider"]
+		if z is Zone and (z as Zone).kind == kind and (z as Zone).enabled:
+			return true
+	return false
 
 
 ## Plaatsingsregel (C-03): de positie van P1, tenzij die in laag 1 of 5

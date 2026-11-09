@@ -74,19 +74,19 @@ static func ghost(t) -> PlayerActor:
 
 
 static func ghost_frame(source: PlayerActor, tick: int, at: Vector2, on_floor := true,
-		support: int = Motor.Support.WORLD, events := 0) -> void:
+		support: int = Motor.Support.WORLD, events := 0, plank_since_ground := false) -> void:
 	source.recorder.push(tick, 0, at, Vector2.ZERO, on_floor, at, Vector2.ZERO, events,
-		on_floor, 1, support)
+		on_floor, 1, support, 0, false, plank_since_ground)
 
 
 ## Vult de spookbron voor ticks `from` .. `from + count - 1` met posities uit
 ## `path(k)` (k = 0 .. count - 1).
 static func ghost_path(source: PlayerActor, from: int, count: int, path: Callable,
-		on_floor := true, support: int = Motor.Support.WORLD) -> void:
+		on_floor := true, support: int = Motor.Support.WORLD, plank_since_ground := false) -> void:
 	if count > source.recorder.capacity:
 		push_error("ghost_path: %d frames passen niet in %d" % [count, source.recorder.capacity])
 	for k in count:
-		ghost_frame(source, from + k, path.call(k), on_floor, support)
+		ghost_frame(source, from + k, path.call(k), on_floor, support, 0, plank_since_ground)
 
 
 ## Houdt per tick (na stap 5) de positie van elke node bij: rows[i][tick].
