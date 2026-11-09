@@ -32,7 +32,7 @@ Plus de andere eisen uit de DoD van T17:
 | Speler | Wat het bewijst | Wat het **niet** bewijst |
 |---|---|---|
 | **Scripted runs** (headless, deel 1) | Dat de kamer de objectieve normen MP-1–MP-4, MP-6, MP-7 **kan** halen, per D; herhaalbaar en deterministisch | MP-5 (norm 3), de *Nine Sols*-check, voorspelbaarheid en wachten in co-op: die vragen een mens |
-| **De CEO** (± 20 min, deel 2) | MP-5 per modus en per D, de open vragen (gdd §5 vraag 1, 5–8), en de objectieve normen bij een mens vanaf zijn derde run | Een tweede mens als P2 vraagt een besluit (kaart §6) |
+| **De CEO** (± 20 min, deel 2) | MP-5 per modus en per D, de open vragen (gdd §5 vraag 1, 5–8), en de objectieve normen bij een mens vanaf zijn derde run | Een tweede mens als P2 vraagt een besluit ([#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124)) |
 
 Een externe playtest valt buiten fase 2 zonder apart CEO-besluit (kader F4).
 
@@ -59,7 +59,7 @@ Draaiboek en scorekaart: `docs/qa/ceo-kaart-f0.md`. Opbouw (± 20 min spelen + �
 | 1 | Twee oefenruns solo, D = 120 (tellen niet mee: geoefend = vanaf de derde run, gdd §4.5) | ± 5 min |
 | 2 | Solo D = 180, D = 90, D = 120 (wisselende volgorde, gdd §5); na elke run score per kamer (toetsen 1–5) en "wist je waar je echo zou zijn?" | ± 7 min |
 | 3 | Open vraag over het merk, **vóór** we iets over het merk zeggen (*Nine Sols*-check) en de merksprong-vraag | ± 1 min |
-| 4 | Co-op D = 120, D = 180, D = 90, met P2 volgens het besluit op de kaart; na elke run score per kamer, wachten ja/nee, hulp of last | ± 7 min |
+| 4 | Co-op D = 120, D = 180, D = 90, met P2 volgens het besluit in [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124); na elke run score per kamer, wachten ja/nee, hulp of last | ± 7 min |
 | 5 | Luistercheck F2 (audio bible §9.4): drie ja/nee-vragen | ± 5 min |
 
 De CEO stuurt de meetlog-CSV's mee (de kamer schrijft ze zelf, `docs/design/kamers/flowkamer.md` §7). De QA Lead rekent ze uit met `flow_report.gd` en de MP-7-code uit `test_flowtest_t17.gd`.
@@ -84,4 +84,4 @@ De CEO stuurt de meetlog-CSV's mee (de kamer schrijft ze zelf, `docs/design/kame
 | W5 | MP-1 voor P2: zelfde definitie als P1; opgeloste ticks tellen niet en na `P2_TERUG` gelden 60 ticks niet (zoals na een respawn) | gdd §4.5 MP-7 (b) noemt de opgeloste ticks; de 60 ticks zijn een QA-keuze |
 | W6 | MP-7 (c): een springplank, lancering of vang telt voor de drager én de springer; een merk-combo voor beide spelers | Elke samenwerkingsactie heeft twee lichamen (gdd §2.7) |
 | W7 | De CEO is "geoefend" vanaf zijn derde run; de eerste twee tellen niet mee | gdd §4.5 |
-| W8 | De *Nine Sols*-check bij de CEO is een zwak signaal: de CEO koos *Nine Sols* zelf als referentie (#51) | Een speler die de referentie niet kent, is een sterkere toets (kaart §6) |
+| W8 | De *Nine Sols*-check bij de CEO is een zwak signaal: de CEO koos *Nine Sols* zelf als referentie (#51) | Een speler die de referentie niet kent, is een sterkere toets ([#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124)) |

@@ -385,7 +385,10 @@ func _coop(t, d: int, mode: String) -> String:
 	var combos: int = _count(room, "ONTPLOFFING") - _chain_links(room)
 	# Elke springplank/lancering/vang heeft één drager en één springer: hij telt voor allebei.
 	var per_player := as_springer_p1 + as_springer_p2 + combos
-	var ratio := float(room.run_ticks()) / maxf(float(_solo_ticks.get(d, 0)), 1.0)
+	# MP-7 (a) vraagt de solo-run van dezelfde D (een eerdere test in dit script).
+	var solo: int = _solo_ticks.get(d, 0)
+	t.check(solo > 0, "co-op %s D=%d: geen solo-run om MP-7 (a) mee te vergelijken" % [mode, d])
+	var ratio := float(room.run_ticks()) / float(solo) if solo > 0 else NAN
 	# MP-4 co-op (werkaanname QA): tijd zonder tweede lichaam = echo Leeg vóór
 	# drop-in + P2 opgelost.
 	var empty_before := joined_at - rep.start
@@ -402,7 +405,7 @@ func _coop(t, d: int, mode: String) -> String:
 	if no_body > 0.40: fails.append("MP-4 %.0f %%" % (no_body * 100.0))
 	if rep.lp_total <= 0 or float(lp_coop) / rep.lp_total < 0.40: fails.append("MP-6 %d/%d LP" % [lp_coop, rep.lp_total])
 	if pumps_p2 < 1: fails.append("MP-6 geen pompslag P2")
-	if ratio < 0.5: fails.append("MP-7a %.2f×" % ratio)
+	if is_nan(ratio) or ratio < 0.5: fails.append("MP-7a %.2f×" % ratio)
 	if still.longest > 300: fails.append("MP-7b P2 %d" % still.longest)
 	if _per_min(per_player, ticks) < 1.0: fails.append("MP-7c %.2f/min" % _per_min(per_player, ticks))
 	if dissolved_share > 0.10: fails.append("MP-7d %.0f %%" % (dissolved_share * 100.0))

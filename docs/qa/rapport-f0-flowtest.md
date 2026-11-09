@@ -9,11 +9,11 @@ Plan: `docs/qa/testplan-f0.md`. Deel 2 (de CEO-sessie, het eindoordeel F0) volgt
 - **Solo haalt alle objectieve normen bij elke staart** (D = 90 / 120 / 180): MP-1, MP-2, MP-3, MP-4 en MP-6 met ruime marge. Norm (3) (MP-5) en de *Nine Sols*-check kunnen alleen mensen geven: die wachten op de CEO.
 - **Co-op is met scripted runs nog niet te beoordelen.** Er is geen gescripte geoefende co-op-run (gdd §4.5 vraagt die van de WLD met de Gameplay Programmer). De twee partners die QA zelf schreef zijn ondergrenzen: ze halen MP-2 en MP-6 niet, wat iets zegt over die partners, niet over de kamer (§4, §6 punt 1).
 - **Staartkeuze**: solo laat alle drie de D toe; de keuze valt op MP-5 van de CEO en op co-op. Zonder verschil in MP-5 wordt het D = 120 (keuzeregel gdd §4.5), wat past bij besluit #51 (± 2 s).
-- **Advies nu: nog geen go of no-go voor F0.** Solo is klaar voor de CEO, co-op heeft eerst een tweede speler nodig (kaart §6) en de co-op-run van de WLD (§6).
+- **Advies nu: nog geen go of no-go voor F0.** Solo is klaar voor de CEO, co-op heeft eerst een tweede speler nodig ([#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124)) en de co-op-run van de WLD (§6).
 
 ## 2. Opzet
 
-`game/tests/test_flowtest_t17.gd`, 10 runs in de gewone suite (164 tests groen, Linux, Godot 4.6.3, ± 36 s). Elke run eindigt met `RUN_EIND`; de schaduwpartner-run D = 120 tweemaal gedraaid gaf twee keer hetzelfde meetlog. Getallen hieronder komen uit de `T17 …`-regels van die uitvoer. 60 ticks = 1 s.
+`game/tests/test_flowtest_t17.gd`, 10 runs in de gewone suite (171 tests groen na de merge van main met #117, Linux, Godot 4.6.3, ± 33 s; de T17-getallen zijn na die merge gelijk gebleven). Elke run eindigt met `RUN_EIND`; de schaduwpartner-run D = 120 tweemaal gedraaid gaf twee keer hetzelfde meetlog. Getallen hieronder komen uit de `T17 …`-regels van die uitvoer. 60 ticks = 1 s.
 
 ## 3. Solo
 
@@ -76,11 +76,11 @@ Wat dit wel en niet zegt:
 
 | # | Wat ontbreekt | Waarom het ertoe doet | Wie |
 |---|---|---|---|
-| 1 | **Gescripte geoefende co-op-run** per D (gdd §4.5): P1 en P2 als inputbron, met bounce in beide richtingen, lancering in B4, merk-combo in K2, pompslagen van P2 | Zonder die run weten we niet of de kamer in co-op MP-2, MP-6 en MP-7 (c) **kan** halen, en kan MP-7 (a) niet echt mislukken. Voorstel aan de Producer: een issue voor de World & Level Designer (met de Gameplay Programmer); de proxy `_CoopView` en de MP-7-code in `test_flowtest_t17.gd` kunnen ze gebruiken. QA heeft dat issue niet zelf aangemaakt | world-level-designer, gameplay-programmer |
-| 2 | **De bot lanceert niet in B4** (comment in `flow_bot.gd`: "de lancering komt in T16c"; T16c is gemerged) | Vraag 8 vraagt lancering ≥ 1× per co-op-run in B4; nu is B4 alleen via de langzame lijn gemeten (0 landingen) | world-level-designer |
-| 3 | **Het meetlog meet MP-1 alleen voor P1** (`meetlog.gd`) | MP-7 (b) vraagt P2 ook. In de scripted runs rekent de testcode het uit; voor de CSV's van de CEO-sessie ontbreekt het, dus MP-7 (b) is bij mensen alleen te observeren | gameplay-programmer |
-| 4 | **Een tweede speler voor co-op** met de CEO | Zonder P2 geen co-op-score voor norm (3), en F0 vraagt solo én co-op. Een vraag aan de CEO staat op de kaart (§6) | CEO |
-| 5 | MP-4 in co-op en MP-7 (b)/(c) hebben in de gdd geen uitgewerkte telling; QA rekent met W4–W6 (testplan §6) | De LGD bevestigt of corrigeert ze vóór het eindoordeel | lead-game-designer |
+| 1 | **Gescripte geoefende co-op-run** per D (gdd §4.5): P1 en P2 als inputbron, met bounce in beide richtingen, lancering in B4, merk-combo in K2, pompslagen van P2 | Zonder die run weten we niet of de kamer in co-op MP-2, MP-6 en MP-7 (c) **kan** halen, en kan MP-7 (a) niet echt mislukken. Punt 1–3 komen samen in één issue voor de World & Level Designer (met de Gameplay Programmer): issue volgt (Producer). De proxy `_CoopView` en de MP-7-code in `test_flowtest_t17.gd` kunnen ze gebruiken | world-level-designer, gameplay-programmer |
+| 2 | **De bot lanceert niet in B4** (zelfde issue als punt 1) (comment in `flow_bot.gd`: "de lancering komt in T16c"; T16c is gemerged) | Vraag 8 vraagt lancering ≥ 1× per co-op-run in B4; nu is B4 alleen via de langzame lijn gemeten (0 landingen) | world-level-designer |
+| 3 | **Het meetlog meet MP-1 alleen voor P1** (`meetlog.gd`) | MP-7 (b) vraagt P2 ook. In de scripted runs rekent de testcode het uit; voor de CSV's van de CEO-sessie ontbreekt het, dus MP-7 (b) is bij mensen alleen te observeren (zelfde issue als punt 1) | gameplay-programmer |
+| 4 | **Een tweede speler voor co-op** met de CEO | Zonder P2 geen co-op-score voor norm (3), en F0 vraagt solo én co-op. Vraag aan de CEO: [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) | CEO |
+| 5 | MP-4 in co-op en MP-7 (b)/(c) hebben in de gdd geen uitgewerkte telling; QA rekent met W4–W6 (testplan §6) | **De LGD bevestigt W4–W6 vóór deel 2** | lead-game-designer |
 
 ## 7. Werkaannames
 
