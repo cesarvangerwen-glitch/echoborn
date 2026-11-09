@@ -10,7 +10,7 @@ Gebaseerd op besluit #18 (stijl 2D, 640×400 op de Deck), besluit #51 (echo-staa
 - **Dit is géén Steam Deck-meting.** Er is geen Deck in deze werkomgeving. Ik heb gemeten met Godot 4.6.3 (Compatibility-renderer, OpenGL 3) op **llvmpipe**: Mesa rendert daar op 2 CPU-kernen in plaats van op een GPU. De absolute milliseconden zeggen dus niets over de Deck. De **verhoudingen** (wat kost een extra licht, een schaduw, een occluder) zijn wel bruikbaar, en het meetscript draait ongewijzigd op een Deck (§6).
 - **Grootste winst: render de wereld op 640×400 en schaal ×2 op.** Dezelfde kamer op native 1280×800 kost ±3× zoveel, en het licht zelf ±3,2× zoveel. Dat past ook bij pixel art (besluit #18).
 - **Licht is grofweg additief en lineair.** Het eerste licht op het scherm kost een vaste opstap (±3 lichteenheden), elk volgend licht ±1 eenheid, met schaduw ±2,5. Occluders zijn goedkoop, het schaduwfilter weinig. De echo (licht + staart) kost minder dan één schaduwlicht.
-- **Voorlopig lichtbudget per scherm: 20 lichteenheden (LE), kortstondig 30.** Dat is ruwweg 4 schaduwlichten (één ervan FelLicht) + 2 echo's + 32–64 occluders + een saturatiepass voor grijs → kleur. Het budget is veilig zolang de Deck minstens 5× sneller is dan deze llvmpipe-opstelling; naar verwachting is hij dat ruim (aanname, §5.3). De Deck-meting (§6) moet dat bevestigen of het getal bijstellen.
+- **Voorlopig lichtbudget per scherm: 20 lichteenheden (LE), kortstondig 30.** Voorbeelden (§5.2): een donkere kamer kost ±11 LE, een verlichte wijk met 3 grote warme schaduwlichten ±20 LE. Grote lichten (384 px) kosten ±1,5× een licht van 192 px, niet 4×. Het budget is veilig zolang de Deck minstens 5× sneller is dan deze llvmpipe-opstelling; naar verwachting is hij dat ruim (aanname, §5.3). De Deck-meting (§6) moet dat bevestigen of het getal bijstellen.
 
 ## 2. De testscène
 
@@ -22,7 +22,7 @@ Eén scène en één script: `game/prototypes/lichtmeting/lichtmeting.tscn` en `
 |---|---|---|
 | Kamer | Achterwand (één getextureerde sprite over het hele scherm), ±320 tegels van 16 px (vloer, plafond, 6 zuilen, 6 richels), botsing uit `spike_world.gd` | Elke tegel en de achterwand vangen licht: zo telt de overdraw mee, zoals in een echte kamer |
 | Grijs ↔ kleur | `CanvasModulate` grijs-donker (0,22 / 0,22 / 0,27); optioneel een saturatiepass over het hele scherm (`hint_screen_texture`) | Pitch v0.4: de wereld begint grijs-donker en wordt kleurrijk als je licht oppompt |
-| Lichten | `PointLight2D`, radiale textuur 256 px, `texture_scale` 1,5: diameter 384 wereld-eenheden = 30 % van de schermbreedte (192 px op 640×400), in een raster dat overlapt | Een "gewone" lamp per kamerdeel |
+| Lichten | `PointLight2D`, radiale textuur 256 px, `texture_scale` 1,5: diameter 384 wereld-eenheden = 30 % van de schermbreedte (192 px op 640×400), in een raster dat overlapt. Scenario S4-groot: `texture_scale` 3,0 = 384 px op 640×400 | Een "gewone" lamp per kamerdeel; S4-groot voor het warme licht van een verlichte wijk |
 | Schaduw | `shadow_enabled`, filter PCF5 (standaard), ook hard en PCF13 | Lichtlaag/schaduwlaag (ontwerp.md §8) |
 | Occluders | `LightOccluder2D`, vierkant van één tegel, verdeeld over zuilen en richels | Schaduwwerpers |
 | 2 spelers + echo's | `Sim`, `PlayerActor` en `EchoActor` (STATE) uit de spike, gescripte input; elke 2 s per speler een nieuwe echo van de laatste 2 s | Co-op 2 spelers, echo-staart ± 2 s (#51 8A) |
@@ -100,6 +100,18 @@ Opties na `--`: `--frames=300`, `--warmup=90`, `--only=S4,typisch` (alleen die s
 | 2 spelers + echo-simulatie | Valt weg in de ruis (CPU-render basis 0,5 ms); zie ook ontwerp.md §4 |
 | Optelbaar? | Ja, binnen ±10 %: S4 (11,3) + echo (1,5) + saturatie (4,0) + FelLicht (2,1) = 18,9 LE voorspeld, 19,5 gemeten |
 
+### 4.2 Grote lichten (S4-groot)
+
+Toegevoegd na de Lead-review: zelfde opzet als S4, maar lichten van 384 px (`texture_scale` 3,0) in plaats van 192 px. Aparte sessie op dezelfde machine, 2 runs met alleen basis, S4 en S4-groot. De machine was in deze sessie iets trager (basis 3,1 ms i.p.v. 2,8), dus vergelijk alleen binnen de sessie.
+
+| Scenario | Frame gem. ms | GPU ms (run 1 / run 2) | GPU gem. ms | Lichtkosten ms |
+|---|---:|---:|---:|---:|
+| basis | 7,3 | 2,94 / 3,19 | 3,1 | 0 |
+| S4 (192 px) | 18,3 | 13,39 / 11,92 | 12,7 | 9,6 |
+| S4-groot (384 px) | 22,5 | 17,41 / 16,66 | 17,0 | 14,0 |
+
+**Conclusie:** de lichtkosten worden **1,46× zo hoog** bij een dubbele diameter (4× zoveel oppervlak), niet 4×. Een deel van de kosten per licht hangt niet van de grootte af (o.a. de schaduwkaart). Bovendien snijdt het scherm grote lichten af, en de lichten overlappen. De oude regel "kosten × (diameter / 192)²" klopt dus niet en is vervangen in §5.1. In LE uit §4: S4 11,3 × 1,46 ≈ **16,5 LE** voor S4-groot. Lichten groter dan 384 px zijn niet gemeten.
+
 ## 5. Voorlopig lichtbudget
 
 ### 5.1 Rekenregel per scherm (640×400)
@@ -116,19 +128,30 @@ Kosten in lichteenheden (LE), afgerond naar de veilige kant:
 | Echo (licht + staart van 8 nabeelden) | 0,8 per echo |
 | Saturatiepass grijs ↔ kleur (hele scherm) | 4 |
 | FelLicht-zone (schaduwlamp + SUB-licht op de schaduwgeometrie) | 3 |
-| Groter licht | kosten × (diameter / 192 px)²: een licht van 384 px telt als 4 |
+| Groter licht, 384 px (gemeten, §4.2) | × 1,5 op de kosten van dat licht |
+| Groter licht, > 384 px tot schermvullend | × 2,5 (**aanname, niet gemeten**) |
 
-Controle: S4 + 32 occluders = 3 + 3 × 2,5 + 1,6 = 12,1 LE berekend, 11,3 gemeten. Typisch = 20,7 berekend, 19,5 gemeten. Zwaar = 32,3 berekend, 30,5 gemeten. De regel schat dus iets te hoog in, zoals bedoeld.
+Controle: S4 + 32 occluders = 3 + 3 × 2,5 + 1,6 = 12,1 LE berekend, 11,3 gemeten. Typisch = 20,7 berekend, 19,5 gemeten. Zwaar = 32,3 berekend, 30,5 gemeten. S4-groot = 3 × 1,5 + 3 × 2,5 × 1,5 + 1,6 = 17,4 berekend, ±16,5 gemeten (§4.2). De regel schat dus iets te hoog in, zoals bedoeld.
 
 ### 5.2 Budget
 
 | | Budget | Voorbeeld dat past |
 |---|---|---|
-| **Normaal** (elke kamer, verkenning, combat) | **≤ 20 LE** | 4 schaduwlichten (waarvan 1 FelLicht-zone) + 2 echo's + ≤ 40 occluders + saturatiepass |
-| **Piek** (kort: bossfase, oppomp-moment, ≤ ±10 s) | **≤ 30 LE** | 8 schaduwlichten + 2 echo's + 64 occluders + saturatiepass |
+| **Normaal** (elke kamer, verkenning, combat) | **≤ 20 LE** | Zie de voorbeelden hieronder |
+| **Piek** (kort: bossfase, oppomp-moment, ≤ ±10 s) | **≤ 30 LE** | 8 schaduwlichten van 192 px + 2 echo's + 64 occluders + saturatiepass |
 | Altijd | Wereld op 640×400 renderen en ×2 opschalen | Native 1280×800 maakt hetzelfde licht ±3,2× duurder |
 | Altijd | PCF5 als standaard; PCF13 alleen voor één hoofdlicht | |
 | Liever niet | Een tweede volledige schermpass bovenop de saturatiepass | Elke schermpass ±4 LE |
+
+**Voorbeelden.** FelLicht is een lokale zone bij een zichtbare lamp (`docs/design/gdd.md`, E-11), dus niet elk scherm heeft er een; zie de rekenregel (3 LE) als een kamer er wel een heeft.
+
+| Voorbeeld | Inhoud | Som | LE |
+|---|---|---|---:|
+| **Donkere kamer** (grijs, vóór het oppompen) | 1 schaduwlicht 192 px, 1 licht zonder schaduw, 20 occluders, 2 echo's, saturatiepass | 3 + 1 + 1 + 1,6 + 4 | **±11** |
+| **Verlichte wijk** (na het oppompen: warm gewoon licht, harde schaduwen, géén FelLicht) | 3 schaduwlichten van 384 px, 1 licht zonder schaduw 192 px, 32 occluders, 2 echo's, saturatiepass | 3 × 1,5 + 2 × 2,5 × 1,5 + 1 + 1,6 + 1,6 + 4 | **±20** |
+| Verlichte wijk met een 4e groot schaduwlicht | als hierboven + 1 schaduwlicht van 384 px | 20 + 3,75 | ±24: boven normaal, binnen piek |
+
+De verlichte wijk is de toestand waarin de speler het meest speelt, en hij vult het normale budget precies. Een 4e groot schaduwlicht past alleen als iets anders wegvalt, of als de Deck-meting (§6) ruimte geeft. Hoeveel LE een wijk krijgt, beslis ik pas na die meting (open punt 1).
 
 Licht dat buiten beeld valt (en zijn occluders) telt niet mee zolang Godot het wegsnijdt; de meting zegt daar niets over (open punt).
 
@@ -178,9 +201,10 @@ godot --path game --fullscreen --resolution 1280x800 --audio-driver Dummy \
 | 1 | **Echte Deck-meting** volgens §6. Er is een Deck nodig en iemand die hem bedient; de agent-omgeving heeft er geen. | Engine & Platform Programmer (+ wie de Deck heeft) | Vóór of tijdens fase-2-taak T7 |
 | 2 | C7 in `docs/tech/ontwerp.md` §6 bijwerken met een verwijzing naar dit document; dat bestand is van de TD. | Technical Director | Na review van deze PR |
 | 3 | Framebudget: is 3 ms GPU voor licht (van 16,7 ms) akkoord? | Technical Director | Bij de review |
-| 4 | **Renderen op 640×400** (`content_scale_mode = viewport` of een SubViewport voor de wereld): past licht op pixel-resolutie bij de look? De UI kan dan scherp blijven als alleen de wereld in een SubViewport van 640×400 staat; dat is een keuze voor UX/UI. | Art Director; UX Designer en UI Artist voor de UI | Fase 2, vóór T7 |
-| 5 | Grijs ↔ kleur: saturatiepass over het scherm (±4 LE, op llvmpipe ook CPU-kosten) of per sprite in de shader (geen schermkopie, maar elke sprite een material)? Kiezen na de Deck-meting. | Technical Artist (met Art Director) | Fase 2 |
+| 4 | **Besloten door de Art Director** (Lead-review PR #62): de wereld rendert met licht en al op 640×400; een licht met zichtbare pixeltrappen past bij de look. Open blijft alleen of de UI scherp blijft (wereld in een SubViewport van 640×400, UI native). | UX Designer en UI Artist | Fase 2, vóór T7 |
+| 5 | Grijs ↔ kleur. **Art-eis (AD):** het moet lokaal kunnen, per wijk en per licht, met de echo erbij. Een globale schermpass met vaste saturatie (gemeten: ±4 LE) is dus hooguit een onderdeel van de oplossing, bv. met een saturatiemasker uit de lichten; de techniek kies ik op die eis en daarna op kosten (Deck-meting). | Technical Artist (met Art Director) | Fase 2 |
 | 6 | FelLicht "lost de brug op": het SUB-licht maakt de schaduwgeometrie hier zwart, niet doorzichtig. Een echte oplossing (dissolve) vraagt een eigen `light()`-shader; de kosten daarvan zijn nog niet gemeten. | Technical Artist | Fase 2, bij de licht/schaduw-shader |
 | 7 | Niet gemeten: licht buiten beeld en cullen, `TileMapLayer` i.p.v. losse sprites, normal maps, Windows/Proton, lagere klokken dan run B. | Technical Artist + Engine & Platform Programmer | Bij T7 |
 | 8 | `game/prototypes/` is een nieuwe map; `docs/tech/standaarden.md` §5 noemt hem nog niet. | Technical Director | Bij de review |
 | 9 | Lichtbudget opnemen in `docs/art/specificaties.md` zodra dat document bestaat. | Technical Artist | Fase 2 |
+| 10 | Banding en dithering van lichtgradiënten op 640×400 controleren en vastleggen in de art bible. | Art Director | Fase 2 |

@@ -1,20 +1,6 @@
 extends Node2D
-## Lichtmeting 2D (issue #21, risico C7): wat kost dynamisch 2D-licht in de
-## Compatibility-renderer op Steam Deck-resolutie (1280x800)?
-##
-## Eén kamer naar de stijltest (docs/art/stijltests.md §2): grijs-donkere
-## wereld (CanvasModulate), tegels en zuilen als lichtvangers, 2 spelers en
-## hun echo's uit de spike (Sim, PlayerActor, EchoActor in STATE-modus, staart
-## 2 s volgens besluit #51 8A). Per scenario verandert één ding: aantal
-## PointLight2D's, schaduw aan/uit, schaduwfilter, aantal LightOccluder2D's,
-## echo-effect, saturatie-pass (grijs -> kleur), FelLicht-zone, resolutie.
-##
-## Draaien (vanuit de repo-root, met venster; zie docs/tech/lichtmeting.md §3):
-##   godot --path game --resolution 1280x800 res://prototypes/lichtmeting/lichtmeting.tscn
-## Opties na `--`:  --frames=300  --warmup=90  --only=S4,typisch  --shots (PNG per scenario)
-## Uitvoer: een tabel op stdout en user://lichtmeting.csv. Stopt zelf.
-##
-## Prototype, geen productiecode: niets uit game/scripts hangt hiervan af.
+## Lichtmeting 2D (#21, C7): logt frametijd per lichtscenario op 1280x800.
+## Opzet, opties en resultaten: docs/tech/lichtmeting.md.
 
 const Sim = preload("res://scripts/sim.gd")
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
@@ -48,15 +34,17 @@ void fragment() {
 const BASE := {
 	"lights": 0, "shadows": false, "filter": Light2D.SHADOW_FILTER_PCF5,
 	"occluders": 32, "echo_fx": false, "post": false, "fel": false, "native": false,
+	"scale": LIGHT_SCALE,
 }
 
-var scenarios: Array = [
+var scenarios: Array[Array] = [
 	["basis", {}],
 	["L1", {"lights": 1}], ["L2", {"lights": 2}], ["L4", {"lights": 4}],
 	["L8", {"lights": 8}], ["L16", {"lights": 16}],
 	["S1", {"lights": 1, "shadows": true}], ["S2", {"lights": 2, "shadows": true}],
 	["S4", {"lights": 4, "shadows": true}], ["S8", {"lights": 8, "shadows": true}],
 	["S16", {"lights": 16, "shadows": true}],
+	["S4-groot", {"lights": 4, "shadows": true, "scale": 3.0}],   # 384 px op 640x400
 	["S4-occ0", {"lights": 4, "shadows": true, "occluders": 0}],
 	["S4-occ8", {"lights": 4, "shadows": true, "occluders": 8}],
 	["S4-occ128", {"lights": 4, "shadows": true, "occluders": 128}],
@@ -87,7 +75,7 @@ var _tile_tex: ImageTexture
 var _echo_of: Dictionary = {}
 var _ghosts: Array[Sprite2D] = []
 var _echo_lights: Array[PointLight2D] = []
-var _results: Array = []
+var _results: Array[Dictionary] = []
 var _index := -1
 var _frame := 0
 var _last_usec := 0
@@ -121,7 +109,7 @@ func _parse_args() -> void:
 			_warmup = int(arg.get_slice("=", 1))
 		elif arg.begins_with("--only="):
 			var keep := arg.get_slice("=", 1).split(",")
-			scenarios = scenarios.filter(func(s: Array) -> bool: return s[0] in keep)
+			scenarios.assign(scenarios.filter(func(s: Array) -> bool: return s[0] in keep))
 		elif arg == "--shots":
 			_shots = true
 
@@ -175,13 +163,13 @@ func _build_actors() -> void:
 	_sim.name = "Sim"
 	add_child(_sim)
 	# Gescripte input die eindeloos heen en weer loopt en springt.
-	var loop := []
+	var loop: Array[Array] = []
 	for i in 400:
 		loop.append([50, InputBits.RIGHT])
 		loop.append([12, InputBits.RIGHT | InputBits.JUMP])
 		loop.append([60, InputBits.LEFT])
 		loop.append([12, InputBits.LEFT | InputBits.JUMP])
-	var colors := [Color(1.0, 0.85, 0.4), Color(0.5, 0.85, 1.0)]
+	var colors: Array[Color] = [Color(1.0, 0.85, 0.4), Color(0.5, 0.85, 1.0)]
 	for i in 2:
 		var player := PlayerActor.new()
 		player.setup(i + 1, ScriptedInput.new(loop), colors[i])
@@ -232,6 +220,7 @@ func _apply(cfg: Dictionary) -> void:
 		var light := _make_light(Color(1.0, 0.75, 0.4) if i % 2 == 0 else Color(0.7, 0.8, 1.0))
 		light.position = Vector2((i % cols + 0.5) * WORLD_SIZE.x / cols,
 			(floorf(float(i) / cols) + 0.5) * (SpikeWorld.FLOOR_Y - 40.0) / rows + 20.0)
+		light.texture_scale = cfg.scale
 		light.shadow_enabled = cfg.shadows
 		light.shadow_filter = cfg.filter
 		light.shadow_filter_smooth = 1.5
@@ -252,7 +241,8 @@ func _apply(cfg: Dictionary) -> void:
 			var g := Sprite2D.new()
 			g.texture = _light_tex
 			g.scale = Vector2.ONE * 0.12
-			g.modulate = Color(1.0, 0.7, 0.3, 0.5 * (1.0 - float(k % GHOSTS_PER_ECHO) / GHOSTS_PER_ECHO))
+			var fade := 1.0 - float(k % GHOSTS_PER_ECHO) / GHOSTS_PER_ECHO
+			g.modulate = Color(1.0, 0.7, 0.3, 0.5 * fade)
 			var mat := CanvasItemMaterial.new()
 			mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 			g.material = mat
@@ -402,7 +392,8 @@ func _write_results() -> void:
 	var f := FileAccess.open("user://lichtmeting.csv", FileAccess.WRITE)
 	if f == null:
 		return
-	f.store_line("scenario,lights,shadows,occluders,res,mean_ms,p50_ms,p95_ms,cpu_render_ms,gpu_render_ms,adapter")
+	f.store_line("scenario,lights,shadows,occluders,res,mean_ms,p50_ms,p95_ms,"
+		+ "cpu_render_ms,gpu_render_ms,adapter")
 	for r in _results:
 		f.store_line("%s,%d,%s,%d,%s,%.3f,%.3f,%.3f,%.3f,%.3f,%s" % [r.scenario, r.lights,
 			r.shadows, r.occluders, r.res, r.mean_ms, r.p50_ms, r.p95_ms, r.cpu_render_ms,
