@@ -185,9 +185,10 @@ func _process(delta: float) -> void:
 ## C-07: het beeld van de gedeelde camera in wereldpixels. Zoomt uit tot
 ## `leash_view_px` om P1 en P2 in beeld te houden; P1 blijft altijd minstens
 ## `leash_margin_px` van de rand. Dezelfde maten als de leiband in
-## `Sim._check_partner`: P2 staat in dit beeld precies als de leiband niet telt.
-## Het beeld is in wereldpixels en hangt niet af van de rendergrootte; die zit
-## alleen in `camera_zoom` (#120).
+## `Sim._check_partner`: P2 staat in dit *logische* beeld (16:9, in
+## wereldpixels) precies als de leiband niet telt. Het hangt niet af van de
+## rendergrootte; die zit alleen in `camera_zoom` (#120). Bij een andere
+## beeldverhouding (bv. 16:10 op de Deck) toont de camera meer dan dit beeld.
 static func camera_view(p1_at: Vector2, p2_at: Vector2) -> Rect2:
 	var c: Dictionary = Tuning.coop()
 	var max_view := Vector2(float(c["leash_view_px"][0]), float(c["leash_view_px"][1]))

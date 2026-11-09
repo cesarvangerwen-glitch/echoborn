@@ -313,6 +313,27 @@ func test_120_zoom_follows_render_size(t) -> void:
 			"bij %s toont de camera %s, kleiner dan de leiband %s" % [render, shown, leash])
 
 
+## #120, runtime-pad: `_render_size` → `_camera.zoom`. De flow-kamer in een
+## SubViewport van 640 × 400 krijgt na `_ready` zoom 1, in 1280 × 720 zoom 2.
+func test_120_scene_zoom_in_subviewport(t) -> void:
+	for case in [[Vector2i(640, 400), 1.0], [Vector2i(1280, 720), 2.0]]:
+		var vp := SubViewport.new()
+		vp.size = case[0]
+		t.tree.root.add_child(vp)
+		var room = FlowRoom.new()
+		room.echo_on = false
+		room.autosave = false
+		room.show_hud = false
+		room.input_override = ScriptedInput.new([])
+		vp.add_child(room)
+		await t.tree.process_frame
+		var z: Vector2 = room._camera.zoom
+		t.check(z.is_equal_approx(Vector2(case[1], case[1])),
+			"SubViewport %s: zoom %s, verwacht %.1f" % [case[0], z, case[1]])
+		vp.queue_free()
+		await t.tree.process_frame
+
+
 ## C-09: P2 lost op terwijl P1 op hem staat: P1 valt op die tick.
 func test_c09_p1_falls_when_p2_dissolves(t) -> void:
 	var a := _pair(t, Vector2(300, ON_TOP), Vector2(300, Fx.STAND_Y))
