@@ -1,6 +1,6 @@
 # Kamers: de grijze flow-kamer (mijlpaal 1, F0)
 
-Versie 0.2 · Eigenaar: World & Level Designer (met Gameplay Programmer) · Taak T16b (`docs/productie/fase-2-kader.md` §2) · Reviewer: Lead Game Designer
+Versie 0.3 · Eigenaar: World & Level Designer (met Gameplay Programmer) · Taak T16b (`docs/productie/fase-2-kader.md` §2) · Reviewer: Lead Game Designer
 Bron: `docs/design/gdd.md` v0.4 §2.5a, §2.12, §4 (flow-kamer-spec, bouwstenen B1–B4, FK-1–FK-6, MP-1–MP-7) en `docs/concept/pitch.md` v0.4.
 Scène: `game/levels/flowkamer/flowkamer.tscn` (hoofdscène van het project). Code: `game/levels/flowkamer/` (kamer, maten, vijanden, meetlog, gescripte run, normberekening) en `game/scripts/light/` (lichtmeter, gemaal, pomprad). Tests: `game/tests/test_flowkamer.gd`.
 
@@ -53,23 +53,22 @@ Alle maten uit gdd §4.3; per bouwsteen alleen wat ik koos of moest kiezen.
 | | Inhoud | Wanneer |
 |---|---|---|
 | Golf 1 | 4 basisvijanden (x 1600, 1720, 1840, 1940) | P1 komt K2 voor het eerst binnen |
-| Golf 2 | 4 basisvijanden (x 1580, 1700, 1820, 1940) + 1 pantserdoel (x 1840) | Alle basisvijanden van golf 1 zijn op |
+| Golf 2 | 5 basisvijanden (x 1580, 1640, 1700, 1820, 1940) + 1 pantserdoel (x 1840) | Alle basisvijanden van golf 1 zijn op |
 | Terugkeer | De basisvijanden van golf 2 die op zijn, komen terug; een pantserdoel dat nog staat, blijft | Elke keer dat P1 K2 binnenkomt na golf 2, zolang het gemaal niet vol is |
 
 Vijanden blijven in K2 (x 1458–1992) en doen alleen iets zolang P1 in K2 is. De arena sluit niet af. Waarden van de basisvijand en het pantserdoel: gdd §4.3 (werkaanname LGD).
 
-**4 in plaats van 3 per golf.** Met 3 + 3 haalde de gescripte run 92 LP na K1 en één keer K2; het doel is ≥ 100 (gdd §4.2). Met 4 + 4 is het 102 bij elke D (vóór co-op 7A in code; sinds de vang in B3 is het 100, zie §12). De LP-waarden zijn ongewijzigd (gdd §4.2: eerst de aantallen bijstellen).
+**4 + 5 in plaats van 3 + 3.** Met 3 + 3 haalde de gescripte run 92 LP na K1 en één keer K2; het doel is ≥ 100 (gdd §4.2). Met 4 + 4 was het 102, en sinds de vang in B3 (co-op 7A, +3 in plaats van +5) 100: marge 0. Met een vijfde basisvijand in golf 2 is het **108 bij elke D** (marge 8, één gemiste landing in K1 kost 5). De LP-waarden zijn ongewijzigd (gdd §4.2: eerst de aantallen bijstellen).
 
-**FK-2-grens met 4 + 4 vijanden** (gdd §4.4; zonder echo komt licht alleen uit P1-treffers: 3 treffers × 2 LP = 6 LP per basisvijand, het pantser breekt niet en geeft 0 LP):
+**FK-2-grens met 4 + 5 vijanden** (gdd §4.4; zonder echo komt licht alleen uit P1-treffers: 3 treffers × 2 LP = 6 LP per basisvijand, het pantser breekt niet en geeft 0 LP):
 
 | | Basisvijanden | LP | Totaal |
 |---|---|---|---|
-| Eerste keer K2 (golf 1 + 2) | 4 + 4 | 8 × 6 = 48 | 48 |
-| Terugkeer 1 | 4 | 4 × 6 = 24 | 72 |
-| Terugkeer 2 | 4 | 24 | 96 |
-| Terugkeer 3 | 4 | 24 | **120 ≥ 100** |
+| Eerste keer K2 (golf 1 + 2) | 4 + 5 | 9 × 6 = 54 | 54 |
+| Terugkeer 1 | 5 | 5 × 6 = 30 | 84 |
+| Terugkeer 2 | 5 | 30 | **114 ≥ 100** |
 
-Het gemaal is zonder echo dus vol na **3 terugkeren** (grens FK-2: ≤ 4). Gemeten: 3 bij elke D. Met 3 + 3 (gdd) was het 36 + 4 × 18 = 108 na 4 terugkeren.
+Het gemaal is zonder echo dus vol na **2 terugkeren** (grens FK-2: ≤ 4). Gemeten: 2 bij elke D. Ter vergelijking: met 4 + 4 was het 48 + 3 × 24 = 120 na 3 terugkeren, met 3 + 3 (gdd) 36 + 4 × 18 = 108 na 4.
 
 ## 5. K3 gemaal en lichtmeter
 
@@ -102,7 +101,7 @@ Elke run schrijft `user://meetlog_<datum-tijd>_<solo|coop>_D<D>_p1.csv` (gdd §4
 
 - **Spelen**: open `game/` in Godot 4.6.3 en start het project (F5). P1: A/D lopen, spatie springen, linker Shift dash, E aanval/pompen, Q 0,5 s = Loslaten. P2: Enter doet mee, Backspace 1 s stopt (via de InputRouter; de echte drop-in/out is T16c).
 - **Debugmenu** (§4.1): F1/F2/F3 = D 90/120/180 (nieuwe run, met het B3-blok van die D), F4 = echo aan/uit (nieuwe run), F5 = meetlog aan/uit, F6 = herstart. Na de run: 1–5 per kamer.
-- **Headless**: `godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd`. `test_flowkamer.gd` bouwt de kamer per D, draait de gescripte run (moet `RUN_EIND` en de normen halen), speelt de run van D = 90 opnieuw af met een `ScriptedInput` (zelfde log), en draait per D de run met echo uit (FK-2). De run met echo uit bij D = 180 duurt 6895 ticks; de runner geeft een test 7200 frames.
+- **Headless**: `godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd`. `test_flowkamer.gd` bouwt de kamer per D, draait de gescripte run (moet `RUN_EIND` en de normen halen), speelt de run van D = 90 opnieuw af met een `ScriptedInput` (zelfde log), en draait per D de run met echo uit (FK-2). De run met echo uit bij D = 180 duurt 6020 ticks; de runner geeft een test 7200 frames.
 
 ## 9. Gemeten met de gescripte geoefende run
 
@@ -110,16 +109,16 @@ Solo, uit het meetlog berekend (`flow_report.gd`). Dit zijn geen speltestresulta
 
 | | D = 90 | D = 120 | D = 180 | Norm |
 |---|---|---|---|---|
-| Runtijd | 64,1 s | 65,4 s | 76,3 s | ≤ 120 s |
-| LP na K1 + één keer K2 | 100 | 100 | 100 | ≥ 100 |
+| Runtijd | 63,5 s | 65,4 s | 76,6 s | ≤ 120 s |
+| LP na K1 + één keer K2 | 108 | 108 | 108 | ≥ 100 |
 | MP-1 langste stilstand | 107 ticks | 137 | 197 | ≤ 300 |
-| MP-2 echo-acties/min (K1 / K2) | 14,0 (8,8 / 38,2) | 12,8 (8,6 / 34,5) | 11,8 (8,1 / 25,4) | ≥ 3,0, ook per kamer |
-| MP-2 langste gat | 13,6 s | 12,8 s | 14,9 s | ≤ 40 s |
+| MP-2 echo-acties/min (K1 / K2) | 14,2 (8,8 / 39,9) | 12,8 (8,6 / 34,4) | 11,0 (8,1 / 22,3) | ≥ 3,0, ook per kamer |
+| MP-2 langste gat | 13,5 s | 12,8 s | 14,9 s | ≤ 40 s |
 | MP-3 landingen/min, zonder wachten | 4,7 / 100 % | 4,6 / 100 % | 3,9 / 100 % | ≥ 75 % |
 | MP-4 echo Leeg | 2 % | 3 % | 4 % | ≤ 40 % |
-| MP-6 LP met de echo, pompslagen echo | 82 %, 5 | 82 %, 5 | 82 %, 5 | ≥ 40 %, ≥ 1 |
+| MP-6 LP met de echo, pompslagen echo | 81 %, 5 | 81 %, 5 | 81 %, 5 | ≥ 40 %, ≥ 1 |
 | Echo breekt | 0 | 0 | 0 | 0 (FK-4) |
-| **Echo uit** (FK-2): runtijd, terugkeren K2 | 113,4 s (1,77×), 3 | 113,9 s (1,74×), 3 | 114,9 s (1,51×), 3 | ≤ 2×, ≤ 4 |
+| **Echo uit** (FK-2): runtijd, terugkeren K2 | 98,8 s (1,55×), 2 | 99,3 s (1,52×), 2 | 100,3 s (1,31×), 2 | ≤ 2×, ≤ 4 |
 
 De langste stilstand zit telkens aan de waterkant in K3: P1 wacht tot de echo zijn pompslagen herhaald heeft en het water zakt (± D + 40 ticks).
 
@@ -128,7 +127,7 @@ De langste stilstand zit telkens aan de waterkant in K3: P1 wacht tot de echo zi
 | Regel | Oordeel | Toelichting |
 |---|---|---|
 | FK-1 geen puzzel | ja | Elke bouwsteen: lopen, keren, springen; nergens een volgorde of schakelaar. B3 vraagt timing (afspringen als de echo de kom in komt), met de langzame lijn ernaast |
-| FK-2 nooit een slot | ja | Elke echolijn heeft een langzame lijn; met echo uit gemeten ≤ 1,77× en 3 terugkeren (tabel §9) |
+| FK-2 nooit een slot | ja | Elke echolijn heeft een langzame lijn; met echo uit gemeten ≤ 1,55× en 2 terugkeren (tabel §9) |
 | FK-3 open doorgangen | ja | Geen deur valt achter P1 dicht; kamerwissels resetten de echo niet (0 × `ECHO_LEEG_START` in de runs) |
 | FK-4 echo breekt niet | ja | Geen schaduwgeometrie, `FelLicht` of `Schaduwgevaar`; 0 × `BREEK` |
 | FK-5 pomprad in de route | ja | 30 px boven de vloer, lopend en springend te raken, geen vijand binnen 80 px |
@@ -142,7 +141,7 @@ De langste stilstand zit telkens aan de waterkant in K3: P1 wacht tot de echo zi
 Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 90 / 120 / 180, lichtmeter LM-01–LM-06, MP-1-definitie zoals T16a hem bouwde. Van mij (WLD), voor deze kamer:
 
 1. **De "scripted geoefende run" is een deterministische bot** (`flow_bot.gd`), geen vaste lijst bits: hij kijkt waar P1 en de echo staan. Zijn bits, afgespeeld als `ScriptedInput`, geven hetzelfde log (test). Zo hoeft de run niet opnieuw bij elke maatwijziging.
-2. **4 basisvijanden per golf** in plaats van 3 (§4).
+2. **4 basisvijanden in golf 1 en 5 in golf 2** in plaats van 3 + 3 (§4).
 3. **Treden van B1, B2 en B3 zijn eenrichtingsrichels** (§3).
 4. **K3 heeft een trap terug naar K2**, zodat wie te weinig licht heeft niet vastzit achter de dichte sluis.
 5. **`SCORE`** als extra event voor norm (3), in dezelfde CSV.
@@ -167,12 +166,13 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 - Gameplay Programmer, in T16c: P1 die een richting vasthoudt tegen een wand op de vloer, is niet `on_floor` en springt niet (de bot laat één tick los).
 - WLD met Gameplay Programmer: B3 werkt met de vang (getest); B4 met de lancering nog toetsen, de gescripte run neemt daar nog de langzame lijn.
 - Gameplay Programmer: de springplank-reeks `n` opnieuw laten beginnen bij aflopen van de echo kan van `flow_meetlog.gd` naar `meetlog.gd`.
-- LGD: gdd §4.2 en FK-2 naar 4 + 4 vijanden.
-- LGD en T17: sinds co-op 7A in code (#78) is de landing in B3 een vang (+3) in plaats van springplank + bounce (+5); de gescripte run haalt nu precies 100 LP na K1 + K2 (marge 0). T17 kijkt of 4 + 4 vijanden genoeg is.
+- LGD: gdd §4.2 en FK-2 naar 4 + 5 vijanden.
+- LGD na T17: in B3 geeft de vang +3 tegen +5 voor landen plus bounce; met 4 + 5 vijanden haalt de gescripte run 108 LP na K1 + K2 (marge 8).
 
 ## 13. Wijzigingen
 
 | Versie | Wat |
 |---|---|
 | 0.1 | Eerste blockout van de flow-kamer (T16b) |
+| 0.3 | Lead-review: vijfde basisvijand in golf 2 (108 LP na K1 + K2), FK-2-grens en metingen bijgewerkt |
 | 0.2 | Merge met co-op 7A (#78): vang en lancering tellen in de lichtmeter (+3, +4), B3 landt met een vang; metingen bijgewerkt. Lead-review: FK-2-grens voor 4 + 4 vijanden voorgerekend (§4), FK-2-test per D, antwoorden van de LGD en open punten (§12) |

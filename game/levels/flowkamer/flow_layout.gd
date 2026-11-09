@@ -85,12 +85,13 @@ const ROOM_START := {
 }
 
 ## Vijanden in K2 (x op de vloer). gdd §4.2 noemt 3 per golf; met 3 haalt de
-## scripted run 92 LP na K1 + K2 (doel ≥ 100). Daarom 4 basisvijanden per
-## golf (gdd §4.2: eerst de aantallen bijstellen, niet de LP-waarden). Golf 2
-## heeft er ook het pantserdoel bij. Bij een terugkeer komen de
+## scripted run 92 LP na K1 + K2 (doel ≥ 100). Daarom 4 basisvijanden in
+## golf 1 en 5 in golf 2 (gdd §4.2: eerst de aantallen bijstellen, niet de
+## LP-waarden; de vijfde geeft marge sinds de vang in B3, Lead-review PR #112).
+## Golf 2 heeft er ook het pantserdoel bij. Bij een terugkeer komen de
 ## basisvijanden van golf 2 terug.
 const WAVE_1 := [1600.0, 1720.0, 1840.0, 1940.0]
-const WAVE_2 := [1580.0, 1700.0, 1820.0, 1940.0]
+const WAVE_2 := [1580.0, 1640.0, 1700.0, 1820.0, 1940.0]
 const ARMORED_X := 1840.0
 
 
