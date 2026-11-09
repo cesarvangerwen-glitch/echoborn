@@ -233,7 +233,16 @@ func test_save_from_dict_checks_range(t) -> void:
 		"vulstand": func(d: Dictionary) -> void: d["gemalen"]["gemaal_k3"]["vulstand"] = 101,
 		"vulstand ": func(d: Dictionary) -> void: d["gemalen"]["gemaal_k3"]["vulstand"] = 37.5,
 		"vlag": func(d: Dictionary) -> void: d["vlaggen"]["sluis_k3_open"] = "ja",
+		"lichtmeter  ": func(d: Dictionary) -> void: d["lichtmeter"] = INF,
+		"speeltijd_ticks ": func(d: Dictionary) -> void: d["speeltijd_ticks"] = 1e19,
 	}
+	# Zoals JSON het leest: "1e999" wordt INF (Godot meldt dan de
+	# verwachte waarschuwing "Exponent too high"; een waarschuwing is geen FAIL).
+	var json := JSON.new()
+	json.parse(JSON.stringify(_state().to_dict()).replace("\"lichtmeter\":64", "\"lichtmeter\":1e999"))
+	errors = PackedStringArray()
+	t.check(typeof(json.data) == TYPE_DICTIONARY and GameState.from_dict(json.data, errors) == null
+		and errors.size() == 1 and errors[0].contains("lichtmeter"), "lichtmeter 1e999 uit JSON niet geweigerd: %s" % errors)
 	for name: String in cases:
 		var data := _state().to_dict()
 		(cases[name] as Callable).call(data)

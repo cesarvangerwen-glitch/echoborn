@@ -67,9 +67,11 @@ func to_dict() -> Dictionary:
 	}
 
 
-## Grenzen per veld (SM-punt #82): LP en speeltijd zijn hele getallen ≥ 0,
+## Grenzen per veld (SM-punt #82): LP en speeltijd zijn hele getallen 0–2^53,
 ## een vulstand een heel getal 0–100 (LM-03), een positie eindig.
 const VULSTAND_MAX := 100
+## Bovengrens voor hele getallen zonder eigen grens (2^53).
+const WHOLE_MAX := 9007199254740992.0
 
 
 ## Leest een Dictionary van de huidige versie. Geeft null en vult `errors`
@@ -139,10 +141,13 @@ static func _need(data: Dictionary, key: String, type: int, errors: PackedString
 
 
 ## Een heel getal in [low, high] (high -1 = geen bovengrens).
+## Zonder eigen bovengrens geldt WHOLE_MAX (2^53): tot daar is elk heel getal
+## exact als float (JSON), en `int()` loopt niet over. INF en NaN vallen af.
 static func _need_whole(value: Variant, key: String, low: int, high: int, errors: PackedStringArray) -> void:
 	var number := float(value)
-	if number != floorf(number) or number < low or (high >= 0 and number > high):
-		var range_text := "%d–%d" % [low, high] if high >= 0 else "≥ %d" % low
+	var top := float(high) if high >= 0 else WHOLE_MAX
+	if not is_finite(number) or number != floorf(number) or number < low or number > top:
+		var range_text := "%d–%d" % [low, high] if high >= 0 else "%d–2^53" % low
 		errors.append("veld '%s' = %s, verwacht een heel getal %s" % [key, value, range_text])
 
 
