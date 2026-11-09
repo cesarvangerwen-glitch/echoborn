@@ -20,6 +20,7 @@ const TEST_SCRIPTS := [
 	"res://tests/test_echo.gd",
 	"res://tests/test_sim.gd",
 	"res://tests/test_input.gd",
+	"res://tests/test_input_router.gd",
 	"res://tests/test_events.gd",
 	"res://tests/test_objects.gd",
 ]

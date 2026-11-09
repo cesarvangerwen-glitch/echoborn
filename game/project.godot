@@ -10,6 +10,10 @@ config/description="Spike: echo-opname en -afspelen, 2 lokale spelers."
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.6")
 
+[autoload]
+
+InputRouter="*res://scripts/input/input_router.gd"
+
 [display]
 
 window/size/viewport_width=1280
