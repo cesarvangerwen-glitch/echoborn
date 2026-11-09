@@ -5,7 +5,7 @@ extends RefCounted
 ## (`RUN_EIND`) en de normen MP-1, MP-2, MP-4 en MP-6, het meetlog schrijft de
 ## CSV en is deterministisch, en met echo uit is het gemaal vol te krijgen
 ## (FK-2). Elke run duurt ± 3800–6900 ticks; de runner geeft een test 7200
-## frames, daarom is elke run een eigen test. De run van D = 90 wordt in een
+## frames, daarom is elke run een eigen test (ook FK-2 per D). De run van D = 90 wordt in een
 ## volgende test afgespeeld met een ScriptedInput (zelfde bits, zelfde log).
 
 const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
@@ -21,8 +21,8 @@ const Meetlog = preload("res://scripts/events/meetlog.gd")
 ## Run van test_scripted_run_d90, voor de replay-test.
 static var _d90_bits := PackedInt32Array()
 static var _d90_csv := ""
-## Duur van de run met echo bij D = 120, voor FK-2.
-static var _d120_ticks := 0
+## Duur van de run met echo per D, voor FK-2.
+static var _echo_ticks := {}
 
 const TICK_CAP := 7000
 
@@ -138,6 +138,7 @@ func test_scripted_run_d90(t) -> void:
 		"CSV klopt niet met het log")
 	t.check(room.log_file_name().begins_with("meetlog_") and room.log_file_name().ends_with("_solo_D90_p1.csv"),
 		"bestandsnaam %s" % room.log_file_name())
+	_echo_ticks[90] = room.run_ticks()
 	_d90_bits = bot.recorded
 	_d90_csv = room.meetlog.to_csv()
 	await _free(t, room)
@@ -165,7 +166,7 @@ func test_scripted_run_d120(t) -> void:
 	var room = pair[0]
 	await _run(t, room)
 	_check_run(t, room, pair[1], 120)
-	_d120_ticks = room.run_ticks()
+	_echo_ticks[120] = room.run_ticks()
 	await _free(t, room)
 
 
@@ -174,24 +175,38 @@ func test_scripted_run_d180(t) -> void:
 	var room = pair[0]
 	await _run(t, room)
 	_check_run(t, room, pair[1], 180)
+	_echo_ticks[180] = room.run_ticks()
 	await _free(t, room)
 
 
-## FK-2 (en C-15 (1)): met echo uit is het gemaal vol na ≤ 4 terugkeren in K2
-## en duurt de run ≤ 2× de run met echo bij dezelfde D.
-func test_fk2_echo_off_d120(t) -> void:
-	var pair := _room(t, 120, false)
+## FK-2 (en C-15 (1)), per D (gdd §4.4): met echo uit is het gemaal vol na
+## ≤ 4 terugkeren in K2 en duurt de run ≤ 2× de run met echo bij dezelfde D.
+func _fk2_echo_off(t, d: int) -> void:
+	var pair := _room(t, d, false)
 	var room = pair[0]
 	await _run(t, room)
-	t.check(room.run_over, "met echo uit geen RUN_EIND (bot op %s/%s, G=%d)" % [pair[1].leg, pair[1].sub, room.gemaal.fill])
-	t.check(room.gemaal.full_tick >= 0 and room.k2_returns <= 4, "FK-2: %d terugkeren in K2 (≤ 4)" % room.k2_returns)
-	t.check(_d120_ticks > 0 and room.run_ticks() <= 2 * _d120_ticks,
-		"FK-2: run zonder echo %d ticks, met echo %d (≤ 2×)" % [room.run_ticks(), _d120_ticks])
+	var with_echo: int = _echo_ticks.get(d, 0)
+	t.check(room.run_over, "D=%d: met echo uit geen RUN_EIND (bot op %s/%s, G=%d)" % [d, pair[1].leg, pair[1].sub, room.gemaal.fill])
+	t.check(room.gemaal.full_tick >= 0 and room.k2_returns <= 4, "FK-2 D=%d: %d terugkeren in K2 (≤ 4)" % [d, room.k2_returns])
+	t.check(with_echo > 0 and room.run_ticks() <= 2 * with_echo,
+		"FK-2 D=%d: run zonder echo %d ticks, met echo %d (≤ 2×)" % [d, room.run_ticks(), with_echo])
 	t.check(room.meetlog.count("SPRINGPLANK") == 0 and room.meetlog.count("ONTPLOFFING") == 0,
-		"echo uit maar toch echo-acties")
-	t.note("echo uit, D=120: %d ticks (%.2f× de run met echo), %d terugkeren in K2" % [
-		room.run_ticks(), float(room.run_ticks()) / maxi(_d120_ticks, 1), room.k2_returns])
+		"D=%d: echo uit maar toch echo-acties" % d)
+	t.note("echo uit, D=%d: %d ticks (%.2f× de run met echo), %d terugkeren in K2" % [
+		d, room.run_ticks(), float(room.run_ticks()) / maxi(with_echo, 1), room.k2_returns])
 	await _free(t, room)
+
+
+func test_fk2_echo_off_d90(t) -> void:
+	await _fk2_echo_off(t, 90)
+
+
+func test_fk2_echo_off_d120(t) -> void:
+	await _fk2_echo_off(t, 120)
+
+
+func test_fk2_echo_off_d180(t) -> void:
+	await _fk2_echo_off(t, 180)
 
 
 ## E-08a met een eenrichtingsrichel (laag 1, gdd §4.1): P1 springt er van

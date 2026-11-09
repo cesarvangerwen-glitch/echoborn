@@ -1,6 +1,6 @@
 # Kamers: de grijze flow-kamer (mijlpaal 1, F0)
 
-Versie 0.1 · Eigenaar: World & Level Designer (met Gameplay Programmer) · Taak T16b (`docs/productie/fase-2-kader.md` §2) · Reviewer: Lead Game Designer
+Versie 0.2 · Eigenaar: World & Level Designer (met Gameplay Programmer) · Taak T16b (`docs/productie/fase-2-kader.md` §2) · Reviewer: Lead Game Designer
 Bron: `docs/design/gdd.md` v0.4 §2.5a, §2.12, §4 (flow-kamer-spec, bouwstenen B1–B4, FK-1–FK-6, MP-1–MP-7) en `docs/concept/pitch.md` v0.4.
 Scène: `game/levels/flowkamer/flowkamer.tscn` (hoofdscène van het project). Code: `game/levels/flowkamer/` (kamer, maten, vijanden, meetlog, gescripte run, normberekening) en `game/scripts/light/` (lichtmeter, gemaal, pomprad). Tests: `game/tests/test_flowkamer.gd`.
 
@@ -60,6 +60,17 @@ Vijanden blijven in K2 (x 1458–1992) en doen alleen iets zolang P1 in K2 is. D
 
 **4 in plaats van 3 per golf.** Met 3 + 3 haalde de gescripte run 92 LP na K1 en één keer K2; het doel is ≥ 100 (gdd §4.2). Met 4 + 4 is het 102 bij elke D. De LP-waarden zijn ongewijzigd (gdd §4.2: eerst de aantallen bijstellen).
 
+**FK-2-grens met 4 + 4 vijanden** (gdd §4.4; zonder echo komt licht alleen uit P1-treffers: 3 treffers × 2 LP = 6 LP per basisvijand, het pantser breekt niet en geeft 0 LP):
+
+| | Basisvijanden | LP | Totaal |
+|---|---|---|---|
+| Eerste keer K2 (golf 1 + 2) | 4 + 4 | 8 × 6 = 48 | 48 |
+| Terugkeer 1 | 4 | 4 × 6 = 24 | 72 |
+| Terugkeer 2 | 4 | 24 | 96 |
+| Terugkeer 3 | 4 | 24 | **120 ≥ 100** |
+
+Het gemaal is zonder echo dus vol na **3 terugkeren** (grens FK-2: ≤ 4). Gemeten: 3 bij elke D. Met 3 + 3 (gdd) was het 36 + 4 × 18 = 108 na 4 terugkeren.
+
 ## 5. K3 gemaal en lichtmeter
 
 - **Pomprad** (32 × 48, niet `Merkbaar`) op x = 1960, middelpunt 30 px boven de vloer (FK-5: 15–40). Je raakt het lopend en vanuit een sprong, van links en van rechts. Geen vijand binnen 80 px (K2 ligt erboven, achter de vloer).
@@ -91,7 +102,7 @@ Elke run schrijft `user://meetlog_<datum-tijd>_<solo|coop>_D<D>_p1.csv` (gdd §4
 
 - **Spelen**: open `game/` in Godot 4.6.3 en start het project (F5). P1: A/D lopen, spatie springen, linker Shift dash, E aanval/pompen, Q 0,5 s = Loslaten. P2: Enter doet mee, Backspace 1 s stopt (via de InputRouter; de echte drop-in/out is T16c).
 - **Debugmenu** (§4.1): F1/F2/F3 = D 90/120/180 (nieuwe run, met het B3-blok van die D), F4 = echo aan/uit (nieuwe run), F5 = meetlog aan/uit, F6 = herstart. Na de run: 1–5 per kamer.
-- **Headless**: `godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd`. `test_flowkamer.gd` bouwt de kamer per D, draait de gescripte run (moet `RUN_EIND` en de normen halen), speelt de run van D = 90 opnieuw af met een `ScriptedInput` (zelfde log), en draait de run met echo uit (FK-2).
+- **Headless**: `godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd`. `test_flowkamer.gd` bouwt de kamer per D, draait de gescripte run (moet `RUN_EIND` en de normen halen), speelt de run van D = 90 opnieuw af met een `ScriptedInput` (zelfde log), en draait per D de run met echo uit (FK-2). De run met echo uit bij D = 180 duurt 6895 ticks; de runner geeft een test 7200 frames.
 
 ## 9. Gemeten met de gescripte geoefende run
 
@@ -108,7 +119,7 @@ Solo, uit het meetlog berekend (`flow_report.gd`). Dit zijn geen speltestresulta
 | MP-4 echo Leeg | 2 % | 3 % | 4 % | ≤ 40 % |
 | MP-6 LP met de echo, pompslagen echo | 82 %, 5 | 82 %, 5 | 82 %, 5 | ≥ 40 %, ≥ 1 |
 | Echo breekt | 0 | 0 | 0 | 0 (FK-4) |
-| **Echo uit** (FK-2): runtijd, terugkeren K2 | 113,4 s (1,77×), 3 | 113,9 s (1,74×), 3 | 114,9 s (1,51×), 3 | ≤ 2×, ≤ 4 |
+| **Echo uit** (FK-2): runtijd, terugkeren K2 | 113,4 s (1,77×), 3 | 113,9 s (1,74×), 3 | 114,9 s (1,50×), 3 | ≤ 2×, ≤ 4 |
 
 De langste stilstand zit telkens aan de waterkant in K3: P1 wacht tot de echo zijn pompslagen herhaald heeft en het water zakt (± D + 40 ticks).
 
@@ -139,24 +150,29 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 7. **B4 neemt nu de langzame lijn**; de lancering werkt pas na T16c.
 8. Een wissel van D of echo aan/uit in het debugmenu start een nieuwe run (één CSV per D).
 
-## 12. Bevindingen en vragen
+## 12. Bevindingen, antwoorden en open punten
 
-**Voor de Lead Game Designer**
+**Antwoorden van de Lead Game Designer** (Lead-review)
 
-1. **In K1 is de echolijn niet sneller dan de langzame lijn.** Tijd tot K2: D = 90 2452 tegen 2469 ticks, D = 120 2512 tegen 2499, D = 180 2666 tegen 2559. Keren en teruglopen naar de echo kost evenveel als twee sprongen via de trede. De echo levert in K1 dus licht op (30 LP), geen tempo. Voor R-V2 en F4b(b) kan dat een probleem zijn: wie snel wil, laat de echo liggen. Opties: de langzame lijn langer maken (drie treden, of de trede een eind van de wand), of het zo laten omdat K2 de echo wel nodig heeft (merk-afmaker). Graag een keuze vóór T17.
-2. **B2 bij D = 180: de regel "afzetten als de echo ± 130 px vóór je is"** vraagt dat de echo 33 ticks vóór de ontmoeting al op de richel loopt, dus een landing ≥ D + 66 px van de wand. Met 216 px is de echo er pas ± 76 px vóór je; de bot springt dan zodra de echo landt en stuurt in de lucht bij. Het lukt, maar het venster is krap voor mensen.
-3. **B3: "stap terug" is te vroeg.** Wie van het blok stapt, landt na ± 20 ticks naast de echo; wie **afspringt**, landt in het venster van 29–49 ticks. Die landing is snel vallen (v.y ≥ 4): na T16c is dat een **vang** (C-13), geen gewone landing. Graag bevestigen dat dat de bedoeling is.
-4. **Diepwater vóór het gemaal vol is**: P1 wordt teruggezet en dat telt als respawn, dus de echo wordt Leeg en de pompslagen die hij nog zou herhalen, gaan verloren. Klopt dat met LM-06?
-5. **MP-1** gebruikt de definitie uit T16a; de open vraag van de Gameplay Programmer over keren (3–4 stille ticks) en ter plaatse springen (2) geldt hier ook.
+1. K1, echolijn niet sneller dan de langzame lijn: zo laten voor T17; K1 moet norm (2) en R-V12 halen, geen tempowinst. T17 telt per bouwsteen welke lijn spelers kiezen; kiest meer dan 50 % de langzame lijn, dan zet de WLD de trede verder van de wand.
+2. B2 bij D = 180 (afzetten zodra de echo landt, ± 76 px): akkoord, dat is de prijs van D = 180; T17 meet het.
+3. B3: afspringen van het blok wordt na T16c een vang (C-13); zo is het bedoeld.
+4. Diepwater vóór het gemaal vol: klopt met LM-06 en E-04b; er gaat geen LP verloren, wat de echo niet pompt, blijft in de meter.
+5. MP-1: de definitie uit T16a is de maat; `flow_report.gd` blijft zoals het is.
 
-**Voor de Gameplay Programmer** (code van T16a)
+**Open punten**
 
-1. **E-08a en eenrichtingsrichels**: de echo brak als hij (zoals P1) van onder door een eenrichtingsrichel ging. In `tail_echo.gd` telt de vrij-controle een eenrichtingsvorm nu niet mee (`_is_free`), met een test (`test_echo_passes_one_way_ledge`). Graag review.
-2. **P1 tegen een wand of trede**: wie een richting vasthoudt tegen een wand op de vloer, is in `Motor.step` niet `on_floor` en kan niet springen. Spelers merken dat bij elke trede. De bot laat één tick los als workaround.
-3. **Springplank-reeks in het meetlog**: `n` begon niet opnieuw als P1 van de echo áfliep op de vloer. `flow_meetlog.gd` doet dat nu; mag naar `meetlog.gd`.
+- K1–K3 worden na de AreaLoader (T5b) `Kamer`-nodes met de AreaLoader, in plaats van `Layout.NEIGHBOURS` (WLD).
+- Gameplay Programmer, in T16c: review van de fix in `tail_echo.gd` (E-08a negeert eenrichtingsrichels, `_is_free`).
+- Gameplay Programmer, in T16c: P1 die een richting vasthoudt tegen een wand op de vloer, is niet `on_floor` en springt niet (de bot laat één tick los).
+- Gameplay Programmer, in T16c: B3 (vang) en B4 (lancering) opnieuw toetsen met de co-op-acties.
+- Gameplay Programmer: de springplank-reeks `n` opnieuw laten beginnen bij aflopen van de echo kan van `flow_meetlog.gd` naar `meetlog.gd`.
+- LGD: gdd §4.2 en FK-2 naar 4 + 4 vijanden.
+- T17: de LP-marge is 2 (102); met één gemiste landing in K1 zakt de run onder 100. T17 kijkt of 4 + 4 vijanden genoeg is.
 
 ## 13. Wijzigingen
 
 | Versie | Wat |
 |---|---|
 | 0.1 | Eerste blockout van de flow-kamer (T16b) |
+| 0.2 | Lead-review: FK-2-grens voor 4 + 4 vijanden voorgerekend (§4), FK-2-test per D, antwoorden van de LGD en open punten (§12) |
