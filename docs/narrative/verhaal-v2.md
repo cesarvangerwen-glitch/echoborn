@@ -1,6 +1,6 @@
 # Verhaal V2: "Het gemaal van herinneringen"
 
-Versie 0.1 (hoofdlijnen) · Eigenaar: Narrative Designer · Lead-review: Creative Director · Taak: T9 (`docs/productie/fase-2-kader.md` §2)
+Versie 0.2 (hoofdlijnen, herstel na Lead-review CD op PR #105) · Eigenaar: Narrative Designer · Lead-review: Creative Director · Taak: T9 (`docs/productie/fase-2-kader.md` §2)
 Werktitel *Polderlight* (besluit #96); repo en mappen heten nog "echoborn", de mechaniek heet "echo".
 Bronnen: `docs/concept/pitch.md` v0.4 (§5, §6 en de toonregels), `docs/beslissingen.md` (#2, #18, #51 deel 2: 1A, 7A, 8A; #96), `docs/design/gdd.md` (mechaniek), `docs/art/bible.md` (figuren, grijs naar kleur, water).
 
@@ -16,7 +16,7 @@ Dit document legt het verhaal vast op hoofdlijnen: de wereld, wie wie is, de boo
 | CEO-besluit #51 deel 2 (1A, 7A, 8A) | Verhaal V2 (jij bent de jonge machinist, je schaduw is de sluiswachter); geen puzzels op de kritieke route; co-op 7A (de partner is de sluiswachter die weer uit zichzelf beweegt; gedeelde echo alleen als finisher); 8A: echo-staart ± 2 s in het spel, **de 10 s leven in het verhaal**: bevroren echo's, het einde, de co-op-finisher |
 | CEO-besluit #96 | Werktitel *Polderlight* |
 | Fasekader fase 2 v0.2 | T9 zoals in §2; F3 (slice: polderwijk, eerste gemaal, Gemaalmeester), F7 (toon in de visie-review), R-V7 |
-| **Werkaanname Narrative Designer** | **Vier gebieden plus een proloog en een finale** (de maxima uit `docs/design/kernloop.md` §5): gebied 1 is de polderwijk van de slice; gebied 2 en 3 zijn in **vrije volgorde** te spelen; gebied 4 komt als laatste vóór de finale. De namen en de volgorde van de gebieden zijn een voorstel. De wereldstructuur is van de LGD (gdd v1, wereldstructuur); wijkt die af, dan past dit document zich aan, niet andersom. Het verhaal is zo gebouwd dat elk fragment los staat (§4.1), dus een andere volgorde of een gebied minder breekt het niet. |
+| **Werkaanname Narrative Designer** | **Vier gebieden plus een proloog en een finale** (de maxima uit `docs/design/kernloop.md` §5): gebied 1 is de polderwijk van de slice, daarna gebied 2, 3 en 4 in de **vaste volgorde** van `kernloop.md` K-02, gebied 4 als laatste vóór de finale. **Voorstel aan de LGD (geen aanname):** gebied 2 en 3 in vrije volgorde; het verhaal kan dat aan (§4.1), maar K-02 beslist. De namen van de gebieden zijn een voorstel. De wereldstructuur is van de LGD (gdd v1, wereldstructuur); wijkt die af, dan past dit document zich aan, niet andersom. Het verhaal is zo gebouwd dat elk fragment los staat (§4.1), dus een andere volgorde of een gebied minder breekt het niet. |
 | **Werkaanname Narrative Designer** | Boss-namen na de Gemaalmeester zijn werknamen voor het verhaal; vorm en mechaniek kiest de Combat Designer (gdd, T8b en fase 3) |
 
 ---
@@ -65,19 +65,20 @@ De wereld begint grijs, de echo ook (art bible §5). In het verhaal is dat één
 ### 3.1 De machinist (speler 1)
 
 De **jonge machinist** van de poldermachine, nog in de leer. Pet met klep, korte jas, **amber sjaal** (art bible §6). Altijd in kleur: de machinist brengt het licht.
-- **Waarom hier:** de machinist is de leerling van de sluiswachter. Zij werkten samen: de een liet 's avonds het water in, de ander pompte het 's ochtends uit. Op de ochtend na de laatste avond kwam de sluiswachter niet meer.
+- **Waarom hier:** de machinist is de leerling van de sluiswachter. Zij werkten samen: de een liet 's avonds het water in, de ander pompte het 's ochtends uit. De laatste avond had de leerling dienst in het **dijkgemaal**, op de ringdijk, buiten de stad. Daar sliep de machinist die nacht, veilig en droog, en daarom is de machinist niet bevroren. Op de ochtend erna kwam de sluiswachter niet meer, en lag de stad grijs. Daar begint de proloog (§4.3).
+- **De machinist leeft, is gezond en is echt.** Nooit dood, nooit ziek, nooit een herinnering of een droomfiguur (besluit CD, T-4).
 - **Geen naam, geen voornaamwoord.** In beide talen heet het personage "de machinist" / "the machinist"; teksten vermijden hij/zij (EN: geen *he/she*). Zo kan elke speler het zijn, en in co-op blijft "jij en de sluiswachter" helder.
 - **Spreekt niet.** De machinist handelt; de wereld en de sluiswachter vertellen.
 
 ### 3.2 De sluiswachter (de echo solo, speler 2 in co-op)
 
 **Ward** (EN idem; *ward* is ook "bewaker"; de naam valt pas in de finale, §7). Brede hoed, lange jas met wijde zoom, staf met **pikhaak**, **cyaan sjaal** (art bible §6). Hij beheerde de sluizen van Hollestede: elke avond liet hij een beetje water binnen.
-- **Wat er gebeurde (het geheim van het spel):** Ward wilde niets meer laten gaan. Iets wat hij liefhad dreigde hij te vergeten (de stad laat open wat; zie §3.4), en hij hield de sluizen dicht, avond na avond. Het water bleef niet weg; het drukte tegen de ringdijk. Op de laatste avond zag hij dat de dijk het niet zou houden, en hij deed wat een sluiswachter doet: hij **opende de grote sluis zelf**, in één keer, zodat het water door de sluis kwam en niet door een bres. Zo werd de stad grijs, niet kapot. Daarna kon hij niets meer zelf doen. Hij werd een schaduw die alleen nog herhaalt wat een ander doet.
+- **Wat er gebeurde (het geheim van het spel):** Ward wilde niets meer laten gaan. Ward werd oud en merkte dat hij begon te vergeten: namen, gezichten, wat hij liefhad (de stad laat open wie hij het meest vreesde te vergeten; zie §3.4). Uit angst daarvoor hield hij de sluizen dicht, avond na avond. Het water bleef niet weg; het drukte tegen de ringdijk. Op de laatste avond zag hij dat de dijk het niet zou houden, en hij deed wat een sluiswachter doet: hij **opende de grote sluis zelf**, in één keer, zodat het water door de sluis kwam en niet door een bres. Zo werd de stad grijs, niet kapot. Daarna kon hij niets meer zelf doen. Hij werd een schaduw die alleen nog herhaalt wat een ander doet.
 - **Waarom de echo hém is:** wie niet wil vergeten, blijft herhalen. Ward herhaalt jou, omdat hij zichzelf kwijt is.
 - **Wat de speler gaandeweg ontdekt:** wie hij was (gebied 1–3) en waarom het water kwam (gebied 4 en de finale). De volledige waarheid pas in zijn eigen tien seconden (§7).
-- **Het checkpoint-gebaar:** bij een checkpoint houdt de sluiswachter je hand even vast (pitch §6, gevoel). Dit is het enige wat hij **niet** van jou herhaalt: een eerste teken dat er nog iemand in hem zit. De speler merkt het pas na een paar keer op (geen tekst).
+- **Het checkpoint-gebaar:** bij een checkpoint houdt de sluiswachter je hand even vast (pitch §6, gevoel). Dit is het enige wat hij **niet** van jou herhaalt: een eerste teken dat er nog iemand in hem zit. De speler merkt het pas na een paar keer op (geen tekst). **In co-op** doet het tweede lichaam hetzelfde: staat P2 bij het activeren van een checkpoint binnen ± 2 tegels van P1, dan pakt Ward de hand van de machinist (± 1 s, alleen beeld, geen input afgenomen, geen stilstand); staat P2 verder weg of is P2 opgelost (C-06), dan valt het gebaar weg. Er wordt niemand verplaatst. Solo geldt dezelfde afstand voor de echo.
 
-**Sporen van de sluiswachter in de echo** (open punt art bible §10, voorstel aan Art Director en CD): de solo-echo heeft het silhouet van de eigenaar (art bible §6), want hij herhaalt jou. Mijn voorstel: **na elke gebiedsboss neemt de echo één detail van Ward over, alleen in de rand, nooit in het silhouet**: na boss 1 de **rand van de brede hoed** (een streep boven je pet), na boss 2 de **wijde zoom** van de jas (twee pixels breder onderaan), na boss 3 de **cyaan zweem** in de sjaal, na boss 4 de **pikhaak** op de rug. Het silhouet blijft dat van de eigenaar, zodat de leesbaarheidsregels (art bible §6, §7) gelden. In de finale staat hij voor het eerst in zijn eigen silhouet. Of dit leesbaar blijft op de Deck, toetst de Art Director; zo niet, dan alleen de ogen (van amber naar cyaan) als spoor.
+**Sporen van de sluiswachter in de echo** (open punt art bible §10, voorstel aan Art Director en CD): de solo-echo heeft het silhouet van de eigenaar (art bible §6), want hij herhaalt jou. Mijn voorstel: **na een gebiedsboss neemt de echo één detail van Ward over, alleen in vorm, nooit in kleur**: na boss 1 de **rand van de brede hoed** (een streep boven je pet), na boss 2 de **wijde zoom** van de jas (twee pixels breder onderaan), na boss 3 de **pikhaak** op de rug; boss 4 voegt niets toe (het belfort geeft het eerste harde feit, §4.3). **Geen kleur als spoor:** rand, ogen en sjaal van de echo blijven amber, want amber = P1 en cyaan = P2 (art bible §6). Het silhouet blijft dat van de eigenaar, zodat de leesbaarheidsregels (art bible §6, §7) gelden. In de finale krijgt het tweede lichaam voor het eerst Wards eigen silhouet (§7.2). Of dit leesbaar blijft op de Deck, toetst de Art Director; zo niet, dan alleen de hoedrand als spoor. In co-op heeft P2 al het silhouet van de sluiswachter (art bible §2); de sporen gelden alleen voor de solo-echo.
 
 ### 3.3 In co-op: de sluiswachter die weer uit zichzelf beweegt
 
@@ -90,7 +91,9 @@ In co-op speelt speler 2 de sluiswachter **live** (pitch §5, gdd C-02). Verhaal
 
 Hollestede heeft **geen levende NPC's** in het basisplan. De bewoners zijn **bevroren echo's** (§5): een bakker, kinderen bij het carillon, een begijn die een kaars aansteekt, marktvrouwen, een veerman. Ze spreken niet; ze tonen.
 
-**Wat de stad bewust open laat:** *wie* Ward dreigde te vergeten. Het spel toont alleen sporen: een tweede kop op de vensterbank van het sluiswachtershuis, een kindertekening van het gemaal in zijn logboek, een amber sjaal die precies lijkt op die van de machinist. Wie wil, leest dat de machinist zelf degene was die hij niet wilde vergeten; wie het niet leest, mist geen verhaal. Het spel noemt het nooit en toont nooit een ziekte, een ziekenhuis of een sterfbed (toonregel T-4).
+**Wat vaststaat:** Ward vreesde te vergeten **omdat hij oud werd** (besluit CD in de Lead-review van PR #105). Geen ziekte, geen ongeluk, geen verlies van iemand.
+
+**Wat de stad bewust open laat:** *wie* Ward het meest vreesde te vergeten. Het spel toont alleen sporen: een tweede kop op de vensterbank van het sluiswachtershuis, een kindertekening van het gemaal in zijn logboek, een amber sjaal die precies lijkt op die van de machinist. Wie wil, leest dat hij vooral zijn leerling niet wilde vergeten; wie het niet leest, mist geen verhaal. De machinist is in die lezing de levende leerling die elke ochtend kwam, **nooit** een overledene, een zieke of een herinnering. Het spel noemt het nooit (toonregel T-4).
 
 ---
 
@@ -111,16 +114,16 @@ Een metroidvania laat de speler kiezen. Daarom:
 | Proloog | **De ringdijk** | Aankomst bij een grijze stad die stilstaat | Geen; je ziet hem alleen: een schaduw die jouw eerste sprong herhaalt | Geen | — |
 | 1 | **De polderwijk** (slice) | Een gewone wijk die weer aangaat: ramen, kades, een gemaal | *Het werk*: een sluiswachter en zijn leerling, avond in, ochtend uit | **De Gemaalmeester** (§6) | Rand van de hoed |
 | 2 | **Het begijnhof** | Stilte en zorg; wachten op wie terugkomt | *De zorg*: Ward die elke avond een lamp liet branden voor iemand | **De Wake** (werknaam): een lichtwacht die niemand laat gaan | Wijde zoom |
-| 3 | **De markt en de waag** | Een drukte die midden in een beweging stilviel | *Het wegen*: Ward die meer wilde houden dan de stad kon dragen | **De Waag** (werknaam): een weegschaal die alles wil houden | Cyaan zweem in de sjaal |
-| 4 | **Het belfort** | Tijd en maat: omhoog, naar het carillon | *De laatste avond*: de sluizen bleven dicht, het water drukte tegen de dijk | **Het Uurwerk** (werknaam): een carillon dat de tijd wil stilzetten | Pikhaak |
-| Finale | **De grote sluis** | Waar het water binnenkwam | *Zijn eigen tien seconden* (§7) | **De Grendel** (werknaam, eindboss): de sluis die niet loslaat | Zijn eigen silhouet |
+| 3 | **De markt en de waag** | Een drukte die midden in een beweging stilviel | *Het wegen*: Ward die meer wilde houden dan de stad kon dragen | **De Waag** (werknaam): een weegschaal die alles wil houden | Pikhaak |
+| 4 | **Het belfort** | Tijd en maat: omhoog, naar het carillon | *De laatste avond*: de sluizen bleven dicht, het water drukte tegen de dijk | **Het Uurwerk** (werknaam): een carillon dat de tijd wil stilzetten | Niets nieuws |
+| Finale | **De grote sluis** | Waar het water binnenkwam | *Zijn eigen tien seconden* (§7) | **De Grendel** (werknaam, eindboss): de sluis die niet loslaat | Het tweede lichaam krijgt Wards eigen silhouet (solo en co-op, §7.2) |
 
 Elke gebiedsboss is in het verhaal **een stuk van de stad dat Wards weigering heeft overgenomen**: een machine of plek die blijft vasthouden wat ze los zou moeten laten. Ze zijn geen kwaad; ze zijn vastgelopen. Ze **lossen op in licht** als ze verslagen zijn (toonregel G-1), en daarna werkt de plek weer gewoon: het gemaal pompt, het hof is open, de waag weegt, het carillon slaat.
 
 ### 4.3 Per gebied
 
 **Proloog: de ringdijk** (10–15 min, `kernloop.md` §5).
-- **Beats:** (1) de machinist loopt over de dijk in de schemer; links de rivier, rechts een grijze stad half onder water. (2) Bij de eerste sprong over een kapotte dijkplank herhaalt een schaduw die sprong; de speler ziet het, de machinist kijkt om (geen tekst). (3) Het eerste kleine dijkgemaal: de speler pompt voor het eerst, een lantaarn op de dijk gaat aan, en in die lichtpoel keert de kleur even terug (art bible §5: licht = kleur). (4) Afdaling de polder in.
+- **Beats:** (1) de machinist stapt in de ochtendschemer naar buiten uit het **dijkgemaal**, waar de leerling die nacht dienst had (§3.1), en loopt over de dijk; links de rivier, rechts een grijze stad half onder water. Het dijkgemaal is droog en in kleur: hier kwam het water niet. (2) Bij de eerste sprong over een kapotte dijkplank herhaalt een schaduw die sprong; de speler ziet het, de machinist kijkt om (geen tekst). (3) Het eerste kleine dijkgemaal: de speler pompt voor het eerst, een lantaarn op de dijk gaat aan, en in die lichtpoel keert de kleur even terug (art bible §5: licht = kleur). (4) Afdaling de polder in.
 - **Wat de omgeving toont:** de stad is grijs maar heel; niets is verwoest. Het water staat stil en spiegelt.
 
 **Gebied 1: de polderwijk** (de slice, F3).
@@ -162,7 +165,7 @@ Overal in de stad staan **de laatste tien seconden van de bewoners**, stilgezet 
 ### 5.2 Hoe ze eruitzien en wat ze doen
 
 - **Beeld:** hol, zoals de echo (art bible §6), maar **stil en grijs**, zonder nabeelden en met een koele rand die niet in een spelerskleur is (geen amber, geen cyaan). Precieze beeldtaal: Art Director.
-- **In het spel:** sfeer en verhaal, **geen puzzel**. Ze zijn geen object om te activeren en houden niets tegen. **Hooguit** dient een bevroren echo als springplank of als oriëntatiepunt (pitch §6); of en waar, beslist de World & Level Designer in de gdd-regels. Je kunt door ze heen lopen.
+- **In het spel:** sfeer en verhaal, **geen puzzel**. Ze zijn geen object om te activeren en houden niets tegen. **Hooguit** dient een bevroren echo als springplank of als oriëntatiepunt (pitch §6); of en waar, beslist de World & Level Designer in de gdd-regels. Je kunt door ze heen lopen. **Open punt (WLD):** een bevroren echo die als springplank dient, vervaagt na het oppompen (§5.3); de World & Level Designer zorgt dat terugkeren hem dan niet nodig heeft.
 - **Als je erlangs loopt:** één korte klank uit het carillon en een zweem kleur in de figuur (± 1 s). Geen tekst, geen knop, geen stilstand.
 - **Plaats:** een bevroren echo staat **nooit onder de waterlijn** (toonregel W-3). In een ondergelopen wijk staan ze hoger: op stoepen, bruggen, trappen, in deuropeningen. Zakt het water, dan verschijnen er geen echo's uit het water.
 
@@ -206,31 +209,33 @@ De finale speelt in de **grote sluis aan de ringdijk**, waar het water binnenkwa
 
 De sluis zelf, die niet meer los wil laten: deuren, kettingen en balken die zich tegen de stroom in sluiten. Hij is de laatste vorm van Wards weigering. Mechaniek en vorm: Combat Designer (fase 3). In het verhaal: elke keer dat je zijn pantser breekt, valt er een stuk van de stad terug op zijn plek in de verte (beeld).
 
-**De finisher van de eindboss** (C-14) speelt, net als bij elke boss, **jullie laatste tien seconden samen** af. Daarna gebeurt wat alleen hier gebeurt: de gedeelde echo, half machinist en half sluiswachter, valt uit elkaar in twee figuren. De amber helft wordt weer jouw schaduw. De cyaan helft blijft staan, in **Wards eigen silhouet**.
+**Eén beat voor solo en co-op** (pillar 3, gdd C-01). In beide modi zijn er twee lichamen: de machinist (P1) en **het tweede lichaam** (solo de echo, co-op P2). Er komt geen derde figuur bij; Ward krijgt geen eigen lichaam naast P2.
+
+**De finisher van de eindboss** (C-14) speelt, net als bij elke boss, **jullie laatste tien seconden samen** af. De gedeelde echo is geen lichaam en vervaagt daarna zoals altijd. Dan gebeurt wat alleen hier gebeurt: **het tweede lichaam wordt Ward zelf.** Het krijgt in ± 1 s **Wards eigen silhouet** (brede hoed, lange jas, pikhaak) en zijn eigen kleuren, zoals een wijk die aangaat (art bible §5). Solo verandert de echo van jouw silhouet in het zijne; in co-op heeft P2 dat silhouet al en krijgt hij alleen zijn kleur. Het eindbeeld is in beide modi hetzelfde: de machinist en Ward, twee figuren.
 
 ### 7.3 Wards tien seconden
 
 Ward krijgt **zijn eigen tien seconden terug**: de laatste tien seconden die hij zelf deed, vóór hij een schaduw werd (pitch §6; #51: 8A). Die tien seconden zijn het einde van het verhaal en tonen wat geen logboek zei:
 1. Ward staat bij de grote sluis op de laatste avond. Achter hem de dijk die zingt.
-2. Hij kijkt om, naar het gemaal, waar een lamp brandt (de leerling slaapt daar, na een lange dag).
+2. Hij kijkt om, over de stad heen, naar het **dijkgemaal** op de ringdijk, waar een lamp brandt: de leerling heeft daar dienst, buiten de stad en hoog en droog. Die lamp is veilig.
 3. Hij legt zijn hand op het rad van de sluis, en **opent hem zelf**: rustig, met de hele slag, zodat het water door de sluis gaat en niet door de dijk.
 4. Hij zet zijn hoed af en hangt hem aan de haak.
 
-Niemand verdrinkt en niets breekt; het water komt stil en grijs de stad in (toonregels §8). Wat de speler begrijpt: hij liet het water binnen om de stad te redden, niet om haar te verliezen, en wat hij niet kon, was daarna zelf loslaten.
+Niemand verdrinkt en niets breekt; het water komt stil en grijs de stad in (toonregels §8), en niet tot aan het dijkgemaal. Wat de speler begrijpt: hij liet het water binnen om de stad te redden, niet om haar te verliezen, hij wist dat zijn leerling veilig was, en wat hij niet kon, was daarna zelf loslaten.
 
-**Voorstel aan de LGD (geen besluit):** de tien seconden zijn **speelbaar** en draaien de rollen om. Solo bestuurt de speler Ward (alleen lopen naar de sluis en het rad draaien; niets kan mislukken), en **de machinist loopt als echo ± 2 s achter hem aan**: voor het eerst herhaal jij hem. In co-op bestuurt speler 2 Ward en loopt speler 1 naast hem, als machinist. Daarna is het rad omgedraaid en neemt het spel de besturing weer terug. Het is geen nieuw systeem (de echo-staart bestaat al), maar wel een uitzondering op de rollen in gdd §2.7; daarom ligt de keuze bij de LGD. **Terugvaloptie zonder nieuwe regel:** de tien seconden spelen af als een bevroren echo van Ward, net zoals de fragmenten (§4.4), terwijl de speler vrij rondloopt.
+**Voorstel aan de LGD (geen besluit), gelijk in solo en co-op:** de tien seconden zijn **speelbaar** en draaien de rollen om. Het tweede lichaam, nu Ward, loopt vooraan naar de sluis en draait het rad; **de machinist loopt als echo ± 2 s achter hem aan**: voor het eerst herhaal jij hem. Solo bestuurt de speler Ward; in co-op bestuurt P2 Ward, zoals de hele tijd al, en loopt P1 als echo mee. Alleen lopen en het rad draaien; niets kan mislukken (geen vijanden, geen gaten, geen water, geen tijdslimiet). Drop-in of drop-out tijdens deze 10 s verandert niets aan het beeld: wie Ward bestuurt, wisselt volgens C-03/C-05. Daarna is het rad omgedraaid en neemt het spel de besturing terug. Het is geen nieuw systeem (de echo-staart bestaat al), maar wel een uitzondering op de rollen in gdd §2.7; daarom ligt de keuze bij de LGD. **De CD steunt de speelbare 10 s** (de draai wordt speelbaar), mits gelijk in solo en co-op en zonder faalkans (Lead-review PR #105). **Terugvaloptie zonder nieuwe regel, voor de CD aanvaardbaar:** de tien seconden spelen af als een bevroren echo van Ward, net zoals de fragmenten (§4.4), terwijl beide lichamen vrij rondlopen.
 
 ### 7.4 Loslaten
 
-Na zijn tien seconden kijkt Ward de machinist aan. Hij zegt zijn **enige regels in het spel** (max. 2 korte zinnen, EN en NL, nog te schrijven, §10; richting: zijn naam, en dat de machinist het nu zelf kan). Hij houdt de hand van de machinist vast, zoals bij elk checkpoint, en **laat dan los**. Hij vervaagt in warm licht, zoals de bevroren echo's (§5.3): niet weg, maar thuis.
+Na zijn tien seconden kijkt Ward de machinist aan. Hij zegt zijn **enige regels in het spel** (max. 2 korte zinnen, EN en NL, nog te schrijven, §10; richting: zijn naam, en dat de machinist het nu zelf kan). Hij houdt de hand van de machinist vast, het checkpoint-gebaar (§3.2), en **laat dan los**. Hij vervaagt in warm licht, zoals de bevroren echo's (§5.3): niet weg, maar thuis. Solo en co-op is dat hetzelfde: het tweede lichaam vervaagt; in co-op is dat de enige keer dat P2 niet terugkomt na 120 ticks, omdat het spel hier eindigt.
 
 Dan opent de grote sluis zich zacht, de andere kant op. **Het water gaat met het tij naar zee, maar niet allemaal.** De stad houdt een beetje water in de grachten, zoals een stad die ook een beetje mag vergeten om te kunnen slapen. Het carillon slaat tien tellen. Hollestede is in kleur.
 
 ### 7.5 Het laatste beeld
 
-De machinist loopt terug over de ringdijk, in de ochtend. Bij het sluiswachtershuis hangt de hoed aan de haak, naast de tweede pet. De machinist zet de pet op de haak, neemt de hoed, en gaat de avondronde doen: de sluis een klein stukje open, voor de nacht.
+De machinist loopt terug over de ringdijk, in de ochtend, alleen, langs het dijkgemaal waar de nacht begon. Bij het sluiswachtershuis hangt de hoed aan de haak, naast de tweede pet. De machinist zet de pet op de haak, neemt de hoed, en gaat de avondronde doen: de sluis een klein stukje open, voor de nacht. Solo en co-op is dit beeld gelijk.
 
-**Je schaduw is na het einde gewoon je schaduw.** Speelt de speler na het einde verder (als de gdd dat toelaat), dan blijft de echo er voor de gameplay, maar in het eigen silhouet van de machinist en zonder de sporen van Ward: een gewoonte, geen geest. In co-op blijft speler 2 Ward, omdat co-op de droom is waarin hij zelf beweegt (§3.3).
+**Na het einde** (als de gdd verder spelen toelaat) komt het tweede lichaam in beide modi terug als gewone schaduw, zonder Wards sporen en zonder zijn eigen kleuren uit §7.2: een gewoonte, geen geest. Solo volgt de echo weer jouw silhouet; in co-op houdt P2 zijn figuur uit de art bible (§6), want co-op blijft de droom waarin de sluiswachter zelf beweegt (§3.3). Uitwerking met Art Director en LGD.
 
 ### 7.6 De 10 s in het verhaal, samengevat (#51: 8A)
 
@@ -256,7 +261,7 @@ Doel: **duister maar niet gruwelijk; melancholisch, niet wanhopig; PEGI 12** (be
 | **W-1** | **Water is vergeten, geen dood.** Het water neemt kleur, geluid en beweging, nooit levens. Geen tekst, geen beeld en geen geluid suggereert dat iemand is verdronken. |
 | **W-2** | **Geen lichamen, geen verdrinking, geen paniek** (pitch §6). Geen drijvende figuren, geen handen boven water, geen geschreeuw, geen naar adem happen. Ook **geen sporen van slachtoffers**: geen drijvend speelgoed, geen losse schoenen, geen lege bootjes, geen zandzakken of reddingsboeien. |
 | **W-3** | **Onder water staan alleen dingen, nooit mensen.** Bevroren echo's staan altijd boven de waterlijn (§5.2). Zakt het water, dan verschijnen er geen figuren uit het water. |
-| **W-4** | **De speler verdrinkt niet.** Raakt de machinist diep water (`Diepwater`, gdd LM-06; terugzetten in E-04b), dan is dat **terugzetten, geen dood**: geen verdrinkingsanimatie of -geluid, maar een kort beeld van wegzakken in grijs en wakker worden op het checkpoint, waar de sluiswachter je hand vasthoudt. Uitvoering: Animator, UX en Audio. Hetzelfde voor P2 (oplossen, gdd C-06). |
+| **W-4** | **De speler verdrinkt niet.** Raakt de machinist diep water (`Diepwater`, gdd LM-06; terugzetten in E-04b), dan is dat **terugzetten, geen dood**: geen verdrinkingsanimatie of -geluid, maar in de 30 ticks van LM-06 een kort beeld van wegzakken in grijs, en dan wakker worden op de **laatste vloerpositie buiten het water** (niet op het checkpoint). Geen handgebaar: dat hoort bij het checkpoint (§3.2). Solo is de echo daarna even Leeg (respawn, E-04b) en haalt je ± 2 s later in. **In co-op** blijft P2 waar hij is (water is geen speellaag voor P2, LM-06); P2 zakt nooit weg in water, zijn enige falen is oplossen (gdd C-06), ook geen dood. Uitvoering: Animator, UX en Audio. |
 | **W-5** | **Het water kwam stil.** Geen golf die de stad overspoelt, geen bres, geen instortende gebouwen, ook niet in Wards tien seconden (§7.3). De stad is heel; ze is alleen grijs en nat. |
 | **W-6** | **Geen echte watersnood.** Geen verwijzing naar 1953 of een andere echte ramp: geen datum, geen plaatsnaam, geen monument, geen herkenbaar gebouw of beeld uit de berichtgeving. Hollestede is verzonnen (§2.1); andere namen in het spel zijn dat ook. Respect voor het publiek in de Lage Landen (pitch §6). |
 | **W-7** | **Water is ook mooi.** Het spiegelt het licht, het staat stil, het houdt de stad in een droom. Muziek en geluid bij water zijn kalm en zacht (richting Audio Director), geen dreiging. Dreiging hoort bij donker en vijanden, niet bij het water. |
@@ -280,7 +285,7 @@ Doel: **duister maar niet gruwelijk; melancholisch, niet wanhopig; PEGI 12** (be
 | **T-1** | **Stilte en warmte.** Verlaten plekken, licht als iets kostbaars. De warme momenten (een wijk die aangaat, de hand bij een checkpoint, het brood op de toonbank) dragen het verhaal; ze werken omdat de rest donker is. |
 | **T-2** | **Melancholisch, niet wanhopig.** Elk gebied eindigt beter dan het begon. Geen scène eindigt in verlies zonder dat er iets terugkomt. |
 | **T-3** | **Humor zuinig en droog,** vooral via de echo, die ook je mislukte sprong trouw herhaalt (pitch §6). Geen knipogen naar de speler, geen ironie over het verdriet. |
-| **T-4** | **Het open punt blijft open** (§3.4). Geen ziekte, geen ziekenhuis, geen sterfbed, geen begrafenis in beeld of tekst. Ward "laat los" en "gaat naar huis"; hij "sterft" niet. |
+| **T-4** | **Het open punt blijft open** (§3.4), binnen het besluit van de CD: Ward vreest te vergeten **omdat hij oud wordt**; de machinist is **nooit dood, ziek of een herinnering**. Geen ziekte, geen ziekenhuis, geen sterfbed, geen begrafenis in beeld of tekst. Ward "laat los" en "gaat naar huis"; hij "sterft" niet. |
 | **T-5** | **Niet:** grimdark, horror-jumpscares, schedels, kettingen als marteling, krijsende gezichten, ellenlange lore-dumps (pitch §6). |
 
 ---
@@ -326,15 +331,16 @@ Deze versie is het verhaal op hoofdlijnen. Wat nog komt, in volgorde:
 
 | Punt | Wie |
 |---|---|
-| Speelbare tien seconden van Ward met omgekeerde rollen (§7.3), of de terugvaloptie | Lead Game Designer, met CD |
-| Sporen van Ward in de echo (§3.2): leesbaar op de Deck, of alleen de ogen | Art Director, met CD |
+| Speelbare tien seconden van Ward met omgekeerde rollen, gelijk in solo en co-op (§7.3; CD steunt), of de terugvaloptie | Lead Game Designer |
+| Sporen van Ward in de echo, alleen in vorm (§3.2): leesbaar op de Deck, of alleen de hoedrand | Art Director, met CD |
 | Beeldtaal van de bevroren echo's (koele rand, geen nabeelden) en het afspelen bij het oppompen (§5) | Art Director, Animator |
 | Fragmenten en het oppompen afspelen in het speelveld zonder stilstand; leesbaar logboekkader | LGD, UX Designer |
 | Terugzetten uit diep water als "wakker worden" (W-4) | Animator, UX Designer, Audio Director |
 | Carillon: korte maat (staart) en tien tellen (herinnering) | Audio Director |
 | Vorm en mechaniek van boss 2–4 en de eindboss binnen hun verhaalrol (§4.2) | Combat Designer |
 | Kost van 8–15 bevroren echo's per gebied (§5.4) | Executive Producer (T15), met Animator |
-| Lezing van het open punt (§3.4): past de subtiele lezing bij de visie, of houden we het nog lichter | Creative Director |
+| Bevroren echo als springplank vervaagt na het oppompen: terugkeren mag hem niet nodig hebben (§5.2–5.3) | World & Level Designer |
+| Checkpoint-gebaar in co-op (afstand ± 2 tegels, §3.2) en terugzetten uit diep water (W-4) | UX Designer, Animator |
 
 ---
 
@@ -342,4 +348,5 @@ Deze versie is het verhaal op hoofdlijnen. Wat nog komt, in volgorde:
 
 | Versie | Wat |
 |---|---|
+| 0.2 | Herstel na Lead-review CD (PR #105): einde §7.2–7.5 als één beat voor solo en co-op (het tweede lichaam wordt Ward, geen extra figuur); leerling die nacht in het dijkgemaal buiten de stad (§3.1, §4.3, §7.3); besluit CD over §3.4 in T-4; sporen alleen in vorm; W-4 volgens LM-06; K-02 als vaste volgorde (§0); CD-steun bij §7.3; open punt springplank (§5.2) |
 | 0.1 | Eerste versie op hoofdlijnen (T9): wereld, personages, boog voor proloog, 4 gebieden en finale, de Gemaalmeester, bevroren echo's, einde en co-op-finisher, toonregels voor water (R-V7), werkaannames |
