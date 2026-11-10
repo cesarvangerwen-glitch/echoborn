@@ -12,6 +12,8 @@ extends RefCounted
 ##   opgelost was. Solo: de echo is D ticks Leeg (E-04b).
 ## - Een treffer die niet de laatste is en terugzetten zonder dood (L-10)
 ##   gaan nooit naar het checkpoint.
+## - Meetlog (gdd §4.5): één `RESPAWN` per respawn, ook als `requested` twee
+##   keer met dezelfde tick komt (nieuw checkpoint na de laatste treffer).
 ##
 ## Elke test maakt een eigen `Progress` (en zo nodig `SaveService`) met een
 ## eigen map; de echte autoloads en `user://saves` blijven onaangeroerd.
@@ -28,6 +30,7 @@ const Layers = preload("res://scripts/world/layers.gd")
 const LightMeter = preload("res://scripts/light/light_meter.gd")
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 const Tuning = preload("res://scripts/echo/tuning.gd")
+const Meetlog = preload("res://scripts/events/meetlog.gd")
 
 const DIR := "user://test_saves_t5b_respawn"
 const TOP := -400.0
@@ -376,4 +379,39 @@ func test_checkpoint_after_last_hit_is_respawn_point(t) -> void:
 	await t.run_ticks(sim, 1)
 	t.check(not p1.died and p1.position.distance_to(nieuw) < 3.0 and w["requests"].size() == 2,
 		"checkpoint na de respawn verplaatste P1: %s, %s" % [p1.position, w["requests"]])
+	await t.cleanup()
+
+
+## gdd §4.5 (meetlog, randgeval van §7): P1 krijgt de laatste treffer en
+## bereikt vóór de respawntick een nieuw checkpoint, dus `requested` komt twee
+## keer met dezelfde tick. Het meetlog heeft precies één `RESPAWN`, op de
+## respawntick, met x, y = de plek waar P1 werkelijk verschijnt (het nieuwe
+## checkpoint), en telt één respawn. Het log leest `echo_reset` van P1 na de
+## tick, niet `requested`: twee meldingen geven zo nooit twee regels.
+func test_meetlog_one_respawn_row_when_requested_twice(t) -> void:
+	var p := _progress(t, false)
+	var progress: Progress = p["progress"]
+	var w := _world(t, p["sim"], progress)
+	var sim = w["sim"]
+	var p1: PlayerActor = w["p1"]
+	await _reach_checkpoint_then_leave(w, t)
+	var log := Meetlog.new(sim, p1, null)
+	await t.run_ticks(sim, 5)
+	var t0 := _kill(p1, sim)
+	var nieuw := IN_A + Vector2(80, 0)
+	progress.reach_checkpoint(nieuw)
+	t.check(w["requests"].size() == 2 and w["requests"][0][0] == t0 and w["requests"][1][0] == t0,
+		"opzet: twee meldingen met dezelfde tick verwacht: %s" % [w["requests"]])
+	await t.run_ticks(sim, 10)
+	log.finish()
+	var rows: Array = []
+	for row in log.rows:
+		if row[2] == "RESPAWN":
+			rows.append(row)
+	t.check(log.count("RESPAWN") == 1 and rows.size() == 1, "RESPAWN-regels: %s" % [rows])
+	if rows.size() == 1:
+		var at := Vector2(float(rows[0][5]), float(rows[0][6]))
+		t.check(int(rows[0][0]) == t0, "RESPAWN op tick %s, respawntick %d" % [rows[0][0], t0])
+		t.check(at.distance_to(nieuw) < 1.0 and at.distance_to(CHECKPOINT_AT) > 100.0,
+			"RESPAWN op %s, P1 verschijnt op %s" % [at, nieuw])
 	await t.cleanup()
