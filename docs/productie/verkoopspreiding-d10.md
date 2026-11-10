@@ -1,6 +1,6 @@
 # Verkoopspreiding voor het financieringsplan (D10): *Polderlight* (werktitel)
 
-Versie 0.1 · 2026-11-10 · Eigenaar: Executive Producer · Issue: [#72](https://github.com/cesarvangerwen-glitch/echoborn/issues/72) (T13; D10 in `docs/business/vaf-dossier-productie.md` §6.2) · Lead-review: Creative Director
+Versie 0.2 · 2026-11-10 · Eigenaar: Executive Producer · Issue: [#72](https://github.com/cesarvangerwen-glitch/echoborn/issues/72) (T13; D10 in `docs/business/vaf-dossier-productie.md` §6.2) · Lead-review: Creative Director
 Bron van alle cijfers: `docs/business/markt-en-verkoopraming.md` v0.1, §4.1 (scenario's, rekenregel) en §4.2 (aannames A3–A8). Dit document lost daar O4 en O7 op.
 
 ## 1. Besluit over O4: welk scenario in het financieringsplan
@@ -58,7 +58,7 @@ Netto is vóór vennootschapsbelasting en zonder kosten van een uitgever (§4.1)
 
 - **Gevoeligheid K1.** Met de randen van A8 (40 % of 60 % in zes weken) wordt K1 45–65 % van de totale verkoop: netto K1 **€ 12.140–17.535 (Laag)** en **€ 49.321–71.242 (Midden)**. Het totaal over 24 maanden verandert daardoor niet.
 - **Na K1 is de verkoop klein.** In Laag brengt elk kwartaal vanaf K2 hooguit ± € 2.700 netto. Vaste kosten na de release (bv. patches, Deck-tests) mogen in het plan niet op die kwartalen leunen.
-- **Verkoopmoment ≠ uitbetaling.** De tabel staat op het moment van verkoop. Valve betaalt achteraf uit volgens de Steamworks-voorwaarden; de termijn staat niet in de raming en is niet bevestigd. De cashflow in D10 schuift de bedragen op met die termijn (open punt, §6).
+- **Verkoopmoment ≠ uitbetaling.** De tabel staat op het moment van verkoop. Valve betaalt de verkoop van maand *m* uit eind maand *m* + 1, in USD; de cashflow in D10 gebruikt daarom de kasbasis-tabel van `docs/business/vaf-dossier-productie.md` §3.3 (zelfde totalen; Laag K1 € 14.003 in plaats van € 14.838, het verschil schuift naar K2, plus een K9 met de uitbetaling van maand 24). Dat verandert §1 niet: de eerste uitbetaling komt pas ± 1–2 maanden na de release, dus verkoop financiert fase 3 niet.
 - **Herzien** zodra er wishlists zijn: dan vervangt de wishlist-methode (A8, O6 van de raming) zowel de totalen als het aandeel van K1.
 
 ## 5. Werkaanname (kader §5)
@@ -69,14 +69,13 @@ Netto is vóór vennootschapsbelasting en zonder kosten van een uitgever (§4.1)
 
 | # | Wat | Van wie | Wanneer |
 |---|---|---|---|
-| P1 | Uitbetalingstermijn van Steam (Steamworks-voorwaarden) bevestigen voor de cashflow | Business/Legal Advisor | Bij het afwerken van D10 |
+| ~~P1~~ | ~~Uitbetalingstermijn van Steam (Steamworks-voorwaarden) bevestigen voor de cashflow~~ **Gesloten**: uitgewerkt in `docs/business/vaf-dossier-productie.md` §3.3 (termijn, drempel, munt, formulieren, kwartalen op kasbasis); effect in §4 | Business/Legal Advisor | Gesloten 2026-11-10 |
 | P2 | Verkoop afzetten tegen het budget fase 3 (tweede helft O4) | Executive Producer | Met F6 (T15), naar de CEO via het gate-voorstel (F8) |
 | P3 | Spreiding herzien met echte wishlists en het kortingsplan (R9 van de raming) | Marketing & Community Manager, EP | Na de Steam-pagina (D7) |
-
-Verwijzing (BLA, 2026-11-10): P1 is uitgewerkt in `docs/business/vaf-dossier-productie.md` §3.3 (termijn, drempel, munt, formulieren en de kwartalen op kasbasis); afvinken door de EP.
 
 ## 7. Logboek wijzigingen
 
 | Versie | Datum | Wijziging |
 |---|---|---|
 | 0.1 | 2026-11-10 | Eerste versie voor #72: besluit O4 (Laag náást Midden, Laag als rekenscenario, verkoop geen bron voor fase 3) en spreiding per kwartaal over 24 maanden voor Laag en Midden (O7), herleid uit §4.1 en A3/A8/A10 van `markt-en-verkoopraming.md`. |
+| 0.2 | 2026-11-10 | P1 gesloten (uitbetalingstermijn Steam, uitgewerkt in `vaf-dossier-productie.md` §3.3; kasbasis-totalen gecontroleerd tegen §3, gelijk); §4 verwijst nu naar de kasbasis-tabel; verwijzingsregel onder §6 opgeruimd. |
