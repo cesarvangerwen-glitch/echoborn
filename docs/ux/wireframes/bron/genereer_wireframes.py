@@ -399,7 +399,7 @@ def hud_coop(img, L=60, hp=5, hpmax=5, p2="speelt", p2_v=1.0):
 
 def logkader(img, regel1, regel2, kop="LOGBLADZIJDE 3"):
     H, W = img.shape[:2]
-    w, h = 300, 32
+    w, h = 360, 32
     x, y = (W - w) // 2, H - 8 - h
     plaat(img, x, y, w, h, 0.78)
     frame(img, x, y, w, h, C["kader_d"])
@@ -512,7 +512,7 @@ def blad_hud_annotaties():
     gemaalmeter(img, 560, 196, 130)
     noot(img, 6, 572, 190)
     logkader(img, "HET WATER STOND TOT DE TWEEDE TREDE.", "DAARNA HOORDE NIEMAND DE KLOK NOG.")
-    noot(img, 7, 168, 316)
+    noot(img, 7, 126, 320)
     melding(img, "LAMPGLAS: +1 LEVEN")
     noot(img, 8, 540, 324)
     label(img, "HUD SOLO MET NOTITIES (NRS = HUD-TABEL)")
@@ -823,8 +823,6 @@ def blad_coop_storyboard():
     c = laad("r5_kleur_640x360.png")
     hud_coop(c, L=40, hp=5, p2="speelt")
     pijl_rand(c, 632, 230, 0.35)
-    dashed(c, 0, 0, 640, 360, C["noot"], 6)
-    txt(c, "MAX. ZOOM-UIT: 960X540 (1,5X)", 380, 330, C["noot"])
     label(c, "3. P2 BUITEN BEELD: PIJL + RING (60 TICKS)")
     panelen.append(c)
     # 4. drop-out: stoppen vasthouden

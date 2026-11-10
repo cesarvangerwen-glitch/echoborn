@@ -1,6 +1,6 @@
 # UX-spec HUD en menu's *Polderlight*
 
-Versie 0.1.1 · Eigenaar: UX Designer (met de UI Artist voor de eind-art) · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10, `docs/productie/fase-2-kader.md` §2) · Review: Lead Game Designer
+Versie 0.1.2 · Eigenaar: UX Designer (met de UI Artist voor de eind-art) · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10, `docs/productie/fase-2-kader.md` §2) · Review: Lead Game Designer
 Co-op, drop-in/drop-out en de gedeelde camera: **`docs/ux/coop.md`**. Wireframes: **`docs/ux/wireframes/`** (bron: `bron/genereer_wireframes.py`, draait vanaf de repo-root en print de metingen van §2.3).
 
 Bronnen: `docs/design/gdd.md` v0.6.2 (§2.5–2.9, §2.12, O-2), `kernloop.md` §4, `wereld.md` §2.5 (rij T10) en WS-08, `gemaalmeester.md` GM-03/GM-08, `docs/art/bible.md` §2, §3, §5–7, `docs/audio/bible.md` §6.1, `docs/tech/input.md`, `docs/tech/ontwerp.md` §8a, `docs/tech/performance-flowkamer.md` §7 (punt 14, 15), pitch v0.4 (P2: "zichtbaar zonder icoon of uitleg").
@@ -156,15 +156,36 @@ Het merk zit **op het object**, niet in de HUD. Het moet in één blik zeggen: v
 
 ### 3.7 Logbladzijde (HUD-07)
 
-- Oppakken = lopend erdoorheen (geen knop). Onder in het midden verschijnt een kader van 300×32 px: kop *Logbladzijde n* (`HUD_LOG_KOP`) en de tekst van max. 2 regels (`verhaal-v2.md` §4.4). Het spel loopt door.
+- Oppakken = lopend erdoorheen (geen knop). Onder in het midden verschijnt een kader van **360×32 px** (binnenruimte 348 px breed na 6 px marge links en rechts): kop *Logbladzijde n* (`HUD_LOG_KOP`) en de tekst van max. 2 regels (`verhaal-v2.md` §4.4). Het spel loopt door.
 - Het kader blijft **6 s** (bij *Tekstgrootte: groot* 8 s) en schuift weg bij een nieuwe bladzijde of in een gevecht met een boss. Alles wat je oppakte, staat in **Pauze → Logboek** (MN-15); niets is te missen.
-- Een regel is max. 50 tekens in het Engels (NL ± 30 % langer, dus max. 65; §6). Langere tekst = twee bladzijden.
+- **Maximum in pixels:** een regel is in het gekozen lettertype **≤ 348 px** breed, in elke taal. Omdat NL tot 35 % langer is (§6), schrijft de Narrative Designer de Engelse regel op **≤ 258 px** (348 / 1,35). Gemeten met het wireframe-font (6 px per teken): ± 43 tekens EN, 58 NL. Bij het echte lettertype rekent de UI Artist dit om naar tekens (§7 punt 1). Past het niet: twee bladzijden, nooit kleiner zetten.
+- **Tekstgrootte groot** (TG-10, 1,5×): het kader groeit mee naar **540×48 px** (binnenruimte 528 px, regelhoogte 14 px), zodat er evenveel tekens per regel passen en het bij kop + 2 regels blijft. Het past nog in 640 px met 50 px aan elke kant.
 
 ### 3.8 Boss-balk (HUD-09)
 
 - **Waarom een balk:** de Gemaalmeester heeft fasen op 60 % en 20 % en een Wankel-moment op ≤ 20 % (GM-03, GM-08). Zonder balk ziet de speler niet hoe dicht de finisher is; dat kost bij een boss van 8–12 min (wereld §2.1) te veel spanning. Het is de enige plek waar we van "de wereld eerst" afwijken. **Besloten door de LGD** (Lead-review PR #129); de Combat Designer voegt niets toe.
 - **Vorm:** 240×4 px onder in het midden, met de naam erboven (`HUD_BOSS_GEMAALMEESTER`) en **fasestrepen op 60 % en 20 %**. Bij Wankel knippert de streep van 20 % in de kleur van gloed 6 en verschijnt de merkplek op de ketel (GM-08): de balk wijst, de wereld toont.
 - In co-op gelijk; één balk.
+- **Feedback per verplicht moment** (GM-09: geluid, schermschok en licht). UX legt het moment en de sterkte vast, de vorm komt van de genoemde rol:
+
+| Moment | Licht (beeld) | Schermschok (TG-02 schaalt) | Geluid | Vorm door |
+|---|---|---|---|---|
+| Schot breekt (GM-06) | de ketel slaat open en gloeit; vonken in de kleur van de ontsteker | middel, 8 ticks | breken van ijzer + ontploffing van het merk | Animator, Audio Director |
+| Kern open, 300 ticks (GM-06) | de kerngloed **pulseert sneller** in de laatste 60 ticks (zoals de klokring, zonder getal) | — | stoom die aanzwelt in de laatste 60 ticks | Art Director, Audio Director |
+| Grote rad geraakt (GM-07) | vonk op het rad, het rad draait een slag | klein, 4 ticks | ijzeren klap, toon per treffer stijgend | Animator, Audio Director |
+| Rad wisselt van kant, 180 ticks (GM-07) | de arm zwaait met een aanloop van ≥ 30 ticks (GM-04) | — | piepende as | Animator, Audio Director |
+| Lanceersprong (C-11, B4) | de lanceerhouding gloeit op de drager (amber of cyaan), de lancering trekt een streep | klein, 4 ticks | eigen klank voor houding en lancering | Animator, Audio Director |
+| Fasewissel naar 60 % (GM-07) | de streep van 60 % op de balk flitst; merken op de boss doven | middel, 8 ticks | grote klok | Art Director, Audio Director |
+| Wankel (GM-08) | zie hierboven (streep van 20 % knippert, merkplek verschijnt) | — | de maat van het carillon stopt | Combat Designer, Audio Director |
+
+### 3.8a De finisher (C-14) in de HUD
+
+De gedeelde echo speelt jullie laatste 10 s af in **120 ticks**; de finisher mislukt nooit (C-14d). De HUD volgt het mee, de wereld blijft het hoofdbeeld:
+- **Meter:** elke finisherslag geeft **+1 LP** (C-14c) en een vonk op de meter in de kleur van wie de slag oorspronkelijk sloeg (amber P1 en echo, cyaan P2). Een snelle reeks vonken laat de meter "tikken": je ziet je eigen 10 s terug.
+- **Boss-balk:** loopt van de streep van 20 % in **120 ticks lineair** leeg naar 0, met een kleine stap bij elke slag; op `t_f + 120` (`BOSS_VERSLAGEN`) verdwijnt hij met de naam.
+- **Rest van de HUD:** blijft staan (ook met *HUD: automatisch*); logkader en meldingen wachten tot na `BOSS_VERSLAGEN`.
+- **Schermschok:** klein (2 ticks) per slag, één grote op het einde; geschaald door TG-02.
+- **Flitsen verminderen** (TG-03): geen witte flits per slag en op het einde. In plaats daarvan een rand van 2 px in amber en cyaan om de gedeelde echo per slag, en op het einde een rand van 2 px om de boss.
 
 ### 3.9 Wat níét in de HUD komt
 
@@ -240,7 +261,7 @@ Wireframe: `menu_opties_toegankelijkheid_x2_placeholder.png`. Elke optie staat i
 
 | ID | Optie | Standaard | Wat het doet | Afhankelijk van |
 |---|---|---|---|---|
-| **TG-01** | **Vasthouden of tikken** | vasthouden | **Loslaten (E-09), genezen (LM-07) en stoppen (C-05)** werken met één druk: de handeling loopt evenveel ticks door, met dezelfde regels om af te breken (een tweede druk, een sprong of een treffer), dus het geeft geen voordeel. **Lanceerhouding (C-11a), alleen met *tikken*** (regel van de LGD): een **tweede AANVAL-druk binnen de herhaaltijd** (tick x+1…x+19 na een AANVAL-event op x; die druk geeft toch geen event, E-10) zet `aanval_vast` aan als **virtuele knop**. De houding loopt dan volgens C-11a vanaf x+12, tot de volgende AANVAL-flank, een DASH, de lanceertick (C-11d) of 120 ticks. De recorder neemt de virtuele bit op, zodat de echo hetzelfde doet. **Eén tik geeft nooit houding**: een bounce wordt niet per ongeluk een lancering. De lancering zelf komt zoals altijd door de landing van de springer (C-11b). | Besloten door de LGD (Lead-review PR #129) |
+| **TG-01** | **Vasthouden of tikken** | vasthouden | **Loslaten (E-09), genezen (LM-07) en stoppen (C-05)** werken met één druk: de handeling loopt evenveel ticks door, met dezelfde regels om af te breken (een tweede druk, een sprong of een treffer), dus het geeft geen voordeel. **Lanceerhouding (C-11a), alleen met *tikken*** (regel van de LGD): een **tweede AANVAL-druk binnen de herhaaltijd** (tick x+1…x+19 na een AANVAL-event op x; die druk geeft toch geen event, E-10) zet `aanval_vast` aan als **virtuele knop**. Twee gevallen: **(1) tweede druk op x+1…x+11**: de virtuele knop staat aan, maar de houding begint pas op **x+12** (C-11a: het event moet 12 ticks geleden zijn); **(2) tweede druk op x+12…x+19**: de houding begint **meteen**, op die tick. Een druk op x+20 of later is een gewone AANVAL-flank met een nieuw event, geen houding. De houding (en de virtuele knop) stopt bij de volgende AANVAL-flank, een DASH, de lanceertick (C-11d) of na **120 ticks, gerekend vanaf de tweede druk**. De recorder neemt de virtuele bit op, zodat de echo hetzelfde doet. **Eén tik geeft nooit houding**: een bounce wordt niet per ongeluk een lancering. De lancering zelf komt zoals altijd door de landing van de springer (C-11b). | Besloten door de LGD (Lead-review PR #129) |
 | **TG-02** | Schermschok | 100 % | 0–100 %, ook voor de ontploffingen | — |
 | **TG-03** | Flitsen verminderen | uit | Geen witte flits bij een volle meter, een ontploffing of een fasewissel; in plaats daarvan een rand van 2 px | Technical Artist |
 | **TG-04** | Echo-rand dikker | uit | Rand van de echo en P2 2 px in plaats van 1 (art bible §6) | Art Director |
@@ -276,11 +297,13 @@ Wireframe: `menu_opties_toegankelijkheid_x2_placeholder.png`. Elke optie staat i
 | 7 | **TG-01** bouwen: tik bij Loslaten, genezen en stoppen; bij de lanceerhouding de virtuele knop `aanval_vast` (tweede AANVAL-druk binnen x+1…x+19, houding vanaf x+12 tot de volgende AANVAL-flank, DASH, lanceertick of 120 ticks; de recorder neemt de bit op) | Gameplay Programmer | Met T8a |
 | 8 | Hulpmodus: beslist de LGD na T11, op basis van playtestdata | Lead Game Designer | Na T11 |
 | 9 | HUD bijstellen na F0 en na de eerste playtest van de slice (T11): verstaan spelers het echo-icoon en de klokring zonder uitleg? | UX Designer, QA Lead | Na F0 en T11 |
-| 10 | `docs/ux/besturing.md`, `docs/ux/onboarding.md` en `docs/ux/toegankelijkheid.md` (rolbestand) volgen in een eigen issue; deze spec dekt de opties van toegankelijkheid al | UX Designer | Fase 2, na T10 |
+| 10 | **NL-tekst per vak meten** (+35 %, §6) met het eerste lettertype van de UI Artist: past elk vak (logkader, meldingen, menu's, tabbladen)? | UI Artist, UX Designer | Bij het eerste font (§7 punt 1, na F1) |
+| 11 | `docs/ux/besturing.md`, `docs/ux/onboarding.md` en `docs/ux/toegankelijkheid.md` (rolbestand) volgen in een eigen issue; deze spec dekt de opties van toegankelijkheid al | UX Designer | Fase 2, na T10 |
 
 ## 8. Wijzigingen
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.1.2 | 2026-11-10 | Na de SM-review (PR #129): logkader in px (360×32, groot 540×48); feedback per verplicht boss-moment (GM-09); de finisher in de HUD (§3.8a); TG-01 met de twee gevallen x+1…x+11 en x+12…x+19; open punt NL-tekst meten. |
 | 0.1.1 | 2026-11-10 | Na de Lead-review (PR #129): TG-01 bij de lanceerhouding met de regel van de LGD (virtuele knop); keuzes LGD: boss-balk ja, tikken bij genezen, Loslaten en stoppen ja, spelsnelheid nee, hulpmodus na T11; MN-14 verwijst naar CO-09. |
 | 0.1 | 2026-11-10 | Eerste versie (T10 deel 1, #87): HUD solo, merk-aftelling, grijs/kleur en Deck, menu's, opties, toegankelijkheid, taal; wireframes in `docs/ux/wireframes/`. |
