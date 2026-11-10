@@ -19,3 +19,6 @@ Godot_v*
 godot.zip
 SHA512-SUMS.txt
 /tools/
+
+# Python
+__pycache__/

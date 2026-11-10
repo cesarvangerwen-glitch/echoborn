@@ -16,7 +16,7 @@ Dit document legt de namen vast van de proloog, de 4 gebieden, hun 12 wijken en 
 | **NM-3** | **Verzonnen, en geen ramp** (toonregel W-6). Alleen soortnamen van gebouwen en plekken uit de Lage Landen (begijnhof, lakenhal, waag, belfort); geen bestaande plaats, geen datum, geen monument. |
 | **NM-4** | **Geen naam twee keer.** Een wijk heet niet zoals een boss, een vaardigheid of haar eigen gebied, zodat *De Waag · Licht 40* nooit kan betekenen "je staat bij de boss". |
 | **NM-5** | **NL eerst, EN als eigen naam.** De NL-naam is de bron (de stad ligt in de Lage Landen). De EN-naam is geen woord-voor-woordvertaling maar de naam die een Engelstalige stad voor zo'n plek zou gebruiken (*Quayside*, *Canal Row*). Engels in Brits Engels (*dyke*, niet *dike*). Hollestede blijft in beide talen Hollestede. |
-| **NM-6** | **Hoofdletters.** Gebiedsnamen zijn beschrijvend en krijgen in het NL alleen een hoofdletter vooraan (*De polderwijk*, zoals `wereld.md` §1.3); wijknamen zijn eigennamen (*De Kadewijk*). EN volgt title case. |
+| **NM-6** | **Hoofdletters.** Gebiedsnamen zijn beschrijvend en krijgen in het NL alleen een hoofdletter vooraan (*De polderwijk*, zoals `wereld.md` §1.3); wijknamen zijn eigennamen (*De Kadewijk*), en dat geldt ook voor de proloog en de finale, want hun naam staat op de plek van een wijknaam (*De Ringdijk*, *De Grote Sluis*). In lopende tekst over het verhaal mag *de ringdijk* klein blijven. EN volgt title case. |
 
 ---
 
@@ -28,8 +28,8 @@ Breedte in px, Polderletter normaal / groot (TG-10). Grens NM-1: **165** normaal
 
 | Sleutel | NL | px | EN | px | Betekenis |
 |---|---|---:|---|---:|---|
-| `COMMON_DISTRICT_PROLOGUE` | De ringdijk | 46 / 55 | The Ring Dyke | 62 / 77 | De dijk rond de polder waarover de machinist aankomt; boven het water, onder hem de grijze stad. In het logboek heet de tab *Proloog* (`MENU_LOG_PROLOGUE`); de wijkregel in het menu toont *De ringdijk*. |
-| `COMMON_DISTRICT_FINALE` | De grote sluis | 62 / 74 | The Great Sluice | 74 / 90 | Waar het water binnenkwam. Een gewoon woord voor een groot ding; de sluis is geen monster in haar naam, alleen in de boss (De Grendel). |
+| `COMMON_DISTRICT_PROLOGUE` | De Ringdijk | 47 / 58 | The Ring Dyke | 62 / 77 | De dijk rond de polder waarover de machinist aankomt; boven het water, onder hem de grijze stad. In het logboek heet de tab *Proloog* (`MENU_LOG_PROLOGUE`); de wijkregel in het menu toont *De Ringdijk*. |
+| `COMMON_DISTRICT_FINALE` | De Grote Sluis | 64 / 78 | The Great Sluice | 74 / 90 | Waar het water binnenkwam. Een gewoon woord voor een groot ding; de sluis is geen monster in haar naam, alleen in de boss (De Grendel). |
 
 ### 2.2 Gebieden (`COMMON_AREA_n`: logboektab, pauze)
 
@@ -87,8 +87,9 @@ Alle andere namen zijn overgenomen. Bewust niet veranderd:
 |---|---|---|---|
 | NM-O1 | **Tabel gebied → wijk** (`hud-menus.md` §7 punt 13): welke waarde van `state.gebied` (of een wijk-id ernaast) bij welke sleutel hoort. Voorstel: proloog → `COMMON_DISTRICT_PROLOGUE`; wijk *n*.*m* → `COMMON_DISTRICT_n_m` en gebied *n* → `COMMON_AREA_n`; finale → `COMMON_DISTRICT_FINALE` (de logboektab van de finale, als die er komt, is van de UX Designer). Of `state.gebied` de wijk bevat of alleen het gebied, beslissen de World & Level Designer en de Gameplay Programmer; de sleutels hierboven werken voor beide. | World & Level Designer, Gameplay Programmer | Met T8a |
 | NM-O2 | **`wereld.md` §1.3 en §1.4 bijwerken:** wijk 3.3 heet *Het Waagplein* (§3). Ik verander dat document niet zelf. | World & Level Designer | Bij de volgende versie van `wereld.md` |
+| NM-O2a | Wijk 2.1 *De Poort* botst met de spelterm *terugkeerpoort* (`wereld.md` §1.4); samen met NM-O2 beslissen of de naam blijft of wordt bv. *De Poorttoren*. | World & Level Designer, met Narrative Designer | Samen met NM-O2 |
 | NM-O3 | **Opnieuw meten** als Polderletter verandert (eind-font van de UI Artist, `hud-menus.md` §7 punt 1 en 10): de breedtes hier zijn van de huidige `polderletter.py`. Met 78 px marge verwacht ik geen probleem. | Narrative Designer, UI Artist | Bij een nieuw font |
-| NM-O4 | De EN-namen zijn door de Narrative Designer geschreven, niet door een moedertaalspreker. *Dykefoot* en *Towerfoot* zijn verzonnen samenstellingen: laten toetsen door een EN-lezer, samen met de rest van de EN-tekst. | Creative Director | Vóór de eerste publieke build |
+| NM-O4 | De EN-namen zijn door de Narrative Designer geschreven, niet door een moedertaalspreker. *Dykefoot* en *Towerfoot* zijn verzonnen samenstellingen: laten toetsen door een EN-lezer, samen met de rest van de EN-tekst. Aangenomen door de CD (Lead-review). | Creative Director | Vóór de eerste publieke build |
 
 ---
 
@@ -97,3 +98,4 @@ Alle andere namen zijn overgenomen. Bewust niet veranderd:
 | Versie | Wat |
 |---|---|
 | 0.1 | Eerste versie (T10, `hud-menus.md` §7 punt 17): namen van proloog, 4 gebieden, 12 wijken en finale in EN en NL, met betekenis en gemeten breedte; wijk 3.3 *De Waag* wordt *Het Waagplein*; sleutels `COMMON_AREA_1`–`4` en `COMMON_DISTRICT_*` in `strings.csv` |
+| 0.1.1 | Na de Lead-review CD: *De Ringdijk* en *De Grote Sluis* met hoofdletters (NM-6, hermeten); open punt NM-O2a (*De Poort*); NM-O4 aangenomen door de CD |
