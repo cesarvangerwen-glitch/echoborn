@@ -5,9 +5,9 @@ Eigen werk van de UI Artist. Geen externe assets. Draait vanaf de repo-root:
     python3 docs/art/ui/bron/genereer_ui.py
 
 Schrijft:
-  game/assets/ui/font/   Polderletter normaal en groot (.fnt + .png, en .ttf)
-  game/assets/ui/hud/    HUD-onderdelen op de interne resolutie (1 px = 1 px bij 640x360)
-  game/assets/ui/wereld/ merk + klokring en peilbuis (staan in de wereld, niet in de HUD)
+  game/art/ui/font/   Polderletter normaal en groot (.fnt + .png, en .ttf)
+  game/art/ui/hud/    HUD-onderdelen op de interne resolutie (1 px = 1 px bij 640x360)
+  game/art/ui/wereld/ merk + klokring en peilbuis (staan in de wereld, niet in de HUD)
   docs/art/ui/           previews (x2, x3, x4) voor review
 en print de metingen van docs/art/ui-stijlgids.md par. 6 en 7.
 
@@ -26,7 +26,7 @@ import polderletter as PL  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(HIER, "..", "..", "..", ".."))
 R5 = os.path.join(ROOT, "docs", "art", "r5-scene")
-GAME = os.path.join(ROOT, "game", "assets", "ui")
+GAME = os.path.join(ROOT, "game", "art", "ui")
 DOCS = os.path.join(ROOT, "docs", "art", "ui")
 
 
@@ -72,8 +72,8 @@ def deut(img):
     return out
 
 
-# Palet: alles uit de art bible par. 3 (ramps) en par. 6 (figuurkleuren). Nieuw voor de UI
-# (voorstel, review AD): "cyaan licht" #bff4fc, dezelfde kleur als de klokring in de wireframes.
+# Palet: alles uit de art bible par. 3 (ramps) en par. 6 (figuurkleuren). Klokring P2, licht =
+# #e8ffff (ogen P2), niet #bff4fc: dat ligt op FelLicht 5/6 (AD-review PR #137).
 WIT = [hx(c) for c in ("#0e0e1a", "#201f30", "#37344a", "#5b576e", "#817c8a", "#a8a19f", "#cbc2b5", "#ece2cc")]
 LUCHT = [hx(c) for c in ("#06060f", "#0c0c1d", "#10132a", "#181c3b", "#21264c", "#2b315e", "#3a3e6d", "#4a4c7c")]
 GLOED = [hx(c) for c in ("#4a2a0a", "#764110", "#a45c17", "#cc7e22", "#e9a039", "#fbc058", "#ffdb94", "#fff6d8")]
@@ -82,7 +82,7 @@ C = {
     "K": hx("#06060f"),          # contour, bijna-zwart (lucht 0)
     "plaat": LUCHT[1],
     "amber_d": hx("#b45c16"), "amber": hx("#f29a26"), "amber_l": hx("#ffd27a"),
-    "cyaan_d": hx("#1fb4cc"), "cyaan": hx("#3ee6f4"), "cyaan_l": hx("#e8ffff"), "cyaan_ring": hx("#bff4fc"),
+    "cyaan_d": hx("#1fb4cc"), "cyaan": hx("#3ee6f4"), "cyaan_l": hx("#e8ffff"), "cyaan_ring": hx("#e8ffff"),
     "p2_lijf": hx("#08080e"), "hatch": hx("#3a1e56"),
     "grijs_rand": hx("#a8c4c8"),
     "vijand": hx("#45091a"), "vijand_kern": hx("#ff475c"),

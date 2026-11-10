@@ -1,6 +1,6 @@
 # UI-stijlgids *Polderlight*
 
-Versie 0.1 · Eigenaar: UI Artist · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10 deel 2: eind-UI-art) · Review: Art Director
+Versie 0.1.1 · Eigenaar: UI Artist · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10 deel 2: eind-UI-art) · Review: Art Director
 Basis: UX-spec `docs/ux/hud-menus.md` v0.1.2 en `docs/ux/coop.md` (PR #129), art bible v0 (`docs/art/bible.md` §2, §3, §6, §7), assetlijst S-17.
 
 Alles in deze gids is **eigen werk** en wordt gemaakt door één script, zonder externe assets:
@@ -9,7 +9,7 @@ Alles in deze gids is **eigen werk** en wordt gemaakt door één script, zonder 
 python3 docs/art/ui/bron/genereer_ui.py      # vanaf de repo-root, ± 3 s
 ```
 
-Het script schrijft de assets naar `game/assets/ui/`, de previews naar `docs/art/ui/` en print de metingen van §6 en §7.
+Het script schrijft de assets naar `game/art/ui/`, de previews naar `docs/art/ui/` en print de metingen van §6 en §7.
 
 ## 0. Werkaannames (kader §5)
 
@@ -45,7 +45,7 @@ Het script schrijft de assets naar `game/assets/ui/`, de previews naar `docs/art
 
 ## 3. Palet
 
-Alle kleuren komen uit de ramps van bible §3 en de figuurkleuren van §6. Eén kleur is nieuw (vet), ter goedkeuring door de Art Director.
+Alle kleuren komen uit de ramps van bible §3 en de figuurkleuren van §6. Er is geen nieuwe kleur.
 
 | Rol in de UI | Kleur | Bron |
 |---|---|---|
@@ -58,9 +58,9 @@ Alle kleuren komen uit de ramps van bible §3 en de figuurkleuren van §6. Eén 
 | Vulling: boven / midden / onder / glans | `#ffdb94` / `#fbc058` / `#cc7e22` / `#fff6d8` | gloed 6, 5, 3, 7 |
 | P1 en echo | `#b45c16`, `#f29a26`, `#ffd27a`; arcering `#3a1e56` | bible §6 |
 | P2 | `#1fb4cc`, `#3ee6f4`, `#e8ffff`; lijf `#08080e` | bible §6 |
-| **Klokring P2, licht** | **`#bff4fc`** | nieuw (zelfde kleur als in de UX-wireframes) |
+| Klokring P2, licht | `#e8ffff` | ogen P2, bible §6. Niet `#bff4fc`: dat ligt op FelLicht 5/6 (ΔE 8–9), het licht waarin de echo oplost (AD-review PR #137) |
 | Klemmen, kappen, tandwiel-as | `#3a3640` … `#6a6268` | ijzer 5–7 |
-| Rode bovenrand boss-balk | `#ff475c` | vijandkern (UX-wireframes) |
+| Rode bovenrand boss-balk | `#ff475c` | vijandkern/-rand (UX-wireframes; akkoord AD, komt in bible v1 §6) |
 | Tekst / kop / gedimd | `#ece2cc` / `#ffdb94` / `#a8a19f` | gevel wit 7, gloed 6, gevel wit 5 |
 
 ## 4. Lettertype: *Polderletter*
@@ -73,19 +73,20 @@ Alle kleuren komen uit de ramps van bible §3 en de figuurkleuren van §6. Eén 
 | Regelafstand in het ontwerp | 10 px | 14 px |
 | Breedte | proportioneel, 1 px tussen letters; gemiddeld 4,5 px per teken | gemiddeld 5,4 px per teken |
 | Gebruik | HUD, meldingen, menu's, logkader | menu's, logkader, meldingen bij *groot* |
-| Bestanden (`game/assets/ui/font/`) | `polderletter_normaal.fnt` + `.png`, `.ttf` | `polderletter_groot.fnt` + `.png`, `.ttf` |
+| Bestanden (`game/art/ui/font/`) | `polderletter_normaal.fnt` + `.png`, `.ttf` | `polderletter_groot.fnt` + `.png`, `.ttf` |
 
 - **Groot is apart getekend**, geen schaalfilter (TG-10). Het is ± 1,4× zo hoog en ± 1,2× zo breed per teken; daardoor passen in het grote logkader (528 px binnen) **97** tekens NL tegen **77** in het normale (348 px). UX §3.7 vraagt "evenveel tekens per regel": dat haalt het ruim.
 - **Titels**: normaal ×2 (hoofdletter 14 px, UX §2.2), alleen integer.
 - **Tekens (177)**: ASCII 0x20–0x7E, alle letters van Latin-1 (À–ÿ, ook Æ Ø Ð Þ ß æ ø ð þ), plus ¡ ¿ « » ° · × ± ² ³ © £ € … – — ‘ ’ “ ”. Accenten worden samengesteld uit basisletter + accent; op hoofdletters staat het accent in de 2 (groot 3) rijen boven de hoofdletter. Nog niet getekend: de zeldzame Latin-1-symbolen ¢ ¤ ¥ ¦ § ¨ ª ¬ ® ¯ µ ¶ ¸ ¹ º ¼ ½ ¾ ÷ (niet nodig voor EN/NL; op aanvraag).
 - **Tekst staat altijd met 1 px schaduw** rechtsonder in `#06060f` (Godot: `font_shadow_color`, `shadow_offset_x/y = 1`).
-- **Godot (BMFont, aanbevolen):** `.fnt` importeert als FontFile. Regelhoogte in het bestand is 11 (groot 16), inclusief ruimte voor accenten op hoofdletters; voor de ontwerpregel van 10 (groot 14) in het logkader: Label-constante `line_spacing = -1` (groot `-2`). Texture-filter **Nearest**, geen mipmaps.
+- **Godot 4 (BMFont, de bron):** `.fnt` (tekst-BMFont, 1 page) importeert als FontFile. Labels met Polderletter staan **altijd op `font_size` 11** (groot: **16**). Een BMFont heeft een vaste grootte: bij een andere maat schaalt Godot hem en krijg je mixels. Regelhoogte in het bestand is 11 (groot 16), inclusief ruimte voor accenten op hoofdletters; voor de ontwerpregel van 10 (groot 14) in het logkader: Label-constante `line_spacing = -1` (groot `-2`).
+- **Filter:** in Godot 4 is "filter Nearest" geen importoptie meer. Zet de projectinstelling `rendering/textures/canvas_textures/default_texture_filter = Nearest`, of `texture_filter = Nearest` op de HUD-CanvasLayer (erft door naar alle kinderen). Geen mipmaps.
 - **Godot (TTF):** 100 eenheden per pixel; gebruik op `font_size` 11 (groot 16), met *Antialiasing: None*, *Hinting: None*, *Subpixel positioning: Disabled*. Met hinting aan verschuift FreeType de accenten één rij (gezien in een test met Pillow). De TTF is er vooral voor mock-ups in andere tools.
 - Specimen: `docs/art/ui/polderletter_specimen_x3.png`.
 
 ## 5. HUD-onderdelen
 
-Alle bestanden in `game/assets/ui/hud/` (HUD, CanvasLayer) en `game/assets/ui/wereld/` (aan een object in de wereld). Stroken (`_<n>f`) zijn frames van gelijke maat naast elkaar (Godot: `AnimatedSprite2D` of `AtlasTexture` met `hframes`). 1 tick = 1/60 s.
+Alle bestanden in `game/art/ui/hud/` (HUD, CanvasLayer) en `game/art/ui/wereld/` (aan een object in de wereld). Stroken (`_<n>f`) zijn frames van gelijke maat naast elkaar (Godot: `AnimatedSprite2D` of `AtlasTexture` met `hframes`). 1 tick = 1/60 s.
 
 | UX-ID | Element | Bestand(en) | Maat | Toestanden en timing | In Godot |
 |---|---|---|---|---|---|
@@ -158,7 +159,8 @@ Op de Deck (640×400) gelden dezelfde getallen met H = 400: de HUD staat dan in 
 | Merkkern amber / rode vijandkern | 60,0 | 32,4 | 12,4 | ja; plus contour |
 | Merkkern cyaan / schaduwgeometrie 3 | 94,9 | 67,2 | 69,7 | ja |
 | Klokring brandend / gedoofd, amber | 84,5 | 85,9 | 66,1 | ja |
-| Klokring brandend / gedoofd, cyaan | 73,5 | 69,0 | 70,1 | ja |
+| Klokring brandend / gedoofd, cyaan | 77,6 | 75,8 | 75,5 | ja |
+| Klokring cyaan licht (`#e8ffff`) / cyaan kern | 36,7 | 25,9 | 14,3 | ja (zelfde eigenaar; ring en kern blijven toch uit elkaar te houden) |
 | Boss-balk vol / leeg | 73,4 | 74,1 | 67,3 | ja |
 | Fasestreep Wankel / normaal | 33,5 | 34,0 | 10,1 | ja |
 | Tekst (wit 7) / kader | 89,2 | 89,7 | 86,2 | ja |
@@ -206,10 +208,10 @@ Gemeten in Polderletter normaal met **testteksten** (EN en NL, in het script, `V
 
 ## 9. Regels voor wie UI bouwt (Gameplay Programmer)
 
-- Importeer alle PNG's met **filter Nearest**, zonder mipmaps; geen schaal of rotatie op HUD-nodes (bible §2). De pijl van P2 draait alleen in stappen van 90°.
+- **Filter Nearest** via de projectinstelling `rendering/textures/canvas_textures/default_texture_filter` of `texture_filter` op de HUD-CanvasLayer (in Godot 4 geen importoptie meer); geen mipmaps; geen schaal of rotatie op HUD-nodes (bible §2). De pijl van P2 draait alleen in stappen van 90°.
 - Zet de HUD op een **CanvasLayer** op de interne resolutie (640×360 / 640×400), niet op 1280×720: een asset van 7×9 moet 7×9 interne pixels blijven.
 - Plaatsing ten opzichte van de schermrand, nooit ten opzichte van het 16:9-beeld (HUD-M1).
-- Tekst: Polderletter (`.fnt`), `font_color` gevel wit 7, schaduw `#06060f` op (1, 1). Kop van het logkader in gloed 6, tweede regel van een melding in gevel wit 5, P2-meldingen in cyaan met `kader_9slice_cyaan`.
+- Tekst: Polderletter (`.fnt`) op `font_size` 11 (groot 16), nooit een andere maat; `font_color` gevel wit 7, schaduw `#06060f` op (1, 1). Kop van het logkader in gloed 6, tweede regel van een melding in gevel wit 5, P2-meldingen in cyaan met `kader_9slice_cyaan`.
 - **Tekstgrootte groot**: wissel naar `polderletter_groot.fnt` en het grote logkader; de HUD (meter, levens, badge) blijft gelijk (TG-10).
 - **TG-05 Merk-ring groter**: gebruik de `_groot`-stroken. **TG-03 Flitsen verminderen**: sla `meter_vol_flits`, `peilbuis_flits` en `lantaarn` *flits* over; de rand van 2 px komt van de Technical Artist.
 
@@ -220,9 +222,9 @@ Gemeten in Polderletter normaal met **testteksten** (EN en NL, in het script, `V
 | 1 | **Wijziging UX §2.3**: plaat 62 % → **66 %** (meetpunt haalt dan ΔL\* 43,0). Graag overnemen in de UX-spec. | UX Designer | Volgende versie van `hud-menus.md` |
 | 2 | **Wijziging UX/tekst**: `HUD_PAD_JOIN_HINT` in NL op twee regels (*Controller 2* / *Druk op Start om mee te doen*), of korter. | UX Designer, Narrative Designer | Bij `strings.csv` (T8a) |
 | 3 | **Wijziging UX §2.1 / §3.7**: een melding schuift 36 px omhoog zolang het logkader staat (anders overlapt ze bij > 128 px breed). Voorstel max. breedte melding: 196 px. | UX Designer | Volgende versie van `hud-menus.md` |
-| 4 | Nieuwe paletkleur **`#bff4fc`** (klokring P2, licht) en de rode bovenrand `#ff475c` op de boss-balk: goedkeuren of een kleur uit een ramp aanwijzen. | Art Director | Review van deze PR |
-| 5 | **Map**: het rolbestand noemt `game/art/ui/`, de opdracht `game/assets/ui/`. Deze PR gebruikt `game/assets/ui/`. Graag één map vastleggen in de bestandsconventies (assetlijst: TA, vóór F-01). | Technical Artist, Art Director | Bestandsconventies |
-| 6 | **Viewport**: `project.godot` heeft op pc 1280×720 zonder stretch-modus. De UI gaat uit van 640×360 met integer schalen (bible §2). | Technical Director | Bij de bouw van de HUD (T8a) |
+| 4 | `#ff475c` vastleggen als vijandkern/-rand in bible §6 (ook de rode bovenrand van de boss-balk). | Art Director | Bible v1 |
+| 5 | Vervallen: de map is `game/art/ui/` (AD-review PR #137). | — | — |
+| 6 | **Viewport en filter**: `project.godot` heeft op pc 1280×720 zonder stretch-modus, en zet nog geen standaardfilter Nearest (`rendering/textures/canvas_textures/default_texture_filter`). De UI gaat uit van 640×360 met integer schalen (bible §2). | Technical Director | Bij de bouw van de HUD (T8a) |
 | 7 | **Licentieregister**: Polderletter is eigen werk; geen licentie van derden. Wil de Business/Legal Advisor het toch als regel "eigen werk" in `docs/licenties.md` (rolbestand UI Artist: "lettertypes hebben een licentie in licenties.md")? | Business/Legal Advisor | Geen haast |
 | 8 | Nog te testen op een echte Steam Deck: leesbaarheid van Polderletter normaal (7 px = ± 1,7 mm), de arcering van het echo-icoon (11×17) en de ring van 2 px. | Engine & Platform Programmer, met de UI Artist | Bij de Deck-build (#79) |
 | 9 | Kleurprofielen TG-07 (amber/wit-blauw, geel/magenta): de assets zijn per eigenaar in aparte bestanden, zodat een profiel alleen kleuren wisselt. Varianten tekenen zodra de AD de paren kiest. | Art Director, daarna UI Artist | Bible v1 |
@@ -232,4 +234,5 @@ Gemeten in Polderletter normaal met **testteksten** (EN en NL, in het script, `V
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.1.1 | 2026-11-10 | Na de Lead-review van de AD (PR #137): klokring P2 `#e8ffff` in plaats van `#bff4fc`; map `game/art/ui/`; Godot 4-filter en `font_size` 11/16; open punten 4–6 bijgewerkt. |
 | 0.1 | 2026-11-10 | Eerste versie (T10 deel 2, #87): beeldtaal, palet, Polderletter normaal en groot, alle HUD-onderdelen, merk en peilbuis, meetpunt (plaat 66 %), NL-tekst per vak. |
