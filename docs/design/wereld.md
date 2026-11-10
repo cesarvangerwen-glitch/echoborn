@@ -48,7 +48,7 @@ Thema's, bosses en fragmenten volgen `verhaal-v2.md` §4.2. Poorten volgen gdd �
 
 ### 1.3a Wijk-id's (NM-O1, NM-O5)
 
-Elke wijk, de proloog en de finale hebben een **vaste id**: ascii, snake_case, zonder lidwoord, en nooit hernoemd (ook niet als de naam later verandert; dan verandert alleen de sleutel in `strings.csv`). De id is wat de save en de code gebruiken om de wijkregel onder *Doorgaan* en in `MENU_SLOT_DETAILS` (`hud-menus.md` §4.2, §4.7) te kiezen: `state.gebied` bevat alleen het gebied (`docs/tech/ontwerp.md` §7). Hoe de id in de save komt, staat in OW-9. De namen zijn die van `namen.md` §2 en `game/locale/strings.csv`; bij verschil geldt `strings.csv`.
+Elke wijk, de proloog en de finale hebben een **vaste id**: ascii, snake_case, zonder lidwoord, en nooit hernoemd (ook niet als de naam later verandert; dan verandert alleen de tekst achter de sleutel in `strings.csv`). Een wijk-id is **uniek in het hele spel**, anders dan een `kamer_id`, dat alleen binnen zijn gebied uniek is (`ontwerp.md` §3a). **Werkaanname** (fase-2-kader §5): de indeling in wijken van §1.3 geldt tot T8a; valt een wijk weg, dan vervalt haar id en wordt hij niet opnieuw gebruikt. De id is wat de save en de code gebruiken om de wijkregel onder *Doorgaan* en in `MENU_SLOT_DETAILS` (`hud-menus.md` §4.2, §4.7) te kiezen: `state.gebied` bevat alleen het gebied (`docs/tech/ontwerp.md` §7). Hoe de id in de save komt, staat in OW-9. De namen zijn die van `namen.md` §2 en `game/locale/strings.csv`; bij verschil geldt `strings.csv`, behalve voor 2.1: daar geldt *De Poorttoren* en volgt `strings.csv` via OW-10.
 
 | Gebied | Wijk | Id | Sleutel | NL | EN |
 |---|---|---|---|---|---|
@@ -213,8 +213,9 @@ Alle drie zijn `Merkbaar`. De kost per type (runs, animaties) meet de EP in F6 t
 | OW-6 | De 4 minibazen komen bovenop de 5 bosses: hun kost apart meten in F6, naast R-V4 | Executive Producer | T15 |
 | OW-7 | C-17 wijkt af van de rolverdeling uit 7A (max. twee lichamen blijft); geen CEO-vraag (8A legt de 10 s bij het einde), wel een melding in het fase-2-statusrapport | Executive Producer | T15 |
 | OW-8 | De EP leidt in T15 de kost per kamer af uit T8a en T11, en legt het moment van de terugval naar 3 gebieden (§1.7) vast vóór de start van fase 3 | Executive Producer | T15 |
-| OW-9 | **Wijk-id in de save** (NM-O5): `state.gebied` heeft geen wijk (`ontwerp.md` §7); hoe de id uit §1.3a in de save komt (bv. een veld naast het checkpoint), kiezen GP en TD in schema v2. `wijk_gemaal` en het begin per kamer volgen met de slice-wijk (T8a, [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83)) | Gameplay Programmer, Technical Director | Schema v2, vóór T8a |
-| OW-10 | **Naam 2.1 *De Poorttoren*** (§1.3a, NM-O2a): `COMMON_DISTRICT_2_1` NL van *De Poort* naar *De Poorttoren* in `namen.md` §2.3 en `strings.csv` (gemeten 63 px, ≤ 165 px); EN *The Gatehouse* blijft | Narrative Designer | Bij de volgende versie van `namen.md` |
+| OW-9 | **Wijk-id in de save** (NM-O5): `state.gebied` heeft geen wijk (`ontwerp.md` §7); hoe de id uit §1.3a in de save komt (bv. een veld naast het checkpoint), kiezen GP en TD in schema v2. `wijk_gemaal` en het begin per kamer volgen met de slice-wijk (T8a, [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83)). Daarna sluit de UX Designer NM-O5 | Gameplay Programmer, Technical Director, daarna UX Designer | Schema v2, vóór T8a |
+| OW-10 | **Naam 2.1 *De Poorttoren*** (§1.3a, NM-O2a): `COMMON_DISTRICT_2_1` NL van *De Poort* naar *De Poorttoren* in `namen.md` §2.3 en `strings.csv` (gemeten 63 px, ≤ 165 px); EN *The Gatehouse* blijft; in `namen.md` §3 een rij voor 2.1 toevoegen en NM-O2 en NM-O2a sluiten | Narrative Designer | Bij de volgende versie van `namen.md` |
+| OW-11 | De poort-botsing van NM-O2a speelt ook in het EN: *The Gatehouse* naast *gate* voor een vaardigheidspoort. Meenemen met de EN-toets van NM-O4 | Creative Director | Met NM-O4, vóór de eerste publieke build |
 
 ---
 
@@ -222,7 +223,7 @@ Alle drie zijn `Merkbaar`. De kost per type (runs, animaties) meet de EP in F6 t
 
 | Versie | Wat |
 |---|---|
-| 0.1.3 | Namen uit `namen.md` (#87, NM-O2, NM-O2a, NM-O5): wijk 3.3 *Het Waagplein* en 2.1 *De Poorttoren* in §1.3–§1.5; nieuwe §1.3a met de vaste wijk-id's (gebied → wijk → id → sleutel → NL/EN) en de keuze voor *De Poorttoren*; OW-2 afgestemd; open punten OW-9 (wijk-id in de save) en OW-10 (naam 2.1 in `namen.md` en `strings.csv`). |
+| 0.1.3 | Namen uit `namen.md` (#87, NM-O2, NM-O2a, NM-O5): wijk 3.3 *Het Waagplein* en 2.1 *De Poorttoren* in §1.3–§1.5; nieuwe §1.3a met de vaste wijk-id's (gebied → wijk → id → sleutel → NL/EN) en de keuze voor *De Poorttoren*; OW-2 afgestemd; open punten OW-9 (wijk-id in de save) en OW-10 (naam 2.1 in `namen.md` en `strings.csv`). Na de Lead-review (PR #152): uitzondering 2.1 op "bij verschil geldt `strings.csv`", werkaanname over de indeling tot T8a, wijk-id uniek in het spel, OW-9 en OW-10 aangevuld, OW-11 (EN *Gatehouse*). |
 | 0.1.2 | Na de SM-review (PR #123): verwijzing naar `kernloop.md` v0.5.1 in §1.6; open punt OW-8. |
 | 0.1.1 | Herstel na de Lead-review van de EP (PR #123): rekensom met het plan als aparte regel (321–404 min ≈ 5,4–6,7 uur) en dezelfde kolommen als `kernloop.md`; open punten OW-5–OW-7. |
 | 0.1 | Eerste versie (GDD v1, deel 2; T3c, [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81)). Wereldstructuur: 4 gebieden van 3 wijken, proloog en finale (WS-01–WS-11), gebieden en ingangen, 7 terugkeerpoorten, wereldkaart, rekensom 5,3–6,8 uur (plan 5,4–6,7), terugvaloptie 3 gebieden. Verzamelobjecten: lampglas en logbladzijde (LM-11). Slice: de Kadewijk, kamers S1–S9, SL-01–SL-06, 3 vijandtypes binnen het plafond van 4 (R-V4), wat T8a–d bouwen, checklist. |
