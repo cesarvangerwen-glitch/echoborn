@@ -304,6 +304,21 @@ De Sim laat hooguit één schaduwlichaam toe: een echo óf P2. `add_echo` weiger
 - Wordt het gemaal vol (`full`) terwijl het het checkpoint van nu is, dan volgt nog één autosave, met het volle gemaal (wie de laatste slag gaf, maakt niet uit).
 - Hooguit één keer per tick (`reached`): pompen en binnenkomen in dezelfde tick geven één save. Die save valt in stap (4); net als de autosave in stap (5) meet de Engine & Platform Programmer hem mee in T7 (R9).
 
+**Respawn bij 0 levenspunten** (deel 3b; E-04b, C-08, LM-05, LM-08, L-10). **Werkaanname** (fasekader §5): de respawnplek is het checkpoint van `Progress.state` als dat in het gebied van nu ligt; anders het begin van de kamer, zoals LM-05 in de flow-kamer. Een checkpoint in een ander gebied laadt geen ander gebied (dat bevestigt of wijzigt de Lead Game Designer, §12). Levenspunten staan nog niet in de save (schema v2, na T3c).
+
+| Onderdeel | Rol |
+|---|---|
+| `Respawn` (`scripts/save/respawn.gd`, een `RefCounted`) | Luistert naar `PlayerActor.health_changed`. Bij 0 roept het `p1.respawn_at(plek, death = true)` aan en meldt `requested(tick, plek, op_checkpoint)`. De plek is `state.checkpoint_positie` als `Progress.has_checkpoint_in_area()`, anders `room_start.call()` (het begin van de kamer, door de gebiedsscène gegeven). Zonder `Progress` geldt altijd het begin van de kamer (zo gebruikt de flow-kamer het). De scène houdt een verwijzing vast; zonder verwijzing verdwijnen het object en de verbinding. |
+| `Progress.has_checkpoint_in_area()` | Waar als er een loader gekoppeld is, `state.gebied` niet leeg is en gelijk is aan het gebied van de loader, en het checkpoint in een kamer van dat gebied ligt. Niet waar bij een nieuw spel, in een nieuw gebied vóór zijn eerste checkpoint, en bij een checkpoint buiten alle kamers (een oude save na een herindeling; met een waarschuwing in het log). |
+
+Verloop: de laatste treffer valt in tick `t0 − 1` (een vijandelijk aanvalsvlak, LM-05). P1 blijft dan op 0 levenspunten, en verdere treffers kosten niets (`take_hit`). Op tick `t0` gaat het via de bestaande weg (E-04b):
+
+1. **Stap (2):** P1 staat op de plek, stil, met `echo_reset = RESPAWN` en `died`. De levenspunten zijn weer vol (`p1_health`), met `health_changed` voor de HUD.
+2. **Stap (3):** de AreaLoader volgt P1. Ligt het checkpoint in een kamer die geen buur is, dan is dat een kamerwissel met reset (E-04a) en laadt die kamer in deze tick. De plek van P2 van vóór de respawn telt niet als "P2 in een ontladen kamer" (keuze (c), §3a): P2 respawnt mee. Daarna zet de Sim P2 naast P1 volgens de plaatsingsregel (C-08, C-03), ook een opgeloste P2, en de echo wordt Leeg met `geldig_vanaf = t0` (D ticks Leeg).
+3. **Stap (5):** het `Checkpoint` voelt P1 binnenkomen. Dat geeft een extra autosave op dezelfde plek (zie de tabel hierboven).
+
+Een respawn laadt de save niet opnieuw: L, `G`, hendels en sluizen blijven zoals ze zijn (LM-05, LM-06). Terugzetten na een gemiste sprong, diep water of doorns (L-10, LM-06) roept `respawn_at` aan zonder `death`: naar de laatste vloerpositie, nooit naar het checkpoint, en P2 blijft waar hij is. Tests: `tests/test_respawn.gd`.
+
 De autoload heet `Progress` en niet `GameState` (zoals in de eerste doelstructuur): in GDScript gaat een autoload als typenaam vóór een lokale `const GameState = preload(...)`, en dan breekt elk script dat het schema zo gebruikt (nagemeten: parse-fouten in `test_save.gd`).
 
 **Stand van een slot** (`SaveService.SlotStatus`) en wat het spel toont (de teksten zelf: UX Designer en UI, T10, via Localization):
@@ -427,7 +442,7 @@ De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gave
 - **Gameplay Programmer (T16c):** `valid_from` (`geldig_vanaf`) staat op de `TailEcho`-node en gaat verloren als C-01 hem weghaalt; E-09 in co-op en C-05 vragen dat hij bij P1 hoort.
 - **Debugmenu, `force_unloaded`:** zodra het debugmenu het aanroept, een `push_error`-guard als het tijdens stap (4) of (5) gebeurt (§3a).
 - **T5b deel 3b** (Technical Director met de Engine & Platform Programmer). Deel 3a (autoloads `Progress` en `SaveService`, slots, `Checkpoint`, autosave, vlagcontrole, kapot slot; §3a, §7) en de eerste helft van deel 3b (gemaal in gestreamde inhoud, pompen als checkpoint; §3a, §7) zijn af. Over blijft:
-  1. **Respawn op het checkpoint** bij 0 levenspunten (E-04b, C-08) leest `Progress.state.checkpoint_*`: Gameplay Programmer, samen met de levenspunten.
+  1. **Respawn op het checkpoint** bij 0 levenspunten (E-04b, C-08): gebouwd (`Respawn`, §7). Open: (a) de **Lead Game Designer** bevestigt of wijzigt de werkaanname uit §7: zonder checkpoint in het gebied van nu respawnt P1 op het begin van de kamer, en een checkpoint in een ander gebied laadt geen ander gebied. (b) De levenspunten in de save horen bij punt 2. (c) Een gebiedsscène met AreaLoader die `Respawn` gebruikt (met `Progress` en het begin van elke kamer), bouwt de Gameplay Programmer met de eerste slice-wijk (World & Level Designer); de flow-kamer gebruikt het nu zonder checkpoint.
   2. **Schema v2** met levenspunten, `s` per wijk, vaardigheden en verzamelobjecten (LM-12), met een migratie 1 → 2 in `builtin_migrations()`: na T3c. Dan ook `G_max = 100 × trappen` (LM-08: de vulstand tot 200) in `GameState.from_dict` en in `Gemaal`.
   3. **Steam Cloud op de Deck** (Engine & Platform Programmer, T7): `user://` synchroniseren, wat er gebeurt bij een conflict, en of `NOTIFICATION_WM_CLOSE_REQUEST` op de Deck komt bij afsluiten en bij slaapstand (anders ook `NOTIFICATION_APPLICATION_PAUSED`).
   4. **Threaded laden (R9):** pas na de meting in T7. Meet daarin ook `AreaLoader.known_object_flags`: bij elk `Progress.bind_area_loader` maakt het de inhoud van álle kamers van het gebied synchroon aan, naast de autosave in stap (4) (pompslag) en stap (5) (checkpoint).

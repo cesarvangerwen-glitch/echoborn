@@ -174,7 +174,13 @@ func start_errors(position: Vector2, kamer_id: StringName = &"") -> PackedString
 func sim_track(tick: int, p1: PlayerActor) -> bool:
 	_last_tick = tick
 	var switched := _track_p1(tick, p1)
-	_track_partner(tick)
+	# C-08: stierf P1, dan zet de Sim P2 na deze stap naast hem (ook in een
+	# kamer die nu pas laadt). De plek van P2 van vóór de respawn telt dan
+	# niet als "in een ontladen kamer" (keuze (c), §3a).
+	if p1.died:
+		_partner_outside = false
+	else:
+		_track_partner(tick)
 	return switched
 
 

@@ -30,6 +30,7 @@ const FlowMeetlog = preload("res://levels/flowkamer/flow_meetlog.gd")
 const LightMeter = preload("res://scripts/light/light_meter.gd")
 const Gemaal = preload("res://scripts/light/gemaal.gd")
 const Pomprad = preload("res://scripts/light/pomprad.gd")
+const Respawn = preload("res://scripts/save/respawn.gd")
 
 const P1_COLOR := Color(1.0, 0.85, 0.4)
 const P2_COLOR := Color(0.5, 0.85, 1.0)
@@ -65,6 +66,9 @@ var meter: LightMeter
 var gemaal: Gemaal
 var pomprad: Pomprad
 var meetlog: FlowMeetlog
+## LM-05: bij 0 levenspunten respawn op het begin van de kamer. Geen
+## `Progress`: de flow-kamer heeft geen checkpoint (C-08: P2 respawnt mee).
+var respawn: Respawn
 var room := "K1"
 ## Kamerwissels van P1 (E-04e), als [tick, van, naar].
 var room_changes: Array = []
@@ -120,7 +124,7 @@ func _ready() -> void:
 	p1.setup(1, input_override if input_override else _router_source(1), P1_COLOR)
 	p1.position = Layout.RUN_START
 	sim.add_player(p1)
-	p1.health_changed.connect(_on_health_changed)
+	respawn = Respawn.new(p1, func() -> Vector2: return Layout.ROOM_START[room])
 	if echo_on:
 		_add_echo()
 	meter = LightMeter.new(sim, p1)
@@ -362,13 +366,6 @@ func _all_dead(list: Array[CombatTarget]) -> bool:
 		if e.alive:
 			return false
 	return not list.is_empty()
-
-
-## LM-05: 0 levenspunten = respawn op het begin van de kamer, L en G gelijk.
-func _on_health_changed(_tick: int, health: int) -> void:
-	if health <= 0:
-		p1.respawn_at(Layout.ROOM_START[room], true)  # C-08: P2 respawnt mee
-		p1.health = int(Tuning.combat()["p1_health"])
 
 
 func _finish_run(tick: int) -> void:
