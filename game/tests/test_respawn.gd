@@ -96,9 +96,10 @@ func _progress(t, with_service: bool) -> Dictionary:
 	return {"sim": sim, "progress": progress, "service": service, "saves": saves}
 
 
-## Gebied met kamers A – B – C, P1 in A (en P2 als `coop`), een lichtmeter,
-## een Respawn met `progress` (of zonder), in de wereld van `sim`. Het checkpoint in C krijgt bij elk
-## laden de eigen Progress, nooit de autoload.
+## Bouwt in de wereld van `sim` een gebied met de kamers A – B – C, met P1 in
+## A (en P2 als `coop`), een lichtmeter en een Respawn met `progress` (of
+## zonder). Het checkpoint in C krijgt bij elk laden de eigen Progress, nooit
+## de autoload.
 func _world(t, sim: Node, progress: Progress, coop := false, gebied := GEBIED) -> Dictionary:
 	var p1 := Fx.manual_player(sim, 1, IN_A)
 	var p2: PlayerActor = Fx.manual_player(sim, 2, IN_A + Vector2(60, 0)) if coop else null
