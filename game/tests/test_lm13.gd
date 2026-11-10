@@ -189,9 +189,10 @@ func test_lm13_returning_enemies_wijk_not_full(t) -> void:
 	await t.cleanup()
 
 
-## LM-13 (test 1, slot) en LM-09(a): gemaal vol. Een verslagen Kadeloper (ook
-## als hij vóór het vullen viel) komt niet terug: niet bij binnenkomen, niet
-## na laden, niet na opslaan en laden, niet na sterven.
+## LM-13 (test 1, slot; test Dwaallicht, slot) en LM-09(a): gemaal vol. Een
+## verslagen Kadeloper (ook als hij vóór het vullen viel) en een verslagen
+## Dwaallicht komen niet terug: niet bij binnenkomen, niet na laden, niet na
+## opslaan en laden, niet na sterven.
 func test_lm13_wijk_full_nothing_returns(t) -> void:
 	var state := GameState.new()
 	var gemaal_id := _gemaal_id()
@@ -203,27 +204,32 @@ func test_lm13_wijk_full_nothing_returns(t) -> void:
 	var progress: Progress = w["progress"]
 	await _goto(sim, p1, t, IN_B)
 	_defeat(sim, b, "Kadeloper")
+	_defeat(sim, b, "Dwaallicht")
 	# Het gemaal wordt pas daarna vol.
 	state.set_gemaal(gemaal_id, 100, true)
 	t.check(loader.is_wijk_full(b), "wijk niet vol")
 	await _goto(sim, p1, t, IN_C)
 	await _goto(sim, p1, t, IN_B)
-	t.check(not _enemy(b, "Kadeloper").alive, "Kadeloper terug na binnenkomen in een volle wijk")
+	t.check(not _enemy(b, "Kadeloper").alive and not _enemy(b, "Dwaallicht").alive,
+		"Kadeloper of Dwaallicht terug na binnenkomen in een volle wijk")
 	await _goto(sim, p1, t, IN_C)
 	await _goto(sim, p1, t, IN_D)
 	await _goto(sim, p1, t, IN_C)
-	t.check(_is_away(sim, _enemy(b, "Kadeloper")), "Kadeloper terug na laden in een volle wijk")
+	t.check(_is_away(sim, _enemy(b, "Kadeloper")) and _is_away(sim, _enemy(b, "Dwaallicht")),
+		"Kadeloper of Dwaallicht terug na laden in een volle wijk")
 	# Opslaan en laden: de vlag gaat mee door de save (to_dict/from_dict).
 	progress.store_world()
 	var errors := PackedStringArray()
 	var loaded: GameState = GameState.from_dict(state.to_dict(), errors)
-	t.check(errors.is_empty() and loaded.has_flag(_flag("Kadeloper")), "vlag niet in de save: %s" % [errors])
+	t.check(errors.is_empty() and loaded.has_flag(_flag("Kadeloper")) and loaded.has_flag(_flag("Dwaallicht")),
+		"vlag niet in de save: %s" % [errors])
 	await _goto(sim, p1, t, IN_D)
 	progress.adopt(loaded, -1)
 	# Verwacht: één waarschuwing van `unknown_flags` (geen echt gemaal in C).
 	progress.bind_area_loader(loader, GEBIED)
 	await _goto(sim, p1, t, IN_C)
-	t.check(_is_away(sim, _enemy(b, "Kadeloper")), "Kadeloper terug na opslaan en laden")
+	t.check(_is_away(sim, _enemy(b, "Kadeloper")) and _is_away(sim, _enemy(b, "Dwaallicht")),
+		"Kadeloper of Dwaallicht terug na opslaan en laden")
 	# Sterven en respawnen in B (het checkpoint): hij blijft weg (LM-13e).
 	await _goto(sim, p1, t, IN_B)
 	progress.reach_checkpoint(IN_B)

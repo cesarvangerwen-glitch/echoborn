@@ -24,6 +24,8 @@ const LightMeter = preload("res://scripts/light/light_meter.gd")
 const Gemaal = preload("res://scripts/light/gemaal.gd")
 const Pomprad = preload("res://scripts/light/pomprad.gd")
 const CombatTarget = preload("res://scripts/combat/combat_target.gd")
+const Respawn = preload("res://scripts/save/respawn.gd")
+const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 
 const DIR := "user://test_saves_t5b_3b"
 const TOP := -400.0
@@ -303,3 +305,44 @@ func test_gemaal_id_renames_and_unknown(t) -> void:
 		"gemaal-id niet hernoemd: %s" % [state.gemalen])
 	t.check(unknown == PackedStringArray([String(stale)]), "onbekende id's: %s" % [unknown])
 	await t.cleanup()
+
+
+## LM-08 en C-08 (gdd §4.6, test LM-08): de respawnplek na pompen.
+## Co-op: alleen P2 pompt het gemaal (P1 raakt het vlak niet), P1 sterft
+## later in een andere kamer: beiden respawnen bij het gemaal, P2 naast P1.
+## Solo: P1 pompt, sterft in een andere kamer (C ontladen): respawn bij het
+## gemaal, met C weer geladen.
+func test_lm08_respawn_at_pumped_gemaal(t) -> void:
+	for coop in [true, false]:
+		var state := GameState.new()
+		state.lichtmeter = 100
+		var w := _world(t, state)
+		var sim = w["sim"]
+		var p1: PlayerActor = w["p1"]
+		var progress: Progress = w["progress"]
+		var loader: AreaLoader = w["loader"]
+		var c: Kamer = w["c"]
+		var p2: PlayerActor = Fx.manual_player(sim, 2, IN_B + Vector2(60, 0)) if coop else null
+		var respawn := Respawn.new(p1, func() -> Vector2: return IN_A, progress)
+		p1.position = IN_B
+		await t.run_ticks(sim, 1)
+		var checkpoint: Checkpoint = c.inhoud_node.get_node("Checkpoint")
+		checkpoint.progress = progress
+		_strike(sim, "p2" if coop else "p1", Layers.SHADOW if coop else Layers.LIGHT)
+		t.check(not checkpoint.overlaps(p1) and progress.state.checkpoint_positie == checkpoint.spawn_point()
+			and respawn.has_checkpoint(), "co-op %s: pompslag zette geen checkpoint" % coop)
+		# Naar A: C ontlaadt.
+		p1.position = IN_A
+		if coop:
+			p2.position = IN_A + Vector2(60, 0)
+		await t.run_ticks(sim, 2)
+		t.check(c.inhoud_node == null, "co-op %s: C nog geladen" % coop)
+		p1.health = 1
+		p1.take_hit(sim.tick)
+		await t.run_ticks(sim, 1)
+		t.check(p1.died and p1.position.distance_to(CHECKPOINT_AT) < 1.0 and loader.huidige == &"C"
+			and c.inhoud_node != null, "co-op %s: P1 respawnt op %s (kamer %s)" % [coop, p1.position, loader.huidige])
+		if coop:
+			t.check(not p2.dissolved and p2.position.distance_to(p1.position) <= 64.0,
+				"P2 niet naast P1 bij het gemaal: %s" % p2.position)
+		await t.cleanup()
