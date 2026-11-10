@@ -66,7 +66,9 @@ func bind_area_loader(loader: Node, gebied: StringName) -> PackedStringArray:
 	_loader = loader
 	_meter = null
 	_gemalen.clear()
-	state.gebied = gebied
+	# `state.gebied` blijft het gebied van het checkpoint (reach_checkpoint):
+	# afsluiten in een nieuw gebied vóór zijn eerste checkpoint laadt op het
+	# oude checkpoint, in het oude gebied.
 	loader.gebied = gebied
 	loader.game_state = state
 	loader.apply_flag_renames(state)
@@ -109,11 +111,13 @@ func store_world() -> void:
 
 ## Een checkpoint (E-04b, LM-08): P1 verschijnt na laden op `positie`, in de
 ## kamer die de gekoppelde AreaLoader daar vindt (anders &"": dan geldt bij
-## laden de kamer van de positie). Meldt `checkpoint_reached`.
+## laden de kamer van de positie), in het gebied van die loader. Pas hier
+## verandert `state.gebied`. Meldt `checkpoint_reached`.
 func reach_checkpoint(positie: Vector2) -> void:
 	var kamer := &""
 	if is_instance_valid(_loader):
 		kamer = _loader.room_at(positie)
+		state.gebied = _loader.gebied
 	state.checkpoint_kamer = kamer
 	state.checkpoint_positie = positie
 	checkpoint_reached.emit(kamer, positie)

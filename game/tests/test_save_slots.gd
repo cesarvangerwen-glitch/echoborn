@@ -117,6 +117,14 @@ func test_slot_status_and_both_files_broken(t) -> void:
 		"save van een nieuwere versie: status %s, slot %d" % [info["status"], progress.slot])
 	service.new_game(2)
 	t.check(FileAccess.file_exists(service.path_of(2) + SaveService.SET_ASIDE), "nieuwere save niet opzijgezet")
+	# Slots zijn 1..SLOT_COUNT; daarbuiten geweigerd, zonder bestand of wijziging.
+	progress.clear()
+	for bad in [0, -1, SaveService.SLOT_COUNT + 1]:
+		t.check(service.slot_info(bad)["status"] == SaveService.SlotStatus.ONGELDIG
+			and service.load_slot(bad)["status"] == SaveService.SlotStatus.ONGELDIG
+			and service.new_game(bad) == ERR_PARAMETER_RANGE_ERROR and progress.slot == -1
+			and not FileAccess.file_exists(service.path_of(bad)),
+			"slot %d buiten het bereik niet geweigerd" % bad)
 	await t.cleanup()
 	_clear()
 
@@ -211,6 +219,20 @@ func test_checkpoint_autosave_stores_objects_first(t) -> void:
 	t.check(saves.size() == 3 and saves[2][1] == "afsluiten", "geen autosave bij afsluiten: %s" % [saves])
 	t.check(stored != null and stored.checkpoint_positie == checkpoint.spawn_point(),
 		"afsluiten verplaatste het checkpoint")
+	# Door een deur naar een tweede gebied, afsluiten vóór zijn eerste
+	# checkpoint: de save houdt het oude gebied en checkpoint (EP-review #128).
+	var other := AreaLoader.new()
+	var c: Kamer = Kamer.make(&"Z", Rect2(5000, TOP, 1000, HEIGHT), [])
+	t.world_root().add_child(c)
+	other.add_kamer(c)
+	t.world_root().add_child(other)
+	progress.bind_area_loader(other, &"tweede_gebied")
+	service._notification(Node.NOTIFICATION_WM_CLOSE_REQUEST)
+	stored = SaveService.read(service.path_of(3))["state"]
+	t.check(stored != null and stored.gebied == &"testgebied" and stored.checkpoint_kamer == &"B"
+		and stored.checkpoint_positie == checkpoint.spawn_point(),
+		"afsluiten in een nieuw gebied vóór zijn checkpoint: %s" % [stored.to_dict() if stored else null])
+	progress.bind_area_loader(loader, &"testgebied")
 	var inhoud: PackedScene = a.inhoud
 	await t.cleanup()
 	# Laden: een nieuwe wereld begint in de kamer van het checkpoint, de hendel om.

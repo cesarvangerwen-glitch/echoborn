@@ -162,10 +162,13 @@ static func _read_one(path: String, migrations: Dictionary, target: int) -> Dict
 ##   en dan worden de bestanden opzijgezet (`.kapot`), niet gewist.
 ## - NIEUWER: een save van een nieuwere versie van het spel. Menu: "kan niet
 ##   laden: nieuwere versie"; nieuw spel zet de bestanden ook opzij.
+## - ONGELDIG: geen slot (buiten 1..SLOT_COUNT); een fout in de aanroeper.
 ## De teksten zelf zijn voor de UX Designer en UI (T10), via Localization.
-enum SlotStatus { LEEG, OK, HERSTELD, KAPOT, NIEUWER }
+enum SlotStatus { LEEG, OK, HERSTELD, KAPOT, NIEUWER, ONGELDIG }
 
 ## Aantal slots in het menu (werkaanname, UX Designer T10 kan het wijzigen).
+## Slots zijn 1-based: 1 tot en met SLOT_COUNT, zoals in het menu en in de
+## bestandsnaam `slot_<n>.json`.
 const SLOT_COUNT := 3
 ## Achtervoegsel voor opzijgezette bestanden van een kapot slot.
 const SET_ASIDE := ".kapot"
@@ -195,6 +198,11 @@ func use(p_progress: Node) -> void:
 	progress.checkpoint_reached.connect(_on_checkpoint_reached)
 
 
+## Ligt `slot` in 1..SLOT_COUNT?
+static func is_valid_slot(slot: int) -> bool:
+	return slot >= 1 and slot <= SLOT_COUNT
+
+
 func path_of(slot: int) -> String:
 	return slot_path(slot, dir)
 
@@ -204,6 +212,10 @@ func path_of(slot: int) -> String:
 ## PackedStringArray}. Bij HERSTELD staan de fouten van de save zelf in
 ## `errors`.
 func slot_info(slot: int) -> Dictionary:
+	if not is_valid_slot(slot):
+		var errors := PackedStringArray()
+		errors.append("slot %d bestaat niet (1..%d)" % [slot, SLOT_COUNT])
+		return {"status": SlotStatus.ONGELDIG, "state": null, "errors": errors}
 	var path := path_of(slot)
 	var result := read(path)
 	var info := {"status": SlotStatus.OK, "state": result["state"], "errors": result["errors"]}
@@ -219,7 +231,7 @@ func slot_info(slot: int) -> Dictionary:
 
 
 ## Laadt een slot in `progress` als het OK of HERSTELD is; geeft
-## `slot_info`. Bij LEEG, KAPOT of NIEUWER verandert er niets.
+## `slot_info`. Bij LEEG, KAPOT, NIEUWER of ONGELDIG verandert er niets.
 func load_slot(slot: int) -> Dictionary:
 	var info := slot_info(slot)
 	if info["status"] == SlotStatus.OK or info["status"] == SlotStatus.HERSTELD:
@@ -232,6 +244,8 @@ func load_slot(slot: int) -> Dictionary:
 ## (`<pad>.kapot`, `<pad>.bak.kapot`; een vorige `.kapot` gaat weg). Een
 ## goede save in het slot wordt gewist: het menu vraagt dat eerst.
 func new_game(slot: int, p_state: GameState = null) -> Error:
+	if not is_valid_slot(slot):
+		return ERR_PARAMETER_RANGE_ERROR
 	var status: int = slot_info(slot)["status"]
 	var path := path_of(slot)
 	for file in [path, path + ".bak", path + ".tmp"]:
