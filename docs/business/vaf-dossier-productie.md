@@ -188,7 +188,7 @@ Niet in het sjabloon, wel mee te nemen naar het gesprek (geen deel van de 2-page
 >
 > Deze wereld is gekozen door de oprichter van de studio, die in België woont; de studio heeft haar vestiging in Vlaanderen of Brussel.
 
-Bronnen: art bible §8 (eisen 4–5) en §5 (van grijs naar kleur); verhaal V2 §2.1 (Hollestede, carillon, tien tellen), §5 (bevroren echo's), §4.4 (logboeken in beide talen) en §7.4 (loslaten); pitch §6 (setting, toonregels); #51 deel 1 (5A, voorstel CD) en deel 2 (1A: licht oppompen als kernloop, water géén speellaag). Bewijs in het dossier: art bible en de scène op eindkwaliteit (T1), audiorichting met het carillon (T2), narratief V2 (T9).
+Bronnen: art bible §8 (eisen 4–5) en §5 (van grijs naar kleur); verhaal V2 §2.1 (Hollestede), §2.3 (carillon, tien tellen), §5 (bevroren echo's), §4.4 (logboeken in beide talen) en §7.4 (loslaten); pitch §6 (setting, toonregels); #51 deel 1 (5A, voorstel CD) en deel 2 (1A: licht oppompen als kernloop, water géén speellaag). Bewijs in het dossier: art bible en de scène op eindkwaliteit (T1), audiorichting met het carillon (T2), narratief V2 (T9).
 
 Regels voor de dossiertekst:
 - **Geen verwijzing naar 1953** of een andere echte ramp (pitch §6), en geen namen van echte plaatsen (verhaal V2, toonregel W-6).
@@ -219,7 +219,7 @@ Regels voor de dossiertekst:
 | D12 | Slice-build | Team (F3) | Einde fase 2 |
 | D1, D5, D14 | Vennootschap en statuten, CV, intake en hearing | CEO (met boekhouder) | Na `Besluit:` over de intake |
 
-**Open punt:** crit. 3 van cat. I (personages of voorwerpen, "al dan niet fictief", die naar Vlaanderen, België of de EER verwijzen; geen fictieve-wereldtoets) als extra criterium; mogelijk bewijs in verhaal V2 §5 (bevroren echo's van een begijn en een veerman) en §2.1 (het carillon). CD en BLA bekijken het vóór de intake.
+**Open punt:** crit. 3 van cat. I (personages of voorwerpen, "al dan niet fictief", die naar Vlaanderen, België of de EER verwijzen; geen fictieve-wereldtoets) als extra criterium; mogelijk bewijs in verhaal V2 §5 (bevroren echo's van een begijn en een veerman) en §2.3 (het carillon). CD en BLA bekijken het vóór de intake.
 
 **Open punt:** A1 bevestigen vóór de intake: woon- en belastingplaats van de CEO (door de CEO).
 
