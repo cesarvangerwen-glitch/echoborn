@@ -1,6 +1,6 @@
 # Credits *Polderlight*: inhoud
 
-Versie 0.1.1 · 2026-11-10 · eigenaar: Producer, met de Business/Legal Advisor (BLA) · issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10, "credits-inhoud")
+Versie 0.1.2 · 2026-11-10 · eigenaar: Producer, met de Business/Legal Advisor (BLA) · issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10, "credits-inhoud")
 
 Dit document geeft de **inhoud** van het credits-scherm (`docs/ux/hud-menus.md` MN-37, §7 punt 18). Indeling en bediening staan in hud-menus §4.9 (MN-35, MN-36); de mock-up is `menu_credits_x2_placeholder.png` (`docs/art/ui-stijlgids.md` §12.6, script `docs/art/ui/bron/genereer_menu_placeholder.py`).
 
@@ -14,7 +14,7 @@ Blokken van een kop met de regels eronder (MN-35). Van boven naar beneden:
 |---|---|---|---|---|
 | 1 | Titel | — (`GAME_TITLE`, bestaat al) | *Polderlight* | besluit #96 |
 | 2 | Makers | `CREDITS_MADE_BY` | Wie het spel maakt: zie §3 en CEO-vraag §4 | — |
-| 3 | Rollen | per vakgebied `CREDITS_TEAM_*` (§3; optie 1A, zie §4) | De AI-rollen, volgens de keuze in §4 | `studio/roles/` |
+| 3 | Rollen | eerst de regel `CREDITS_TEAM_AI`, dan per vakgebied `CREDITS_TEAM_*` (§3; optie 1A, zie §4) | De AI-rollen, volgens de keuze in §4 | `studio/roles/` |
 | 4 | Gemaakt met | `CREDITS_MADE_WITH` | *Godot Engine* | MN-37 |
 | 5 | Lettertype | `CREDITS_FONT` | *Polderletter*, eigen werk van de studio (geen licentie van derden) | stijlgids §4, §10 punt 7 |
 | 6 | Merken | `CREDITS_TRADEMARKS` | De merkenregel (§5.3) | `docs/business/knop-glyphs-check.md` §3 punt 4 |
@@ -38,6 +38,7 @@ De rollen per vakgebied (voor optie 1A), in de volgorde van het organigram:
 
 | Vakgebied (kop) | Sleutel (voorstel) | EN / NL (voorstel) | Rollen (namen, niet vertaald) |
 |---|---|---|---|
+| (bovenaan, één regel) | `CREDITS_TEAM_AI` | All roles: Claude (AI, Anthropic) / Alle rollen: Claude (AI, Anthropic) | — |
 | Leiding en productie | `CREDITS_TEAM_PRODUCTION` | Leadership & production / Leiding en productie | Executive Producer, Producer, Studio Manager, Workflow & Process Optimization Lead |
 | Ontwerp | `CREDITS_TEAM_DESIGN` | Design / Ontwerp | Creative Director, Lead Game Designer, Systems Designer, Combat Designer, World & Level Designer, UX Designer, Narrative Designer |
 | Art | `CREDITS_TEAM_ART` | Art / Art | Art Director, Concept Artist, 2D Environment Artist, Animator, Technical Artist, UI Artist |
@@ -58,13 +59,13 @@ De credits moeten vóór de eerste publieke build zeggen wie het spel maakte (hu
 ### Vragen
 
 **1. Hoe vermelden we de AI-rollen?**
-- **A. Per vakgebied, met de rollen en "Claude (AI, Anthropic)"** ⭐ Aanbevolen: eerlijk en compact, 7 blokken (§3), ± 25 s scrollen bij 20 px/s; € 0.
+- **A. Per vakgebied, met de rollen; één regel "Claude (AI, Anthropic)" bovenaan blok 3** ⭐ Aanbevolen: eerlijk en compact; 1 regel + 7 koppen + 26 rollen ≈ 520 px, ± 25 s scrollen bij 20 px/s; € 0.
 - **B. Elke rol als eigen blok met "Claude (AI)"**: volledig, maar 26 bijna gelijke blokken (± 50 s); € 0.
 - **C. Eén regel "Gemaakt met AI-rollen (Claude, Anthropic)", zonder rollen**: kortst, maar de structuur van de studio verdwijnt; € 0.
 - **D. Geen vermelding van AI in de credits**: niet aanbevolen; staat los van een eventuele AI-melding op de Steam-pagina (BLA, §6 punt 5); € 0.
 
 **2. Hoe staat de CEO bovenaan?**
-- **A. Met de eigen naam onder de kop *Made by* / *Gemaakt door*, zonder roltitel** (botst dan niet met de AI-rollen) ⭐ Aanbevolen: de mens achter het spel is zichtbaar; € 0.
+- **A. Met de eigen naam (of een schuilnaam) onder de kop *Made by* / *Gemaakt door*, zonder roltitel** (botst dan niet met de AI-rollen) ⭐ Aanbevolen: de mens achter het spel is zichtbaar; geef de naam mee in het besluit; € 0.
 - **B. Alleen een studionaam (later te kiezen, met naamcheck)**: anoniemer; vraagt een naamkeuze en check (± 2–3 runs, € 0 tot de formele merkcheck).
 - **C. Eigen naam én een studionaam**: B en A samen; zelfde kost als B.
 
@@ -74,7 +75,7 @@ De credits moeten vóór de eerste publieke build zeggen wie het spel maakte (hu
 ### Wat wacht hierop
 - [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (credits-inhoud, hud-menus §7 punt 18)
 
-*CEO: antwoord kort met een comment die begint met `Besluit:`, bv. `Besluit: 1A, 2A` of `Besluit: akkoord`.*
+*CEO: antwoord kort met een comment die begint met `Besluit:`, bij 2A of 2C met de naam: bv. `Besluit: 1A, 2A = <naam>` (schuilnaam mag) of `Besluit: akkoord, 2A = <naam>`.*
 
 ## 5. Verplichte teksten
 
@@ -131,11 +132,12 @@ De definitieve tekst stemt de Narrative Designer af met de BLA (glyph-check §4 
 | 7 | De `CREDITS_*`-sleutels van §1 en §2 in `game/locale/strings.csv` zetten (EN/NL, met context); de sleutels zijn een voorstel, de tekst is van de Narrative Designer. | Narrative Designer | Na de CEO-keuze (§4) |
 | 8 | hud-menus §7 punt 18 sluiten met een verwijzing naar dit document; dit document wijzigt hud-menus niet. | UX Designer | Bij zijn volgende wijziging van hud-menus |
 | 9 | Placeholder in `genereer_menu_placeholder.py` (blok *Licenties*: *Tekst volgt*) vervangen door de echte inhoud, zodra punt 1 en §4 rond zijn. | UI Artist | Bij de eind-art van de credits |
-| 10 | Credits bouwen uit dit document (de licentietekst bij voorkeur via `Engine.get_license_text()`, zodat hij altijd bij de gebruikte versie past). | Gameplay Programmer | Met hud-menus §7 punt 19 (T8a) |
+| 10 | Credits bouwen uit dit document (de licentietekst bij voorkeur via `Engine.get_license_text()`, zodat hij altijd bij de gebruikte versie past). De bouw herbreekt de licentie-alinea's op de kolom van 320 px (± 71 tekens per regel), niet op de regels van `LICENSE.txt`. | Gameplay Programmer | Met hud-menus §7 punt 19 (T8a) |
 
 ## 7. Wijzigingen
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.1.2 | 2026-11-10 | Na de SM-review (PR #156): 2A met naam in het besluit (`2A = <naam>`); plaats van de regel *Claude (AI, Anthropic)* (`CREDITS_TEAM_AI`, bovenaan blok 3) met duurschatting; herbreken van de licentietekst (open punt 10). |
 | 0.1.1 | 2026-11-10 | Na de Lead-review van de EP (PR #156): werkaanname correct geciteerd; 7 kopsleutels `CREDITS_TEAM_*` met EN/NL; roltitels = namen (niet vertaald); voorbeeld bij 2A zonder roltitel; Engelse licentietekst als werkaanname. |
 | 0.1 | 2026-11-10 | Eerste versie (#87): opbouw, sleutels (voorstel), rollen, CEO-vraag namen en rollen, Godot-licentie, merkenregel, open punten voor de BLA. |
