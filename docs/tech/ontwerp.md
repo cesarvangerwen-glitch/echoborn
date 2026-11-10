@@ -432,6 +432,11 @@ De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gave
   3. **Steam Cloud op de Deck** (Engine & Platform Programmer, T7): `user://` synchroniseren, wat er gebeurt bij een conflict, en of `NOTIFICATION_WM_CLOSE_REQUEST` op de Deck komt bij afsluiten en bij slaapstand (anders ook `NOTIFICATION_APPLICATION_PAUSED`).
   4. **Threaded laden (R9):** pas na de meting in T7. Meet daarin ook `AreaLoader.known_object_flags`: bij elk `Progress.bind_area_loader` maakt het de inhoud van álle kamers van het gebied synchroon aan, naast de autosave in stap (4) (pompslag) en stap (5) (checkpoint).
 - **Checkpoint, binnenlopen na pompen** (TD, besloten: zo laten): binnenlopen in het vlak heeft geen `is_current_checkpoint`-controle, pompen wel. Pomp je van afstand en loop je daarna het vlak in, dan volgt een tweede autosave op dezelfde plek. Bewust: binnenlopen bewaart ook wat er sinds het checkpoint veranderde (hendels, `G`, L), zoals bij weglopen en terugkomen in deel 3a; de kost is één extra kleine save en een `.bak` gelijk aan de save (§7). Herzien als de meting in T7 (R9) een hapering laat zien.
+<<<<<<< HEAD
 - **UX Designer (T10):** menu voor de slots met de standen uit §7 en hun teksten in de Localization-CSV.
 - **UX Designer (T10):** `new_game` wist de bestanden van een goed slot vóór de eerste save; mislukt die save, dan is de oude save weg. De bevestiging "bestaand spel overschrijven" in het slot-menu moet dus dwingend zijn (expliciet kiezen, niet de standaardknop).
+=======
+- **Lead Game Designer:** de werkaanname bij "pompen zet een checkpoint" (§7) bevestigen of wijzigen: alleen een pompslag van P1 zet het checkpoint, niet een van de echo of van P2.
+- **UX Designer (T10):** slot-menu en dwingende bevestiging bij overschrijven: uitgewerkt in `docs/ux/hud-menus.md` §4.7 (MN-20–MN-25, teksten in `strings.csv`); de vragen aan de TD (volgorde in `new_game`, laatst gespeelde plaats) staan daar in §7 punt 12.
+>>>>>>> origin/main
 

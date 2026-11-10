@@ -1,6 +1,6 @@
 # UX-spec co-op: drop-in, drop-out en gedeelde camera *Polderlight*
 
-Versie 0.1 · Eigenaar: UX Designer · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10) · Review: Lead Game Designer
+Versie 0.1.1 · Eigenaar: UX Designer · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10) · Review: Lead Game Designer
 Hoort bij **`docs/ux/hud-menus.md`** (HUD, menu's, opties). Wireframes: `docs/ux/wireframes/coop_dropin_dropout_storyboard_placeholder.png`, `hud_coop_640x360_placeholder.png`, `hud_elementen_x4_placeholder.png` (P2-badge).
 
 Bronnen: `docs/design/gdd.md` §2.7 (C-01–C-09), §2.9; `kernloop.md` §4 en §7; `docs/tech/input.md` (W1–W7, §2, §2a); `docs/tech/performance-flowkamer.md` §7 punt 14 en 15; pitch v0.4 §5 en P3.
@@ -26,7 +26,7 @@ Een tweede speler doet **binnen 10 seconden** mee, zonder menu, zonder dat de ee
 |---|---|
 | **CO-01** | **Waar:** overal waar P1 kan spelen of kiezen: in het spel, in het pauzemenu en in het hoofdmenu. **Hoe:** Start/Menu op een vrije controller, of Enter op de P2-helft van het toetsenbord (`input.md` §2a). Er is geen bevestiging en geen keuzescherm. |
 | **CO-02** | **In het hoofdmenu** krijgt P2 de badge rechtsboven (`hud-menus.md` §4.2, nr. 4) en start bij *Doorgaan* of *Nieuw spel* mee, op de plek van P1 (C-03: de echo is dan Leeg). **In de pauze** krijgt P2 de badge meteen en verschijnt hij bij *Verder* volgens C-03. |
-| **CO-03** | **Hint:** zodra een vrije controller verbindt, staat rechtsonder 5 s *Controller 2: druk op Start om mee te doen* (`HUD_PAD_JOIN_HINT`, in cyaan). Dezelfde regel staat in het pauzemenu en in het hoofdmenu zolang er een vrij apparaat is. Op het toetsenbord alleen in het pauzemenu (anders bij elke solospeler met een toetsenbord). |
+| **CO-03** | **Hint:** zodra een vrije controller verbindt, staat rechtsonder 5 s een melding van twee regels: *Controller 2* / *Druk op Start om mee te doen* (`HUD_PAD_NAME`, `HUD_PAD_JOIN_HINT`, in cyaan; op één regel past het NL niet, `hud-menus.md` §6). Dezelfde regel staat in het pauzemenu en in het hoofdmenu zolang er een vrij apparaat is. Op het toetsenbord alleen in het pauzemenu (anders bij elke solospeler met een toetsenbord). |
 | **CO-04** | **Het moment zelf** (storyboard paneel 2): de echo **wordt wakker**: op zijn plek een cyaan ring die in 12 ticks uitdijt, het amber van de echo slaat om naar het volle zwart met cyaan rand van de sluiswachter (art bible §6, Animator), een eigen klank (Audio Director). Rechtsboven verschijnt de P2-badge, en 3 s de melding *P2 doet mee* met daaronder *Houd View vast om te stoppen* (`HUD_P2_JOINED`, `HUD_P2_STOP_HOLD`). Het echo-icoon van P1 verdwijnt (er is geen echo in co-op, C-01). |
 | **CO-05** | **De knop die liet meedoen** doet in het spel niets tot hij is losgelaten (`input.md` W5): Enter is op `kb2` ook springen. |
 
@@ -92,4 +92,5 @@ Alle waarden blijven de startwaarden van de gdd; ze worden gemeten in T17 en T11
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.1.1 | 2026-11-10 | CO-03: de hint op twee regels (ui-stijlgids §10 punt 2, `hud-menus.md` v0.2). |
 | 0.1 | 2026-11-10 | Eerste versie (T10 deel 1, #87). |
