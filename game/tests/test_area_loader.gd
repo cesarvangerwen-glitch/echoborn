@@ -446,10 +446,22 @@ func test_r10_remove_combat_target(t) -> void:
 
 # --- T5b deel 2: P2 in een kamer die niet geladen is (keuze (c), §3a) -------
 
-## P1 blijft in A (buur B, C geen buur van A). P2 loopt van A via B naar C:
-## in B niets, op de tick waarop zijn middelpunt in C komt één melding en
-## geen kamerwissel. Gaat P1 naar B, dan is C geladen en P2 niet meer
-## Buiten; terug naar A meldt opnieuw.
+## Legt het oplossen (C-06) en het terugkomen van P2 vast: [tick, oorzaak, plek].
+func _partner_log(sim: Node) -> Dictionary:
+	var log := {"gone": [], "back": []}
+	sim.partner_dissolved.connect(func(tick: int, at: Vector2, cause: String) -> void:
+		log["gone"].append([tick, cause, at]))
+	sim.partner_returned.connect(func(tick: int, at: Vector2) -> void:
+		log["back"].append([tick, at]))
+	return log
+
+
+## C-06, keuze (c): P1 blijft in A (buur B, C geen buur van A). P2 loopt van A
+## via B naar C: in B niets; op de tick waarop zijn middelpunt in C komt één
+## melding, en P2 lost op díé tick op met de oorzaak `ontladen` (gdd §4.5),
+## zonder kamerwissel. 120 ticks later staat hij naast P1 (C-03).
+## Daarna: P1 in B (C geladen), P2 in C: niets. P1 terug naar A ontlaadt C:
+## P2 lost op op de tick van de kamerwissel.
 func test_c06_partner_in_unloaded_room(t) -> void:
 	var sim = Fx.world(t)
 	# P1 en P2 dicht bij elkaar, en P2 stopt net in C: zo grijpt de leiband
@@ -463,28 +475,73 @@ func test_c06_partner_in_unloaded_room(t) -> void:
 	var reports: Array = []
 	loader.partner_in_ontladen_kamer.connect(func(tick: int, who: PlayerActor, kamer: StringName) -> void:
 		reports.append([tick, who == p2, String(kamer)]))
+	var log := _partner_log(sim)
 	var switches := _switches(loader)
 	var p2_x := {}
+	sim.partner_dissolved.connect(func(_tick: int, _at: Vector2, _cause: String) -> void:
+		p2.input_source.bits = 0)
 	sim.tick_finished.connect(func(tick: int) -> void:
-		p2_x[tick] = p2.position.x
-		if p2.position.x >= 860.0:
-			p2.input_source.bits = 0)
-	await t.run_ticks(sim, 200)
-	var t_c := -1
-	for tick in range(200):
-		if p2_x.has(tick) and p2_x[tick] >= 840.0:
-			t_c = tick
-			break
+		if not p2.dissolved:
+			p2_x[tick] = p2.position.x)
+	# P2 komt rond tick 110 in C; 120 ticks later terug.
+	await t.run_ticks(sim, 300)
+	var gone: Array = log["gone"]
+	var t_c: int = gone[0][0] if not gone.is_empty() else -1
 	t.check(t_c > 0 and reports == [[t_c, true, "C"]],
-		"melding P2 in ontladen C: %s (verwacht op tick %d)" % [reports, t_c])
-	t.check(switches.is_empty() and loader.huidige == &"A" and loader.is_partner_outside() and not p2.dissolved,
-		"P2 wisselde de kamer, of is niet meer Buiten (opgelost: %s)" % p2.dissolved)
+		"melding P2 in ontladen C: %s (opgelost op tick %d)" % [reports, t_c])
+	t.check(gone.size() == 1 and gone[0][1] == "ontladen" and loader.room_at(gone[0][2]) == &"C"
+		and p2_x.get(t_c - 1, 9999.0) < 840.0, "oplossen: %s (P2 vóór t_c op x %s)" % [gone, p2_x.get(t_c - 1)])
+	t.check(switches.is_empty() and loader.huidige == &"A" and not loader.is_partner_outside(),
+		"P2 wisselde de kamer, of telt als opgelost nog als Buiten")
+	var back: Array = log["back"]
+	t.check(back.size() == 1 and back[0][0] == t_c + 120 and not p2.dissolved and p2.visible
+		and p2.position.distance_to(p1.position) <= 64.0 and loader.room_at(p2.global_position) == &"A",
+		"terug: %s (verwacht op tick %d, naast P1 op %s)" % [back, t_c + 120, p1.position])
+	# P1 in B: C geladen; P2 in C telt dan niet.
 	p1.position = Vector2(700, Fx.STAND_Y)
 	await t.run_ticks(sim, 1)
-	t.check(loader.is_loaded(&"C") and not loader.is_partner_outside(), "C geladen, P2 nog Buiten")
+	p2.position = Vector2(900, Fx.STAND_Y)
+	await t.run_ticks(sim, 2)
+	t.check(loader.is_loaded(&"C") and gone.size() == 1 and not p2.dissolved, "P2 in geladen C opgelost: %s" % [gone])
+	# De kamerwissel van P1 terug naar A ontlaadt C: P2 lost op díé tick op.
 	p1.position = Vector2(600, Fx.STAND_Y)
+	var t_back: int = sim.tick
 	await t.run_ticks(sim, 1)
-	t.check(reports.size() == 2 and reports[1][2] == "C", "tweede melding ontbreekt: %s" % [reports])
+	t.check(not loader.is_loaded(&"C") and reports.size() == 2 and reports[1] == [t_back, true, "C"]
+		and gone.size() == 2 and gone[1][0] == t_back and gone[1][1] == "ontladen" and p2.dissolved,
+		"kamerwissel ontlaadt C: meldingen %s, opgelost %s (tick %d)" % [reports, gone, t_back])
+	await t.cleanup()
+
+
+## C-06, keuze (c), met `force_unloaded` (debugmenu, gdd §4.6): P2 in B, B
+## wordt uitgezet: op de volgende tick lost P2 op (`ontladen`). P2 in een gat
+## tussen kamers (keuze (a)): geen oorzaak, ook niet als de kamer ernaast
+## niet geladen is.
+func test_c06_force_unloaded_and_gap(t) -> void:
+	var sim = Fx.world(t)
+	var p1 := Fx.manual_player(sim, 1, Vector2(600, Fx.STAND_Y))
+	var p2 := Fx.manual_player(sim, 2, Vector2(700, Fx.STAND_Y))
+	# A en B grenzen; tussen B en C ligt een gat [900, 960).
+	var loader := _loader(t, sim, [
+		_room("A", -1000, 640, ["B"]), _room("B", 640, 900, ["A", "C"]), _room("C", 960, 2000, ["B"])])
+	loader.start(sim.tick, p1.position)
+	var log := _partner_log(sim)
+	await t.run_ticks(sim, 2)
+	t.check(log["gone"].is_empty(), "P2 opgelost in geladen B: %s" % [log["gone"]])
+	loader.force_unloaded(&"B", true)
+	var t0: int = sim.tick
+	await t.run_ticks(sim, 1)
+	t.check(log["gone"].size() == 1 and log["gone"][0][0] == t0 and log["gone"][0][1] == "ontladen" and p2.dissolved,
+		"force_unloaded(B): %s (verwacht op tick %d)" % [log["gone"], t0])
+	await t.run_ticks(sim, 121)
+	t.check(log["back"].size() == 1 and log["back"][0][0] == t0 + 120 and not p2.dissolved,
+		"terug na force_unloaded: %s" % [log["back"]])
+	# P2 in het gat: geen oorzaak (keuze (a)), ook met B en C uit.
+	loader.force_unloaded(&"C", true)
+	p2.position = Vector2(930, Fx.STAND_Y)
+	await t.run_ticks(sim, 5)
+	t.check(log["gone"].size() == 1 and not p2.dissolved and loader.room_at(p2.global_position) == &"",
+		"P2 in een gat opgelost: %s" % [log["gone"]])
 	await t.cleanup()
 
 

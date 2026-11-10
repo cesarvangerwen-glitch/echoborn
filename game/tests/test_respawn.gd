@@ -133,15 +133,17 @@ func _world(t, sim: Node, progress: Progress, coop := false, gebied := GEBIED) -
 
 ## P1 loopt via B het vlak van het checkpoint in C in (autosave) en gaat
 ## daarna terug naar A: C is dan niet meer geladen.
+## In co-op gaat P2 mee (60 px rechts van P1): anders staat hij na de sprong
+## van P1 in een kamer die niet geladen is en lost hij op (C-06, `ontladen`).
 func _reach_checkpoint_then_leave(w: Dictionary, t) -> void:
 	var sim = w["sim"]
 	var p1: PlayerActor = w["p1"]
-	p1.position = IN_B
-	await t.run_ticks(sim, 1)
-	p1.position = CHECKPOINT_AT
-	await t.run_ticks(sim, 1)
-	p1.position = IN_A
-	await t.run_ticks(sim, 1)
+	var p2: PlayerActor = w.get("p2")
+	for at: Vector2 in [IN_B, CHECKPOINT_AT, IN_A]:
+		p1.position = at
+		if p2 != null:
+			p2.position = at + Vector2(60, 0)
+		await t.run_ticks(sim, 1)
 
 
 ## De laatste treffer: P1 op 1 levenspunt, één vijandelijke treffer. Geeft de

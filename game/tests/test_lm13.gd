@@ -64,11 +64,12 @@ func _enemy_scene() -> PackedScene:
 	return scene
 
 
-## Geeft {sim, p1, loader, progress, b, respawn}. `wijk` = false: B hoort bij
+## Geeft {sim, p1, loader, progress, b, respawn}. `inhoud` = de inhoud van B
+## (standaard `_enemy_scene`). `wijk` = false: B hoort bij
 ## geen wijk. `gemaal` = [vulstand, vol] van het gemaal van de wijk, gezet ná
 ## `bind_area_loader` (er staat geen echt gemaal in C; vóór het binden zou
 ## `unknown_flags` het melden).
-func _world(t, state: GameState, wijk := true, gemaal: Array = []) -> Dictionary:
+func _world(t, state: GameState, wijk := true, gemaal: Array = [], inhoud: PackedScene = null) -> Dictionary:
 	var sim = Fx.world(t)
 	var p1 := Fx.manual_player(sim, 1, IN_A)
 	var progress := Progress.new()
@@ -79,7 +80,7 @@ func _world(t, state: GameState, wijk := true, gemaal: Array = []) -> Dictionary
 	var b: Kamer = Kamer.make(&"B", ROOM_B, ["A", "C"])
 	var c: Kamer = Kamer.make(&"C", Rect2(1640, TOP, 1360, HEIGHT), ["B", "D"])
 	var d: Kamer = Kamer.make(&"D", Rect2(3000, TOP, 1000, HEIGHT), ["C"])
-	b.inhoud = _enemy_scene()
+	b.inhoud = inhoud if inhoud != null else _enemy_scene()
 	if wijk:
 		for room: Kamer in [a, b, c, d]:
 			room.wijk_gemaal = WIJK
@@ -317,4 +318,129 @@ func test_lm13_returning_kinds_and_validation(t) -> void:
 	t.check(loader.validate().is_empty(), "validate met een goede wijk: %s" % [loader.validate()])
 	a.free()
 	loader.free()
+	await t.cleanup()
+
+
+## Zoals een vijand die de World & Level Designer in de editor in de inhoud
+## zet: alleen geëxporteerde waarden, géén `setup_target`. De Kadeloper heeft
+## geen vlak (dan het standaardvlak), de Schotdrager een eigen vlak van
+## 20 × 30 en `walks` aan (de standaard in de inspector).
+func _editor_scene() -> PackedScene:
+	var origin := ROOM_B.get_center()
+	var root := Node2D.new()
+	root.name = "Inhoud"
+	var kadeloper := CombatTarget.new()
+	kadeloper.name = "Kadeloper"
+	kadeloper.kind = CombatTarget.Kind.ENEMY
+	kadeloper.walks = false
+	kadeloper.position = Vector2(KADELOPER_X, Fx.TARGET_Y) - origin
+	var schotdrager := CombatTarget.new()
+	schotdrager.name = "Schotdrager"
+	schotdrager.kind = CombatTarget.Kind.ARMORED
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(20, 30)
+	schotdrager.shape = rect
+	schotdrager.position = Vector2(SCHOTDRAGER_X, Fx.TARGET_Y) - origin
+	for target: CombatTarget in [kadeloper, schotdrager]:
+		root.add_child(target)
+		target.owner = root
+	var scene := PackedScene.new()
+	scene.pack(root)
+	root.free()
+	return scene
+
+
+func _visuals(target: CombatTarget) -> Array[Polygon2D]:
+	var found: Array[Polygon2D] = []
+	for child in target.get_children():
+		if child is Polygon2D:
+			found.append(child)
+	return found
+
+
+## LM-13, §12 punt (2), deel 1: een vijand die verslagen wordt in een kamer
+## die geladen blijft, verdwijnt op die tick (niet zichtbaar, niet meer te
+## raken). Hij blijft bij de Sim aangemeld (*keuze TD*, ontwerp.md §3a) en
+## komt bij binnenkomen terug op zijn startplek, weer zichtbaar; de
+## Schotdrager blijft weg en onzichtbaar.
+func test_lm13_defeated_enemy_disappears_in_loaded_room(t) -> void:
+	var state := GameState.new()
+	var w := _world(t, state, true, [40, false])
+	var sim = w["sim"]
+	var p1: PlayerActor = w["p1"]
+	var b: Kamer = w["b"]
+	await _goto(sim, p1, t, IN_B)
+	var kadeloper := _enemy(b, "Kadeloper")
+	var schotdrager := _enemy(b, "Schotdrager")
+	var died: Array = []
+	kadeloper.died.connect(func(tick: int) -> void: died.append([tick, kadeloper.visible]))
+	t.check(kadeloper.visible and schotdrager.visible, "vijanden niet zichtbaar vóór het gevecht")
+	_defeat(sim, b, "Kadeloper")
+	_defeat(sim, b, "Schotdrager")
+	t.check(died.size() == 1 and died[0][1] == false, "Kadeloper zichtbaar bij `died`: %s" % [died])
+	t.check(not kadeloper.visible and not schotdrager.visible, "verslagen vijand nog zichtbaar")
+	var box := Rect2(kadeloper.global_position - Vector2(20, 20), Vector2(40, 40))
+	t.check(not kadeloper.is_hit_by(box, Layers.LIGHT), "verslagen vijand nog te raken")
+	await t.run_ticks(sim, 5)
+	t.check(not kadeloper.visible and not schotdrager.visible and sim.objects.has(kadeloper),
+		"na 5 ticks: zichtbaar %s / %s, aangemeld %s" % [kadeloper.visible, schotdrager.visible, sim.objects.has(kadeloper)])
+	await _goto(sim, p1, t, IN_C)
+	await _goto(sim, p1, t, IN_B)
+	t.check(_is_back(sim, kadeloper, KADELOPER_X), "Kadeloper niet zichtbaar terug na binnenkomen")
+	t.check(not schotdrager.alive and not schotdrager.visible, "Schotdrager terug of zichtbaar na binnenkomen")
+	await t.cleanup()
+
+
+## LM-13, §12 punt (2), deel 2: een vijand uit de editor (geen
+## `setup_target`) krijgt bij het laden zijn beeld (één `Polygon2D`, zo groot
+## als zijn vlak, in de kleur van zijn soort), het standaardvlak als hij er
+## geen had, vol leven en het pantser van zijn soort; een pantserdoel loopt
+## niet. Hij doet mee zoals een vijand uit code (aangemeld, te raken) en
+## volgt LM-13 (weg na ontladen en laden). Een vijand uit code heeft ook na
+## inpakken en laden precies één beeld.
+func test_lm13_enemy_placed_in_editor(t) -> void:
+	var state := GameState.new()
+	var w := _world(t, state, true, [40, false], _editor_scene())
+	var sim = w["sim"]
+	var p1: PlayerActor = w["p1"]
+	var b: Kamer = w["b"]
+	var kadeloper := _enemy(b, "Kadeloper")
+	var schotdrager := _enemy(b, "Schotdrager")
+	var size: Array = load("res://scripts/echo/tuning.gd").combat()["enemy_size"]
+	var cases := [[kadeloper, Vector2(float(size[0]), float(size[1]))], [schotdrager, Vector2(20, 30)]]
+	for case: Array in cases:
+		var target: CombatTarget = case[0]
+		var visuals := _visuals(target)
+		var want: Vector2 = case[1]
+		t.check(target.shape is RectangleShape2D and (target.shape as RectangleShape2D).size == want,
+			"%s: vlak %s (verwacht %s)" % [target.name, target.shape, want])
+		t.check(visuals.size() == 1 and visuals[0].color == CombatTarget.COLORS[target.kind]
+			and visuals[0].polygon[2] == want * 0.5, "%s: beeld %s" % [target.name, visuals.map(func(v): return v.polygon)])
+		t.check(target.alive and target.visible and target.health == target.health_full()
+			and sim.objects.has(target) and sim.combat.targets.has(target),
+			"%s: leven %d, aangemeld %s" % [target.name, target.health, sim.objects.has(target)])
+	t.check(schotdrager.armor_intact and not schotdrager.walks, "Schotdrager: pantser %s, loopt %s"
+		% [schotdrager.armor_intact, schotdrager.walks])
+	var box := Rect2(kadeloper.global_position - Vector2(20, 20), Vector2(40, 40))
+	t.check(kadeloper.is_hit_by(box, Layers.LIGHT), "Kadeloper uit de editor niet te raken")
+	await _goto(sim, p1, t, IN_B)
+	_defeat(sim, b, "Schotdrager")
+	await _goto(sim, p1, t, IN_C)
+	await _goto(sim, p1, t, IN_D)
+	await _goto(sim, p1, t, IN_C)
+	t.check(_is_away(sim, _enemy(b, "Schotdrager")), "Schotdrager uit de editor terug na laden")
+	t.check(_visuals(_enemy(b, "Kadeloper")).size() == 1, "Kadeloper na opnieuw laden: %d beelden"
+		% _visuals(_enemy(b, "Kadeloper")).size())
+	await t.cleanup()
+
+
+## Een vijand uit code (`setup_target`, zoals in de flow-kamer en in
+## `_enemy_scene`): één beeld, ook na inpakken en laden in een kamer.
+func test_lm13_code_built_enemy_one_visual(t) -> void:
+	var w2 := _world(t, GameState.new(), true, [40, false])
+	var code_built := _enemy(w2["b"], "Kadeloper")
+	t.check(_visuals(code_built).size() == 1 and code_built.get_node_or_null(^"Beeld") != null,
+		"vijand uit code: %d beelden" % _visuals(code_built).size())
+	var direct: CombatTarget = Fx.target(w2["sim"], CombatTarget.Kind.ARMORED, 400)
+	t.check(_visuals(direct).size() == 1, "doel uit code direct in de Sim: %d beelden" % _visuals(direct).size())
 	await t.cleanup()
