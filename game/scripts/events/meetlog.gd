@@ -4,9 +4,9 @@ extends RefCounted
 ## (MP-2), R-V12 (MP-3) en echo Leeg (MP-4).
 ##
 ## Luistert alleen naar signalen en leest na elke tick de toestand van P1 en,
-## in co-op, van P2 (standaarden §6: geen testhaken in gameplaycode). Deterministisch: dezelfde
-## `ScriptedInput` en dezelfde D geven dezelfde regels. Kolommen:
-## `tick, kamer, event, waarde, bron, x, y`. Kamers, LP, POMP en
+## in co-op, van P2 (standaarden §6: geen testhaken in gameplaycode).
+## Deterministisch: dezelfde `ScriptedInput` en dezelfde D geven dezelfde
+## regels. Kolommen: `tick, kamer, event, waarde, bron, x, y`. Kamers, LP, POMP en
 ## DROP_IN … P2_TERUG schrijft de flow-kamer (`flow_meetlog.gd`); hier staan
 ## de springplank-events van P1 en, in co-op, van P2 (bron = de drager).
 ##
@@ -87,7 +87,9 @@ func finish() -> void:
 		_add(tick, "STIL_EIND", str(tick - _still_since + 1), "p1", _p1.position)
 		_still_since = -1
 	if _p2_still_since >= 0:
-		_add(tick, "STIL_EIND", str(tick - _p2_still_since + 1), "p2", _p2.position)
+		# Lengte bewust als bij P1 hierboven: de laatste tick is nog stil (+ 1).
+		var at: Vector2 = _p2.position if _p2 != null and is_instance_valid(_p2) else Vector2.ZERO
+		_add(tick, "STIL_EIND", str(tick - _p2_still_since + 1), "p2", at)
 		_p2_still_since = -1
 	_add(tick, "RUN_EIND", "", "", _p1.position)
 	# Daarna komt er niets meer bij, ook niet als de Sim nog een tick draait.
