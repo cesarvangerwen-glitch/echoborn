@@ -14,7 +14,7 @@ HUD_THANKS,Thank you. Measurement log: %s,Bedankt. Meetlog: %s,%s = pad van het 
 MENU_NEW_GAME,New game,Nieuw spel,"Hoofdmenu zonder spelbestanden (start meteen in plaats 1) en de regel bij een lege plaats (hud-menus.md §4.7, MN-22)."
 MENU_SLOTS,Save files,Spelbestanden,Hoofdmenu: naar het slot-menu (hud-menus.md §4.7).
 MENU_SLOT_NAME,Slot %d,Plaats %d,"%d = nummer van de plaats, 1 tot en met 3 (1-based, zoals slot_<n>.json)."
-MENU_SLOT_DETAILS,%s   Light %d   %s,%s   Licht %d   %s,"Regel onder een plaats met een spel. %s = wijknaam, %d = lichtmeter (LP), %s = speeltijd (MENU_SLOT_TIME_MIN of MENU_SLOT_TIME_HM)."
+MENU_SLOT_DETAILS,%s · Light %d · %s,%s · Licht %d · %s,"Regel 2 van een plaats met een spel, op één regel (hud-menus.md §4.7a, max. 379 px). %s = wijknaam, %d = lichtmeter (LP), %s = speeltijd (MENU_SLOT_TIME_MIN of MENU_SLOT_TIME_HM)."
 MENU_SLOT_TIME_MIN,%d min,%d min,Speeltijd onder 1 uur. %d = minuten.
 MENU_SLOT_TIME_HM,%d h %02d min,%d u %02d min,"Speeltijd vanaf 1 uur. %d = uren, %02d = minuten (twee cijfers)."
 MENU_SLOT_EMPTY,Empty,Leeg,Stand LEEG: geen save en geen back-up.
@@ -33,3 +33,11 @@ HUD_SAVE_RESTORED,Save restored,Spel hersteld,"Melding na laden van een plaats m
 HUD_SAVE_RESTORED_SUB,Some recent progress was lost,Je bent wat voortgang kwijt,"Melding HERSTELD, regel 2: de voortgang sinds het vorige checkpoint is weg. Bewust geen plek: de back-up ligt vaak op dezelfde plek als de save."
 HUD_SAVE_FAILED,Saving failed,Opslaan mislukt,"Melding als een autosave mislukt (signaal saved met fout, §4.6). Regel 1."
 HUD_SAVE_FAILED_SUB,Is the disk full?,Is de schijf vol?,"Melding opslaan mislukt, regel 2."
+MENU_CONTINUE_DETAILS,Light %d · %s,Licht %d · %s,"Hoofdmenu, tweede regel onder Doorgaan (hud-menus.md §4.2 nr. 2); de eerste regel is de wijknaam (max. 165 px, ook EN). %d = lichtmeter (LP), %s = speeltijd (MENU_SLOT_TIME_MIN of MENU_SLOT_TIME_HM)."
+MENU_SLOT_LAMPGLAS,Lamp glass %d/%d,Lampglas %d/%d,"Pas na schema v2 (hud-menus.md §4.7a): achter MENU_SLOT_DETAILS, met ' · ' ertussen. %d = gevonden, %d = totaal (4)."
+MENU_LOGBOOK,Logbook,Logboek,"Pauzeregel en titel van het logboek (hud-menus.md §4.8)."
+MENU_LOG_COUNT,%d of %d found,%d van %d gevonden,"Logboek, onder de tabs: bladzijden van dit gebied. %d = gevonden, %d = totaal in het gebied."
+MENU_LOG_NONE,No pages found here yet.,Nog geen bladzijden in dit gebied.,"Logboek: in het kader als je in dit gebied nog niets vond (MN-32). Max. 348 px."
+MENU_CREDITS,Credits,Credits,"Hoofdmenuregel en titel van de credits (hud-menus.md §4.9)."
+MENU_CREDITS_FASTER,Faster,Sneller,"Knophint in de credits naast het d-pad: omlaag vasthouden = 4x zo snel (MN-36)."
+MENU_COLUMN,Column,Kolom,"Knophint in Opties > Besturing naast d-pad links/rechts: van kolom wisselen (MN-40)."
