@@ -6,7 +6,7 @@
 <line x1="165" y1="194" x2="165" y2="220" stroke="#cbc2b5" stroke-width="1.5" marker-end="url(#p)"/>
 <text x="171" y="203" fill="#ffdb94" font-size="11">knop</text>
 <line x1="290" y1="252" x2="340" y2="252" stroke="#cbc2b5" stroke-width="1.5" marker-end="url(#p)"/>
-<text x="321" y="248" fill="#ffdb94" font-size="11">Nieuw spel</text>
+<text x="321" y="248" fill="#ffdb94" font-size="11">Spelbestanden</text>
 <line x1="165" y1="284" x2="165" y2="340" stroke="#cbc2b5" stroke-width="1.5" marker-end="url(#p)"/>
 <text x="171" y="308" fill="#ffdb94" font-size="11">Doorgaan</text>
 <line x1="340" y1="252" x2="290" y2="372" stroke="#cbc2b5" stroke-width="1.5" marker-end="url(#p)"/>
@@ -31,10 +31,10 @@
 <text x="50" y="174" fill="#a8a19f" font-size="10.5">“druk op een knop” = P1 (W3)</text>
 <rect x="40" y="220" width="250" height="64" rx="4" fill="#0c0c1d" stroke="#5b576e" stroke-width="2"/>
 <text x="50" y="244" fill="#ece2cc" font-size="14" font-weight="bold">Hoofdmenu</text>
-<text x="50" y="264" fill="#a8a19f" font-size="10.5">Doorgaan · Nieuw spel · Opties · Credits · Afsluiten</text>
+<text x="50" y="264" fill="#a8a19f" font-size="10.5">Doorgaan · Spelbestanden · Opties · Credits · Afsluiten</text>
 <rect x="340" y="220" width="250" height="64" rx="4" fill="#0c0c1d" stroke="#5b576e" stroke-width="2"/>
-<text x="350" y="244" fill="#ece2cc" font-size="14" font-weight="bold">Spelbestand kiezen</text>
-<text x="350" y="264" fill="#a8a19f" font-size="10.5">3 plaatsen, bevestig overschrijven</text>
+<text x="350" y="244" fill="#ece2cc" font-size="14" font-weight="bold">Spelbestanden (§4.7)</text>
+<text x="350" y="264" fill="#a8a19f" font-size="10.5">3 plaatsen; overschrijven dwingend bevestigen</text>
 <rect x="340" y="340" width="250" height="64" rx="4" fill="#0c0c1d" stroke="#5b576e" stroke-width="2"/>
 <text x="350" y="364" fill="#ece2cc" font-size="14" font-weight="bold">Opties</text>
 <text x="350" y="384" fill="#a8a19f" font-size="10.5">Algemeen · Beeld · Geluid · Besturing · Toegankelijkheid</text>

@@ -373,7 +373,14 @@ def vijand(img, cx, cy):
     rect(img, cx + 7, cy - 2, 2, 2, hx("#ffeaf0"))
 
 
-def plaat(img, x, y, w, h, alpha=0.62):
+# Plaat achter de HUD: 66 % (hud-menus.md 0.2, par. 2.3; was 62 %, ui-stijlgids par. 6).
+PLAAT_ALPHA = 0.66
+# Melding (HUD-08): max. 196 px breed; staat het logkader er, dan 36 px hoger (par. 3.7).
+MELDING_MAX_B = 196
+LOG_H = 32
+
+
+def plaat(img, x, y, w, h, alpha=PLAAT_ALPHA):
     rect(img, x + 1, y, w - 2, h, C["plaat"], alpha)
     rect(img, x, y + 1, 1, h - 2, C["plaat"], alpha)
     rect(img, x + w - 1, y + 1, 1, h - 2, C["plaat"], alpha)
@@ -408,12 +415,19 @@ def logkader(img, regel1, regel2, kop="LOGBLADZIJDE 3"):
     txt(img, regel2, x + 6, y + 22, C["tekst"])
 
 
-def melding(img, tekst, sub=None, kleur=None):
-    """Melding rechtsonder (lampglas, controller, opslaan): max. 3 s, geen pauze."""
+def melding(img, tekst, sub=None, kleur=None, boven_log=False):
+    """Melding rechtsonder (lampglas, controller, opslaan): max. 3 s, geen pauze.
+
+    Max. MELDING_MAX_B px breed (HUD-M5). Met boven_log=True staat het logkader
+    er en schuift de melding LOG_H + 4 = 36 px omhoog (HUD-M6).
+    """
     H, W = img.shape[:2]
     w = max(text_width(tekst, 1), text_width(sub or "", 1)) + 12
+    assert w <= MELDING_MAX_B, "melding te breed (%d px): %s" % (w, tekst)
     h = 22 if sub else 13
     x, y = W - 8 - w, H - 8 - h
+    if boven_log:
+        y -= LOG_H + 4
     plaat(img, x, y, w, h, 0.78)
     frame(img, x, y, w, h, kleur if kleur is not None else C["kader_d"])
     txt(img, tekst, x + 6, y + 3, kleur if kleur is not None else C["tekst"])
@@ -513,8 +527,8 @@ def blad_hud_annotaties():
     noot(img, 6, 572, 190)
     logkader(img, "HET WATER STOND TOT DE TWEEDE TREDE.", "DAARNA HOORDE NIEMAND DE KLOK NOG.")
     noot(img, 7, 126, 320)
-    melding(img, "LAMPGLAS: +1 LEVEN")
-    noot(img, 8, 540, 324)
+    melding(img, "LAMPGLAS: +1 LEVEN", boven_log=True)
+    noot(img, 8, 540, 288)
     label(img, "HUD SOLO MET NOTITIES (NRS = HUD-TABEL)")
     opslaan(img, "hud_solo_annotaties_x2_placeholder.png", 2)
 
@@ -667,7 +681,7 @@ def blad_hoofdmenu():
     rect(img, 0, 120, 330, 120, C["plaat"], 0.8)
     txt(img, "POLDERLIGHT", 48, 64, C["tekst"], scale=4)
     txt(img, "WERKTITEL", 48, 102, C["tekst_d"])
-    menulijst(img, 56, 140, ["DOORGAAN", "NIEUW SPEL", "OPTIES", "CREDITS", "AFSLUITEN"], 0)
+    menulijst(img, 56, 140, ["DOORGAAN", "SPELBESTANDEN", "OPTIES", "CREDITS", "AFSLUITEN"], 0)
     txt(img, "WIJK 1.1 DE KADEWIJK   LICHT 40   12 MIN", 56, 224, C["tekst_d"])
     noot(img, 1, 34, 136)
     noot(img, 2, 300, 222)
@@ -679,6 +693,63 @@ def blad_hoofdmenu():
     hintbalk(img, [("A", "KIES"), ("B", "TERUG")])
     label(img, "HOOFDMENU")
     opslaan(img, "menu_hoofdmenu_x2_placeholder.png", 2)
+
+
+def blad_spelbestanden():
+    """Slot-menu (hud-menus.md par. 4.7): de stand van elke plaats en de dwingende bevestiging.
+
+    Boven: de lijst met plaats 1 (HERSTELD), 2 (beschadigd) en 3 (leeg); de cursor staat op
+    het laatst gespeelde. Onder: overschrijven van plaats 1, cursor op TERUG.
+    Geen vraagteken in het wireframe-font; de echte tekst staat in strings.csv.
+    """
+    def lijst(img, gekozen):
+        txt(img, "SPELBESTANDEN", 48, 32, C["tekst"], scale=2)
+        rijen = [
+            ("PLAATS 1", "WIJK 1.1 DE KADEWIJK   LICHT 40   1 U 12 MIN", C["tekst_d"]),
+            ("PLAATS 2", "BESCHADIGD: KAN NIET LADEN", C["gloed"][6]),
+            ("PLAATS 3", "LEEG", C["kader_d"]),
+        ]
+        for i, (kop, sub, kl) in enumerate(rijen):
+            y = 72 + i * 44
+            plaat(img, 48, y, 400, 36, 0.78)
+            frame(img, 48, y, 400, 36, C["amber"] if i == gekozen else C["kader_d"], 2 if i == gekozen else 1)
+            if i == gekozen:
+                for k in range(4):
+                    rect(img, 38 + k, y + 14 + k, 1, 7 - 2 * k, C["amber"])
+            txt(img, kop, 60, y + 7, C["tekst"])
+            txt(img, sub, 60, y + 21, kl)
+            if i == 0:
+                # Stand HERSTELD: rechts op regel 1, naast PLAATS n (MN-22).
+                t = "HERSTELD UIT BACK-UP"
+                txt(img, t, 48 + 400 - 12 - text_width(t, 1), y + 7, C["tekst_d"])
+        return img
+
+    a = lijst(menu_basis("grijs", 0.55), 0)
+    noot(a, 1, 452, 72)
+    noot(a, 2, 452, 116)
+    noot(a, 3, 452, 160)
+    noot(a, 4, 452, 84)
+    hintbalk(a, [("A", "LADEN"), ("X", "NIEUW SPEL HIER"), ("B", "TERUG")])
+    noot(a, 5, 400, 328)
+    label(a, "SPELBESTANDEN: STAND PER PLAATS (MN-21, MN-22)")
+
+    b = lijst(menu_basis("grijs", 0.55), 0)
+    b = (b * 0.4 + C["plaat"] * 0.6).astype(np.uint8)
+    x, y, w, h = 120, 100, 400, 140
+    plaat(b, x, y, w, h, 0.92)
+    frame(b, x, y, w, h, C["gloed"][6], 2)
+    txt(b, "PLAATS 1 OVERSCHRIJVEN", x + 14, y + 12, C["tekst"], scale=2)
+    txt(b, "WIJK 1.1 DE KADEWIJK   1 U 12 MIN", x + 14, y + 38, C["tekst_d"])
+    txt(b, "DIT SPEL WORDT GEWIST. DAT KAN NIET TERUG.", x + 14, y + 50, C["tekst"])
+    menulijst(b, x + 34, y + 80, ["TERUG", "OVERSCHRIJVEN"], 0, stap=20, breedte=170)
+    noot(b, 1, x + 214, y + 78)
+    noot(b, 2, x + 214, y + 98)
+    # Notitie (geen tekst van het venster, geen sleutel): buiten het kader, in magenta.
+    noot(b, 3, x, y + h + 8)
+    txt(b, "NOTITIE: EERST LOSLATEN, DAN OMLAAG + A. GEEN WRAP.", x + 14, y + h + 10, C["noot"])
+    hintbalk(b, [("A", "KIES"), ("B", "TERUG")])
+    label(b, "BEVESTIGING OVERSCHRIJVEN: DWINGEND (MN-23)")
+    opslaan(np.concatenate([a, b], 0), "menu_spelbestanden_x2_placeholder.png", 2)
 
 
 def blad_pauze():
@@ -806,7 +877,7 @@ def blad_coop_storyboard():
     # 1. solo, tweede controller aangesloten
     a = laad("r5_kleur_640x360.png")
     hud_solo(a, L=40, hp=5, echo="actief")
-    melding(a, "CONTROLLER 2: DRUK OP START", "OM MEE TE DOEN", C["cyaan"])
+    melding(a, "CONTROLLER 2", "DRUK OP START OM MEE TE DOEN", C["cyaan"])
     label(a, "1. TWEEDE PAD AANGESLOTEN (MELDING 5 S)")
     panelen.append(a)
     # 2. drop-in op de plek van de echo
@@ -848,7 +919,7 @@ def metingen():
     for naam, img in (("grijs", g), ("kleur", k)):
         zone = img[4:34, 4:126].reshape(-1, 3)
         Ls = lab(zone)[:, 0]
-        plaatje = (zone * (1 - 0.62) + C["plaat"] * 0.62)
+        plaatje = (zone * (1 - PLAAT_ALPHA) + C["plaat"] * PLAAT_ALPHA)
         Lp = lab(plaatje)[:, 0]
         print("  achtergrond HUD-zone %s: L* mediaan %.1f, p95 %.1f, max %.1f; met plaat: p95 %.1f, max %.1f"
               % (naam, np.median(Ls), np.percentile(Ls, 95), Ls.max(), np.percentile(Lp, 95), Lp.max()))
@@ -882,8 +953,8 @@ def svg_schermflow():
     knopen = {
         "start": (40, 40, "Opstart", "taal = Steam/systeem (T14)"),
         "titel": (40, 130, "Titelscherm", "“druk op een knop” = P1 (W3)"),
-        "hoofd": (40, 220, "Hoofdmenu", "Doorgaan · Nieuw spel · Opties · Credits · Afsluiten"),
-        "slots": (340, 220, "Spelbestand kiezen", "3 plaatsen, bevestig overschrijven"),
+        "hoofd": (40, 220, "Hoofdmenu", "Doorgaan · Spelbestanden · Opties · Credits · Afsluiten"),
+        "slots": (340, 220, "Spelbestanden (§4.7)", "3 plaatsen; overschrijven dwingend bevestigen"),
         "opties": (340, 340, "Opties", "Algemeen · Beeld · Geluid · Besturing · Toegankelijkheid"),
         "spel": (40, 340, "Spel (HUD)", "solo of co-op; drop-in/out zonder menu"),
         "pauze": (40, 460, "Pauze", "Verder · Logboek · Opties · Speler 2 stopt · Hoofdmenu"),
@@ -891,7 +962,7 @@ def svg_schermflow():
         "pad": (340, 580, "Controller kwijt (P1)", "spel pauzeert; wacht op een knop"),
         "credits": (640, 220, "Credits", ""),
     }
-    pijlen = [("start", "titel", ""), ("titel", "hoofd", "knop"), ("hoofd", "slots", "Nieuw spel"),
+    pijlen = [("start", "titel", ""), ("titel", "hoofd", "knop"), ("hoofd", "slots", "Spelbestanden"),
               ("hoofd", "spel", "Doorgaan"), ("slots", "spel", ""), ("hoofd", "opties", "Opties"),
               ("hoofd", "credits", ""), ("spel", "pauze", "Menu/Esc"), ("pauze", "spel", "Verder"),
               ("pauze", "log", ""), ("pauze", "opties", ""), ("pauze", "hoofd", "Hoofdmenu (opslaan)"),
@@ -951,6 +1022,7 @@ if __name__ == "__main__":
     blad_elementen()
     blad_merk()
     blad_hoofdmenu()
+    blad_spelbestanden()
     blad_pauze()
     blad_opties_toegankelijkheid()
     blad_opties_besturing()
