@@ -37,7 +37,7 @@ De Business/Legal Advisor (BLA) neemt eruit over wat het dossier nodig heeft; de
 |---|---|---|---|
 | **De genrefan** (primair) | Speelde *Hollow Knight*, *Nine Sols*, *Ori*; vooral solo | Groot en bewezen publiek (zie 2.1); kortere indie-metroidvania's van ± € 20 met een eigen idee vinden hun publiek (*Haiku*, *Islets*, *Constance*, *MIO*: tabel §3) | Onderbouwd met vergelijkbare titels |
 | **Het bankduo** (secundair) | Koppel of vrienden, één ervaren en één minder ervaren speler, pc aan de tv | Weinig metroidvania's met lokale co-op; de twee die ik vond verkochten matig (*Guacamelee! 2* goed, *Curse of the Sea Rats* zwak, §3) | **Niet onderbouwd.** Ik vond geen cijfers over hoeveel metroidvania-kopers co-op spelen. Co-op blijft een tweede argument, niet de motor van de raming |
-| **Steam Deck-spelers** (kanaal, geen apart segment) | Solo-spelers onderweg/op de bank | Metroidvania's passen goed bij een handheld; Deck-verkopen daalden naar schatting 80–82 % per week na de prijsverhoging van mei 2026 (Boiling Steam, via [PC Gamer, 2026-07-22](https://www.pcgamer.com/hardware/handheld-gaming-pcs/steam-deck-sales-are-estimated-to-have-plummeted-by-around-80-percent-since-the-massive-price-hikes-earlier-this-year-back-of-the-napkin-maths-suggests/)); Linux-aandeel Steam 3,05 % in september 2026 ([Steam Deck HQ, 2026-10-05](https://steamdeckhq.com/steam-hardware-survey-results-sep-26/)) | Deck-verified is een voorwaarde (#2), geen groeimotor. We noemen de Deck alleen voor solo (pitch §9) |
+| **Steam Deck-spelers** (kanaal, geen apart segment) | Solo-spelers onderweg/op de bank | Metroidvania's passen goed bij een handheld; Deck-verkopen daalden naar schatting 80–82 % per week na de prijsverhoging van mei 2026 (Boiling Steam, via [PC Gamer, 2026-07-22](https://www.pcgamer.com/hardware/handheld-gaming-pcs/steam-deck-sales-are-estimated-to-have-plummeted-by-around-80-percent-since-the-massive-price-hikes-earlier-this-year-back-of-the-napkin-maths-suggests/)) | Deck-verified is een voorwaarde (#2), geen groeimotor. We noemen de Deck alleen voor solo (pitch §9) |
 | **Nederlandstalig publiek** (NL/BE) | Speelt in het Nederlands | NL-versie bij release in principe ja (#51, 5A); geen cijfers gevonden over het effect op verkoop | Niet bevestigd; waarde vooral cultureel (VAF art. 4) |
 
 **Conclusie voor D6.** De raming steunt op de genrefan. Co-op en de Laag-Landse wereld onderscheiden ons (pitch §8), maar ik reken er niet extra op tot er bewijs is (open punt O2).
@@ -89,7 +89,7 @@ De Business/Legal Advisor (BLA) neemt eruit over wat het dossier nodig heeft; de
 
 Rekenregel: netto = kopieën × gem. prijs incl. btw (afgerond zoals in de tabel) ÷ 1,12 × 0,90 × 0,70; bedragen afgerond op de euro. Bedragen zijn vóór vennootschapsbelasting en vóór eventuele kosten van een uitgever (we hebben er geen, #2).
 
-**Hoe te lezen voor het dossier.** *Midden* is het scenario dat ik aanraad als basis voor het financieringsplan (D10): realistisch voor een goed ontvangen eerste game zonder uitgever en zonder marketingbudget. *Laag* is wat er gebeurt als de wishlist-opbouw tegenvalt. *Hoog* vraagt een sterke launch (Next Fest, pers, ± 30.000+ wishlists) en is geen verwachting.
+**Hoe te lezen voor het dossier.** *Midden* (± 430–600 reviews) ligt **2,5–3,5× boven de mediaan** van de prijsklasse $15–20 (174 reviews) en steunt op één bevestigd datapunt (*Haiku* na zes weken). Het is dus een scenario voor een goed ontvangen eerste game, geen genregemiddelde. Neem in het financieringsplan (D10) daarom *Laag* náást *Midden* op (O4). *Laag* is wat er gebeurt als de wishlist-opbouw tegenvalt. *Hoog* vraagt een sterke launch (Next Fest, pers, ± 45.000–70.000 wishlists, A8) en is geen verwachting.
 
 ### 4.2 Aannames
 
@@ -100,7 +100,7 @@ Rekenregel: netto = kopieën × gem. prijs incl. btw (afgerond zoals in de tabel
 - A5. **Terugbetalingen** 10 % (indie-bandbreedte 10–15 %, Steam Page Analyzer; geen Valve-cijfer).
 - A6. **Steam-aandeel** 30 % (25 % pas boven $10 M bruto, [Valve 2018](https://steamcommunity.com/groups/steamworks/announcements/detail/1697191267930157838)).
 - A7. **Boxleiter-ratio** 20–40× voor nieuwe releases, 25–35× gebruikt voor de omrekening naar reviews (§3).
-- A8. **Wishlists → verkoop.** *Haiku* verkocht in zes weken ± 40 % van zijn launch-wishlists (15K / 37K, §3). Voor *Midden* zijn bij de launch ruwweg 15.000–25.000 wishlists nodig; dat is input voor D7 (tractieplan), geen doel dat hier vastligt.
+- A8. **Wishlists → verkoop.** *Haiku* verkocht in zes weken ± 40 % van zijn launch-wishlists (15K / 37K, §3). Rekenstap: neem aan dat de eerste zes weken 40–60 % van de verkoop over 24 maanden brengen (mijn aanname, niet gemeten); dan is launch-verkoop = 0,4–0,6 × de 24-maandenverkoop, en wishlists ≈ launch-verkoop ÷ 0,4. **Laag:** 4.000 × 0,4–0,6 = 1.600–2.400 → ± 4.000–6.000 wishlists. **Midden:** 15.000 × 0,4–0,6 = 6.000–9.000 → ± 15.000–22.500 (afgerond 15.000–25.000). **Hoog:** 45.000 × 0,4–0,6 = 18.000–27.000 → ± 45.000–67.500. Dat is input voor D7 (tractieplan), geen doel dat hier vastligt.
 - A9. **Geen co-op-bonus en geen NL-bonus** in de aantallen (§2.2).
 - A10. **Eén release, geen early access**; de 24 maanden lopen vanaf de releasedatum, welke dat ook wordt (werkaanname §6).
 
@@ -114,7 +114,7 @@ Rekenregel: netto = kopieën × gem. prijs incl. btw (afgerond zoals in de tabel
 | R4 | **Geen uitgever, geen marketingbudget** (#2, fase 2 € 0) | Minder zichtbaarheid dan *MIO* of *Constance* | Next Fest, festivals, pers; budget per fase via de EP |
 | R5 | **Groeiende concurrentie**: ± 290 metroidvania's in 2025, +9 % in 2026 | Moeilijker op te vallen | De eigen draai (echo, licht, Lage Landen) zichtbaar in één GIF |
 | R6 | **Co-op niet bewezen** als verkoopargument | Geen extra verkoop uit het bankduo | Niet meegeteld (A9); toetsen in playtests en bij de Steam-pagina |
-| R7 | **AI-gemaakte content**: Steam vraagt een melding van AI-gebruik op de winkelpagina (Valve-beleid sinds januari 2024; voor dit document niet opnieuw gecontroleerd) | Mogelijk negatieve reactie van een deel van het publiek; effect op verkoop *niet bevestigd* | Eerlijk melden; BLA en CEO bepalen de tekst |
+| R7 | **AI-gemaakte content**: Valve vraagt sinds januari 2024 een melding van AI-gebruik in de Steam-vragenlijst en toont veel daarvan op de winkelpagina ([GamingOnLinux, 2024-01-10](https://www.gamingonlinux.com/2024/01/valve-announces-new-rules-for-games-with-ai-content-on-steam/)); sinds januari 2026 alleen voor content die spelers zien of horen (art, geluid, verhaal, vertaling, winkelpagina, marketing) en niet voor AI als ontwikkeltool ([GameMeca, 2026-01-20](https://www.gamemeca.com/en/view.php?gid=1770331)). Wij maken art, audio en tekst met AI-rollen, dus een melding is waarschijnlijk nodig | Mogelijk negatieve reactie van een deel van het publiek; effect op verkoop *niet bevestigd* | Eerlijk melden; BLA en CEO bepalen de tekst |
 | R8 | **Steam Deck**: Deck-verkopen dalen sinds mei 2026 | Minder groei via handhelds | Deck verified blijft een voorwaarde, geen motor |
 | R9 | **Prijs en kortingen** wijken af van A3 | ± 10–15 % netto verschil | Kortingsbeleid vastleggen vóór de launch |
 
@@ -127,9 +127,11 @@ Dit document gebruikt de werkaanname uit `docs/beslissingen.md`: **totaalbudget 
 - O1. **Steam-reviewtellingen rechtstreeks van Steam**: ik kon de winkelpagina's niet lezen en gebruikte SteamSpy en Steam Page Analyzer. Iemand met een browser kan de tellingen in §3 bevestigen (bv. de BLA bij het afwerken van het dossier). De schattingen veranderen daardoor naar verwachting omhoog, niet omlaag.
 - O2. **Bewijs voor het bankduo**: geen cijfers over co-op-spelers in het genre. Toetsen via playtests (fase 2) en later via de Steam-pagina (D7).
 - O3. **Vlaamse/Nederlandse referentie in het genre**: niet gevonden. Vraag voor de intake (via de BLA): kent het VAF gesteunde metroidvania's of 2D-actiegames met verkoopcijfers?
-- O4. **Netto naar het financieringsplan**: de EP kiest in F6/D10 welk scenario het financieringsplan gebruikt (mijn advies: *Midden*) en hoe de verkoop zich verhoudt tot het budget van fase 3.
+- O4. **Netto naar het financieringsplan**: de EP kiest in F6/D10 welk scenario het financieringsplan gebruikt (mijn advies: *Laag* náást *Midden*, §4.1) en hoe de verkoop zich verhoudt tot het budget van fase 3.
 - O5. **Tractie (D7)** en **pitchvideo (D13)**: buiten dit document; na de slice en een CEO-besluit over een Steam-pagina. A8 geeft de orde van grootte van de wishlists die *Midden* vraagt.
 - O6. **Herzien** zodra er een Steam-pagina en wishlists zijn: dan vervangt de wishlist-methode (A8) de vergelijkbare titels als hoofdbron.
+- O7. **Spreiding over 24 maanden** ontbreekt (per kwartaal); de EP heeft die nodig voor de cashflow in D10.
+- O8. **VAF-dossier §4.3** noemt het bankduo "groot genoeg als tweede verkoopargument"; dit document vindt dat niet onderbouwd (O2), dus de BLA past §4.3 aan.
 
 ## 8. Logboek wijzigingen
 
