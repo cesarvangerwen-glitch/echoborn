@@ -5,6 +5,8 @@ Bronnen: `docs/design/wereld.md` §1.3–§1.4 en §2 (werknamen, opbouw WS-01),
 
 Dit document legt de namen vast van de proloog, de 4 gebieden, hun 12 wijken en de finale van Hollestede, in EN en NL, met wat ze betekenen en hoe breed ze zijn. De teksten staan in `game/locale/strings.csv`. De opbouw (welke wijk in welk gebied ligt, de volgorde) is van de World & Level Designer (`wereld.md` WS-01, WS-04); dit document noemt alleen.
 
+**Werkaanname** (kader §5): de wijknaam komt uit een tabel gebied → wijk (NM-O1); tot T8a geldt de indeling van `wereld.md` §1.3, met wijk 3.3 als *Het Waagplein*.
+
 ---
 
 ## 1. Regels voor een naam
@@ -12,7 +14,7 @@ Dit document legt de namen vast van de proloog, de 4 gebieden, hun 12 wijken en 
 | ID | Regel |
 |---|---|
 | **NM-1** | **Breedte: een wijknaam is ≤ 165 px** in Polderletter normaal, in EN én NL (`hud-menus.md` §4.2: de zijband van het hoofdmenu vanaf x 41). Gemeten met `text_width` uit `docs/art/ui/bron/polderletter.py`. Te lang = korter schrijven, nooit kleiner zetten of afbreken (§6 van de UX-spec). Dezelfde grens houdt `MENU_SLOT_DETAILS` op één regel (§4.7a). Een gebiedsnaam valt niet onder die grens (hij staat in een tab, niet in de zijband), maar blijft er ook onder. |
-| **NM-2** | **Een plek, geen gebeurtenis.** Elke naam is een gewone stadsnaam: een gebouw, een straat, een stuk dijk. Geen naam zegt iets over het water, het vergeten of Ward; dat leest de speler af aan de plek zelf (`verhaal-v2.md` §2.2). Zo verklapt een naam niets en breekt hij niet als je een wijk in een andere volgorde of opnieuw bezoekt (§4.1). |
+| **NM-2** | **Een plek, geen gebeurtenis.** Elke naam is een gewone stadsnaam: een gebouw, een straat, een stuk dijk. Waterwerken mogen in de naam staan, want die horen bij elke polderstad (*De Ringdijk*, *De Dijkvoet*, *De Kadewijk*, *De Grote Sluis*); geen naam zegt iets over wat er met het water gebeurde, over het vergeten of over Ward. Dat leest de speler af aan de plek zelf (`verhaal-v2.md` §2.2). Zo verklapt een naam niets en breekt hij niet als je een wijk in een andere volgorde of opnieuw bezoekt (§4.1). |
 | **NM-3** | **Verzonnen, en geen ramp** (toonregel W-6). Alleen soortnamen van gebouwen en plekken uit de Lage Landen (begijnhof, lakenhal, waag, belfort); geen bestaande plaats, geen datum, geen monument. |
 | **NM-4** | **Geen naam twee keer.** Een wijk heet niet zoals een boss, een vaardigheid of haar eigen gebied, zodat *De Waag · Licht 40* nooit kan betekenen "je staat bij de boss". |
 | **NM-5** | **NL eerst, EN als eigen naam.** De NL-naam is de bron (de stad ligt in de Lage Landen). De EN-naam is geen woord-voor-woordvertaling maar de naam die een Engelstalige stad voor zo'n plek zou gebruiken (*Quayside*, *Canal Row*). Engels in Brits Engels (*dyke*, niet *dike*). Hollestede blijft in beide talen Hollestede. |
@@ -73,7 +75,7 @@ De werknamen uit `wereld.md` §1.3 zijn de basis (`wereld.md` OW-2, `verhaal-v2.
 
 | Wijk | Was | Wordt | Waarom |
 |---|---|---|---|
-| 3.3 | *De Waag* | **Het Waagplein** | NM-4: de boss van gebied 3 heet ook *De Waag* (`verhaal-v2.md` §4.2) en het gebied heet *De markt en de waag*. Drie keer "waag" op één plek: in het slot-menu kon *De Waag · Licht 60* lezen als "staat bij de boss". *Waagplein* houdt het gebouw in beeld en is een plek, geen tegenstander. |
+| 3.3 | *De Waag* | **Het Waagplein** | NM-4: wijk en boss mogen niet dezelfde naam dragen. De boss van gebied 3 heet *De Waag* (`verhaal-v2.md` §4.2); met *Het Waagplein* hebben wijk en boss niet meer dezelfde woorden, dus *Het Waagplein · Licht 60* in het slot-menu leest als een plek en niet als "staat bij de boss". Het gebouw blijft in de naam, omdat de wijk eromheen ligt. |
 
 Alle andere namen zijn overgenomen. Bewust niet veranderd:
 - *De polderwijk* (gebied) met daarin *De Kadewijk* (wijk): twee keer "wijk", maar het ene is een stadsdeel en het andere een buurt aan de kade; de spelers zien ze nooit naast elkaar (het gebied staat in de tab, de wijk in de slot-regel). *De Kadewijk* is ook al de naam van de slice in elk document.
@@ -90,6 +92,7 @@ Alle andere namen zijn overgenomen. Bewust niet veranderd:
 | NM-O2a | Wijk 2.1 *De Poort* botst met de spelterm *terugkeerpoort* (`wereld.md` §1.4); samen met NM-O2 beslissen of de naam blijft of wordt bv. *De Poorttoren*. | World & Level Designer, met Narrative Designer | Samen met NM-O2 |
 | NM-O3 | **Opnieuw meten** als Polderletter verandert (eind-font van de UI Artist, `hud-menus.md` §7 punt 1 en 10): de breedtes hier zijn van de huidige `polderletter.py`. Met 78 px marge verwacht ik geen probleem. | Narrative Designer, UI Artist | Bij een nieuw font |
 | NM-O4 | De EN-namen zijn door de Narrative Designer geschreven, niet door een moedertaalspreker. *Dykefoot* en *Towerfoot* zijn verzonnen samenstellingen: laten toetsen door een EN-lezer, samen met de rest van de EN-tekst. Aangenomen door de CD (Lead-review). | Creative Director | Vóór de eerste publieke build |
+| NM-O5 | `hud-menus.md` §6 ("Volgen nog": gebiedsnamen) en §7 punt 17 sluiten; `state.gebied` heeft geen wijk (`ontwerp.md` §7), dus de wijkregel onder *Doorgaan* vraagt een wijk-id: meenemen bij NM-O1. | UX Designer (sluiten), World & Level Designer en Gameplay Programmer (wijk-id) | Vóór T8a |
 
 ---
 
@@ -99,3 +102,4 @@ Alle andere namen zijn overgenomen. Bewust niet veranderd:
 |---|---|
 | 0.1 | Eerste versie (T10, `hud-menus.md` §7 punt 17): namen van proloog, 4 gebieden, 12 wijken en finale in EN en NL, met betekenis en gemeten breedte; wijk 3.3 *De Waag* wordt *Het Waagplein*; sleutels `COMMON_AREA_1`–`4` en `COMMON_DISTRICT_*` in `strings.csv` |
 | 0.1.1 | Na de Lead-review CD: *De Ringdijk* en *De Grote Sluis* met hoofdletters (NM-6, hermeten); open punt NM-O2a (*De Poort*); NM-O4 aangenomen door de CD |
+| 0.1.2 | Na de SM-review: werkaanname (kader §5); NM-2 laat waterwerken in namen toe; motivatie *Het Waagplein* in §3 herschreven; open punt NM-O5 |
