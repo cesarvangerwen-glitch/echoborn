@@ -266,14 +266,17 @@ func new_game(slot: int, p_state: GameState = null) -> Error:
 
 ## Slaat het lopende spel op in zijn slot, met `store_world` vlak ervoor.
 ## Zonder lopend spel (slot -1): ERR_UNCONFIGURED, en er wordt niets
-## geschreven.
+## geschreven. Mislukt het schrijven, dan blijft de vorige save staan; de
+## fout gaat via `saved` naar het spel (melding: UX/UI, T10) en als
+## waarschuwing naar het log (geen `push_error`: een volle schijf is geen
+## programmeerfout).
 func save_now(reason: String = "handmatig") -> Error:
 	if progress == null or progress.slot < 0:
 		return ERR_UNCONFIGURED
 	progress.store_world()
 	var err := write(path_of(progress.slot), progress.state)
 	if err != OK:
-		push_error("SaveService: opslaan in slot %d mislukt (%s): %s" % [progress.slot, reason, error_string(err)])
+		push_warning("SaveService: opslaan in slot %d mislukt (%s): %s" % [progress.slot, reason, error_string(err)])
 	saved.emit(progress.slot, reason, err)
 	return err
 

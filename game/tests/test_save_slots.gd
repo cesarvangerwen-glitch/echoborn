@@ -129,6 +129,36 @@ func test_slot_status_and_both_files_broken(t) -> void:
 	_clear()
 
 
+## Een mislukte schrijfactie (hier: `<pad>.tmp` is een map): `save_now`
+## geeft de fout, `saved` meldt hem, en de vorige save blijft staan en laadt.
+func test_failed_write_keeps_previous_save(t) -> void:
+	_clear()
+	t.make_sim(false)
+	var s := _services(t)
+	var progress: Progress = s[0]
+	var service: SaveService = s[1]
+	var start := GameState.new()
+	start.lichtmeter = 21
+	service.new_game(1, start)
+	var path := service.path_of(1)
+	var before := FileAccess.get_file_as_string(path)
+	var saves: Array = []
+	service.saved.connect(func(slot: int, reason: String, error: Error) -> void:
+		saves.append([slot, reason, error]))
+	DirAccess.make_dir_recursive_absolute(path + ".tmp")
+	progress.state.lichtmeter = 99
+	var err := service.save_now("checkpoint")
+	t.check(err != OK and saves.size() == 1 and saves[0][2] == err and saves[0][1] == "checkpoint",
+		"mislukte save niet gemeld: %s, %s" % [error_string(err), saves])
+	t.check(FileAccess.get_file_as_string(path) == before, "de vorige save veranderde na een mislukte save")
+	var info := service.slot_info(1)
+	t.check(info["status"] == SaveService.SlotStatus.OK and info["state"].lichtmeter == 21,
+		"vorige save laadt niet meer: %s" % info["status"])
+	DirAccess.remove_absolute(path + ".tmp")
+	await t.cleanup()
+	_clear()
+
+
 ## Kamer A met een Eenmalige hendel in zijn gestreamde inhoud en een
 ## checkpoint, in de wereld van `sim` (`Fx.world`). Geeft [sim, p1, loader,
 ## checkpoint].
