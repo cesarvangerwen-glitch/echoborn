@@ -25,7 +25,7 @@ Kwartaal = 3 maanden vanaf de releasedatum (K1 = maand 1–3, … K8 = maand 22�
 **Herleiding.**
 - K1 = 50 % in de eerste zes weken (midden van de 40–60 % uit A8) + 5 % in week 7–13 (EP-aanname: de staart na de launch, vóór de eerste grote uitverkoop).
 - K2–K8 = de overige 45 %, aflopend van 10 % naar 4 %. EP-aanname, niet gemeten: elke kwartaal valt er minstens één seizoensuitverkoop (A3), dus geen kwartaal op 0; de afname volgt het wegzakken van de launch-zichtbaarheid.
-- **Prijs per kopie is in elk kwartaal het scenariogemiddelde** uit §4.1 (Laag € 11,99, Midden € 12,99 incl. btw). In werkelijkheid is de prijs in K1 hoger (lanceringskorting 10–15 %, A3) en later lager (uitverkopen 25–50 %, A3): de echte euro's liggen dus nog meer in K1 dan de tabel toont, en de tabel overschat K5–K8 licht. Voor de cashflow is de tabel dus voorzichtig voor K1 en iets te ruim voor K5–K8; zie §4.
+- **Prijs per kopie is in elk kwartaal het scenariogemiddelde** uit §4.1 (Laag € 11,99, Midden € 12,99 incl. btw). In werkelijkheid is de prijs in K1 hoger (lanceringskorting 10–15 %, A3) en later lager (uitverkopen 25–50 %, A3): de echte euro's liggen dus nog meer in K1 dan de tabel toont, en de tabel overschat K2–K8 licht. Voor de cashflow is de tabel dus voorzichtig voor K1 en iets te ruim voor K2–K8; zie §4.
 - Rekenregel per kwartaal is die van §4.1: netto = kopieën × gem. prijs ÷ 1,12 × 0,90 × 0,70. Afgerond op de euro; het afrondingsverschil (± € 1) zit in K8, zodat de totalen gelijk zijn aan §4.1.
 
 ## 3. Kwartaaltabel, bruto naar netto (24 maanden, alleen Steam)
