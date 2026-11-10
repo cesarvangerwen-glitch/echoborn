@@ -11,8 +11,11 @@ extends Node
 ## alleen tijdens de meting.
 ##
 ## Opties na `--`: `--frames=300`, `--warmup=90`, `--only=grijs,wijk20`,
-## `--res=native|640` (640 = wereld op 640×400 renderen en ×2 opschalen;
-## zet daarvoor ook de camerazoom van de kamer op 1, zie docs/tech/performance-flowkamer.md §3).
+## `--res=native|640|project` (native = render op venstergrootte, zonder stretch;
+## 640 = wereld op 640×400 renderen en ×2 opschalen; project = de instellingen
+## uit `project.godot` laten staan, in de Deck-build dus 640×400). De camerazoom
+## volgt de rendergrootte zelf (`FlowRoom.camera_zoom`, #120); het script zet
+## hem niet meer. Zie docs/tech/performance-flowkamer.md §3.
 ## Uitleg en drempels: `docs/tech/performance-flowkamer.md`.
 
 const FLOW_SCENE := "res://levels/flowkamer/flowkamer.tscn"
@@ -55,6 +58,9 @@ func _ready() -> void:
 		get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_VIEWPORT
 		get_window().content_scale_size = Vector2i(640, 400)
 		get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
+	elif res_mode == "native":
+		# Ook in de Deck-build (die op 640×400 staat) native meten.
+		get_window().content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
 	_light_tex = _make_light_texture()
 	_print_header()
 	for sc: Array in SCENARIOS:
@@ -91,8 +97,7 @@ func _run_scenario(sc: Array) -> void:
 	add_child(room)
 	await get_tree().process_frame
 	var load_ms := (Time.get_ticks_usec() - t0) / 1000.0
-	if res_mode == "640" and room.get("_camera"):
-		room._camera.zoom = Vector2.ONE  # 640×400 wereldpixels = hetzelfde beeld als zoom 2 op 1280×800
+	var zoom_start: float = room._camera.zoom.x
 	var rig := _add_light_rig(room, sc)
 	for i in warmup:
 		await get_tree().process_frame
@@ -131,8 +136,10 @@ func _run_scenario(sc: Array) -> void:
 		"mem_mb": Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0,
 		"vram_mb": Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0,
 		"laad_ms": load_ms, "tick": room.sim.tick, "run_klaar": room.run_over,
+		"zoom_start": zoom_start, "zoom_eind": room._camera.zoom.x,
 	})
-	print("  klaar: %s (tick %d)" % [sc[0], room.sim.tick])
+	print("  klaar: %s (tick %d, render %s, zoom start %.3f / eind %.3f)" % [sc[0], room.sim.tick,
+		get_viewport().get_visible_rect().size, zoom_start, room._camera.zoom.x])
 	room.queue_free()
 	await get_tree().process_frame
 	await get_tree().process_frame
@@ -234,7 +241,7 @@ func _save_csv() -> void:
 		push_warning("CSV niet opgeslagen: %s" % path)
 		return
 	var keys := ["scenario", "le", "lichten", "schaduwlichten", "occluders", "gem_ms", "p50_ms", "p95_ms",
-		"max_ms", "cpu_ms", "gpu_ms", "drawcalls", "drawcalls_max", "objecten", "mem_mb", "vram_mb", "laad_ms", "tick", "run_klaar"]
+		"max_ms", "cpu_ms", "gpu_ms", "drawcalls", "drawcalls_max", "objecten", "mem_mb", "vram_mb", "laad_ms", "tick", "run_klaar", "zoom_start", "zoom_eind"]
 	f.store_line(",".join(keys))
 	for r: Dictionary in _rows:
 		var vals := PackedStringArray()
