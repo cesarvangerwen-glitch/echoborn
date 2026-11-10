@@ -8,7 +8,8 @@ extends "res://scripts/objects/sim_object.gd"
 ##
 ## LM-13 (T5b, #82; ontwerp.md §3a): in de gestreamde inhoud van een kamer
 ## heeft een vijand de blijvende stand `verslagen` (= niet `alive`), die de
-## AreaLoader als vlag bewaart. Of hij terugkomt, hangt af van `terugkerend`
+## AreaLoader als vlag bewaart. Verslagen = onzichtbaar, op de tick zelf.
+## Of hij terugkomt, hangt af van `terugkerend`
 ## (LM-13a) en van het gemaal van de wijk; dat beslist de loader, die dan
 ## `revive` aanroept. De trefpop (en dus het pomprad) heeft geen stand.
 
@@ -52,12 +53,16 @@ var damage_taken := 0
 @export var walks := true
 var facing := 1
 
+## Gezet door `setup_target` of `_ready` (doel uit de editor).
+var _set_up := false
 var _stunned_until := -1
 var _windup_left := 0
 var _attack_left := 0
 var _attack_hit := false
 
 
+## In code (flow-kamer, tests): soort, vlak, leven en beeld. Een doel dat je
+## in de editor in een scène zet, hoeft dit niet: zie `_ready`.
 func setup_target(p_kind: Kind) -> void:
 	var c: Dictionary = Tuning.combat()
 	var size: Array = c["enemy_size"]
@@ -66,7 +71,41 @@ func setup_target(p_kind: Kind) -> void:
 	health = int(c["enemy_health"]) if kind != Kind.DUMMY else 1_000_000
 	armor_intact = kind == Kind.ARMORED
 	walks = kind == Kind.ENEMY
-	add_child(BodyBuilder.make_visual(shape.get_rect().size, COLORS[kind]))
+	_set_up = true
+	_ensure_visual()
+
+
+## LM-13, een vijand in de editor (ontwerp.md §3a): een scène bewaart `kind`,
+## `walks`, `terugkerend`, `owner_layers` en het vlak, niet het leven en niet
+## het beeld (dat is geen kind met een owner). Kwam het doel niet uit
+## `setup_target`, dan krijgt het hier: het standaardvlak als `shape` leeg
+## is, vol leven, het pantser van zijn soort, en het placeholderbeeld.
+## Alleen de basisvijand loopt (§4.3), wat `walks` ook zegt.
+func _ready() -> void:
+	if _set_up:
+		return
+	_set_up = true
+	if shape == null:
+		var size: Array = Tuning.combat()["enemy_size"]
+		setup(owner_layers, Vector2(float(size[0]), float(size[1])))
+	_reset_fight()
+	walks = walks and kind == Kind.ENEMY
+	_ensure_visual()
+
+
+## Het placeholderbeeld (`Beeld`, een `Polygon2D` zo groot als het vlak, in
+## de kleur van de soort): bestaat het al, dan alleen bijwerken.
+func _ensure_visual() -> void:
+	var size := shape.get_rect().size if shape != null else Vector2.ZERO
+	var visual := BodyBuilder.make_visual(size, COLORS[kind])
+	var old := get_node_or_null(^"Beeld") as Polygon2D
+	if old != null:
+		old.polygon = visual.polygon
+		old.color = visual.color
+		visual.free()
+		return
+	visual.name = "Beeld"
+	add_child(visual)
 
 
 ## LM-13(a): terugkerend (basisvijand zonder pantser) of niet.
@@ -153,7 +192,11 @@ func apply_damage(tick: int, amount: int, source: String) -> int:
 	damage_taken += done
 	damaged.emit(tick, done, source)
 	if health <= 0:
+		# LM-13: verslagen = weg, ook in een kamer die geladen blijft. Hij
+		# blijft bij de Sim aangemeld (niet `alive`: beweegt niet, wordt niet
+		# geraakt) tot zijn kamer ontlaadt, of `revive` hem terugzet.
 		alive = false
+		visible = false
 		died.emit(tick)
 	return done
 

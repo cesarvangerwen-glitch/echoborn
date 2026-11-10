@@ -15,7 +15,7 @@ extends Node
 ## - P2 en de echo veroorzaken nooit een kamerwissel (E-04e). Staat het
 ##   middelpunt van P2 in een kamer die niet geladen is, dan meldt de loader
 ##   dat één keer (`partner_in_ontladen_kamer`); keuze (c) in ontwerp.md §3a:
-##   dat telt als "uit de kamer vallen" (C-06).
+##   de Sim laat P2 dan oplossen met de oorzaak `ontladen` (C-06).
 ## - Objecten (`SimObject`) in de `inhoud` van een kamer worden bij het laden
 ##   bij de Sim aangemeld en bij het ontladen afgemeld (R10). Een object met
 ##   een blijvende stand (een hendel) bewaart die als vlag in `game_state`
@@ -32,7 +32,8 @@ extends Node
 ##   terugkerende vijand (`CombatTarget.is_returning`) in een wijk waarvan het
 ##   gemaal (`Kamer.wijk_gemaal`) niet vol is: die staat weer op zijn
 ##   startplek met vol leven. Een weggebleven vijand is niet bij de Sim
-##   aangemeld en niet zichtbaar.
+##   aangemeld en niet zichtbaar. Een vijand die verslagen wordt terwijl zijn
+##   kamer geladen is, verdwijnt meteen (`CombatTarget.apply_damage`).
 ##
 ## Geen eigen `_physics_process`: de Sim roept `sim_track` aan na stap (3)
 ## van E-07b, vóór de echo de resets van P1 verwerkt. Een wijziging in wat
@@ -52,7 +53,8 @@ signal kamer_gewisseld(tick: int, van: StringName, naar: StringName, reset: bool
 signal geladen_gewijzigd(tick: int, kamer: StringName, geladen: bool)
 ## Het middelpunt van P2 kwam deze tick in een kamer die niet geladen is
 ## (keuze (c), §3a). Eén keer per keer; weer in een geladen kamer of weg uit
-## het spel = opnieuw gewapend. De Gameplay Programmer koppelt hier C-06 aan.
+## het spel = opnieuw gewapend. Niet op de respawntick van C-08. De Sim
+## (`set_area_loader`) laat P2 hierop oplossen: `dissolve_partner("ontladen")`.
 signal partner_in_ontladen_kamer(tick: int, p2: PlayerActor, kamer: StringName)
 
 ## Alle kamers op id, in de volgorde van toevoegen.

@@ -43,8 +43,9 @@ signal tick_finished(tick: int)
 signal partner_left(tick: int, at: Vector2)
 ## P2 doet mee (C-03), op positie `at`.
 signal partner_joined(tick: int, at: Vector2)
-## P2 lost op (C-06) op `at`; `cause` is `fellicht`, `gevaar`, `val` of
-## `leiband` (C-07), zoals de bron van `P2_OPGELOST` in het meetlog (§4.5).
+## P2 lost op (C-06) op `at`; `cause` is `fellicht`, `gevaar`, `val`,
+## `leiband` (C-07) of `ontladen` (een kamer die niet geladen is, keuze (c)
+## in ontwerp.md §3a), zoals de bron van `P2_OPGELOST` in het meetlog (§4.5).
 signal partner_dissolved(tick: int, at: Vector2, cause: String)
 ## P2 is terug naast P1 (C-06 na 120 ticks, of C-08 bij een respawn van P1).
 signal partner_returned(tick: int, at: Vector2)
@@ -135,9 +136,16 @@ func can_add_echo() -> bool:
 ## loader krijgt de Sim terug, om objecten in gestreamde inhoud aan en af te
 ## melden (R10) en P2 te volgen (ontwerp.md §3a).
 func set_area_loader(loader: Node) -> void:
+	if area_loader != null and area_loader.has_signal(&"partner_in_ontladen_kamer") \
+			and area_loader.partner_in_ontladen_kamer.is_connected(_on_partner_in_ontladen_kamer):
+		area_loader.partner_in_ontladen_kamer.disconnect(_on_partner_in_ontladen_kamer)
 	area_loader = loader
 	if loader != null and "sim" in loader:
 		loader.sim = self
+	# C-06, keuze (c): P2 in een kamer die niet geladen is, lost op. De loader
+	# meldt het in `sim_track` (na stap 3), niet op de respawntick van C-08.
+	if loader != null and loader.has_signal(&"partner_in_ontladen_kamer"):
+		loader.partner_in_ontladen_kamer.connect(_on_partner_in_ontladen_kamer)
 	for echo in echoes:
 		if "area_loader" in echo:
 			echo.area_loader = loader
@@ -235,6 +243,8 @@ func _physics_process(delta: float) -> void:
 		area_loader.sim_track(tick, p1)
 	# C-08: stierf P1 in co-op, dan respawnt P2 mee, naast P1. Anders: lost P2
 	# deze tick op (C-06, C-07)? Dan voert hij in (4) geen events meer uit.
+	# Een ontladen kamer (C-06, keuze (c)) gaf de loader hierboven al door
+	# (`_on_partner_in_ontladen_kamer`).
 	if p1 and p2:
 		if p1.died:
 			_return_partner(p2, p1)
@@ -424,6 +434,15 @@ static func partner_in_view(p1_at: Vector2, p2_at: Vector2) -> bool:
 	var margin := float(c["leash_margin_px"])
 	var delta := (p2_at - p1_at).abs()
 	return delta.x <= float(view[0]) - margin and delta.y <= float(view[1]) - margin
+
+
+## C-06, keuze (c) (ontwerp.md §3a): het middelpunt van P2 kwam na stap (3)
+## in een kamer die niet geladen is. P2 lost op deze tick op, met de oorzaak
+## `ontladen`; vóór de controles van `_check_partner`, die een opgeloste P2
+## overslaat.
+func _on_partner_in_ontladen_kamer(_tick: int, p2: PlayerActor, _kamer: StringName) -> void:
+	if p2 == get_player(2):
+		dissolve_partner("ontladen")
 
 
 ## C-06: P2 lost op deze tick op (breek-effect op zijn plek). Geen
