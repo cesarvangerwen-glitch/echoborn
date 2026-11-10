@@ -1,6 +1,6 @@
 # UI-stijlgids *Polderlight*
 
-Versie 0.2 · Eigenaar: UI Artist · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10 deel 2: eind-UI-art; deel 3: menu's, glyphs, Theme) · Review: Art Director
+Versie 0.2.1 · Eigenaar: UI Artist · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10 deel 2: eind-UI-art; deel 3: menu's, glyphs, Theme) · Review: Art Director
 Basis: UX-spec `docs/ux/hud-menus.md` v0.1.2 (menu's: §4 en de wireframes in `docs/ux/wireframes/`) en `docs/ux/coop.md`, art bible v0 (`docs/art/bible.md` §2, §3, §6, §7), assetlijst S-17.
 
 Alles in deze gids is **eigen werk** en wordt gemaakt door twee scripts, zonder externe assets:
@@ -241,19 +241,21 @@ Gemeten in Polderletter normaal met **testteksten** (EN en NL, in het script, `V
 | 7 | **Licentieregister**: Polderletter is eigen werk; geen licentie van derden. Wil de Business/Legal Advisor het toch als regel "eigen werk" in `docs/licenties.md` (rolbestand UI Artist: "lettertypes hebben een licentie in licenties.md")? | Business/Legal Advisor | Geen haast |
 | 8 | Nog te testen op een echte Steam Deck: leesbaarheid van Polderletter normaal (7 px = ± 1,7 mm), de arcering van het echo-icoon (11×17) en de ring van 2 px. | Engine & Platform Programmer, met de UI Artist | Bij de Deck-build (#79) |
 | 9 | Kleurprofielen TG-07 (amber/wit-blauw, geel/magenta): de assets zijn per eigenaar in aparte bestanden, zodat een profiel alleen kleuren wisselt. Varianten tekenen zodra de AD de paren kiest. | Art Director, daarna UI Artist | Bible v1 |
-| 10 | **Deel 3** geleverd: menu-art, knop-glyphs per apparaat en het Godot Theme (§12–§14). Wat nog openstaat: punt 11–17. | UI Artist (review AD) | — |
+| 10 | **Deel 3** geleverd: menu-art, knop-glyphs per apparaat en het Godot Theme (§12–§14). Wat nog openstaat: punt 11–18. | UI Artist (review AD) | — |
 | 11 | **Spelbestand kiezen** (UX §4.2, *Nieuw spel*: 3 plaatsen met wijk, licht, speeltijd, lampglas; overschrijven met B als standaard): nog geen wireframe of indeling, dus geen art in deel 3. Het bouwt op keuzebalk, paneel en dialoog (§12). Art volgt na de indeling van de UX Designer. | UX Designer, daarna UI Artist | Na de volgende versie van `hud-menus.md` |
 | 12 | **Logboek (MN-15) en credits**: geen eigen mock-up; het Theme dekt de onderdelen (RichTextLabel, scrollbalk, kader). Mock-up na een wireframe. | UX Designer, daarna UI Artist | Na de wireframes |
 | 13 | **Herbinden: de kolom kiezen.** De art toont de gekozen kolom met `cel_focus` (open rand gloed 6) binnen de gekozen regel. UX §4.5 zegt niet hoe je van kolom wisselt (links/rechts in de regel?). Graag bevestigen. | UX Designer | Volgende versie van `hud-menus.md` |
-| 14 | **Glyphs zonder merkkleur** (monochroom ijzer + gevel wit 7). Akkoord, of een kleurhint per gezichtsknop uit het eigen palet? Ook: de knoptekst in een `Button` heeft in Godot geen schaduw (§14); gemeten ΔL\* ≥ 34 (§12.5). Akkoord? | Art Director | Bij de review van deel 3 |
+| 14 | **Besloten door de AD (Lead-review PR #142):** glyphs monochroom, zonder merkkleur (kleur blijft voor licht en spelers). Knoptekst zonder schaduw mag, met als menunorm **ΔL\* ≥ 34** (worst case), zolang een menuregel altijd op de zijband, op de verduistering (≥ 72 %) of op de keuzebalk staat. Voor de HUD blijft ΔL\* ≥ 40. | Art Director | Besloten |
 | 15 | **Glyphs in Xbox- en PlayStation-stijl**: eigen tekeningen van generieke vormen (letters, kruis, rondje, vierkant, driehoek), geen logo's. Graag een korte check of die vormen en de namen in *Knopiconen* zonder licentie in een Steam-release mogen. | Business/Legal Advisor | Vóór de eerste publieke build |
 | 16 | **Theme nog niet in Godot geopend** (geen editor in de werkomgeving van de UI Artist). Graag laden bij de bouw van de menu's en fouten melden in #87; het hangt ook af van punt 6 (filter Nearest). | Gameplay Programmer | Met T8a |
 | 17 | **Spelnaam als tekst**, geen logo (bible: geen naam of logo in de art), tot na de merkcheck van *Polderlight* (besluit #96). Een logo is een eigen opdracht. | Art Director | Na de merkcheck |
+| 18 | **Lengte van wijknamen** (regel onder *Doorgaan*, §12.5): de regel staat op twee regels (wijk / licht · speeltijd), want op één regel past hij al niet. Graag overnemen in UX §4.2. De wijknaam moet dan ≤ 165 px blijven (± 36 tekens, ook in het EN), anders wordt de zijband breder. | UX Designer, Narrative Designer | Bij de wijknamen in `strings.csv` |
 
 ## 11. Wijzigingen
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.2.1 | 2026-11-10 | Na de Lead-review van de AD (PR #142): lamp ook bij hover (§12.3, Theme `icon_hover_color`); herbinden met glyphs en de dialoog in de set van het apparaat (§12.4); regel onder *Doorgaan* op twee regels en in de meting (§12.5, open punt 18); Menu-glyph in de P2-hint; *Pauze van P1* bovenaan (MN-11); Deck-glyphs in ijzer 5 (§13); open punt 14 besloten. |
 | 0.2 | 2026-11-10 | T10 deel 3 (#87): menu-art (§12), knop-glyphs per apparaat (§13), Godot Theme normaal en groot (§14), fonts titel ×2 en spelnaam ×3 (§4), previews (§8), regels voor menu's (§9), open punten 10–17. |
 | 0.1.1 | 2026-11-10 | Na de Lead-review van de AD (PR #137): klokring P2 `#e8ffff` in plaats van `#bff4fc`; map `game/art/ui/`; Godot 4-filter en `font_size` 11/16; open punten 4–6 bijgewerkt. |
 | 0.1 | 2026-11-10 | Eerste versie (T10 deel 2, #87): beeldtaal, palet, Polderletter normaal en groot, alle HUD-onderdelen, merk en peilbuis, meetpunt (plaat 66 %), NL-tekst per vak. |
@@ -300,8 +302,10 @@ Geen asset: de **verduistering** achter Opties is een `ColorRect` in lucht 0 (`#
 | normaal | geen | (ruimte blijft, onzichtbaar) | gevel wit 5 |
 | focus | keuzebalk | aan | gevel wit 7 |
 | ingedrukt | keuzebalk ingedrukt (+ focus erover) | aan | gloed 6 |
-| hover (muis) | keuzebalk hover | uit | gevel wit 7 |
+| hover (muis) | keuzebalk hover (met focus: keuzebalk erover) | aan | gevel wit 7 |
 | uit | geen | uit | gevel wit 3 |
+
+De muis neemt de focus (§9), dus hover zonder focus komt in de game niet voor; de lamp staat daarom ook bij hover aan (AD-review PR #142).
 
 Hoogte van een regel: **15 px** (regel 11 + 2 + 2), groot **20 px** (16 + 2 + 2). Tekst start 13 px na de linkerkant (3 marge + lamp 7 + 3).
 
@@ -312,36 +316,40 @@ Hoogte van een regel: **15 px** (regel 11 + 2 + 2), groot **20 px** (16 + 2 + 2)
 | Titelscherm (MN-02) | zelfde opbouw als het hoofdmenu; `MENU_PRESS_ANY` op de plaats van de eerste regel | — |
 | Hoofdmenu | zijband | x 0, breedte 214, hele hoogte |
 | | spelnaam (`Spelnaam`, ×3) / "werktitel" (`Gedimd`) | (28, 44) / (30, 80) |
-| | regels (Button, 160 breed) | x 28, y 108 + 16 × i |
-| | regel onder *Doorgaan* (`Gedimd`) | (41, 194) |
-| | "2e speler: druk op Start" (`P2`) | rechts uitgelijnd op W − 8, y 316 |
+| | *Doorgaan* (Button, 160 breed) | (28, 108) |
+| | regel onder *Doorgaan* (`Gedimd`, UX §4.2 nr. 2), op twee regels: wijk / licht · speeltijd | (41, 123) en (41, 133) |
+| | overige regels (Button, 160 breed) | x 28, y 148 + 16 × i |
+| | "2e speler: druk op" (`P2`) + Menu-glyph van de set (PS-stijl: *options*) | glyph rechts op W − 8, y 314; tekst 3 px links ervan |
 | | taal-hint (glyph + tekst) | linksonder, glyph op (8, H − 19) |
 | | knophints | rechtsonder, laatste tekst eindigt op W − 8, glyph op y H − 19; 3 px tussen glyph en tekst, 10 px tussen paren |
 | Pauze | titel (`Titel`, ×2) | (28, 36) |
 | | regels (Button, 160 breed) | x 28, y 76 + 16 × i |
 | | info rechts (`Uitleg`, 152 × 64) | (226, 74), regels om de 14 px |
-| | "Pauze van P1. P2 kan niet sturen." (`Gedimd`) | (28, H − 40) |
+| | "Pauze van P1. P2 kan niet sturen." (`Gedimd`, MN-11: bovenaan) | gecentreerd, y 6 |
 | Opties | titel / tabbalk | (28, 8) / y 34: LB-glyph op x 22, tabs 4 px uit elkaar, RB-glyph erachter; tablijn op y 49 van x 16 tot 624 |
 | | regels (Button, 588 breed) | x 20, vanaf y 56, om de 18 px (groot 22) |
 | | waardekolom | x 400 (groot 392): pijl, 4 px, waarde, 4 px, pijl; schuif 120 × 7, percentage 8 px erachter |
 | | uitleg (`Uitleg`, 588 breed) | onderaan, 8 px boven de knophints; 4 regels om de 10 px (groot 14) |
 | Besturing | kolommen Actie / Toetsenbord 1 / Toetsenbord 2 / Controller | x 20 / 196 / 326 / 466 (tekst + 13), kop in gloed 6, regels om de 18 px |
-| | dialoog *Bezet door …* (`PanelContainer`) | midden, y 238 |
+| | cellen | glyphs van de kolom: `Toetskap` met de toetsnaam, pijl- en muisglyphs, in *Controller* de glyphs van de set; meerdere knoppen 3 px uit elkaar; geen knop = "–" in gevel wit 3 |
+| | dialoog *Bezet door …* (`PanelContainer`) | midden, y 238; de knoppen erin (A = wisselen, B = annuleren) en de knophints in de set van het apparaat waarmee je herbindt |
 
 Bij *groot* past de optielijst niet meer op het scherm: de lijst scrolt (`ScrollContainer` met de scrollbalk, x 612) en houdt de gekozen regel in beeld.
 
 ### 12.5 Tekstmeting menu's (script, testteksten EN/NL)
 
-Alles past, ook groot (vak × 1,5, TG-10): de langste NL-menuregel (*Naar hoofdmenu*) is 69 px van 147; *Meedoen (vrij apparaat)* 104 van 163 in de kolom *Actie*; *Druk een knop…* 69 van 127. De tabbalk is NL 298 px (groot 349) van de 608 die er zijn.
+Alles past, ook groot (vak × 1,5, TG-10), op één na: de langste NL-menuregel (*Naar hoofdmenu*) is 69 px van 147; *Meedoen (vrij apparaat)* 104 van 163 in de kolom *Actie*; *Druk een knop…* 69 van 127. De tabbalk is NL 298 px (groot 349) van de 608 die er zijn.
 
-**Knoptekst zonder schaduw.** Een Godot-`Button` tekent geen tekstschaduw (§14). Gemeten tegen de lichtste plek van de R5-scène: focus ΔL\* 44,2; normaal op de zijband 38,8; normaal op de verduistering van 72 % 34,7. Daarom staat elke menuregel op de zijband, de verduistering of de keuzebalk, nooit los op de wereld (open punt 14).
+**Regel onder *Doorgaan*** (vak 165 px: van x 41 tot 4 px voor de rand van de zijband). Op één regel past hij niet: *Wijk 1.1 De Kadewijk · Licht 40 · 12 min* is al 169 px. Daarom staat hij op twee regels. *Wijk 1.1 De Kadewijk* is 85 px (EN *District 1.1 The Quayside* 108), *Licht 100 · 12 u 59 min* 102 px. Een lange testnaam (*Wijk 3.2 De Verzonken Gemaalpolder*) is NL 160 px en past, maar in het EN is hij 176 px en past hij **niet**. Bij *groot* wordt de zijband 260 px breed. Zie open punt 18.
+
+**Knoptekst zonder schaduw** (menunorm van de AD, open punt 14). Een Godot-`Button` tekent geen tekstschaduw (§14). Gemeten tegen de lichtste plek van de R5-scène: focus ΔL\* 44,2; normaal op de zijband 38,8; normaal op de verduistering van 72 % 34,7. Daarom staat elke menuregel op de zijband, de verduistering of de keuzebalk, nooit los op de wereld (open punt 14).
 
 ## 13. Knop-glyphs per apparaat
 
 Alle bestanden in `game/art/ui/glyphs/<apparaat>/`, als losse PNG per knop; `<naam>.png` is normaal (**11 px** hoog, naast Polderletter normaal), `<naam>_groot.png` is groot (**15 px**, naast groot). Een glyph staat in de tekstregel, verticaal gecentreerd.
 
 - **Eigen tekeningen, generieke vormen.** Schijf, pil, kruis en letters uit Polderletter (groot) of een eigen letter van 3×5 en 5×5 px (normaal). Geen logo's, geen merkiconen, geen merkkleuren van derden.
-- **Monochroom**: lijf in ijzer (`#3a3640`, licht `#6a6268`, schaduw `#1f1d26`), symbool gevel wit 7, contour bijna-zwart. De Deck-set is een tint donkerder (lijf ijzer 3). Kleur blijft voor licht en spelers (open punt 14).
+- **Monochroom**: lijf in ijzer 5 (`#3a3640`, licht `#6a6268`, schaduw `#1f1d26`), symbool gevel wit 7, contour bijna-zwart. Dat geldt voor alle sets, ook de Deck (AD-review PR #142: ijzer 3 viel weg op de plaat). Kleur blijft voor licht en spelers (open punt 14, akkoord AD).
 - Vormen zeggen wat voor knop het is: **schijf** = gezichtsknop of stick, **platte pil** = schouder, **hoge pil** = trekker, **pil met schuine hoek** = greep achterop (Deck), **afgeronde tegel** = trackpad (Deck), **kruis** = d-pad, met de richting in gevel wit 7.
 
 | Set | Bestanden (`<naam>.png`) |

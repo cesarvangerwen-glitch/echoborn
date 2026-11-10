@@ -317,7 +317,7 @@ SYM = {
 }
 GLYPH_KLEUR = {
     "std": dict(lijf=IJZER[5], licht=IJZER[7], schaduw=IJZER[3], sym=WIT[7]),
-    "deck": dict(lijf=IJZER[3], licht=IJZER[5], schaduw=IJZER[2], sym=WIT[7]),
+    "deck": dict(lijf=IJZER[5], licht=IJZER[7], schaduw=IJZER[3], sym=WIT[7]),   # AD-review PR #142: ijzer 5
 }
 
 
@@ -739,8 +739,7 @@ def maak_thema(groot):
         t.zet("Button/colors/%s" % k, kleur(col))
     t.zet("Button/colors/icon_normal_color", kleur(ONZICHTBAAR, 0))
     t.zet("Button/colors/icon_disabled_color", kleur(ONZICHTBAAR, 0))
-    t.zet("Button/colors/icon_hover_color", kleur(ONZICHTBAAR, 0))
-    for k in ("icon_focus_color", "icon_pressed_color", "icon_hover_pressed_color"):
+    for k in ("icon_focus_color", "icon_hover_color", "icon_pressed_color", "icon_hover_pressed_color"):
         t.zet("Button/colors/%s" % k, kleur(ONZICHTBAAR, 1))
     # HerbindCel: knop in een kolom van Besturing, zonder lamp; gekozen kolom = open gloedrand
     t.zet('HerbindCel/base_type', '&"Button"')
@@ -826,7 +825,7 @@ def menuregel(img, s, x, y, w, staat="normaal", grootte="normaal"):
             over(img, negen4(keuzebalk("hover"), w, h, 3, 3, 3, 3), x, y)
         if staat != "hover":
             over(img, negen4(keuzebalk("focus"), w, h, 3, 3, 3, 3), x, y)
-    if staat in ("focus", "ingedrukt"):
+    if staat in ("focus", "ingedrukt", "hover"):
         over(img, lamp(), x + 3, y + 2 + (f["lijn"] - 9) // 2)
     col = {"normaal": WIT[5], "focus": WIT[7], "hover": WIT[7], "ingedrukt": GLOED[6], "uit": WIT[3]}[staat]
     PL.draw(img, s, x + 3 + 7 + 3, y + 2 + f["cap0"], col, grootte)   # Button: geen schaduw (Godot)
@@ -882,11 +881,18 @@ def mock_hoofdmenu(apparaat="xbox"):
     band(img, 214)
     label(img, "Polderlight", 28, 44, WIT[7], schaal=3)
     label(img, "werktitel", 30, 80, WIT[5])
-    regels = ["Doorgaan", "Nieuw spel", "Opties", "Credits", "Afsluiten"]
-    for i, s in enumerate(regels):
-        menuregel(img, s, 28, 108 + i * 16, 160, "focus" if i == 0 else "normaal")
-    label(img, "Wijk 1.1 De Kadewijk · Licht 40 · 12 min", 41, 194, WIT[5])
-    label(img, "2e speler: druk op Start", 640 - 8 - PL.text_width("2e speler: druk op Start"), 316, C["cyaan"])
+    menuregel(img, "Doorgaan", 28, 108, 160, "focus")
+    # regel onder Doorgaan (UX 4.2 nr. 2), op twee regels: de wijknaam past dan ook in EN en lang
+    label(img, "Wijk 1.1 De Kadewijk", 41, 123, WIT[5])
+    label(img, "Licht 40 · 12 min", 41, 133, WIT[5])
+    for i, s in enumerate(["Nieuw spel", "Opties", "Credits", "Afsluiten"]):
+        menuregel(img, s, 28, 148 + i * 16, 160, "normaal")
+    # 2e speler: druk op <Menu-glyph van de set> (P2)
+    g = glyph(apparaat, "options" if apparaat == "playstation" else "menu")
+    t = "2e speler: druk op"
+    gx = 640 - 8 - g.shape[1]
+    over(img, g, gx, 314)
+    label(img, t, gx - 3 - PL.text_width(t), 314, C["cyaan"])
     hint_links(img, "y", "Taal: Nederlands", apparaat)
     hints(img, [("a", "Kies"), ("b", "Terug")], apparaat)
     return img
@@ -905,7 +911,8 @@ def pauze_inhoud(img, apparaat, H=360):
     over(img, negen4(U.kader_9slice(), 152, 4 * 14 + 8, 2, 2, 2, 2), 226, 74)
     for i, (s, c) in enumerate(info):
         label(img, s, 232, 76 + i * 14, c)
-    label(img, "Pauze van P1. P2 kan niet sturen.", 28, H - 40, WIT[5])
+    t = "Pauze van P1. P2 kan niet sturen."      # MN-11: bovenaan
+    label(img, t, (img.shape[1] - PL.text_width(t)) // 2, 6, WIT[5])
     hints(img, [("a" if apparaat != "playstation" else "kruis", "Kies"),
                 ("b" if apparaat != "playstation" else "rondje", "Verder")], apparaat)
 
@@ -1016,18 +1023,39 @@ def mock_opties_a11y(apparaat="toetsenbord", grootte="normaal", focus=0):
     return img
 
 
-HERBIND = [("Links / rechts", "A / D", "Pijlen", "Stick, D-pad"), ("Springen", "Spatie", "Enter", "A"),
-           ("Aanval", "E", "R-Ctrl", "X"), ("Interactie (genezen)", "F", "/", "Y"),
-           ("Echo (loslaten)", "Q", ".", None), ("Dash", "L-Shift", "R-Shift", "RB"),
-           ("Pauze", "Esc", "Esc", "Menu"), ("Meedoen (vrij apparaat)", "–", "Enter", "Menu"),
-           ("Stoppen (vasthouden)", "–", "Backspace", "View")]
+# cellen: ("t", tekst) = toetskap; ("k", glyph-naam) = toetsenbord-glyph; ("x", naam) = controller (Xbox-stijl);
+# "-" = geen knop; None = wacht op een nieuwe knop
+HERBIND = [("Links / rechts", [("t", "A"), ("t", "D")], [("k", "pijl_links"), ("k", "pijl_rechts")],
+            [("x", "stick_l"), ("x", "dpad_horizontaal")]),
+           ("Springen", [("t", "Spatie")], [("t", "Enter")], [("x", "a")]),
+           ("Aanval", [("t", "E")], [("t", "R-Ctrl")], [("x", "x")]),
+           ("Interactie (genezen)", [("t", "F")], [("t", "/")], [("x", "y")]),
+           ("Echo (loslaten)", [("t", "Q")], [("t", ".")], None),
+           ("Dash", [("t", "L-Shift")], [("t", "R-Shift")], [("x", "rb")]),
+           ("Pauze", [("t", "Esc")], [("t", "Esc")], [("x", "menu")]),
+           ("Meedoen (vrij apparaat)", "-", [("t", "Enter")], [("x", "menu")]),
+           ("Stoppen (vasthouden)", "-", [("t", "Backspace")], [("x", "view")])]
 KOLOM_X = [20, 196, 326, 466]
 
 
+def cel_glyphs(img, cel, x, y):
+    """Glyphs in een herbind-cel, verticaal gecentreerd in de regel van 15; 3 px ertussen."""
+    for soort, n in cel:
+        if soort == "t":
+            g = toets_met(n)
+        elif soort == "k":
+            g = glyph("toetsenbord", n)
+        else:
+            g = glyph("xbox", n)
+        over(img, g, x, y + (15 - g.shape[0]) // 2)
+        x += g.shape[1] + 3
+
+
 def mock_besturing():
+    """Herbinden met de controller: dialoog en knophints in de set van dat apparaat (AD-review PR #142)."""
     img = U.laad("r5_grijs_640x360.png")
     dim(img)
-    y0 = opties_kop(img, 3, "toetsenbord")
+    y0 = opties_kop(img, 3, "xbox")
     for k, s in zip(KOLOM_X, ("Actie", "Toetsenbord 1", "Toetsenbord 2", "Controller")):
         label(img, s, k + 13, y0, GLOED[6])
     y0 += 16
@@ -1036,26 +1064,27 @@ def mock_besturing():
         focus = i == 4
         menuregel(img, rij[0], KOLOM_X[0], y, 588, "focus" if focus else "normaal")
         for j, cel in enumerate(rij[1:]):
-            cx = KOLOM_X[j + 1]
-            if cel is None:   # wacht op een nieuwe knop
+            cx = KOLOM_X[j + 1] + 13
+            if cel is None:   # wacht op een nieuwe knop (HerbindWacht)
                 w = PL.text_width("Druk een knop…") + 8
-                over(img, negen4(herbind_wacht(), w, 15, 2, 2, 2, 2), cx + 9, y)
-                PL.draw(img, "Druk een knop…", cx + 13, y + 4, K)
+                over(img, negen4(herbind_wacht(), w, 15, 2, 2, 2, 2), cx - 4, y)
+                PL.draw(img, "Druk een knop…", cx, y + 4, K)
+            elif cel == "-":
+                PL.draw(img, "–", cx, y + 4, WIT[3])
             else:
-                PL.draw(img, cel, cx + 13, y + 4, WIT[7] if focus else WIT[5])
-    # dialoog "Bezet door Dash: wisselen?"
-    s1, s2 = "Bezet door Dash: wisselen?", ""
+                cel_glyphs(img, cel, cx, y)
+    s1 = "Bezet door Dash: wisselen?"
     w = PL.text_width(s1) + 16
     px, py = (640 - w) // 2, 238
     over(img, negen4(paneel(), w, 40, 4, 4, 4, 4), px, py)
     label(img, s1, px + 8, py + 6, GLOED[6])
     xg = px + 8
-    for g, s in (("Enter", "Wisselen"), ("Esc", "Annuleren")):
-        gi = toets_met(g)
+    for g, s in (("a", "Wisselen"), ("b", "Annuleren")):
+        gi = glyph("xbox", g)
         over(img, gi, xg, py + 23)
         label(img, s, xg + gi.shape[1] + 3, py + 23, WIT[6])
         xg += gi.shape[1] + 3 + PL.text_width(s) + 12
-    hints(img, [("Enter", "Herbind"), ("Del", "Standaard"), ("Esc", "Terug")], "toetsenbord")
+    hints(img, [("a", "Herbind"), ("x", "Standaard"), ("b", "Terug")], "xbox")
     return img
 
 
@@ -1170,6 +1199,10 @@ MEET = [
         ("Hold or tap", "Vasthouden of tikken"), ("Reduce flashes", "Flitsen verminderen"),
         ("Countdown also vibrates", "Aftelling ook trillen"), ("Player colour profile", "Kleurprofiel spelers"),
         ("Sound captions", "Geluidsbijschriften")]),
+    ("Hoofdmenu, regel onder Doorgaan (2 regels, 165)", 165, [
+        ("District 1.1 The Quayside", "Wijk 1.1 De Kadewijk"), ("Light 40 · 12 min", "Licht 40 · 12 min"),
+        ("District 3.2 The Sunken Pumping Polder", "Wijk 3.2 De Verzonken Gemaalpolder"),
+        ("Light 100 · 12 h 59 min", "Licht 100 · 12 u 59 min")]),
     ("Herbinden, kolom Actie (163)", 163, [
         ("Interact (heal)", "Interactie (genezen)"), ("Join (free device)", "Meedoen (vrij apparaat)"),
         ("Leave (hold)", "Stoppen (vasthouden)")]),
