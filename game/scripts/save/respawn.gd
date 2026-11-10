@@ -4,9 +4,8 @@ extends RefCounted
 ##
 ## Valt het aantal levenspunten van P1 op 0, dan zet dit P1 op de volgende
 ## tick terug (`PlayerActor.respawn_at(…, death = true)`):
-## - op het checkpoint (`Progress.state.checkpoint_positie`) als er een is in
-##   het gebied van nu (`Progress.has_checkpoint_in_area`; LM-08: het laatste
-##   gemaal dat P1 aanraakte of pompte);
+## - op het checkpoint in `Progress.state` (`checkpoint_positie`, LM-08) als
+##   er een is in het gebied van nu (`Progress.has_checkpoint_in_area`);
 ## - anders op het begin van de kamer (`room_start`, zoals LM-05 in de
 ##   flow-kamer): bij een nieuw spel, zonder `Progress` of zonder loader, en
 ##   in een nieuw gebied vóór zijn eerste checkpoint.
@@ -69,6 +68,6 @@ func _on_health_changed(tick: int, health: int) -> void:
 	if health > 0:
 		return
 	var on_checkpoint := has_checkpoint()
-	var at := target()
+	var at: Vector2 = progress.state.checkpoint_positie if on_checkpoint else room_start.call()
 	p1.respawn_at(at, true)
 	requested.emit(tick, at, on_checkpoint)
