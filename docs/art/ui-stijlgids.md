@@ -1,15 +1,16 @@
 # UI-stijlgids *Polderlight*
 
-Versie 0.1.1 · Eigenaar: UI Artist · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10 deel 2: eind-UI-art) · Review: Art Director
-Basis: UX-spec `docs/ux/hud-menus.md` v0.1.2 en `docs/ux/coop.md` (PR #129), art bible v0 (`docs/art/bible.md` §2, §3, §6, §7), assetlijst S-17.
+Versie 0.2 · Eigenaar: UI Artist · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10 deel 2: eind-UI-art; deel 3: menu's, glyphs, Theme) · Review: Art Director
+Basis: UX-spec `docs/ux/hud-menus.md` v0.1.2 (menu's: §4 en de wireframes in `docs/ux/wireframes/`) en `docs/ux/coop.md`, art bible v0 (`docs/art/bible.md` §2, §3, §6, §7), assetlijst S-17.
 
-Alles in deze gids is **eigen werk** en wordt gemaakt door één script, zonder externe assets:
+Alles in deze gids is **eigen werk** en wordt gemaakt door twee scripts, zonder externe assets:
 
 ```
-python3 docs/art/ui/bron/genereer_ui.py      # vanaf de repo-root, ± 3 s
+python3 docs/art/ui/bron/genereer_ui.py      # vanaf de repo-root, ± 3 s: font, HUD, wereld (deel 2)
+python3 docs/art/ui/bron/genereer_menu.py    # daarna, ± 3 s: menu's, glyphs, Theme (deel 3)
 ```
 
-Het script schrijft de assets naar `game/art/ui/`, de previews naar `docs/art/ui/` en print de metingen van §6 en §7.
+De scripts schrijven de assets naar `game/art/ui/`, de previews naar `docs/art/ui/` en printen de metingen van §6, §7 en §12.5.
 
 ## 0. Werkaannames (kader §5)
 
@@ -22,15 +23,16 @@ Het script schrijft de assets naar `game/art/ui/`, de previews naar `docs/art/ui
 | W5 | **F1 is gehaald**; F0 nog niet. Na F0 kan de UX Designer maten bijstellen (UX W7); de assets zijn dan met het script snel aan te passen. | fasekader fase 2, UX §7 punt 1 |
 | W6 | De HUD hangt op een **CanvasLayer** en doet niet mee met de saturatiepass van de wijk: in grijs en kleur gelijk. | UX §2.3 |
 
-## 1. Wat deze PR levert en wat in deel 3 volgt
+## 1. Wat deze gids dekt
 
-**Deel 2 (deze PR):** stijlgids, lettertype *Polderletter* (normaal en groot), alle HUD-onderdelen van UX §3 en `coop.md` §3, de merk-aftelling en de peilbuis in de wereld, plaat en kaders, de meting van het meetpunt (§6) en de NL-tekst per vak (§7).
+**Deel 2:** stijlgids, lettertype *Polderletter* (normaal en groot), alle HUD-onderdelen van UX §3 en `coop.md` §3, de merk-aftelling en de peilbuis in de wereld, plaat en kaders, de meting van het meetpunt (§6) en de NL-tekst per vak (§7).
 
-**Deel 3 (volgt, zelfde issue):**
-1. **Menu-art**: titelscherm, hoofdmenu, spelbestanden, pauze, logboek, opties (5 tabs), herbinden, in normaal en *Tekstgrootte: groot*. Mock-ups per scherm als PNG.
-2. **Knop-glyphs per apparaat**: Xbox-stijl, PlayStation-stijl, Steam Deck en toetsenbord (toetskap als 9-slice). Eigen tekeningen, geen logo's.
-3. **Godot Theme** (`.tres`) met Polderletter, de kaders en de keuzebalk, zodat de Gameplay Programmer de menu's niet per scherm hoeft te stijlen.
-4. Wat de review van deze PR en de open punten van §10 opleveren.
+**Deel 3:**
+1. **Menu-art** (§12): keuzebalk met de lamp als focus, tabs, schuif, keuzewaarde, herbind-cellen, scrollbalk, paneel en zijband. Mock-ups van hoofdmenu, pauze (co-op, ook Steam Deck), opties *Toegankelijkheid*, opties *Besturing* met herbinden, en opties bij *Tekstgrootte: groot*. Titels in Polderletter ×2, de spelnaam ×3.
+2. **Knop-glyphs per apparaat** (§13): toetsenbord en muis, Xbox-stijl, PlayStation-stijl en Steam Deck, normaal (11 px) en groot (15 px). Eigen tekeningen, generieke vormen, geen logo's of merkkleuren.
+3. **Godot Theme** (§14): `polderlight_menu.tres` en `polderlight_menu_groot.tres` met Polderletter, de menu-art en type-varianten, zodat de Gameplay Programmer de menu's niet per scherm hoeft te stijlen.
+
+**Nog niet:** het scherm *Spelbestand kiezen*, het logboek (MN-15) en de credits als eigen mock-up (§10, punt 11–12). Het Theme dekt hun onderdelen wel.
 
 ## 2. Beeldtaal
 
@@ -82,6 +84,7 @@ Alle kleuren komen uit de ramps van bible §3 en de figuurkleuren van §6. Er is
 - **Godot 4 (BMFont, de bron):** `.fnt` (tekst-BMFont, 1 page) importeert als FontFile. Labels met Polderletter staan **altijd op `font_size` 11** (groot: **16**). Een BMFont heeft een vaste grootte: bij een andere maat schaalt Godot hem en krijg je mixels. Regelhoogte in het bestand is 11 (groot 16), inclusief ruimte voor accenten op hoofdletters; voor de ontwerpregel van 10 (groot 14) in het logkader: Label-constante `line_spacing = -1` (groot `-2`).
 - **Filter:** in Godot 4 is "filter Nearest" geen importoptie meer. Zet de projectinstelling `rendering/textures/canvas_textures/default_texture_filter = Nearest`, of `texture_filter = Nearest` op de HUD-CanvasLayer (erft door naar alle kinderen). Geen mipmaps.
 - **Godot (TTF):** 100 eenheden per pixel; gebruik op `font_size` 11 (groot 16), met *Antialiasing: None*, *Hinting: None*, *Subpixel positioning: Disabled*. Met hinting aan verschuift FreeType de accenten één rij (gezien in een test met Pillow). De TTF is er vooral voor mock-ups in andere tools.
+- **Titels en spelnaam** (deel 3): `polderletter_titel.fnt` (normaal ×2, `font_size` 22) en `polderletter_naam.fnt` (×3, `font_size` 33), nearest geschaald uit normaal. Een BMFont schaalt in Godot niet mee met `font_size`, dus elke maat is een eigen bestand. Schaduw ×2 en ×3 (2 en 3 px). Bij *Tekstgrootte: groot* blijven titels gelijk.
 - Specimen: `docs/art/ui/polderletter_specimen_x3.png`.
 
 ## 5. HUD-onderdelen
@@ -205,6 +208,14 @@ Gemeten in Polderletter normaal met **testteksten** (EN en NL, in het script, `V
 | `hud_elementen_x4.png` | Alle HUD-onderdelen en hun toestanden |
 | `merk_klokring_x4.png` | Merk P1 en P2 op alle momenten (gezet, slag 1–4, ontploffing, dooft), groot, ontploffing; normaal / alleen luminantie / deuteranopie |
 | `polderletter_specimen_x3.png` | Het lettertype, normaal en groot |
+| `menu_hoofdmenu_x2.png` | Hoofdmenu op de grijze stad, Xbox-stijl-glyphs (UX §4.2) |
+| `menu_pauze_coop_x2.png` | Pauze in co-op, PlayStation-stijl-glyphs (UX §4.3) |
+| `menu_pauze_deck_640x400_x2.png` | Pauze op de Steam Deck (640×400, ×2 = 1280×800), Deck-glyphs |
+| `menu_opties_toegankelijkheid_x2.png` | Opties, tab *Toegankelijkheid*, met schuif en uitleg; toetsenbord-glyphs (UX §4.4, §5) |
+| `menu_opties_besturing_herbinden_x2.png` | Opties, tab *Besturing*: herbinden, cel *Druk een knop…* en de dialoog *Bezet door Dash* (UX §4.5) |
+| `menu_opties_groot_x2.png` | Opties bij *Tekstgrootte: groot*: regel 20 px, lijst scrolt (TG-10) |
+| `menu_elementen_x4.png` | Alle menu-onderdelen en hun staten |
+| `knop_glyphs_x4.png` | Alle knop-glyphs, per apparaat, normaal en groot |
 
 ## 9. Regels voor wie UI bouwt (Gameplay Programmer)
 
@@ -213,6 +224,8 @@ Gemeten in Polderletter normaal met **testteksten** (EN en NL, in het script, `V
 - Plaatsing ten opzichte van de schermrand, nooit ten opzichte van het 16:9-beeld (HUD-M1).
 - Tekst: Polderletter (`.fnt`) op `font_size` 11 (groot 16), nooit een andere maat; `font_color` gevel wit 7, schaduw `#06060f` op (1, 1). Kop van het logkader in gloed 6, tweede regel van een melding in gevel wit 5, P2-meldingen in cyaan met `kader_9slice_cyaan`.
 - **Tekstgrootte groot**: wissel naar `polderletter_groot.fnt` en het grote logkader; de HUD (meter, levens, badge) blijft gelijk (TG-10).
+- **Menu's** (deel 3): zet `polderlight_menu.tres` als `theme` op de wortel-Control van elk menuscherm; bij *Tekstgrootte: groot* wissel je naar `polderlight_menu_groot.tres` (§14). Menuregels zijn `Button`s met `alignment = Left`; de lamp en de keuzebalk komen uit het Theme. Laat de muis de focus nemen (`mouse_entered` → `grab_focus()`), dan is er altijd maar één lamp.
+- Knop-glyphs: kies de set van het **laatst gebruikte apparaat van die speler** (UX §4.5) of de keuze *Knopiconen* in Opties; normaal naast Polderletter normaal, `_groot` naast groot (§13).
 - **TG-05 Merk-ring groter**: gebruik de `_groot`-stroken. **TG-03 Flitsen verminderen**: sla `meter_vol_flits`, `peilbuis_flits` en `lantaarn` *flits* over; de rand van 2 px komt van de Technical Artist.
 
 ## 10. Open punten
@@ -228,11 +241,150 @@ Gemeten in Polderletter normaal met **testteksten** (EN en NL, in het script, `V
 | 7 | **Licentieregister**: Polderletter is eigen werk; geen licentie van derden. Wil de Business/Legal Advisor het toch als regel "eigen werk" in `docs/licenties.md` (rolbestand UI Artist: "lettertypes hebben een licentie in licenties.md")? | Business/Legal Advisor | Geen haast |
 | 8 | Nog te testen op een echte Steam Deck: leesbaarheid van Polderletter normaal (7 px = ± 1,7 mm), de arcering van het echo-icoon (11×17) en de ring van 2 px. | Engine & Platform Programmer, met de UI Artist | Bij de Deck-build (#79) |
 | 9 | Kleurprofielen TG-07 (amber/wit-blauw, geel/magenta): de assets zijn per eigenaar in aparte bestanden, zodat een profiel alleen kleuren wisselt. Varianten tekenen zodra de AD de paren kiest. | Art Director, daarna UI Artist | Bible v1 |
-| 10 | **Deel 3**: menu-art, knop-glyphs per apparaat, Godot Theme (§1). | UI Artist | Na de review van deze PR |
+| 10 | **Deel 3** geleverd: menu-art, knop-glyphs per apparaat en het Godot Theme (§12–§14). Wat nog openstaat: punt 11–17. | UI Artist (review AD) | — |
+| 11 | **Spelbestand kiezen** (UX §4.2, *Nieuw spel*: 3 plaatsen met wijk, licht, speeltijd, lampglas; overschrijven met B als standaard): nog geen wireframe of indeling, dus geen art in deel 3. Het bouwt op keuzebalk, paneel en dialoog (§12). Art volgt na de indeling van de UX Designer. | UX Designer, daarna UI Artist | Na de volgende versie van `hud-menus.md` |
+| 12 | **Logboek (MN-15) en credits**: geen eigen mock-up; het Theme dekt de onderdelen (RichTextLabel, scrollbalk, kader). Mock-up na een wireframe. | UX Designer, daarna UI Artist | Na de wireframes |
+| 13 | **Herbinden: de kolom kiezen.** De art toont de gekozen kolom met `cel_focus` (open rand gloed 6) binnen de gekozen regel. UX §4.5 zegt niet hoe je van kolom wisselt (links/rechts in de regel?). Graag bevestigen. | UX Designer | Volgende versie van `hud-menus.md` |
+| 14 | **Glyphs zonder merkkleur** (monochroom ijzer + gevel wit 7). Akkoord, of een kleurhint per gezichtsknop uit het eigen palet? Ook: de knoptekst in een `Button` heeft in Godot geen schaduw (§14); gemeten ΔL\* ≥ 34 (§12.5). Akkoord? | Art Director | Bij de review van deel 3 |
+| 15 | **Glyphs in Xbox- en PlayStation-stijl**: eigen tekeningen van generieke vormen (letters, kruis, rondje, vierkant, driehoek), geen logo's. Graag een korte check of die vormen en de namen in *Knopiconen* zonder licentie in een Steam-release mogen. | Business/Legal Advisor | Vóór de eerste publieke build |
+| 16 | **Theme nog niet in Godot geopend** (geen editor in de werkomgeving van de UI Artist). Graag laden bij de bouw van de menu's en fouten melden in #87; het hangt ook af van punt 6 (filter Nearest). | Gameplay Programmer | Met T8a |
+| 17 | **Spelnaam als tekst**, geen logo (bible: geen naam of logo in de art), tot na de merkcheck van *Polderlight* (besluit #96). Een logo is een eigen opdracht. | Art Director | Na de merkcheck |
 
 ## 11. Wijzigingen
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.2 | 2026-11-10 | T10 deel 3 (#87): menu-art (§12), knop-glyphs per apparaat (§13), Godot Theme normaal en groot (§14), fonts titel ×2 en spelnaam ×3 (§4), previews (§8), regels voor menu's (§9), open punten 10–17. |
 | 0.1.1 | 2026-11-10 | Na de Lead-review van de AD (PR #137): klokring P2 `#e8ffff` in plaats van `#bff4fc`; map `game/art/ui/`; Godot 4-filter en `font_size` 11/16; open punten 4–6 bijgewerkt. |
 | 0.1 | 2026-11-10 | Eerste versie (T10 deel 2, #87): beeldtaal, palet, Polderletter normaal en groot, alle HUD-onderdelen, merk en peilbuis, meetpunt (plaat 66 %), NL-tekst per vak. |
+
+## 12. Menu's (deel 3)
+
+De **indeling** (welke regels, welke volgorde, wat waar staat) is van de UX Designer (UX §4, wireframes). Deze paragraaf legt de **look** vast: onderdelen, staten en maten. Alle bestanden in `game/art/ui/menu/`, 1:1 op de interne resolutie.
+
+### 12.1 Beeldtaal van de menu's
+
+- **Focus = licht aan.** De gekozen regel krijgt de *keuzebalk* (rand gloed, warme vulling) en links het **lantaarntje** van de HUD. Zo zegt het menu hetzelfde als de kernloop: waar licht is, ben jij. Gloed staat in een menu alleen op de focus, de gekozen tab-tekst en wat je gaat veranderen (schuif, *Druk een knop…*).
+- **Alles wat geen focus heeft, is tekst.** Geen knoppen met een eigen vlak: niet-gekozen regels zijn alleen tekst in gevel wit 5. Dat houdt de menu's licht en de stad zichtbaar.
+- Panelen zijn de **ijzeren platen van het gemaal**: een rand van 2 px ijzer met klinknagels, voor dialogen. De rest staat op de doorschijnende plaat (zijband, kader), zoals de HUD.
+- Dezelfde regels als de HUD (§2): contour 1 px `#06060f`, geen verlopen of gloed rond vormen, geen nieuwe kleuren.
+
+### 12.2 Onderdelen
+
+| Bestand | Maat, 9-slice-marge | Wat | In Godot (Theme, §14) |
+|---|---|---|---|
+| `keuzebalk_9slice.png` | 9×9, marge 3 | focus: rand gloed 5 (boven gloed 6, onder gloed 3), vulling gloed 0 op 70 % | `Button` *focus* |
+| `keuzebalk_ingedrukt_9slice.png` | 9×9, 3 | ingedrukt: ingezakt (bovenrand gloed 3, onder gloed 5), vulling gloed 1 op 92 % | `Button` *pressed* |
+| `keuzebalk_hover_9slice.png` | 9×9, 3 | muis erboven zonder focus: rand gevel wit 4, plaat 78 % | `Button` *hover* |
+| `keuze_lamp.png` | 7×9 | het lantaarntje *vol* van de HUD (HUD-01), alleen te zien bij focus en ingedrukt | `Button` *icon* |
+| `leeg_1x1.png` | 1×1 | transparant: icoon voor varianten zonder lamp | `HerbindCel` *icon* |
+| `tab_gekozen_9slice.png` | 9×9, 3 | gekozen tab: rand gevel wit 7/6/5, onder open, plaat 78 % | `TabBar`, `TabContainer` *tab_selected* |
+| `tab_paneel_9slice.png` | 5×5, 2 | de tablijn (gevel wit 3) | `TabContainer` *panel* |
+| `schuif_baan_9slice.png` | 7×7, 3 | leeg glas, zoals de lichtmeter (lucht 3, bovenrij lucht 4) | `HSlider` *slider* |
+| `schuif_vulling_9slice.png` | 7×7, 3 | gloed 6/5/3, zoals de vulling van de meter | `HSlider` *grabber_area* |
+| `schuif_greep.png`, `_focus`, `_uit` | 5×11 | klem in gevel wit; gloed bij focus of muis; gedoofd als hij uit staat | `HSlider` *grabber*, *grabber_highlight*, *grabber_disabled* |
+| `keuzepijl_{links,rechts}.png`, `_focus` | 5×7 | `<` en `>` naast een keuzewaarde (*< Vasthouden >*); gloed 6 alleen op de gekozen regel | `TextureRect` naast het waarde-Label |
+| `herbind_wacht_9slice.png` | 7×7, 2 | cel die wacht op een knop (`MENU_PRESS_KEY`): vol gloed 5, tekst bijna-zwart | variant `HerbindWacht` |
+| `cel_focus_9slice.png` | 7×7, 2 | gekozen kolom binnen de gekozen herbind-regel: open rand gloed 6 | variant `HerbindCel` *focus* |
+| `scroll_baan_9slice.png`; `scroll_greep_9slice.png`, `_hover`, `_vast` | 5×7, 2 | leeg glas; greep gevel wit 6, bij muis 7, vastgepakt gloed | `VScrollBar` |
+| `paneel_9slice.png` | 11×11, 4 | dialoog (bevestigen, *Bezet door …*): ijzer 2 px met klinknagels, plaat 85 % | `PanelContainer`, `Panel` |
+| `zijband_9slice.png` | 5×5, 2 | band links achter hoofdmenu en pauze: plaat 78 %, rand gevel wit 2 rechts | variant `Zijband` |
+| `../hud/kader_9slice.png` | 7×7, 2 | uitleg onder de opties, info in de pauze (zelfde kader als logkader en meldingen) | variant `Uitleg` |
+
+Geen asset: de **verduistering** achter Opties is een `ColorRect` in lucht 0 (`#06060f`) op **72 %**; de pauze verduistert de wereld 35 % en zet de zijband erover (de HUD blijft staan, UX §4.3).
+
+### 12.3 Staten van een menuregel
+
+| Staat | Achtergrond | Lamp | Tekst |
+|---|---|---|---|
+| normaal | geen | (ruimte blijft, onzichtbaar) | gevel wit 5 |
+| focus | keuzebalk | aan | gevel wit 7 |
+| ingedrukt | keuzebalk ingedrukt (+ focus erover) | aan | gloed 6 |
+| hover (muis) | keuzebalk hover | uit | gevel wit 7 |
+| uit | geen | uit | gevel wit 3 |
+
+Hoogte van een regel: **15 px** (regel 11 + 2 + 2), groot **20 px** (16 + 2 + 2). Tekst start 13 px na de linkerkant (3 marge + lamp 7 + 3).
+
+### 12.4 Plaatsing (interne pixels; Deck: zelfde getallen met H = 400)
+
+| Scherm | Wat | Waar |
+|---|---|---|
+| Titelscherm (MN-02) | zelfde opbouw als het hoofdmenu; `MENU_PRESS_ANY` op de plaats van de eerste regel | — |
+| Hoofdmenu | zijband | x 0, breedte 214, hele hoogte |
+| | spelnaam (`Spelnaam`, ×3) / "werktitel" (`Gedimd`) | (28, 44) / (30, 80) |
+| | regels (Button, 160 breed) | x 28, y 108 + 16 × i |
+| | regel onder *Doorgaan* (`Gedimd`) | (41, 194) |
+| | "2e speler: druk op Start" (`P2`) | rechts uitgelijnd op W − 8, y 316 |
+| | taal-hint (glyph + tekst) | linksonder, glyph op (8, H − 19) |
+| | knophints | rechtsonder, laatste tekst eindigt op W − 8, glyph op y H − 19; 3 px tussen glyph en tekst, 10 px tussen paren |
+| Pauze | titel (`Titel`, ×2) | (28, 36) |
+| | regels (Button, 160 breed) | x 28, y 76 + 16 × i |
+| | info rechts (`Uitleg`, 152 × 64) | (226, 74), regels om de 14 px |
+| | "Pauze van P1. P2 kan niet sturen." (`Gedimd`) | (28, H − 40) |
+| Opties | titel / tabbalk | (28, 8) / y 34: LB-glyph op x 22, tabs 4 px uit elkaar, RB-glyph erachter; tablijn op y 49 van x 16 tot 624 |
+| | regels (Button, 588 breed) | x 20, vanaf y 56, om de 18 px (groot 22) |
+| | waardekolom | x 400 (groot 392): pijl, 4 px, waarde, 4 px, pijl; schuif 120 × 7, percentage 8 px erachter |
+| | uitleg (`Uitleg`, 588 breed) | onderaan, 8 px boven de knophints; 4 regels om de 10 px (groot 14) |
+| Besturing | kolommen Actie / Toetsenbord 1 / Toetsenbord 2 / Controller | x 20 / 196 / 326 / 466 (tekst + 13), kop in gloed 6, regels om de 18 px |
+| | dialoog *Bezet door …* (`PanelContainer`) | midden, y 238 |
+
+Bij *groot* past de optielijst niet meer op het scherm: de lijst scrolt (`ScrollContainer` met de scrollbalk, x 612) en houdt de gekozen regel in beeld.
+
+### 12.5 Tekstmeting menu's (script, testteksten EN/NL)
+
+Alles past, ook groot (vak × 1,5, TG-10): de langste NL-menuregel (*Naar hoofdmenu*) is 69 px van 147; *Meedoen (vrij apparaat)* 104 van 163 in de kolom *Actie*; *Druk een knop…* 69 van 127. De tabbalk is NL 298 px (groot 349) van de 608 die er zijn.
+
+**Knoptekst zonder schaduw.** Een Godot-`Button` tekent geen tekstschaduw (§14). Gemeten tegen de lichtste plek van de R5-scène: focus ΔL\* 44,2; normaal op de zijband 38,8; normaal op de verduistering van 72 % 34,7. Daarom staat elke menuregel op de zijband, de verduistering of de keuzebalk, nooit los op de wereld (open punt 14).
+
+## 13. Knop-glyphs per apparaat
+
+Alle bestanden in `game/art/ui/glyphs/<apparaat>/`, als losse PNG per knop; `<naam>.png` is normaal (**11 px** hoog, naast Polderletter normaal), `<naam>_groot.png` is groot (**15 px**, naast groot). Een glyph staat in de tekstregel, verticaal gecentreerd.
+
+- **Eigen tekeningen, generieke vormen.** Schijf, pil, kruis en letters uit Polderletter (groot) of een eigen letter van 3×5 en 5×5 px (normaal). Geen logo's, geen merkiconen, geen merkkleuren van derden.
+- **Monochroom**: lijf in ijzer (`#3a3640`, licht `#6a6268`, schaduw `#1f1d26`), symbool gevel wit 7, contour bijna-zwart. De Deck-set is een tint donkerder (lijf ijzer 3). Kleur blijft voor licht en spelers (open punt 14).
+- Vormen zeggen wat voor knop het is: **schijf** = gezichtsknop of stick, **platte pil** = schouder, **hoge pil** = trekker, **pil met schuine hoek** = greep achterop (Deck), **afgeronde tegel** = trackpad (Deck), **kruis** = d-pad, met de richting in gevel wit 7.
+
+| Set | Bestanden (`<naam>.png`) |
+|---|---|
+| `toetsenbord/` | `toetskap_9slice.png` (7×11, marge 3) en `toetskap_groot_9slice.png` (9×16, marge 4) met de toetsnaam als Label erin (variant `Toetskap`, §14); `pijl_{op,neer,links,rechts}`, `muis_{links,rechts,wiel}` |
+| `xbox/` (Xbox-stijl) | `a b x y`, `lb rb lt rt`, `menu view`, `dpad` + `dpad_{op,neer,links,rechts,verticaal,horizontaal}`, `stick_l stick_r stick_l_klik stick_r_klik` |
+| `playstation/` (PlayStation-stijl) | `kruis rondje vierkant driehoek`, `l1 r1 l2 r2`, `options create touchpad`, `dpad…` (idem), `stick_l stick_r l3 r3` |
+| `deck/` (Steam Deck) | `a b x y`, `l1 r1 l2 r2`, `l4 l5 r4 r5`, `menu view`, `dpad…`, `stick_l stick_r l3 r3`, `trackpad_l trackpad_r` |
+
+- **Toetsenbord**: de toets is een 9-slice met de **echte** toetsnaam als tekst, zodat AZERTY en andere indelingen kloppen (UX §4.5, `input.md` W7). Tekst gevel wit 7 zonder schaduw.
+- Welke set: *Knopiconen* in Opties (automatisch = het laatst gebruikte apparaat van die speler; Deck-glyphs op de Deck), UX §4.4–4.5. De herkenning van het apparaat is van de Engine & Platform Programmer (UX §7 punt 4).
+- Niet getekend: de Steam- en de …-knop van de Deck (de game bindt ze niet) en de PS-knop/Xbox-knop (idem).
+
+## 14. Godot Theme
+
+`game/art/ui/thema/polderlight_menu.tres` (normaal) en `polderlight_menu_groot.tres` (*Tekstgrootte: groot*), gemaakt door `genereer_menu.py`; niet met de hand wijzigen, maar het script aanpassen en opnieuw draaien. Paden zijn `res://art/ui/…` (de Godot-projectmap is `game/`).
+
+| Type | Wat het Theme zet |
+|---|---|
+| (standaard) | `default_font` Polderletter normaal, `default_font_size` 11 (groot: groot, 16) |
+| `Label` | tekst gevel wit 7, schaduw `#06060f` op (1, 1), `line_spacing` −1 (groot −2) |
+| `Button` | de menuregel van §12.3: *normal* leeg, *focus* keuzebalk, *pressed* ingedrukt, *hover* hover; icoon = lamp, onzichtbaar via `icon_normal_color`/`icon_hover_color` met alfa 0, zichtbaar bij focus en ingedrukt; `h_separation` 3; tekstkleuren per staat |
+| `PanelContainer`, `Panel` | paneel (dialoog), inhoudsmarge 8/6 |
+| `TabContainer`, `TabBar` | gekozen tab, tablijn als *panel*; tekst gekozen gloed 6, anders gevel wit 5; de tabs nemen geen focus (wissel met LB/RB) |
+| `HSlider` | baan, vulling en greep van §12.2 |
+| `VScrollBar` | baan en greep (normaal, hover, vast) |
+| `HSeparator` | lijn van 1 px gevel wit 3 |
+| `RichTextLabel` | als Label, voor credits en logboek |
+
+**Type-varianten** (`theme_type_variation` op de node):
+
+| Variant | Basis | Gebruik |
+|---|---|---|
+| `Kop` / `Gedimd` / `Uit` / `P2` | Label | tekst in gloed 6 / gevel wit 5 / gevel wit 3 / cyaan |
+| `Titel` | Label | Polderletter ×2 (`font_size` 22), schaduw 2 px: *Pauze*, *Opties* |
+| `Spelnaam` | Label | Polderletter ×3 (`font_size` 33), schaduw 3 px: de werktitel op titelscherm en hoofdmenu |
+| `Toetskap` | Label | toets-glyph met tekst (toetskap als *normal*, geen schaduw) |
+| `HerbindWacht` | Label | *Druk een knop…* in de wachtende cel |
+| `HerbindCel` | Button | cel in een kolom van *Besturing*: geen lamp, focus = `cel_focus` |
+| `Zijband`, `Uitleg` | PanelContainer | band links (hoofdmenu, pauze); kader onder de opties en rechts in de pauze |
+
+Wat het Theme **niet** kan en de bouwer per node zet:
+- `alignment = Left` op menuregels (een Button centreert standaard).
+- **Tekstschaduw in een Button** bestaat in Godot niet; zie §12.5. Wie toch schaduw wil, zet een Label in de Button.
+- De verduistering (`ColorRect`, §12.2), de keuzepijlen naast een waarde en de glyphs in de knophints.
+- Filter Nearest: via de projectinstelling of `texture_filter` op de wortel van het menu (§9, open punt 6).

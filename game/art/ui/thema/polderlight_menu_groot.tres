@@ -1,0 +1,370 @@
+[gd_resource type="Theme" load_steps=50 format=3]
+
+[ext_resource type="FontFile" path="res://art/ui/font/polderletter_groot.fnt" id="1_polderletter_groot"]
+[ext_resource type="FontFile" path="res://art/ui/font/polderletter_titel.fnt" id="2_polderletter_titel"]
+[ext_resource type="FontFile" path="res://art/ui/font/polderletter_naam.fnt" id="3_polderletter_naam"]
+[ext_resource type="Texture2D" path="res://art/ui/glyphs/toetsenbord/toetskap_groot_9slice.png" id="4_toetskap_groot_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/herbind_wacht_9slice.png" id="5_herbind_wacht_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/keuzebalk_hover_9slice.png" id="6_keuzebalk_hover_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/keuzebalk_ingedrukt_9slice.png" id="7_keuzebalk_ingedrukt_9sli"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/keuzebalk_9slice.png" id="8_keuzebalk_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/keuze_lamp.png" id="9_keuze_lamp"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/leeg_1x1.png" id="10_leeg_1x1"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/cel_focus_9slice.png" id="11_cel_focus_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/paneel_9slice.png" id="12_paneel_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/zijband_9slice.png" id="13_zijband_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/hud/kader_9slice.png" id="14_kader_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/tab_gekozen_9slice.png" id="15_tab_gekozen_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/tab_paneel_9slice.png" id="16_tab_paneel_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/schuif_baan_9slice.png" id="17_schuif_baan_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/schuif_vulling_9slice.png" id="18_schuif_vulling_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/schuif_greep.png" id="19_schuif_greep"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/schuif_greep_focus.png" id="20_schuif_greep_focus"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/schuif_greep_uit.png" id="21_schuif_greep_uit"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/scroll_baan_9slice.png" id="22_scroll_baan_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/scroll_greep_9slice.png" id="23_scroll_greep_9slice"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/scroll_greep_hover_9slice.png" id="24_scroll_greep_hover_9slic"]
+[ext_resource type="Texture2D" path="res://art/ui/menu/scroll_greep_vast_9slice.png" id="25_scroll_greep_vast_9slice"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_toetskap"]
+texture = ExtResource("4_toetskap_groot_9slice")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+content_margin_left = 4.0
+content_margin_top = 0.0
+content_margin_right = 4.0
+content_margin_bottom = 0.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_herbind_wacht"]
+texture = ExtResource("5_herbind_wacht_9slice")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 4.0
+content_margin_top = 2.0
+content_margin_right = 4.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_knop_normaal"]
+content_margin_left = 3.0
+content_margin_top = 2.0
+content_margin_right = 4.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_knop_uit"]
+content_margin_left = 3.0
+content_margin_top = 2.0
+content_margin_right = 4.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_knop_hover"]
+texture = ExtResource("6_keuzebalk_hover_9slice")
+texture_margin_left = 3.0
+texture_margin_top = 3.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 3.0
+content_margin_top = 2.0
+content_margin_right = 4.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_knop_ingedrukt"]
+texture = ExtResource("7_keuzebalk_ingedrukt_9sli")
+texture_margin_left = 3.0
+texture_margin_top = 3.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 3.0
+content_margin_top = 2.0
+content_margin_right = 4.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_knop_focus"]
+texture = ExtResource("8_keuzebalk_9slice")
+texture_margin_left = 3.0
+texture_margin_top = 3.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 3.0
+content_margin_top = 2.0
+content_margin_right = 4.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_cel_focus"]
+texture = ExtResource("11_cel_focus_9slice")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 4.0
+content_margin_top = 2.0
+content_margin_right = 4.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cel_normaal"]
+content_margin_left = 4.0
+content_margin_top = 2.0
+content_margin_right = 4.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_cel_wacht"]
+texture = ExtResource("5_herbind_wacht_9slice")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 4.0
+content_margin_top = 2.0
+content_margin_right = 4.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_paneel"]
+texture = ExtResource("12_paneel_9slice")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_zijband"]
+texture = ExtResource("13_zijband_9slice")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 2.0
+content_margin_bottom = 0.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_uitleg"]
+texture = ExtResource("14_kader_9slice")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 6.0
+content_margin_top = 3.0
+content_margin_right = 6.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_tab_gekozen"]
+texture = ExtResource("15_tab_gekozen_9slice")
+texture_margin_left = 3.0
+texture_margin_top = 3.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 5.0
+content_margin_top = 2.0
+content_margin_right = 5.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tab"]
+content_margin_left = 5.0
+content_margin_top = 2.0
+content_margin_right = 5.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_tab_paneel"]
+texture = ExtResource("16_tab_paneel_9slice")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 0.0
+content_margin_top = 6.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_schuif"]
+texture = ExtResource("17_schuif_baan_9slice")
+texture_margin_left = 3.0
+texture_margin_top = 3.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 3.0
+content_margin_top = 3.0
+content_margin_right = 3.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_schuif_vulling"]
+texture = ExtResource("18_schuif_vulling_9slice")
+texture_margin_left = 3.0
+texture_margin_top = 3.0
+texture_margin_right = 3.0
+texture_margin_bottom = 3.0
+content_margin_left = 3.0
+content_margin_top = 3.0
+content_margin_right = 3.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_schuif_focus"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_scroll"]
+texture = ExtResource("22_scroll_baan_9slice")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_greep"]
+texture = ExtResource("23_scroll_greep_9slice")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_greep_hover"]
+texture = ExtResource("24_scroll_greep_hover_9slic")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_greep_vast"]
+texture = ExtResource("25_scroll_greep_vast_9slice")
+texture_margin_left = 2.0
+texture_margin_top = 2.0
+texture_margin_right = 2.0
+texture_margin_bottom = 2.0
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_scheiding"]
+color = Color(0.3569, 0.3412, 0.4314, 1)
+thickness = 1
+
+[resource]
+default_font = ExtResource("1_polderletter_groot")
+default_font_size = 16
+Label/colors/font_color = Color(0.9255, 0.8863, 0.8, 1)
+Label/colors/font_shadow_color = Color(0.02353, 0.02353, 0.05882, 1)
+Label/constants/shadow_offset_x = 1
+Label/constants/shadow_offset_y = 1
+Label/constants/line_spacing = -2
+Kop/base_type = &"Label"
+Kop/colors/font_color = Color(1, 0.8588, 0.5804, 1)
+Gedimd/base_type = &"Label"
+Gedimd/colors/font_color = Color(0.6588, 0.6314, 0.6235, 1)
+Uit/base_type = &"Label"
+Uit/colors/font_color = Color(0.3569, 0.3412, 0.4314, 1)
+P2/base_type = &"Label"
+P2/colors/font_color = Color(0.2431, 0.902, 0.9569, 1)
+Titel/base_type = &"Label"
+Titel/fonts/font = ExtResource("2_polderletter_titel")
+Titel/font_sizes/font_size = 22
+Titel/constants/shadow_offset_x = 2
+Titel/constants/shadow_offset_y = 2
+Spelnaam/base_type = &"Label"
+Spelnaam/fonts/font = ExtResource("3_polderletter_naam")
+Spelnaam/font_sizes/font_size = 33
+Spelnaam/constants/shadow_offset_x = 3
+Spelnaam/constants/shadow_offset_y = 3
+Toetskap/base_type = &"Label"
+Toetskap/styles/normal = SubResource("StyleBoxTexture_toetskap")
+Toetskap/colors/font_shadow_color = Color(0.02353, 0.02353, 0.05882, 0)
+HerbindWacht/base_type = &"Label"
+HerbindWacht/styles/normal = SubResource("StyleBoxTexture_herbind_wacht")
+HerbindWacht/colors/font_color = Color(0.02353, 0.02353, 0.05882, 1)
+HerbindWacht/colors/font_shadow_color = Color(0.02353, 0.02353, 0.05882, 0)
+Button/styles/normal = SubResource("StyleBoxEmpty_knop_normaal")
+Button/styles/disabled = SubResource("StyleBoxEmpty_knop_uit")
+Button/styles/hover = SubResource("StyleBoxTexture_knop_hover")
+Button/styles/pressed = SubResource("StyleBoxTexture_knop_ingedrukt")
+Button/styles/hover_pressed = SubResource("StyleBoxTexture_knop_ingedrukt")
+Button/styles/focus = SubResource("StyleBoxTexture_knop_focus")
+Button/icons/icon = ExtResource("9_keuze_lamp")
+Button/constants/h_separation = 3
+Button/colors/font_color = Color(0.6588, 0.6314, 0.6235, 1)
+Button/colors/font_focus_color = Color(0.9255, 0.8863, 0.8, 1)
+Button/colors/font_hover_color = Color(0.9255, 0.8863, 0.8, 1)
+Button/colors/font_pressed_color = Color(1, 0.8588, 0.5804, 1)
+Button/colors/font_hover_pressed_color = Color(1, 0.8588, 0.5804, 1)
+Button/colors/font_disabled_color = Color(0.3569, 0.3412, 0.4314, 1)
+Button/colors/icon_normal_color = Color(1, 1, 1, 0)
+Button/colors/icon_disabled_color = Color(1, 1, 1, 0)
+Button/colors/icon_hover_color = Color(1, 1, 1, 0)
+Button/colors/icon_focus_color = Color(1, 1, 1, 1)
+Button/colors/icon_pressed_color = Color(1, 1, 1, 1)
+Button/colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
+HerbindCel/base_type = &"Button"
+HerbindCel/icons/icon = ExtResource("10_leeg_1x1")
+HerbindCel/constants/h_separation = 0
+HerbindCel/styles/focus = SubResource("StyleBoxTexture_cel_focus")
+HerbindCel/styles/hover = SubResource("StyleBoxTexture_cel_focus")
+HerbindCel/styles/normal = SubResource("StyleBoxEmpty_cel_normaal")
+HerbindCel/styles/pressed = SubResource("StyleBoxTexture_cel_wacht")
+HerbindCel/colors/font_color = Color(0.7961, 0.7608, 0.7098, 1)
+HerbindCel/colors/font_pressed_color = Color(0.02353, 0.02353, 0.05882, 1)
+PanelContainer/styles/panel = SubResource("StyleBoxTexture_paneel")
+Panel/styles/panel = SubResource("StyleBoxTexture_paneel")
+Zijband/base_type = &"PanelContainer"
+Zijband/styles/panel = SubResource("StyleBoxTexture_zijband")
+Uitleg/base_type = &"PanelContainer"
+Uitleg/styles/panel = SubResource("StyleBoxTexture_uitleg")
+TabContainer/styles/tab_selected = SubResource("StyleBoxTexture_tab_gekozen")
+TabContainer/styles/tab_unselected = SubResource("StyleBoxEmpty_tab")
+TabContainer/styles/tab_hovered = SubResource("StyleBoxEmpty_tab")
+TabContainer/styles/tab_disabled = SubResource("StyleBoxEmpty_tab")
+TabContainer/styles/tab_focus = SubResource("StyleBoxEmpty_tab")
+TabContainer/colors/font_selected_color = Color(1, 0.8588, 0.5804, 1)
+TabContainer/colors/font_unselected_color = Color(0.6588, 0.6314, 0.6235, 1)
+TabContainer/colors/font_hovered_color = Color(0.9255, 0.8863, 0.8, 1)
+TabContainer/colors/font_disabled_color = Color(0.3569, 0.3412, 0.4314, 1)
+TabContainer/constants/h_separation = 4
+TabBar/styles/tab_selected = SubResource("StyleBoxTexture_tab_gekozen")
+TabBar/styles/tab_unselected = SubResource("StyleBoxEmpty_tab")
+TabBar/styles/tab_hovered = SubResource("StyleBoxEmpty_tab")
+TabBar/styles/tab_disabled = SubResource("StyleBoxEmpty_tab")
+TabBar/styles/tab_focus = SubResource("StyleBoxEmpty_tab")
+TabBar/colors/font_selected_color = Color(1, 0.8588, 0.5804, 1)
+TabBar/colors/font_unselected_color = Color(0.6588, 0.6314, 0.6235, 1)
+TabBar/colors/font_hovered_color = Color(0.9255, 0.8863, 0.8, 1)
+TabBar/colors/font_disabled_color = Color(0.3569, 0.3412, 0.4314, 1)
+TabBar/constants/h_separation = 4
+TabContainer/styles/panel = SubResource("StyleBoxTexture_tab_paneel")
+TabContainer/constants/side_margin = 0
+HSlider/styles/slider = SubResource("StyleBoxTexture_schuif")
+HSlider/styles/grabber_area = SubResource("StyleBoxTexture_schuif_vulling")
+HSlider/styles/grabber_area_highlight = SubResource("StyleBoxTexture_schuif_vulling")
+HSlider/styles/focus = SubResource("StyleBoxEmpty_schuif_focus")
+HSlider/icons/grabber = ExtResource("19_schuif_greep")
+HSlider/icons/grabber_highlight = ExtResource("20_schuif_greep_focus")
+HSlider/icons/grabber_disabled = ExtResource("21_schuif_greep_uit")
+HSlider/constants/center_grabber = 0
+VScrollBar/styles/scroll = SubResource("StyleBoxTexture_scroll")
+VScrollBar/styles/scroll_focus = SubResource("StyleBoxTexture_scroll")
+VScrollBar/styles/grabber = SubResource("StyleBoxTexture_greep")
+VScrollBar/styles/grabber_highlight = SubResource("StyleBoxTexture_greep_hover")
+VScrollBar/styles/grabber_pressed = SubResource("StyleBoxTexture_greep_vast")
+HSeparator/styles/separator = SubResource("StyleBoxLine_scheiding")
+HSeparator/constants/separation = 1
+RichTextLabel/colors/default_color = Color(0.9255, 0.8863, 0.8, 1)
+RichTextLabel/colors/font_shadow_color = Color(0.02353, 0.02353, 0.05882, 1)
+RichTextLabel/constants/shadow_offset_x = 1
+RichTextLabel/constants/shadow_offset_y = 1
+RichTextLabel/constants/line_separation = -2
