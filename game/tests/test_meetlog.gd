@@ -1,12 +1,14 @@
 extends RefCounted
 ## Tests voor het meetlog (gdd §4.5) dat T16b nodig heeft voor norm (1)
 ## (MP-1, stilstand), norm (2) (MP-2, echo-acties) en R-V12 (MP-3).
-## T16a deel 2, #76.
+## T16a deel 2, #76. MP-1 voor P2 (MP-7 b, werkaanname W5): #125.
 
 const Fx = preload("res://tests/echo_fixture.gd")
 const InputBits = preload("res://scripts/input/input_bits.gd")
 const Meetlog = preload("res://scripts/events/meetlog.gd")
 const CombatTarget = preload("res://scripts/combat/combat_target.gd")
+const PlayerActor = preload("res://scripts/echo/player_actor.gd")
+const FlowReport = preload("res://levels/flowkamer/flow_report.gd")
 
 const L := InputBits.LEFT
 const R := InputBits.RIGHT
@@ -46,6 +48,7 @@ func test_log_is_deterministic_and_complete(t) -> void:
 		if row[2] == "SPRINGPLANK" or row[2] == "VANGEN":
 			chain.append(row[3])
 	t.check(chain.slice(0, 2) == ["1", "2"], "springplank-reeks %s (1, 2)" % str(chain))
+	t.check(_rows_of(first, "p2").is_empty(), "solo: regels met bron p2")
 	t.check(first.save("user://meetlog_test_solo_D90_p1.csv") == OK, "log niet opgeslagen")
 	t.note("%d regels, %d springplank-landingen" % [first.rows.size(), first.count("SPRINGPLANK")])
 
@@ -107,3 +110,126 @@ func _repeat(segments: Array, times: int) -> Array:
 	for i in times:
 		out += segments
 	return out
+
+
+# --- MP-1 voor P2 (MP-7 b, #125) ---------------------------------------------
+
+## STIL_START/STIL_EIND met deze bron, als [tick, event, waarde].
+func _rows_of(log: Meetlog, source: String) -> Array:
+	var out: Array = []
+	for row in log.rows:
+		if (row[2] == "STIL_START" or row[2] == "STIL_EIND") and row[4] == source:
+			out.append([int(row[0]), row[2], row[3]])
+	return out
+
+
+func _coop(t, p1_at: Vector2, p2_at: Vector2) -> Array:
+	var sim = Fx.world(t)
+	var p1 := Fx.manual_player(sim, 1, p1_at)
+	var p2 := Fx.manual_player(sim, 2, p2_at)
+	return [sim, p1, p2, Meetlog.new(sim, p1, null)]
+
+
+func _bits(p: PlayerActor, bits: int) -> void:
+	(p.input_source as Fx.ManualInput).bits = bits
+
+
+## W5: voor P2 geldt dezelfde definitie als voor P1. Beide staan 200 ticks
+## stil en lopen dan elk een kant op: dezelfde stilstand, met bron p1 en p2.
+func test_mp1_p2_same_definition_as_p1(t) -> void:
+	var c := _coop(t, Vector2(300, Fx.STAND_Y), Vector2(340, Fx.STAND_Y))
+	var sim: Node = c[0]
+	var log: Meetlog = c[3]
+	await t.run_ticks(sim, 200)
+	_bits(c[1], L)
+	_bits(c[2], R)
+	await t.run_ticks(sim, 40)
+	log.finish()
+	var p1_rows := _rows_of(log, "p1")
+	var p2_rows := _rows_of(log, "p2")
+	t.check(p1_rows.size() == 2 and p2_rows == p1_rows,
+		"P1 %s, P2 %s (gelijk, één stilstand)" % [str(p1_rows), str(p2_rows)])
+	var rep = FlowReport.from_rows(log.rows, false)
+	t.check(rep.longest_still_p2 == rep.longest_still and rep.longest_still >= 150,
+		"rapport: P1 %d, P2 %d" % [rep.longest_still, rep.longest_still_p2])
+	t.note("stilstand P1 en P2: %s" % str(p2_rows))
+	await t.cleanup()
+
+
+## W5: P2 staat stil tot hij oplost; de stilstand sluit op de tick van het
+## oplossen, opgeloste ticks tellen niet en na P2_TERUG gelden 60 ticks niet.
+## P1 loopt intussen heen en weer (bron p1 staat los van bron p2).
+func test_mp1_p2_dissolved_and_return_grace(t) -> void:
+	var c := _coop(t, Vector2(300, Fx.STAND_Y), Vector2(340, Fx.STAND_Y))
+	var sim: Node = c[0]
+	var log: Meetlog = c[3]
+	var back: Array = []
+	sim.partner_returned.connect(func(tick: int, _at: Vector2) -> void: back.append(tick))
+	await t.run_ticks(sim, 150)
+	var gone_tick: int = sim.tick
+	sim.dissolve_partner("val")
+	while back.is_empty() and sim.tick < gone_tick + 200:
+		await t.run_ticks(sim, 1)
+	await t.run_ticks(sim, 150)
+	log.finish()
+	var rows := _rows_of(log, "p2")
+	t.check(not back.is_empty(), "P2 kwam niet terug")
+	if back.is_empty() or rows.size() < 3:
+		t.check(false, "P2-stilstanden %s (verwacht: vóór en na het oplossen)" % str(rows))
+		await t.cleanup()
+		return
+	var back_tick: int = back[0]
+	t.check(rows[1][1] == "STIL_EIND" and rows[1][0] == gone_tick,
+		"stilstand vóór oplossen eindigt op %s (oplossen op %d)" % [str(rows[1]), gone_tick])
+	t.check(int(rows[1][2]) == gone_tick - rows[0][0], "lengte %s telt opgeloste ticks" % str(rows[1]))
+	t.check(rows[2][1] == "STIL_START" and rows[2][0] == back_tick + Meetlog.RESPAWN_GRACE,
+		"na P2_TERUG (%d) begint de stilstand op %s (verwacht %d)"
+		% [back_tick, str(rows[2]), back_tick + Meetlog.RESPAWN_GRACE])
+	for row in rows:
+		t.check(row[0] <= gone_tick or row[0] >= back_tick + Meetlog.RESPAWN_GRACE,
+			"P2-regel %s tijdens oplossen of de 60 ticks erna" % str(row))
+	await t.cleanup()
+
+
+## Drop-out sluit een open stilstand van P2; RUN_EIND ook. START en EIND van
+## P2 staan altijd in paren, en een nieuwe P2 begint opnieuw.
+func test_mp1_p2_closed_at_drop_out_and_run_end(t) -> void:
+	var c := _coop(t, Vector2(300, Fx.STAND_Y), Vector2(340, Fx.STAND_Y))
+	var sim: Node = c[0]
+	var p1: PlayerActor = c[1]
+	var log: Meetlog = c[3]
+	await t.run_ticks(sim, 100)
+	var out_tick: int = sim.tick
+	sim.drop_out()
+	await t.run_ticks(sim, 20)
+	var rows := _rows_of(log, "p2")
+	t.check(rows.size() == 2 and rows[1][1] == "STIL_EIND" and rows[1][0] == out_tick,
+		"drop-out op %d: P2-stilstanden %s" % [out_tick, str(rows)])
+	var p2 := Fx.manual_player(sim, 2, p1.position + Vector2(40, 0))
+	var in_tick: int = sim.tick
+	await t.run_ticks(sim, 80)
+	log.finish()
+	rows = _rows_of(log, "p2")
+	t.check(rows.size() == 4 and rows[2][1] == "STIL_START" and rows[2][0] >= in_tick + Meetlog.STILL_WINDOW
+		and rows[3][1] == "STIL_EIND" and rows[3][0] == sim.tick - 1,
+		"nieuwe P2 (in op %d): %s" % [in_tick, str(rows)])
+	t.check(p2 != null, "geen nieuwe P2")
+	await t.cleanup()
+
+
+## Achterwaarts leesbaar: een log zonder regels met bron p2 (zoals vóór #125)
+## geeft hetzelfde MP-1 voor P1 en 0 voor P2; regels met bron p2 veranderen
+## MP-1 en MP-3 van P1 niet.
+func test_report_reads_old_and_new_logs(t) -> void:
+	var old := [["0", "K1", "RUN_START", "", "", "0", "0"],
+		["100", "K1", "STIL_START", "", "p1", "0", "0"],
+		["180", "K1", "STIL_EIND", "80", "p1", "0", "0"],
+		["600", "K1", "RUN_EIND", "", "", "0", "0"]]
+	var new := old.duplicate()
+	new.insert(2, ["120", "K1", "STIL_START", "", "p2", "0", "0"])
+	new.insert(4, ["520", "K1", "STIL_EIND", "400", "p2", "0", "0"])
+	var a = FlowReport.from_rows(old, false)
+	var b = FlowReport.from_rows(new, false)
+	t.check(a.longest_still == 80 and a.longest_still_p2 == 0, "oud log: P1 %d, P2 %d" % [a.longest_still, a.longest_still_p2])
+	t.check(b.longest_still == 80 and b.longest_still_p2 == 400 and b.still_runs == a.still_runs,
+		"nieuw log: P1 %d, P2 %d, runs %s" % [b.longest_still, b.longest_still_p2, str(b.still_runs)])
