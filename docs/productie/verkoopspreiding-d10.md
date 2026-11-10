@@ -58,7 +58,7 @@ Netto is vóór vennootschapsbelasting en zonder kosten van een uitgever (§4.1)
 
 - **Gevoeligheid K1.** Met de randen van A8 (40 % of 60 % in zes weken) wordt K1 45–65 % van de totale verkoop: netto K1 **€ 12.140–17.535 (Laag)** en **€ 49.321–71.242 (Midden)**. Het totaal over 24 maanden verandert daardoor niet.
 - **Na K1 is de verkoop klein.** In Laag brengt elk kwartaal vanaf K2 hooguit ± € 2.700 netto. Vaste kosten na de release (bv. patches, Deck-tests) mogen in het plan niet op die kwartalen leunen.
-- **Verkoopmoment ≠ uitbetaling.** De tabel staat op het moment van verkoop. Valve betaalt de verkoop van maand *m* uit eind maand *m* + 1, in USD; de cashflow in D10 gebruikt daarom de kasbasis-tabel van `docs/business/vaf-dossier-productie.md` §3.3 (zelfde totalen; Laag K1 € 14.003 in plaats van € 14.838, het verschil schuift naar K2, plus een K9 met de uitbetaling van maand 24). Dat verandert §1 niet: de eerste uitbetaling komt pas ± 1–2 maanden na de release, dus verkoop financiert fase 3 niet.
+- **Verkoopmoment ≠ uitbetaling.** De tabel staat op het moment van verkoop. Valve betaalt de verkoop van maand *m* uit eind maand *m* + 1, in USD; de cashflow in D10 gebruikt daarom de kasbasis-tabel van `docs/business/vaf-dossier-productie.md` §3.3 (zelfde totalen; elk kwartaal schuift één maand verkoop door naar het volgende: Laag K1 € 14.003 in plaats van € 14.838, en een K9 met de uitbetaling van maand 24). Het grootste kaseffect is de Amerikaanse bronheffing als het verdragstarief niet lukt (bovengrens Laag K1 ± € 9.802 in plaats van € 14.003; bronheffing: bovengrens in §3.3, U1 bij de boekhouder). Dat verandert §1 niet: de eerste uitbetaling komt pas ± 1–2 maanden na de release, dus verkoop financiert fase 3 niet.
 - **Herzien** zodra er wishlists zijn: dan vervangt de wishlist-methode (A8, O6 van de raming) zowel de totalen als het aandeel van K1.
 
 ## 5. Werkaanname (kader §5)
@@ -78,4 +78,4 @@ Netto is vóór vennootschapsbelasting en zonder kosten van een uitgever (§4.1)
 | Versie | Datum | Wijziging |
 |---|---|---|
 | 0.1 | 2026-11-10 | Eerste versie voor #72: besluit O4 (Laag náást Midden, Laag als rekenscenario, verkoop geen bron voor fase 3) en spreiding per kwartaal over 24 maanden voor Laag en Midden (O7), herleid uit §4.1 en A3/A8/A10 van `markt-en-verkoopraming.md`. |
-| 0.2 | 2026-11-10 | P1 gesloten (uitbetalingstermijn Steam, uitgewerkt in `vaf-dossier-productie.md` §3.3; kasbasis-totalen gecontroleerd tegen §3, gelijk); §4 verwijst nu naar de kasbasis-tabel; verwijzingsregel onder §6 opgeruimd. |
+| 0.2 | 2026-11-10 | P1 gesloten (uitbetalingstermijn Steam, uitgewerkt in `vaf-dossier-productie.md` §3.3; kasbasis-totalen gecontroleerd tegen §3, gelijk); §4 verwijst nu naar de kasbasis-tabel (doorschuiven per kwartaal, bovengrens VS-bronheffing, na Lead-review CD); verwijzingsregel onder §6 opgeruimd. |
