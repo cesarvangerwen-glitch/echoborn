@@ -52,11 +52,11 @@ jobs:
       run:
         shell: bash   # ook op Windows (Git Bash); bash draait met -eo pipefail
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Godot-download uit de cache
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ${{ runner.temp }}/godot-dl
           key: godot-${{ env.GODOT_VERSION }}-${{ matrix.zip }}-${{ env[matrix.sha_var] }}
@@ -99,27 +99,37 @@ jobs:
           "$GODOT" --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd 2>&1 | tee tests.log
 
       - name: Meta-run (kapotte tests moeten de suite rood maken)
-        # ontwerp.md §9 "Schuld" en R18: bewijst dat de runner een scriptfout
-        # en een test met 0 checks als FAIL telt en exitcode 1 geeft.
+        # ontwerp.md §9 en R18: bewijst dat de runner een scriptfout, een test
+        # met 0 checks en (#82) een parse-fout in een script waar een test van
+        # afhangt als FAIL telt en exitcode 1 geeft. Die laatste moet de
+        # scriptcontrole vóór de eerste test melden.
+        # Verwacht 5 FAIL's: 2 in de scriptcontrole (meta_broken_dep.gd en
+        # test_meta_broken_dep.gd), 2 tests in test_meta_broken.gd, en
+        # test_meta_broken_dep.gd dat in de testlus niet laadt.
         run: |
-          cp .github/ci/test_meta_broken.gd game/tests/
-          sed -i 's|^const TEST_SCRIPTS := \[|&"res://tests/test_meta_broken.gd", |' game/tests/run_tests.gd
-          grep -q 'res://tests/test_meta_broken.gd' game/tests/run_tests.gd || { echo "::error::meta-test niet in TEST_SCRIPTS gezet"; exit 1; }
+          META="test_meta_broken.gd meta_broken_dep.gd test_meta_broken_dep.gd"
+          for f in $META; do cp ".github/ci/$f" game/tests/; done
+          sed -i 's|^const TEST_SCRIPTS := \[|&"res://tests/test_meta_broken.gd", "res://tests/test_meta_broken_dep.gd", |' game/tests/run_tests.gd
+          grep -q 'res://tests/test_meta_broken_dep.gd' game/tests/run_tests.gd || { echo "::error::meta-tests niet in TEST_SCRIPTS gezet"; exit 1; }
           set +e
           "$GODOT" --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd > meta.log 2>&1
           CODE=$?
           set -e
-          git checkout -- game/tests/run_tests.gd && rm game/tests/test_meta_broken.gd
-          grep -E 'FAIL test_meta_|Resultaat' meta.log
+          git checkout -- game/tests/run_tests.gd
+          for f in $META; do rm "game/tests/$f"; done
+          grep -E 'FAIL (test_meta_|res://tests/(test_)?meta_|script laadt niet)|Resultaat' meta.log
           [ "$CODE" -eq 1 ] || { echo "::error::meta-run gaf exitcode $CODE, verwacht 1"; exit 1; }
           grep -q 'FAIL test_meta_script_error_must_fail' meta.log || { echo "::error::scriptfout niet als FAIL geteld"; exit 1; }
           grep -q 'FAIL test_meta_zero_checks_must_fail' meta.log || { echo "::error::0 checks niet als FAIL geteld"; exit 1; }
-          grep -q ' 2 mislukt' meta.log || { echo "::error::verwacht precies 2 mislukte tests"; exit 1; }
+          # Alles vóór de kop van het eerste testscript is de scriptcontrole.
+          awk '/^res:\/\/tests\//{exit} {print}' meta.log > meta_voor_tests.log
+          grep -q 'FAIL res://tests/meta_broken_dep.gd laadt niet' meta_voor_tests.log || { echo "::error::parse-fout in een afhankelijk script niet vóór de eerste test als FAIL gemeld"; exit 1; }
+          grep -q ' 5 mislukt' meta.log || { echo "::error::verwacht precies 5 mislukte tests"; exit 1; }
           echo "Meta-run OK: runner geeft FAIL en exitcode 1"
 
       - name: Uitvoer bewaren
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: testuitvoer-${{ matrix.os }}
           path: |
