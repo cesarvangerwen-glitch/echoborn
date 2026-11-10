@@ -194,7 +194,7 @@ Regels voor de dossiertekst:
 - **Geen verwijzing naar 1953** of een andere echte ramp (pitch §6), en geen namen van echte plaatsen (verhaal V2, toonregel W-6).
 - **Water is geen speellaag** (#51 deel 2: 1A): de tekst zegt nooit dat de speler het water beheerst; het water zakt omdat de speler licht pompt.
 - **De laatste zin** geldt alleen als de CEO A1 bevestigt (woonplaats in België); anders schrappen. Hij zegt "gekozen", niet "bedacht en vormgegeven": ontwerpen doen de AI-rollen. Bij het indienen staat de echte zetel van de vennootschap er in plaats van "Vlaanderen of Brussel".
-- **Het carillon is lore, geen crit. 6**: crit. 6 vraagt "muziek uit Vlaanderen, België of de EER"; onze muziek is eigen werk van de studio, dus dat criterium claimt het dossier niet.
+- **Het carillon is lore, geen crit. 6**: crit. 6 ("bevat muziek uit Vlaanderen, België of de EER") claimt het dossier niet. Eigen muziek van een studio in Vlaanderen of Brussel kan daar wel onder vallen, maar bij ons maken AI-rollen de muziek, dus de herkomst is onzeker (dezelfde vraag als intakevragen (a) en (i)). Crit. 5 volstaat al als tweede criterium.
 
 ## 6. Wat nog ontbreekt, en van wie
 
@@ -218,6 +218,8 @@ Regels voor de dossiertekst:
 | D4 (cat. II) | Kernteam: opties (bv. Vlaamse freelancers in het kernteam) met hun kost uitwerken; het besluit is van de CEO | Executive Producer (optie en kost), CEO (besluit) | Na intakevraag (a) |
 | D12 | Slice-build | Team (F3) | Einde fase 2 |
 | D1, D5, D14 | Vennootschap en statuten, CV, intake en hearing | CEO (met boekhouder) | Na `Besluit:` over de intake |
+
+**Open punt:** crit. 3 van cat. I (personages of voorwerpen, "al dan niet fictief", die naar Vlaanderen, België of de EER verwijzen; geen fictieve-wereldtoets) als extra criterium; mogelijk bewijs in verhaal V2 §5 (bevroren echo's van een begijn en een veerman) en §2.1 (het carillon). CD en BLA bekijken het vóór de intake.
 
 **Open punt:** A1 bevestigen vóór de intake: woon- en belastingplaats van de CEO (door de CEO).
 
@@ -250,7 +252,7 @@ Het traject tot het contract duurt naar raming ± 3 tot 10 maanden (`subsidies.m
 
 | Versie | Datum | Wijziging |
 |---|---|---|
-| 0.5 | 2026-11-10 | B2 verwerkt na de review van de CD ([comment in #72](https://github.com/cesarvangerwen-glitch/echoborn/issues/72#issuecomment-6755869892)): crit. 5 als tweede criterium, crit. 2 en 4 aanvullend; Hollestede bij naam; "het water beheersen" vervangen door "licht pompen laat het water zakken" (water géén speellaag, #51 deel 2: 1A); lore en thema loslaten in crit. 4; crit. 5 naar art bible §8; laatste zin "gekozen", voorwaardelijk op A1. Zelf getoetst aan art. 4 (§3.1): cat. I kent naast het verplichte crit. 1 geen rangorde, dus crit. 5 als tweede criterium klopt; het is het enige van de drie zonder fictieve-wereldtoets. Blijft binnen #51: 5A ("volgens voorstel CD", dezelfde stad). Toegevoegd, geen afwijking: carillon niet als crit. 6 geclaimd (muziek is eigen werk), echte zetel invullen bij het indienen, crit. 5-bewijs vóór de slice is de art bible en T1. §1, §6.1 en §6.2 bijgewerkt. D6/D8 niet aangeraakt. |
+| 0.5 | 2026-11-10 | B2 verwerkt na de review van de CD ([comment in #72](https://github.com/cesarvangerwen-glitch/echoborn/issues/72#issuecomment-6755869892)): crit. 5 als tweede criterium, crit. 2 en 4 aanvullend; Hollestede bij naam; "het water beheersen" vervangen door "licht pompen laat het water zakken" (water géén speellaag, #51 deel 2: 1A); lore en thema loslaten in crit. 4; crit. 5 naar art bible §8; laatste zin "gekozen", voorwaardelijk op A1. Zelf getoetst aan art. 4 (§3.1): cat. I kent naast het verplichte crit. 1 geen rangorde, dus crit. 5 als tweede criterium klopt; het is het enige van de drie zonder fictieve-wereldtoets. Blijft binnen #51: 5A ("volgens voorstel CD", dezelfde stad). Toegevoegd, geen afwijking: carillon niet als crit. 6 geclaimd (muziek door AI-rollen, herkomst onzeker; na Lead-review EP), echte zetel invullen bij het indienen, crit. 5-bewijs vóór de slice is de art bible en T1. §1, §6.1 en §6.2 bijgewerkt; open punt crit. 3 in §6.2 (Lead-review EP). D6/D8 niet aangeraakt. |
 | 0.4 | 2026-11-09 | Tweede Lead-review EP (klein): woonplaats CEO voorwaardelijk (A1, VA = zetel; Brussel ≠ "in Vlaanderen"; België volstaat voor de fictieve-wereldtoets), zeggenschap CEO volgens `WERKWIJZE.md` §1 in §4.5 rij 5, §5 en (h)/(i), lezing (1) zwakker; open punt A1. |
 | 0.3 | 2026-11-09 | Lead-review EP verwerkt: art. 4 integraal tegen de pdf (§3.1, o.a. fictieve wereld bij I.2 en I.4, worldbuilding/lore, niet-Europese context, kernprofielen bij II.1, tweede zin II.2); §5 met fictieve-wereldtoets, connectie art-/verhaalteam via de CEO, crit. 4 als derde criterium, cat. II crit. 1 herschreven met twee lezingen en crit. 2 als mogelijk tweede criterium; intakevraag (h) aangescherpt, (i) nieuw; sjabloon 2-pager gelezen, §4.5 in de VAF-volgorde met de termijn van 1 dag vóór de intake; terugvaloptie geschrapt; art. 12.3 letterlijk. |
 | 0.2 | 2026-11-09 | Deel 2 van T13 (#72), B1 en B3: hercheck vaf.be (reglement 08/09/2026 geldt nog), art. 4 letterlijk (§3.1), bijlagen en sjablonen (§3.2), 2-pager in voorlopige vorm (§4.5), cat. I crit. 2 + 5 gekozen (§5), intakevragen (g) en (h). Niet leesbaar: deadlines 2027, sjabloon 2-pager. |
