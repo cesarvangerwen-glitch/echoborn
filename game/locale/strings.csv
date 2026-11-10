@@ -46,3 +46,5 @@ MENU_CONFIRM_RESET_ALL,Reset all buttons?,Alle knoppen terugzetten?,"Titel van d
 MENU_CONFIRM_RESET_ALL_BODY,All columns go back to the default buttons.,Alle kolommen krijgen weer de standaardknoppen.,"Tekst van de bevestiging bij Herstel alles. Max. 2 regels in het paneel (368 px)."
 MENU_RESET,Reset,Herstellen,"Tweede keuze in de bevestiging bij Herstel alles; nooit de standaard (MN-23)."
 MENU_ALSO_STICK,Also: left stick,Ook: linker stick,"Gedimde regel onder Links en Rechts in de kolom Controller: de stick is geen cel en niet herbindbaar (MN-43)."
+HUD_LOG_KOP,Log page %d,Logbladzijde %d,"Kop van het logkader in de HUD (hud-menus.md §3.7) en de regel van een gevonden bladzijde in het logboek (§4.8). %d = nummer van de bladzijde."
+MENU_LOG_PROLOGUE,Prologue,Proloog,"Logboek: tabnaam van de proloog (MN-30). De gebieden krijgen hun eigen naam (COMMON_AREA_n, volgt)."
