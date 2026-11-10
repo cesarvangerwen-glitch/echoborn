@@ -21,6 +21,11 @@ extends Area2D
 @export var buren: PackedStringArray = PackedStringArray()
 ## Scène die meestreamt met de kamer (optioneel).
 @export var inhoud: PackedScene
+## Het gemaal van de wijk van deze kamer (L-14, LM-13; ontwerp.md §3a): de
+## id in `GameState.gemalen` zonder gebied, dus `<kamer_id>/<pad in de
+## inhoud>` (zoals `AreaLoader.gemaal_id`), bv. `K3/Gemaal`. Leeg = geen
+## wijk: telt als niet vol (terugkerende vijanden komen altijd terug).
+@export var wijk_gemaal: StringName = &""
 
 ## Is de kamer nu geladen? Gezet door de AreaLoader.
 var geladen := false

@@ -122,6 +122,15 @@ func has_gemaal(id: StringName) -> bool:
 	return _gemalen.has(id) and is_instance_valid(_gemalen[id])
 
 
+## Is het gemaal `id` vol (LM-04)? Een gebonden gemaal geeft zijn stand van
+## nu, anders telt `state.gemalen` (een gemaal in een kamer die niet geladen
+## is). Onbekend = niet vol. Voor LM-13 (`AreaLoader`, ontwerp.md §3a).
+func is_gemaal_full(id: StringName) -> bool:
+	if has_gemaal(id):
+		return _gemalen[id].is_full()
+	return bool(state.gemalen.get(id, {}).get("vol", false))
+
+
 ## Is `positie` in het gebied van de gekoppelde loader het checkpoint van nu
 ## (`state`)? Een pompslag zet alleen een nieuw checkpoint (`Checkpoint`).
 func is_current_checkpoint(positie: Vector2) -> bool:

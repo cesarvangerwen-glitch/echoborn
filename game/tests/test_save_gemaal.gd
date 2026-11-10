@@ -6,8 +6,8 @@ extends RefCounted
 ##   en sluis (geëxporteerde paden), de lichtmeter en zijn stand (via
 ##   `Progress.bind_gemaal`) en een verbinding met `Combat`; bij ontladen gaat
 ##   zijn stand naar `state` en wordt het losgemaakt.
-## - Een pompslag van P1 zet het checkpoint naast het gemaal, ook zonder in
-##   het vlak te komen; de echo en P2 niet (werkaanname).
+## - Een pompslag van P1 of P2 zet het checkpoint naast het gemaal, ook
+##   zonder in het vlak te komen; de echo niet (LM-08).
 ##
 ## Elke test maakt een eigen `Progress` (en zo nodig `SaveService`) met een
 ## eigen map; de echte autoloads en `user://saves` blijven onaangeroerd.
@@ -24,6 +24,8 @@ const LightMeter = preload("res://scripts/light/light_meter.gd")
 const Gemaal = preload("res://scripts/light/gemaal.gd")
 const Pomprad = preload("res://scripts/light/pomprad.gd")
 const CombatTarget = preload("res://scripts/combat/combat_target.gd")
+const Respawn = preload("res://scripts/save/respawn.gd")
+const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 
 const DIR := "user://test_saves_t5b_3b"
 const TOP := -400.0
@@ -193,10 +195,17 @@ func test_gemaal_in_streamed_room(t) -> void:
 	await t.cleanup()
 
 
-## Pompen zet een checkpoint (deel 3b, punt 2; LM-08 "aanraakte of
-## pompte"): P1 komt niet in het vlak. Treffers van de echo of P2 zetten
-## niets; de eerste pompslag van P1 wel (met autosave, G al bijgewerkt);
-## volgende slagen niet opnieuw; vol worden geeft nog één save.
+## Pompen zet een checkpoint (deel 3b, punt 2; LM-08 "aanraakte of dat P1
+## of P2 pompte"): P1 komt niet in het vlak. Een treffer van de echo zet
+## niets; de eerste pompslag van P2 wel (met autosave, G al bijgewerkt);
+## volgende slagen (ook van P1) niet opnieuw; vol worden geeft nog één save.
+## Na een ander checkpoint zet een slag van P1 het gemaal weer, een slag van
+## de echo niet (gdd §4.6, LM-08: het checkpoint blijft het andere).
+## De slagen zijn handmatige `_strike`-aanroepen met `attacker` = "echo",
+## "p1" of "p2" via `Combat.attack` (de echte weg vanaf stap 4), geen echo die
+## een opgenomen slag van P1 D ticks later herhaalt: `Checkpoint` kijkt
+## alleen naar `who` van `Gemaal.pumped`, en dat is voor een echo-slag altijd
+## "echo" (E-10a, `test_combat.gd`).
 func test_pump_sets_checkpoint(t) -> void:
 	_clear()
 	var sim_first = Fx.world(t)
@@ -230,22 +239,26 @@ func test_pump_sets_checkpoint(t) -> void:
 	var cp_ticks: Array = []
 	checkpoint.reached.connect(func(tick: int) -> void: cp_ticks.append(tick))
 	_strike(sim, "echo", Layers.SHADOW)
-	_strike(sim, "p2", Layers.SHADOW)
-	t.check(gemaal.fill == 20 and reached.is_empty(), "echo of P2 zette een checkpoint: %s (G %d)" % [reached, gemaal.fill])
+	t.check(gemaal.fill == 10 and reached.is_empty(), "echo zette een checkpoint: %s (G %d)" % [reached, gemaal.fill])
 	await t.run_ticks(sim, 1)
-	_strike(sim, "p1", Layers.LIGHT)
+	await t.run_ticks(sim, 1)
+	_strike(sim, "p2", Layers.SHADOW)
 	t.check(not checkpoint.overlaps(p1), "P1 staat in het vlak (testopzet)")
 	t.check(reached == [[&"C", checkpoint.spawn_point()]] and cp_ticks == [sim.tick],
-		"pompslag van P1 zette geen checkpoint: %s" % [reached])
+		"pompslag van P2 zette geen checkpoint: %s" % [reached])
 	var stored: GameState = SaveService.read(service.path_of(2))["state"]
 	t.check(saves.size() == 1 and saves[0] == [2, "checkpoint", OK] and stored != null
 		and stored.checkpoint_kamer == &"C" and stored.gebied == GEBIED
-		and stored.gemalen.get(id) == {"vulstand": 30, "vol": false},
+		and stored.gemalen.get(id) == {"vulstand": 20, "vol": false},
 		"autosave na de pompslag: %s %s" % [saves, stored.to_dict() if stored else null])
 	await t.run_ticks(sim, 1)
 	_strike(sim, "p1", Layers.LIGHT)
-	t.check(reached.size() == 1 and saves.size() == 1 and gemaal.fill == 40,
+	t.check(reached.size() == 1 and saves.size() == 1 and gemaal.fill == 30,
 		"tweede pompslag schreef opnieuw: %d saves" % saves.size())
+	await t.run_ticks(sim, 1)
+	_strike(sim, "p1", Layers.LIGHT)
+	t.check(reached.size() == 1 and saves.size() == 1 and gemaal.fill == 40,
+		"derde pompslag schreef opnieuw: %d saves" % saves.size())
 	# Vol: nog één save, met het volle gemaal.
 	gemaal.fill = 90
 	await t.run_ticks(sim, 1)
@@ -259,6 +272,10 @@ func test_pump_sets_checkpoint(t) -> void:
 	await t.run_ticks(sim, 1)
 	gemaal.fill = 50
 	gemaal.full_tick = -1
+	_strike(sim, "echo", Layers.SHADOW)
+	t.check(saves.size() == before and progress.state.checkpoint_positie == IN_B,
+		"echo zette het gemaal terug als checkpoint: %s" % [progress.state.checkpoint_positie])
+	await t.run_ticks(sim, 1)
 	_strike(sim, "p1", Layers.LIGHT)
 	t.check(saves.size() == before + 1 and progress.state.checkpoint_positie == checkpoint.spawn_point(),
 		"pompen na een ander checkpoint: %s" % [progress.state.checkpoint_positie])
@@ -293,3 +310,44 @@ func test_gemaal_id_renames_and_unknown(t) -> void:
 		"gemaal-id niet hernoemd: %s" % [state.gemalen])
 	t.check(unknown == PackedStringArray([String(stale)]), "onbekende id's: %s" % [unknown])
 	await t.cleanup()
+
+
+## LM-08 en C-08 (gdd §4.6, test LM-08): de respawnplek na pompen.
+## Co-op: alleen P2 pompt het gemaal (P1 raakt het vlak niet), P1 sterft
+## later in een andere kamer: beiden respawnen bij het gemaal, P2 naast P1.
+## Solo: P1 pompt, sterft in een andere kamer (C ontladen): respawn bij het
+## gemaal, met C weer geladen.
+func test_lm08_respawn_at_pumped_gemaal(t) -> void:
+	for coop in [true, false]:
+		var state := GameState.new()
+		state.lichtmeter = 100
+		var w := _world(t, state)
+		var sim = w["sim"]
+		var p1: PlayerActor = w["p1"]
+		var progress: Progress = w["progress"]
+		var loader: AreaLoader = w["loader"]
+		var c: Kamer = w["c"]
+		var p2: PlayerActor = Fx.manual_player(sim, 2, IN_B + Vector2(60, 0)) if coop else null
+		var respawn := Respawn.new(p1, func() -> Vector2: return IN_A, progress)
+		p1.position = IN_B
+		await t.run_ticks(sim, 1)
+		var checkpoint: Checkpoint = c.inhoud_node.get_node("Checkpoint")
+		checkpoint.progress = progress
+		_strike(sim, "p2" if coop else "p1", Layers.SHADOW if coop else Layers.LIGHT)
+		t.check(not checkpoint.overlaps(p1) and progress.state.checkpoint_positie == checkpoint.spawn_point()
+			and respawn.has_checkpoint(), "co-op %s: pompslag zette geen checkpoint" % coop)
+		# Naar A: C ontlaadt.
+		p1.position = IN_A
+		if coop:
+			p2.position = IN_A + Vector2(60, 0)
+		await t.run_ticks(sim, 2)
+		t.check(c.inhoud_node == null, "co-op %s: C nog geladen" % coop)
+		p1.health = 1
+		p1.take_hit(sim.tick)
+		await t.run_ticks(sim, 1)
+		t.check(p1.died and p1.position.distance_to(CHECKPOINT_AT) < 1.0 and loader.huidige == &"C"
+			and c.inhoud_node != null, "co-op %s: P1 respawnt op %s (kamer %s)" % [coop, p1.position, loader.huidige])
+		if coop:
+			t.check(not p2.dissolved and p2.position.distance_to(p1.position) <= 64.0,
+				"P2 niet naast P1 bij het gemaal: %s" % p2.position)
+		await t.cleanup()

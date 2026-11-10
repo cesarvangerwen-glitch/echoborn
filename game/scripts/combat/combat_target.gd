@@ -5,6 +5,12 @@ extends "res://scripts/objects/sim_object.gd"
 ## Het vlak (`shape`) is de hurtbox. Schade komt alleen via `Combat` in stap
 ## (4); de basisvijand beweegt en valt aan in stap (5). Een merk hangt aan
 ## het doel en volgt zijn positie (E-14a).
+##
+## LM-13 (T5b, #82; ontwerp.md §3a): in de gestreamde inhoud van een kamer
+## heeft een vijand de blijvende stand `verslagen` (= niet `alive`), die de
+## AreaLoader als vlag bewaart. Of hij terugkomt, hangt af van `terugkerend`
+## (LM-13a) en van het gemaal van de wijk; dat beslist de loader, die dan
+## `revive` aanroept. De trefpop (en dus het pomprad) heeft geen stand.
 
 ## Schade of een gebroken pantser, voor HUD, meetlog en tests.
 signal damaged(tick: int, amount: int, source: String)
@@ -26,14 +32,24 @@ enum Kind {
 	DUMMY,   ## trefpop: niet Merkbaar, alleen voor tests
 }
 
-var kind: Kind = Kind.ENEMY
+## LM-13(a): komt deze vijand terug? STANDAARD volgt de soort: de
+## basisvijand wel, het pantserdoel niet. Een nieuw type (Dwaallicht,
+## minibaas) zet JA of NEE (Combat Designer).
+enum Terugkeer { STANDAARD, JA, NEE }
+
+## Geëxporteerd, zodat een doel in gestreamde inhoud zijn soort houdt.
+@export var kind: Kind = Kind.ENEMY
+@export var terugkerend: Terugkeer = Terugkeer.STANDAARD
+## Startplek (LM-13c/d): gezet door `remember_start` (de AreaLoader, bij het
+## laden), terug bij `revive`.
+var start_position := Vector2.ZERO
 var health := 30
 var armor_intact := false
 var alive := true
 ## Totale schade, voor tests en meetlog.
 var damage_taken := 0
 ## Loopt de basisvijand (§4.3)? Uit = staat stil, valt niet aan.
-var walks := true
+@export var walks := true
 var facing := 1
 
 var _stunned_until := -1
@@ -51,6 +67,66 @@ func setup_target(p_kind: Kind) -> void:
 	armor_intact = kind == Kind.ARMORED
 	walks = kind == Kind.ENEMY
 	add_child(BodyBuilder.make_visual(shape.get_rect().size, COLORS[kind]))
+
+
+## LM-13(a): terugkerend (basisvijand zonder pantser) of niet.
+func is_returning() -> bool:
+	match terugkerend:
+		Terugkeer.JA:
+			return true
+		Terugkeer.NEE:
+			return false
+	return kind == Kind.ENEMY
+
+
+## Bij het laden van de inhoud (LM-13d): de plek uit de scène is de
+## startplek, met vol leven en (pantserdoel) een heel pantser.
+func remember_start() -> void:
+	start_position = position
+	_reset_fight()
+
+
+## LM-13(c): de vijand staat weer op zijn startplek, met vol leven.
+func revive() -> void:
+	alive = true
+	visible = true
+	position = start_position
+	facing = 1
+	_reset_fight()
+
+
+## Vol leven voor deze soort.
+func health_full() -> int:
+	return int(Tuning.combat()["enemy_health"]) if kind != Kind.DUMMY else 1_000_000
+
+
+func _reset_fight() -> void:
+	health = health_full()
+	armor_intact = kind == Kind.ARMORED
+	_stunned_until = -1
+	_windup_left = 0
+	_attack_left = 0
+	_attack_hit = false
+
+
+## LM-13(b): een vijand of pantserdoel bewaart `verslagen`; de trefpop niet.
+func has_persistent_state() -> bool:
+	return kind != Kind.DUMMY
+
+
+## `verslagen`: sinds de tick waarop het leven op 0 viel (`apply_damage`).
+func get_persistent_state() -> bool:
+	return not alive
+
+
+## Verslagen uit de save: weg (niet zichtbaar, geen leven). Of hij toch
+## terugkomt, beslist de AreaLoader (`revive`). Niet verslagen: niets,
+## `remember_start` gaf al vol leven.
+func set_persistent_state(on: bool) -> void:
+	if on:
+		alive = false
+		health = 0
+		visible = false
 
 
 ## E-14a: alleen vijanden en pantserdoelen dragen een merk.
