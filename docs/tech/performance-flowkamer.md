@@ -182,6 +182,8 @@ for m in native project; do for i in 1 2 3; do
 done; done
 ```
 
+Run A gebruikt hier 600 meetframes, de meting op llvmpipe (§4.2) 300. Op de Deck kost dat weinig tijd en geeft het een stabielere p95; vergelijk met §4.2 op gemiddelde en p95, niet op max (meer frames geeft eerder een hogere max).
+
 5. Controleer in de kop: `adapter` is AMD/radeonsi (niet llvmpipe), `features deck: true`, venster 1280×800, render 1280×800 (native) of 640×400 (project). Controleer per scenario de zoom: 2,000 (native) of 1,000 (project). Is `GPU ms` overal 0 (timer niet beschikbaar), gebruik dan `frame gem ms`.
 6. Lichtmeting van de TA erbij: `lichtmeting.md` §6.2 (zelfde Deck, zelfde sessie).
 
@@ -217,15 +219,13 @@ done; done
 | # | Punt | Wie |
 |---|---|---|
 | 1 | **Echte Deck-meting** volgens §6. Geen Deck in de agent-omgeving. | CEO of tester met een Deck; Engine & Platform Programmer verwerkt |
-| 2 | Camera die de rendergrootte volgt ([#120](https://github.com/cesarvangerwen-glitch/echoborn/issues/120)) en de `.deck`-instellingen voor 640×400: gedaan (§3), D1–D4 opnieuw gemeten op llvmpipe (§4.4). Meting op een echte Deck: punt 1. | Engine & Platform Programmer |
 | 3 | Herhalen op de slice (T8a), zodra die er is: zelfde script, met `FLOW_SCENE` naar de slice-scène. | Engine & Platform Programmer |
-| 4 | **Besluit TD:** akkoord op D1–D8 als definitie van "draait op Deck-specificaties", en op het lichtbudget van 3 ms GPU per frame (20 LE normaal, 30 LE piek; `lichtmeting.md` §7 punt 3). | Technical Director (besloten) |
 | 5 | Waarom de rekenregel van #21 hier te laag schat: ±1,3–1,4× (laagste runs) en ±1,6–1,8× (mediaan) (§4.3). | Technical Artist |
 | 6 | Volledige `.x86_64`-build met export templates 4.6.3 (en later een buildscript in CI). Niet gemaakt: geen templates in deze omgeving. | Engine & Platform Programmer (met Tools Programmer voor CI) |
 | 7 | Niet gemeten: Vulkan-renderers, Windows-build via Proton, Deck OLED (90 Hz), Steam Input-integratie. | Engine & Platform Programmer |
 | 8 | Release-preset maken die `tools/perf/` en `prototypes/lichtmeting/` uitsluit (de Deck-preset houdt ze voor de meting). | Engine & Platform Programmer |
 | 9 | Fullscreen-modus 3 (`mode.deck=3`) houden; exclusieve fullscreen (modus 4) is niet getest. | Engine & Platform Programmer |
-| 10 | Geen CI-rooktest voor de export (`--export-pack`) of voor `tools/perf/deck_meting.gd` (de testrunner laadt `tools/` niet). | Engine & Platform Programmer (met Tools Programmer) |
+| 10 | Geen CI-rooktest voor de export (`--export-pack`) of voor `tools/perf/deck_meting.gd` (de testrunner laadt `tools/` niet). `test_deck_settings.gd` leest alleen `project.godot`: verdwijnt `custom_features="deck"` uit de exportpreset, dan blijft CI groen; een CI-rooktest op de export vangt dat. | Engine & Platform Programmer (met Tools Programmer) |
 | 11 | D5 sluit laden uit van de 33 ms-grens, maar hapers door shadercompilatie bij het eerste licht zijn reëel; apart noteren en een eigen drempel bepalen. | Engine & Platform Programmer (met Technical Artist) |
 | 12 | Run B speelt de kamer zonder 2D-licht; verlicht wordt alleen via het meetscript (run A) gemeten. | Engine & Platform Programmer |
 | 13 | De omrekenfactor 10–30× en de metingen hier rusten op één gedeelde 2-vCPU-machine, met spreiding tot ×1,7 tussen runs (§4.3). Een rustige machine of meer runs per modus geeft een scherpere factor; de Deck-meting maakt dit overbodig. | Engine & Platform Programmer (met Technical Artist) |
@@ -233,3 +233,5 @@ done; done
 | 15 | Zoom-uit op 640×400 geeft een niet-gehele schaal (bv. 0,667), dus ongelijke pixels; zichtbaarder dan bij een render van 1280. Vaste zoomtrappen of niet. Ook een venster kleiner dan 640×360 geeft ongelijke pixels (zoom < 1). | Technical Artist en UX Designer |
 | 16 | De HUD rendert op de Deck nu ook op 640×400 (×2 opgeschaald). Tekst kan grof ogen; of de UI in een eigen native laag moet, beslist open punt 4 van `lichtmeting.md`. | Technical Artist en UI Artist |
 | 17 | Piekbudget 30 LE vraagt een Deck die ±13× sneller is dan llvmpipe (§4.4); haalt de Deck dat niet, dan beslist de Technical Artist over verlagen. | Technical Artist |
+
+Punten 2 (camera en `.deck`-instellingen, §3) en 4 (besluit TD over D1–D8 en 3 ms, §5) zijn afgehandeld en vervallen; de nummers van de andere punten blijven gelijk, zodat verwijzingen kloppen.
