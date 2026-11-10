@@ -109,8 +109,10 @@ def spelbestanden_lijst(img, maat="normaal", focus=0, melding=True):
         M.label(img, "Opslaan mislukt. Deze plaats is nu leeg.", 34, my + (1 if maat == "normaal" else 0), WIT[7], g)
 
 
-def bevestiging(img, maat="normaal", apparaat="xbox"):
-    """MN-23: paneel boven de lijst (lijst nog eens 50 % verduisterd); Terug staat standaard."""
+def bevestiging(img, maat="normaal", apparaat="xbox", plaats=1):
+    """MN-23: paneel boven de lijst (lijst nog eens 50 % verduisterd); Terug staat standaard.
+    Titel, details en tekst komen uit de gekozen plaats (1-based): OK/HERSTELD = wijk en speeltijd +
+    OVERWRITE_BODY; KAPOT/NIEUWER = de stand in Gedimd, geen wijk of speeltijd + SET_ASIDE_BODY."""
     M.dim(img, 0.50)
     if maat == "normaal":
         px, py, pw, ph, g, tl, bw, by = 120, 116, 400, 128, "normaal", 10, 160, (80, 96)
@@ -119,10 +121,13 @@ def bevestiging(img, maat="normaal", apparaat="xbox"):
         px, py, pw, ph, g, tl, bw, by = 80, 96, 480, 168, "groot", 14, 200, (100, 120)
         ty = 56
     over(img, M.negen4(M.paneel(), pw, ph, 4, 4, 4, 4), px, py)
-    M.label(img, "Plaats 1 overschrijven?", px + 16, py + 12, WIT[7], schaal=2)
-    M.label(img, "Wijk 1.1 De Kadewijk · 1 u 12 min", px + 16, py + 38, WIT[5], g)
-    body = "Dit spel wordt gewist. Dat kan niet terug." if maat == "normaal" else \
-        "Het oude bestand blijft bewaard voor support, maar deze plaats begint opnieuw."
+    regel2, kleur2, _ = PLAATSEN[plaats - 1]
+    kapot = kleur2 is not None            # KAPOT/NIEUWER (Leeg komt hier niet: geen bevestiging)
+    M.label(img, "Plaats %d overschrijven?" % plaats, px + 16, py + 12, WIT[7], schaal=2)
+    details = regel2 if kapot else "Wijk 1.1 De Kadewijk · 1 u 12 min"
+    M.label(img, details, px + 16, py + 38, WIT[5], g)
+    body = "Het oude bestand blijft bewaard voor support, maar deze plaats begint opnieuw." if kapot else \
+        "Dit spel wordt gewist. Dat kan niet terug."
     regels = wrap(body, pw - 32, g)
     for i, r in enumerate(regels[:2]):
         M.label(img, r, px + 16, py + ty + i * tl, WIT[7], g)
@@ -138,7 +143,7 @@ def mock_spelbestanden():
     M.hints(a, [("a", "Laden"), ("x", "Nieuw spel hier"), ("b", "Terug")], "xbox")
     b = scherm()
     spelbestanden_lijst(b, "normaal", melding=False)
-    bevestiging(b, "normaal", "xbox")
+    bevestiging(b, "normaal", "xbox", plaats=1)
     return stapel(a, b)
 
 
@@ -148,7 +153,7 @@ def mock_spelbestanden_groot():
     M.hints(a, [("x", "Nieuw spel hier"), ("b", "Terug")], "deck", "groot")   # KAPOT: geen A
     b = scherm()
     spelbestanden_lijst(b, "groot", focus=1, melding=False)
-    bevestiging(b, "groot", "deck")
+    bevestiging(b, "groot", "deck", plaats=2)
     return stapel(a, b)
 
 
