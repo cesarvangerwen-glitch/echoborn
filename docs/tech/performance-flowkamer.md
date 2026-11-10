@@ -52,7 +52,7 @@ Besluit #18 en de TA (`lichtmeting.md` §5.2: "wereld op 640×400 renderen en ×
 | `window/size/mode.deck` | 3 (schermvullend) | Ongewijzigd |
 | `window/vsync/vsync_mode.deck` | 1 (aan) | Ongewijzigd |
 
-Stretch-aspect blijft de standaard `keep`; 1280×800 is precies 2× 640×400, dus geen zwarte randen en gelijke pixels.
+`game/tests/test_deck_settings.gd` controleert deze waarden; zet iemand ze terug, dan wordt CI rood. Stretch-aspect blijft de standaard `keep`; 1280×800 is precies 2× 640×400, dus geen zwarte randen en gelijke pixels.
 
 De camera van de flow-kamer leidt zijn zoom af van de rendergrootte (`FlowRoom.camera_zoom`, [#120](https://github.com/cesarvangerwen-glitch/echoborn/issues/120)): 640×400 → zoom 1, 1280×720 en 1280×800 → zoom 2. Het beeld is in beide gevallen hetzelfde (640×360 wereldpixels plus 20 px boven en onder op 16:10). Gemeten:
 
@@ -220,7 +220,7 @@ done; done
 | 2 | Camera die de rendergrootte volgt ([#120](https://github.com/cesarvangerwen-glitch/echoborn/issues/120)) en de `.deck`-instellingen voor 640×400: gedaan (§3), D1–D4 opnieuw gemeten op llvmpipe (§4.4). Meting op een echte Deck: punt 1. | Engine & Platform Programmer |
 | 3 | Herhalen op de slice (T8a), zodra die er is: zelfde script, met `FLOW_SCENE` naar de slice-scène. | Engine & Platform Programmer |
 | 4 | **Besluit TD:** akkoord op D1–D8 als definitie van "draait op Deck-specificaties", en op het lichtbudget van 3 ms GPU per frame (20 LE normaal, 30 LE piek; `lichtmeting.md` §7 punt 3). | Technical Director (besloten) |
-| 5 | Waarom de rekenregel van #21 hier ±1,14–1,3× te laag schat (§4.3). | Technical Artist |
+| 5 | Waarom de rekenregel van #21 hier te laag schat: ±1,3–1,4× (laagste runs) en ±1,6–1,8× (mediaan) (§4.3). | Technical Artist |
 | 6 | Volledige `.x86_64`-build met export templates 4.6.3 (en later een buildscript in CI). Niet gemaakt: geen templates in deze omgeving. | Engine & Platform Programmer (met Tools Programmer voor CI) |
 | 7 | Niet gemeten: Vulkan-renderers, Windows-build via Proton, Deck OLED (90 Hz), Steam Input-integratie. | Engine & Platform Programmer |
 | 8 | Release-preset maken die `tools/perf/` en `prototypes/lichtmeting/` uitsluit (de Deck-preset houdt ze voor de meting). | Engine & Platform Programmer |
@@ -228,8 +228,8 @@ done; done
 | 10 | Geen CI-rooktest voor de export (`--export-pack`) of voor `tools/perf/deck_meting.gd` (de testrunner laadt `tools/` niet). | Engine & Platform Programmer (met Tools Programmer) |
 | 11 | D5 sluit laden uit van de 33 ms-grens, maar hapers door shadercompilatie bij het eerste licht zijn reëel; apart noteren en een eigen drempel bepalen. | Engine & Platform Programmer (met Technical Artist) |
 | 12 | Run B speelt de kamer zonder 2D-licht; verlicht wordt alleen via het meetscript (run A) gemeten. | Engine & Platform Programmer |
-| 13 | De omrekenfactor 10–30× rust op één gedeelde 2-vCPU-machine met twee runs per modus. | Engine & Platform Programmer (met Technical Artist) |
+| 13 | De omrekenfactor 10–30× en de metingen hier rusten op één gedeelde 2-vCPU-machine, met spreiding tot ×1,7 tussen runs (§4.3). Een rustige machine of meer runs per modus geeft een scherpere factor; de Deck-meting maakt dit overbodig. | Engine & Platform Programmer (met Technical Artist) |
 | 14 | **16:10 (C-07), besluit TD: geen blokkade.** De leiband blijft 16:9 (`leash_view_px`) voor pc én Deck, zodat sim, echo en replays op dezelfde tick oplossen; geen aparte Deck-waarde. Op 640×400 toont de camera per rand 20–30 wereldpx extra; UX beslist alleen of die band gedimd wordt. | UX Designer |
 | 15 | Zoom-uit op 640×400 geeft een niet-gehele schaal (bv. 0,667), dus ongelijke pixels; zichtbaarder dan bij een render van 1280. Vaste zoomtrappen of niet. Ook een venster kleiner dan 640×360 geeft ongelijke pixels (zoom < 1). | Technical Artist en UX Designer |
 | 16 | De HUD rendert op de Deck nu ook op 640×400 (×2 opgeschaald). Tekst kan grof ogen; of de UI in een eigen native laag moet, beslist open punt 4 van `lichtmeting.md`. | Technical Artist en UI Artist |
-| 17 | Meting op een gedeelde 2-vCPU-machine: spreiding tot ×1,7 tussen runs (§4.3). Een rustige machine of meer runs per modus geeft een scherpere omrekenfactor; de Deck-meting maakt dit overbodig. | Engine & Platform Programmer |
+| 17 | Piekbudget 30 LE vraagt een Deck die ±13× sneller is dan llvmpipe (§4.4); haalt de Deck dat niet, dan beslist de Technical Artist over verlagen. | Technical Artist |
