@@ -1,6 +1,6 @@
 # Performance flow-kamer: Steam Deck-build (T7)
 
-Eigenaar: Engine & Platform Programmer · Versie 0 · Issue: [#79](https://github.com/cesarvangerwen-glitch/echoborn/issues/79)
+Eigenaar: Engine & Platform Programmer · Versie 1 · Issue: [#79](https://github.com/cesarvangerwen-glitch/echoborn/issues/79)
 Gebaseerd op `docs/productie/fase-2-kader.md` §2 (T7), §3 (F5), §5; besluit #18 (2D, 640×400 op de Deck), besluit #51 (flow-kamer, co-op), randvoorwaarde "Steam Deck verified als doel" (#2); `docs/tech/lichtmeting.md` (lichtbudget, #21); `docs/tech/setup.md`.
 
 ---
@@ -8,13 +8,11 @@ Gebaseerd op `docs/productie/fase-2-kader.md` §2 (T7), §3 (F5), §5; besluit #
 ## 1. Samenvatting
 
 **Gemeten (llvmpipe, géén Deck):**
-- De Deck-build bestaat: preset `Steam Deck (Linux)` in `game/export_presets.cfg`, met de feature `deck` (1280×800, schermvullend, vsync aan). Een export (`.pck`) start, zet de Deck-instellingen en speelt de flow-kamer 300 frames zonder fouten.
-- De flow-kamer zoals hij nu is (grijs, geen 2D-licht) kost op llvmpipe **±3,5 ms GPU op 640×400** en **±10,8 ms op 1280×800**, met 16–22 draw calls per frame en ±32 MB geheugen.
-- Met het lichtbudget van de Technical Artist erbij kost het licht in de flow-kamer **±20 ms (20 LE, "verlichte wijk") en ±26 ms (30 LE, piek) op 640×400**. Dat is **±1,3× (wijk20) en ±1,14× (piek30) meer** dan de rekenregel uit `lichtmeting.md` §5 voorspelt (15 en 22,5 ms). Op native 1280×800 is het licht nog eens **±3,3–4,6× duurder**.
+- De Deck-build rendert nu de wereld op **640×400** en schaalt die ×2 op naar het scherm van 1280×800 (§3). De camera kiest zelf zoom 1 (640×400) of 2 (1280×800); gemeten in de build: feature `deck` actief, venster 1280×800, render 640×400, zoom 1. Een export (`.pck`) start en speelt de flow-kamer 300 frames zonder fouten.
+- De flow-kamer zelf (grijs, geen 2D-licht) kost op llvmpipe **±3,7–7 ms GPU op 640×400** (mediaan 4,7) en **±11,2 ms op 1280×800**, met 16–22 draw calls per frame en ±32,5 MB geheugen.
+- Met het lichtbudget van de Technical Artist erbij kost het licht op 640×400 **mediaan ±24 ms (20 LE, "verlichte wijk"; 20–40 ms) en ±40 ms (30 LE, piek; 30–57 ms)**. De laagste runs (20,5 en 29,8 ms) liggen dicht bij de vorige meting (19,9 en 25,6 ms); de spreiding komt van de gedeelde machine (§4.3). Op native 1280×800 is het licht **±3× duurder**.
 
-**Knelpunt (gemeten):** de build rendert nu op **native 1280×800**, niet op 640×400. De camera van de flow-kamer heeft een vaste zoom 2 voor een venster van 1280×720; met de wereld op 640×400 zou je maar 320×200 wereldpixels zien (§3). Het lichtbudget van #21 gaat uit van 640×400.
-
-**Aanname (niet gemeten):** of de Deck dit haalt, hangt af van hoeveel sneller zijn GPU is dan llvmpipe. Het licht past in de 3 ms van de TA als de Deck **≥ 6,6× (20 LE) en ≥ 8,5× (30 LE) sneller** is op 640×400; op native 1280×800 moet dat **≥ 22–30×** zijn. De TA schat de Deck op 10–30× (`lichtmeting.md` §5.3). Op 640×400 is er dus naar verwachting marge, op native niet. Alleen een meting op een echte Deck (§6) beslist dit.
+**Aanname (niet gemeten):** of de Deck dit haalt, hangt af van hoeveel sneller zijn GPU is dan llvmpipe. Het licht past in de 3 ms van de TA als de Deck op 640×400 **≥ ±8× (20 LE) en ≥ ±13× (30 LE) sneller** is (beste runs: 6,8× en 9,9×); op native moet dat **≥ 25–39×** zijn. De TA schat de Deck op 10–30× (`lichtmeting.md` §5.3). Het normale budget past dus naar verwachting; het piekbudget zit aan de onderkant van die schatting krap. Alleen een meting op een echte Deck (§6) beslist dit.
 
 ## 2. De Deck-build
 
@@ -22,7 +20,8 @@ Gebaseerd op `docs/productie/fase-2-kader.md` §2 (T7), §3 (F5), §5; besluit #
 |---|---|---|---|
 | Platform | Linux x86_64 (SteamOS is Linux; geen Proton nodig) | `export_presets.cfg`, preset `Steam Deck (Linux)` | Native draait zonder vertaallaag |
 | Feature | `deck` (custom feature) | idem | De Deck-instellingen hieronder gelden alleen in deze export; editor, tests en CI veranderen niet |
-| Venster | 1280×800 (16:10), schermvullend (`mode.deck=3`) | `project.godot`, `display/window/size/*.deck` | Deck-scherm; besluit #18 |
+| Venster | 1280×800 (16:10), schermvullend (`mode.deck=3`) | `project.godot`, `display/window/size/window_*_override.deck`, `mode.deck` | Deck-scherm; besluit #18 |
+| Render | wereld op 640×400, ×2 opgeschaald (`viewport_*.deck=640/400`, `stretch/mode.deck="viewport"`) | `project.godot`, `display/window/size/viewport_*.deck`, `display/window/stretch/mode.deck` | Lichtbudget van #21 gaat uit van 640×400; besluit #18 (§3) |
 | Vsync | aan (`vsync_mode.deck=1`) | `project.godot` | Deck-scherm is 60 Hz; geen tearing |
 | Renderer | `gl_compatibility` (OpenGL 3.3) | `project.godot` (al zo) | Het lichtbudget van #21 is met deze renderer gemeten. Vulkan (Forward+/Mobile) is niet gemeten |
 | Texturen | S3TC/BPTC (desktop) | preset | Deck-GPU is desktop-RDNA 2 |
@@ -41,22 +40,37 @@ godot --headless --path game --export-release "Steam Deck (Linux)" ../builds/dec
 
 De pck start met `godot --main-pack builds/deck/polderlight.pck`. Dat is dezelfde runtime als de volledige build (de templates zijn dezelfde 4.6.3-engine zonder editor). Een volledige `.x86_64`-build is in deze werkomgeving niet gemaakt (geen templates; §7).
 
-## 3. Resolutie: 640×400 vraagt een camera die meeschaalt
+## 3. Resolutie: 640×400 met een camera die meeschaalt
 
-Besluit #18 en de TA (`lichtmeting.md` §5.2: "wereld op 640×400 renderen en ×2 opschalen") gaan uit van een wereld die op 640×400 rendert. Godot doet dat met `display/window/stretch/mode = "viewport"` en een basisgrootte van 640×400. Gemeten in een testproject:
+Besluit #18 en de TA (`lichtmeting.md` §5.2: "wereld op 640×400 renderen en ×2 opschalen") gaan uit van een wereld die op 640×400 rendert. De Deck-build doet dat nu met deze instellingen in `game/project.godot`, sectie `[display]`; ze gelden alleen met de feature `deck`:
 
-| Instelling | Render | Wereld in beeld met camerazoom 2 |
+| Instelling | Waarde | Doel |
 |---|---|---|
-| basis 1280×800, geen stretch (de build nu) | 1280×800 | 640×400 ✔ |
-| basis 640×400, stretch `viewport` | 640×400 | 320×200 ✘ (alles 2× te groot) |
+| `window/size/viewport_width.deck` / `viewport_height.deck` | 640 / 400 | Basisgrootte: de wereld rendert op 640×400 |
+| `window/stretch/mode.deck` | `"viewport"` | Render op de basisgrootte, daarna opschalen naar het venster |
+| `window/size/window_width_override.deck` / `window_height_override.deck` | 1280 / 800 | Venster blijft 1280×800 (Deck-scherm), niet 640×400 |
+| `window/size/mode.deck` | 3 (schermvullend) | Ongewijzigd |
+| `window/vsync/vsync_mode.deck` | 1 (aan) | Ongewijzigd |
 
-De flow-kamer zet zijn camera op zoom 2 (`flow_room.gd`, "640 × 360 wereldpixels in het venster van 1280 × 720"). Daarom rendert de Deck-build nu native. Voor 640×400 moet de zoom de rendergrootte volgen (zoom 1 bij 640×400). Dat is een wijziging in de scène en dus niet van mij; de meting in §4 doet dat alleen tijdens de meting (`--res=640`). Zodra de camera meeschaalt, komen in `project.godot` erbij: `window/size/viewport_width.deck=640`, `viewport_height.deck=400`, `window_width_override.deck=1280`, `window_height_override.deck=800`, `window/stretch/mode.deck="viewport"`. Open punt 4 van `lichtmeting.md` (UI scherp houden) beslist of de UI dan in een eigen laag native blijft.
+Stretch-aspect blijft de standaard `keep`; 1280×800 is precies 2× 640×400, dus geen zwarte randen en gelijke pixels.
+
+De camera van de flow-kamer leidt zijn zoom af van de rendergrootte (`FlowRoom.camera_zoom`, [#120](https://github.com/cesarvangerwen-glitch/echoborn/issues/120)): 640×400 → zoom 1, 1280×720 en 1280×800 → zoom 2. Het beeld is in beide gevallen hetzelfde (640×360 wereldpixels plus 20 px boven en onder op 16:10). Gemeten:
+
+| Opstelling | Venster | Render | Camerazoom |
+|---|---|---|---|
+| Deck-build (`--main-pack`, `--res=project`) | 1280×800 | 640×400 | 1,000 |
+| Editorproject, `--res=640` | 1280×800 | 640×400 | 1,000 |
+| Editorproject, `--res=native` | 1280×800 | 1280×800 | 2,000 |
+
+Editor, pc-build, tests en CI veranderen niet: zonder feature `deck` blijft het 1280×720 zonder stretch.
+
+**Gevolg:** ook de HUD rendert nu op 640×400 en wordt ×2 opgeschaald. Of de UI in een eigen laag native moet blijven, is open punt 4 van `lichtmeting.md` (UI scherp houden); zie §7.
 
 ## 4. Meting
 
 ### 4.1 Opzet
 
-Script: `game/tools/perf/deck_meting.gd` + `.tscn`. Meetscript, geen gamecode; de flow-kamer en haar scripts blijven ongewijzigd.
+Script: `game/tools/perf/deck_meting.gd` + `.tscn`. Meetscript, geen gamecode; de flow-kamer en haar scripts blijven ongewijzigd. Het script zet de camerazoom niet meer zelf: de kamer kiest hem uit de rendergrootte (§3). Per scenario print het de render en de zoom bij start en eind; ze staan ook in de CSV (`zoom_start`, `zoom_eind`).
 
 - Per scenario laadt het `levels/flowkamer/flowkamer.tscn` opnieuw en laat de gescripte run (`flow_bot.gd`) spelen, met echo en HUD. 120 opwarmframes, 300 meetframes, vsync uit, geen fps-limiet.
 - Het meet de frametijd (gem., p50, p95, max), de render-tijd van Godot op CPU en GPU (`viewport_get_measured_render_time_*`), draw calls en objecten per frame (`Performance`), geheugen en laadtijd.
@@ -73,52 +87,64 @@ Draaien:
 
 ```bash
 xvfb-run -a -s "-screen 0 1280x800x24" godot --path game --resolution 1280x800 --audio-driver Dummy \
-  res://tools/perf/deck_meting.tscn -- --res=native      # of --res=640; ook --frames=, --warmup=, --only=
+  res://tools/perf/deck_meting.tscn -- --res=native      # of --res=640 / --res=project; ook --frames=, --warmup=, --only=
 ```
+
+| `--res=` | Render | Gebruik |
+|---|---|---|
+| `native` (standaard) | venstergrootte, stretch uit; ook in de Deck-build | D1, en native ter vergelijking |
+| `640` | 640×400, stretch `viewport` | D2–D4 in het editorproject |
+| `project` | wat `project.godot` zegt; in de Deck-build 640×400 | Controle dat de Deck-build zelf 640×400 rendert |
 
 De tabel komt op stdout, een CSV in `user://deck_meting_<res>.csv` (pad wordt geprint). Duur op llvmpipe: ±1 min per modus. `--headless` werkt niet: dan rendert Godot niets.
 
 ### 4.2 Resultaten (llvmpipe, géén Deck)
 
-**Opstelling:** Godot 4.6.3-stable official, `gl_compatibility`, Mesa 25.2.8 llvmpipe (LLVM 20.1.2), 2 vCPU Intel Xeon 2,1 GHz, Xvfb 1280×800. Twee runs per modus, tabel = gemiddelde. Het eerste scenario van een run is soms traag (opwarmen); daarom geldt "grijs-eind" als basis. De machine werd gedeeld met andere processen: op native lagen de twee runs tot 35 % uit elkaar, op 640×400 < 5 %.
+**Opstelling:** Godot 4.6.3-stable official, `gl_compatibility`, Mesa 25.2.8 llvmpipe (LLVM 20.1.2), 2 vCPU, Xvfb 1280×800, camera met zoom uit de rendergrootte (§3). Op 640×400 zes runs (vijf in het editorproject met `--res=640`, één in de Deck-build met `--res=project`), native drie runs. Tabel = **mediaan (laagste–hoogste)**. Lichtkosten = GPU van het scenario min GPU van grijs-eind **in dezelfde run**, daarna de mediaan. De machine werd gedeeld met andere processen; de spreiding is daarom groot (§4.3).
 
-| Modus | Scenario | Frame gem. ms | Frame p95 ms | CPU-render ms | GPU ms | Lichtkosten GPU ms¹ | Draw calls gem. / max |
-|---|---|---:|---:|---:|---:|---:|---:|
-| 640×400 | grijs-eind | 7,8 | 11,8 | 2,7 | 3,5 | 0 | 20 / 22 |
-| 640×400 | wijk20 | 28,7 | 37,2 | 21,9 | 23,4 | **19,9** | 16 / 19 |
-| 640×400 | piek30 | 35,1 | 43,5 | 27,6 | 29,1 | **25,6** | 16 / 19 |
-| native 1280×800 | grijs-eind | 15,6 | 21,0 | 5,3 | 10,8 | 0 | 17 / 22 |
-| native 1280×800 | wijk20 | 98 | 160 | 82 | 89 (76 / 102) | **±66–91** | 16 / 21 |
-| native 1280×800 | piek30 | 132 | 236 | 114 | 122 (105 / 139) | **±95–128** | 18 / 34 |
+| Modus | Scenario | Frame p95 ms | CPU-render ms | GPU ms | Lichtkosten GPU ms | Draw calls max |
+|---|---|---:|---:|---:|---:|---:|
+| 640×400 | grijs-eind | 16,4 (10,2–24,0) | 2,7 (2,3–2,9) | 4,7 (3,7–7,0) | 0 | 22 |
+| 640×400 | wijk20 | 47 (38–65) | 26,2 (25,0–39,6) | 27,8 (26,5–43,5) | **23,9 (20,5–39,5)** | 19 |
+| 640×400 | piek30 | 82 (47–113) | 42,0 (32,2–58,8) | 44,6 (33,7–63,7) | **39,6 (29,8–56,7)** | 19 |
+| native 1280×800 | grijs-eind | 18,6 (18,2–22,3) | 5,3 (5,1–5,5) | 11,2 (11,2–11,4) | 0 | 22 |
+| native 1280×800 | wijk20 | 112 (108–193) | 80,7 (80,2–117,1) | 86,9 (86,1–126,8) | **75,8 (74,7–115,6)** | 36 |
+| native 1280×800 | piek30 | 236 (149–252) | 121,8 (106,8–154,6) | 128,9 (112,8–164,3) | **117,7 (101,6–152,9)** | 36 |
 
-¹ GPU-tijd min die van grijs-eind in dezelfde modus.
-
-| Overig (beide modi) | Waarde |
+| Overig | Waarde |
 |---|---|
-| Geheugen (statisch) | 32,3 MB |
+| Geheugen (statisch) | 32,5 MB (640×400) · 32,6 MB (native) |
 | Videogeheugen | 14,9 MB (640×400) · 24,6 MB (native) |
-| Laden flow-kamer | ±100 ms de eerste keer (scripts compileren), daarna 10–20 ms |
-| Build via `--main-pack` | `deck`-feature actief, venster 1280×800, render 1280×800; grijs 10,5 ms GPU, gelijk aan native hierboven; de flow-kamer (hoofdscène) draait 300 frames zonder fouten |
+| Laden flow-kamer | 100–175 ms de eerste keer (scripts compileren), daarna 10–30 ms |
+| Deck-build via `--main-pack` | feature `deck` actief, venster 1280×800, render 640×400, zoom 1; als hoofdscène 300 frames zonder fouten (exitcode 0) |
+
+**Vergelijking met versie 0** (camera met vaste zoom 2; de meting zette de zoom zelf op 1): de laagste runs nu (wijk20 20,5 ms, piek30 29,8 ms, grijs 3,7 ms) liggen dicht bij de toen gemeten 19,9, 25,6 en 3,5 ms. De camerazoom uit de rendergrootte geeft hetzelfde beeld en dus dezelfde kosten; het hogere mediaan komt van de drukkere machine.
 
 ### 4.3 Wat de cijfers zeggen
 
 | Vraag | Antwoord |
 |---|---|
-| Is de flow-kamer zelf zwaar? | Nee. Zonder licht ±3,5 ms GPU op llvmpipe (640×400) en ≤ 22 draw calls. Op een GPU verwacht ik ruim onder 1 ms (aanname). |
-| Klopt de rekenregel van #21 in een echte kamer? | Grofweg, maar hij schat hier te laag: ±1,3× bij wijk20 (19,9 ms gemeten, 20 × 0,75 = 15 ms verwacht) en ±1,14× bij piek30 (25,6 ms gemeten, 22,5 ms verwacht). Mogelijke oorzaken: de grote lichten bedekken in deze kamer meer schermvlak, de saturatiepass kost op llvmpipe vooral CPU, de machine was gedeeld. Niet uitgezocht. |
-| Native of 640×400? | Native kost het licht **3,3–4,6×** zoveel (TA: 3,1–3,3×). 640×400 is op de Deck dus geen luxe maar nodig om het budget te halen (§3). |
-| CPU-render ≈ GPU | Op llvmpipe rendert de CPU zelf; die CPU-tijd zegt niets over de Deck. Op de Deck moet `cpu_ms` klein blijven (§6). |
+| Rendert de Deck-build op 640×400? | Ja, gemeten in de build zelf (§3). Daarmee geldt het lichtbudget van #21 voor wat de speler ziet. |
+| Is de flow-kamer zelf zwaar? | Nee. Zonder licht 3,7–7 ms GPU op llvmpipe (640×400) en ≤ 22 draw calls. Op een GPU verwacht ik ruim onder 1 ms (aanname). |
+| Waarom zo'n spreiding? | Twee oorzaken. (1) De machine was gedeeld: in dezelfde run wisselen grijs en grijs-eind tot ×1,7. (2) De bot speelt per scenario een iets andere stuk kamer (eindtick verschilt per run, draw calls 17 of 20–21), dus een ander deel van het scherm is verlicht. De laagste run is de beste schatting van een rustige machine; de mediaan is de voorzichtige. |
+| Klopt de rekenregel van #21 in een echte kamer? | De laagste runs geven ±1,3–1,4× de voorspelling (15 en 22,5 ms), de mediaan ±1,6–1,8×. Hij schat in deze kamer dus te laag. Niet uitgezocht (§7 punt 5). |
+| Native of 640×400? | Native kost het licht **±3,0–3,2×** zoveel (TA: 3,1–3,3×). 640×400 is op de Deck nodig om het budget te halen; de build doet dat nu. |
+| CPU-render ≈ GPU | Op llvmpipe rendert de CPU zelf; die CPU-tijd zegt niets over de Deck. Op de Deck moet `cpu_ms` klein blijven (D4). |
 
-### 4.4 Omrekening naar de Deck (aanname)
+### 4.4 D1–D4 op llvmpipe en omrekening naar de Deck (aanname)
 
-De TA stelt 3 ms GPU per frame voor licht voor (`lichtmeting.md` §5.3; akkoord TD). Nodige versnelling Deck t.o.v. deze llvmpipe = lichtkosten / 3 ms:
+De drempels D1–D4 (§6.3) gelden voor een echte Deck. Op llvmpipe zeggen ze alleen iets via de omrekening; ik noteer de waarden zodat de Deck-meting ze direct kan naast elkaar leggen.
 
-| | 640×400 | native 1280×800 |
-|---|---:|---:|
-| wijk20 (20 LE) | **6,6×** | ±22–30× |
-| piek30 (30 LE) | **8,5×** | ±32–43× |
+| # | Drempel (Deck) | llvmpipe, mediaan (laagste) | Nodige versnelling Deck t.o.v. llvmpipe |
+|---|---|---|---:|
+| D1 | grijs-eind native: p95 ≤ 16,7 ms en GPU ≤ 4 ms | p95 18,6 (18,2) ms, GPU 11,2 ms | GPU ±2,8× |
+| D2 | lichtkosten wijk20 op 640×400 ≤ 3 ms | 23,9 (20,5) ms | **±8,0× (6,8×)** |
+| D3 | wijk20 en piek30 op 640×400: p95 ≤ 16,7 ms | 47 / 82 (38 / 47) ms | ±2,8× / ±4,9× (2,3× / 2,8×) op de hele frame |
+| D4 | CPU-render ≤ 4 ms, alle scenario's | 2,7 (grijs) tot 42 (piek30) ms | n.v.t.: op llvmpipe rendert de CPU zelf |
 
-**Aanname, niet gemeten:** de Deck-GPU is 10–30× sneller dan deze llvmpipe (TA, `lichtmeting.md` §5.3). Dan past het budget op 640×400 met een marge van 1,2–4,5×, en op native niet of nauwelijks. De marge is kleiner dan de 2–6× die #21 verwachtte.
+Piekbudget (30 LE, geen eigen drempel, wel het budget van de TA): 39,6 (29,8) ms → **±13× (9,9×)** nodig.
+
+**Aanname, niet gemeten:** de Deck-GPU is 10–30× sneller dan deze llvmpipe (TA, `lichtmeting.md` §5.3). Dan haalt de Deck D1–D3 op 640×400 voor het normale budget (20 LE) met een marge van ±1,3–3,8× (laagste runs: 1,5–4,4×). Het piekbudget (30 LE) past bij 10× niet volgens de mediaan (±4 ms) en net wel volgens de laagste run. Op native zou ook het normale budget niet passen. D4 is op llvmpipe niet te beoordelen. Alleen de meting op een echte Deck (§6) beslist dit.
 
 ## 5. Werkaanname (kader §5)
 
@@ -129,7 +155,8 @@ De TA stelt 3 ms GPU per frame voor licht voor (`lichtmeting.md` §5.3; akkoord 
 | Godot 4.6.3-stable, `gl_compatibility` | `setup.md` §1; lichtbudget #21 is met deze renderer gemeten |
 | Licht ≤ 3 ms GPU per frame; normaal 20 LE, piek 30 LE | Voorstel TA, `lichtmeting.md` §5; akkoord TD |
 | Deck-GPU 10–30× sneller dan llvmpipe op 2 Xeon-kernen | Schatting TA, `lichtmeting.md` §5.3; niet gemeten |
-| Linux-native build (geen Windows-build via Proton) op de Deck | Deze PR; Proton is niet getest |
+| Linux-native build (geen Windows-build via Proton) op de Deck | Engine & Platform Programmer; Proton is niet getest |
+| Deck-build rendert de wereld op 640×400 en schaalt ×2 op; de HUD schaalt mee | §3; besluit #18, `lichtmeting.md` §5.2 |
 | "Draait op Deck-specificaties" = de drempels van §6.3 | Akkoord TD |
 
 ## 6. Meetprotocol voor een echte Steam Deck
@@ -149,13 +176,13 @@ Voor de CEO of een tester met een Deck. Duur ±30 min.
 
 ```bash
 cd echoborn
-for m in native 640; do for i in 1 2 3; do
+for m in native project; do for i in 1 2 3; do
   godot --main-pack builds/deck/polderlight.pck --audio-driver Dummy \
     res://tools/perf/deck_meting.tscn -- --res=$m --frames=600 2>&1 | tee deck_${m}_$i.txt
 done; done
 ```
 
-5. Controleer in de kop: `adapter` is AMD/radeonsi (niet llvmpipe), `features deck: true`, venster 1280×800, render 1280×800 (native) of 640×400 (640). Is `GPU ms` overal 0 (timer niet beschikbaar), gebruik dan `frame gem ms`.
+5. Controleer in de kop: `adapter` is AMD/radeonsi (niet llvmpipe), `features deck: true`, venster 1280×800, render 1280×800 (native) of 640×400 (project). Controleer per scenario de zoom: 2,000 (native) of 1,000 (project). Is `GPU ms` overal 0 (timer niet beschikbaar), gebruik dan `frame gem ms`.
 6. Lichtmeting van de TA erbij: `lichtmeting.md` §6.2 (zelfde Deck, zelfde sessie).
 
 **Run B: spelen (Gamemodus):**
@@ -171,8 +198,8 @@ done; done
 | # | Meting | Geslaagd als |
 |---|---|---|
 | D1 | Run A, grijs-eind, native | frame p95 ≤ 16,7 ms en GPU ≤ 4 ms |
-| D2 | Run A, wijk20 − grijs-eind (lichtkosten GPU) | ≤ 3 ms op 640×400 (budget TA). Op native: noteren; > 3 ms bevestigt dat §3 nodig is |
-| D3 | Run A, wijk20 en piek30, 640×400 | frame p95 ≤ 16,7 ms |
+| D2 | Run A, wijk20 − grijs-eind (lichtkosten GPU) | ≤ 3 ms op 640×400 (`project`; budget TA). Op native: noteren; > 3 ms bevestigt dat §3 nodig is |
+| D3 | Run A, wijk20 en piek30, 640×400 (`project`) | frame p95 ≤ 16,7 ms |
 | D4 | Run A, `CPU-render ms` (alle scenario's) | ≤ 4 ms (anders is de saturatiepass of het licht een CPU-probleem, zie `lichtmeting.md` §7 punt 5) |
 | D5 | Run B, 10 min spelen, en de co-opstap (stap 10) | 60 fps gehouden; geen frametijd > 33 ms behalve bij het laden, ook niet bij P2 oplossen of terugkomen; geen crash |
 | D6 | Run B, TDP 8 W | 60 fps gehouden in de grijze kamer |
@@ -190,7 +217,7 @@ done; done
 | # | Punt | Wie |
 |---|---|---|
 | 1 | **Echte Deck-meting** volgens §6. Geen Deck in de agent-omgeving. | CEO of tester met een Deck; Engine & Platform Programmer verwerkt |
-| 2 | **Camera die de rendergrootte volgt** (§3), [#120](https://github.com/cesarvangerwen-glitch/echoborn/issues/120): `FlowRoom.camera_zoom` leidt de zoom af van de rendergrootte (640×400 → 1, 1280×720/800 → 2). **Volgende stap:** de Engine & Platform Programmer zet de 5 `.deck`-instellingen uit §3 en draait D1–D4 opnieuw ([#79](https://github.com/cesarvangerwen-glitch/echoborn/issues/79)). | Engine & Platform Programmer |
+| 2 | Camera die de rendergrootte volgt ([#120](https://github.com/cesarvangerwen-glitch/echoborn/issues/120)) en de `.deck`-instellingen voor 640×400: gedaan (§3), D1–D4 opnieuw gemeten op llvmpipe (§4.4). Meting op een echte Deck: punt 1. | Engine & Platform Programmer |
 | 3 | Herhalen op de slice (T8a), zodra die er is: zelfde script, met `FLOW_SCENE` naar de slice-scène. | Engine & Platform Programmer |
 | 4 | **Besluit TD:** akkoord op D1–D8 als definitie van "draait op Deck-specificaties", en op het lichtbudget van 3 ms GPU per frame (20 LE normaal, 30 LE piek; `lichtmeting.md` §7 punt 3). | Technical Director (besloten) |
 | 5 | Waarom de rekenregel van #21 hier ±1,14–1,3× te laag schat (§4.3). | Technical Artist |
@@ -204,3 +231,5 @@ done; done
 | 13 | De omrekenfactor 10–30× rust op één gedeelde 2-vCPU-machine met twee runs per modus. | Engine & Platform Programmer (met Technical Artist) |
 | 14 | **16:10 (C-07), besluit TD: geen blokkade.** De leiband blijft 16:9 (`leash_view_px`) voor pc én Deck, zodat sim, echo en replays op dezelfde tick oplossen; geen aparte Deck-waarde. Op 640×400 toont de camera per rand 20–30 wereldpx extra; UX beslist alleen of die band gedimd wordt. | UX Designer |
 | 15 | Zoom-uit op 640×400 geeft een niet-gehele schaal (bv. 0,667), dus ongelijke pixels; zichtbaarder dan bij een render van 1280. Vaste zoomtrappen of niet. Ook een venster kleiner dan 640×360 geeft ongelijke pixels (zoom < 1). | Technical Artist en UX Designer |
+| 16 | De HUD rendert op de Deck nu ook op 640×400 (×2 opgeschaald). Tekst kan grof ogen; of de UI in een eigen native laag moet, beslist open punt 4 van `lichtmeting.md`. | Technical Artist en UI Artist |
+| 17 | Meting op een gedeelde 2-vCPU-machine: spreiding tot ×1,7 tussen runs (§4.3). Een rustige machine of meer runs per modus geeft een scherpere omrekenfactor; de Deck-meting maakt dit overbodig. | Engine & Platform Programmer |
