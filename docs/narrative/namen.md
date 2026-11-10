@@ -1,11 +1,11 @@
 # Namen van gebieden en wijken *Polderlight*
 
-Versie 0.1 · Eigenaar: Narrative Designer · Lead-review: Creative Director · Taak: T10, `docs/ux/hud-menus.md` §7 punt 17 ([#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87))
+Versie 0.1.3 · Eigenaar: Narrative Designer · Lead-review: Creative Director · Taak: T10, `docs/ux/hud-menus.md` §7 punt 17 ([#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87))
 Bronnen: `docs/design/wereld.md` §1.3–§1.4 en §2 (werknamen, opbouw WS-01), `docs/narrative/verhaal-v2.md` §2, §4 en §8 (Hollestede, thema's, toonregels), `docs/ux/hud-menus.md` §4.2, §4.7, §4.8 en §6, besluiten #51 (verzonken stad in de Lage Landen) en #96 (*Polderlight*).
 
 Dit document legt de namen vast van de proloog, de 4 gebieden, hun 12 wijken en de finale van Hollestede, in EN en NL, met wat ze betekenen en hoe breed ze zijn. De teksten staan in `game/locale/strings.csv`. De opbouw (welke wijk in welk gebied ligt, de volgorde) is van de World & Level Designer (`wereld.md` WS-01, WS-04); dit document noemt alleen.
 
-**Werkaanname** (kader §5): de wijknaam komt uit een tabel gebied → wijk (NM-O1); tot T8a geldt de indeling van `wereld.md` §1.3, met wijk 3.3 als *Het Waagplein*.
+**Werkaanname** (kader §5): de wijknaam komt uit een tabel gebied → wijk (NM-O1); tot T8a geldt de indeling van `wereld.md` §1.3, met wijk 3.3 als *Het Waagplein* en 2.1 als *De Poorttoren*.
 
 ---
 
@@ -49,7 +49,7 @@ Breedte in px, Polderletter normaal / groot (TG-10). Grens NM-1: **165** normaal
 | `COMMON_DISTRICT_1_1` | De Dijkvoet | 50 / 61 | Dykefoot | 38 / 47 | De huizen aan de voet van de ringdijk: de eerste wijk na de afdaling uit de proloog. |
 | `COMMON_DISTRICT_1_2` | De Grachtenrij | 64 / 77 | Canal Row | 44 / 55 | Een rij smalle huizen en pakhuizen langs een gracht (de poort in een pakhuis, `wereld.md` §1.4). |
 | `COMMON_DISTRICT_1_3` | De Kadewijk | 51 / 63 | The Quayside | 57 / 70 | Kades, de vismarkt, het sluiswachtershuis en het gemaal: de slice (`wereld.md` §2). |
-| `COMMON_DISTRICT_2_1` | De Poort | 39 / 48 | The Gatehouse | 64 / 79 | De ingang van het hof met de poorttoren (`wereld.md` §1.4). Een begijnhof is een hof achter een poort; de Wake houdt hem dicht. EN *Gatehouse*, omdat *The Gate* alleen een deur is en geen plek. |
+| `COMMON_DISTRICT_2_1` | **De Poorttoren** | 63 / 76 | The Gatehouse | 64 / 79 | De ingang van het hof met de poorttoren (`wereld.md` §1.4). Een begijnhof is een hof achter een poort; de Wake houdt hem dicht. EN *Gatehouse*, omdat *The Gate* alleen een deur is en geen plek. **Gewijzigd**, zie §3. |
 | `COMMON_DISTRICT_2_2` | De Omgang | 46 / 58 | The Cloister Walk | 77 / 93 | De overdekte gang rondom: lussen voor de echo, waar je steeds weer langs dezelfde deuren loopt. |
 | `COMMON_DISTRICT_2_3` | De Binnentuin | 58 / 71 | The Inner Garden | 78 / 93 | De tuin en de kapel in het midden, het stilste punt van het spel; vaardigheid en boss. |
 | `COMMON_DISTRICT_3_1` | De Kramen | 46 / 56 | The Stalls | 45 / 55 | Marktkramen die te vol staan om nog te dragen. |
@@ -71,11 +71,12 @@ Breedte in px, Polderletter normaal / groot (TG-10). Grens NM-1: **165** normaal
 
 ## 3. Wat er veranderd is tegenover `wereld.md`
 
-De werknamen uit `wereld.md` §1.3 zijn de basis (`wereld.md` OW-2, `verhaal-v2.md` §10 punt 1). Eén naam verandert:
+De werknamen uit `wereld.md` §1.3 zijn de basis (`wereld.md` OW-2, `verhaal-v2.md` §10 punt 1). Twee namen veranderen; `wereld.md` §1.3a (v0.1.3) gebruikt ze al:
 
 | Wijk | Was | Wordt | Waarom |
 |---|---|---|---|
 | 3.3 | *De Waag* | **Het Waagplein** | NM-4: wijk en boss mogen niet dezelfde naam dragen. De boss van gebied 3 heet *De Waag* (`verhaal-v2.md` §4.2); met *Het Waagplein* hebben wijk en boss niet meer dezelfde woorden, dus *Het Waagplein · Licht 60* in het slot-menu leest als een plek en niet als "staat bij de boss". Het gebouw blijft in de naam, omdat de wijk eromheen ligt. |
+| 2.1 | *De Poort* | **De Poorttoren** | *De Poort* botste met de spelterm *terugkeerpoort* (`wereld.md` §1.4): *De Poort · Licht 20* kon lezen als "je staat bij een poort". *De Poorttoren* is een gebouw en dus een plek (NM-2), en het is de toren die `wereld.md` §1.4 in de wijk zet. EN *The Gatehouse* blijft: het was al een gebouw. Dezelfde botsing in het EN (*gate* voor een vaardigheidspoort) is `wereld.md` OW-11. Gemeten 63 / 76 px, ruim onder NM-1. |
 
 Alle andere namen zijn overgenomen. Bewust niet veranderd:
 - *De polderwijk* (gebied) met daarin *De Kadewijk* (wijk): twee keer "wijk", maar het ene is een stadsdeel en het andere een buurt aan de kade; de spelers zien ze nooit naast elkaar (het gebied staat in de tab, de wijk in de slot-regel). *De Kadewijk* is ook al de naam van de slice in elk document.
@@ -88,8 +89,8 @@ Alle andere namen zijn overgenomen. Bewust niet veranderd:
 | # | Punt | Wie | Wanneer |
 |---|---|---|---|
 | NM-O1 | **Tabel gebied → wijk** (`hud-menus.md` §7 punt 13): welke waarde van `state.gebied` (of een wijk-id ernaast) bij welke sleutel hoort. Voorstel: proloog → `COMMON_DISTRICT_PROLOGUE`; wijk *n*.*m* → `COMMON_DISTRICT_n_m` en gebied *n* → `COMMON_AREA_n`; finale → `COMMON_DISTRICT_FINALE` (de logboektab van de finale, als die er komt, is van de UX Designer). Of `state.gebied` de wijk bevat of alleen het gebied, beslissen de World & Level Designer en de Gameplay Programmer; de sleutels hierboven werken voor beide. | World & Level Designer, Gameplay Programmer | Met T8a |
-| NM-O2 | **`wereld.md` §1.3 en §1.4 bijwerken:** wijk 3.3 heet *Het Waagplein* (§3). Ik verander dat document niet zelf. | World & Level Designer | Bij de volgende versie van `wereld.md` |
-| NM-O2a | Wijk 2.1 *De Poort* botst met de spelterm *terugkeerpoort* (`wereld.md` §1.4); samen met NM-O2 beslissen of de naam blijft of wordt bv. *De Poorttoren*. | World & Level Designer, met Narrative Designer | Samen met NM-O2 |
+| ~~NM-O2~~ | **Gesloten** (v0.1.3): `wereld.md` v0.1.3 noemt wijk 3.3 *Het Waagplein* (§1.3–§1.5, §1.3a). | | |
+| ~~NM-O2a~~ | **Gesloten** (v0.1.3): wijk 2.1 heet *De Poorttoren* (`wereld.md` §1.3a, §3 hier); NL in §2.3 en `strings.csv`. | | |
 | NM-O3 | **Opnieuw meten** als Polderletter verandert (eind-font van de UI Artist, `hud-menus.md` §7 punt 1 en 10): de breedtes hier zijn van de huidige `polderletter.py`. Met 78 px marge verwacht ik geen probleem. | Narrative Designer, UI Artist | Bij een nieuw font |
 | NM-O4 | De EN-namen zijn door de Narrative Designer geschreven, niet door een moedertaalspreker. *Dykefoot* en *Towerfoot* zijn verzonnen samenstellingen: laten toetsen door een EN-lezer, samen met de rest van de EN-tekst. Aangenomen door de CD (Lead-review). | Creative Director | Vóór de eerste publieke build |
 | NM-O5 | `hud-menus.md` §6 ("Volgen nog": gebiedsnamen) en §7 punt 17 sluiten; `state.gebied` heeft geen wijk (`ontwerp.md` §7), dus de wijkregel onder *Doorgaan* vraagt een wijk-id: meenemen bij NM-O1. | UX Designer (sluiten), World & Level Designer en Gameplay Programmer (wijk-id) | Vóór T8a |
@@ -103,3 +104,4 @@ Alle andere namen zijn overgenomen. Bewust niet veranderd:
 | 0.1 | Eerste versie (T10, `hud-menus.md` §7 punt 17): namen van proloog, 4 gebieden, 12 wijken en finale in EN en NL, met betekenis en gemeten breedte; wijk 3.3 *De Waag* wordt *Het Waagplein*; sleutels `COMMON_AREA_1`–`4` en `COMMON_DISTRICT_*` in `strings.csv` |
 | 0.1.1 | Na de Lead-review CD: *De Ringdijk* en *De Grote Sluis* met hoofdletters (NM-6, hermeten); open punt NM-O2a (*De Poort*); NM-O4 aangenomen door de CD |
 | 0.1.2 | Na de SM-review: werkaanname (kader §5); NM-2 laat waterwerken in namen toe; motivatie *Het Waagplein* in §3 herschreven; open punt NM-O5 |
+| 0.1.3 | `wereld.md` OW-10: wijk 2.1 NL *De Poort* wordt *De Poorttoren* (§2.3, gemeten 63 / 76 px; `COMMON_DISTRICT_2_1` in `strings.csv`); rij voor 2.1 in §3; NM-O2 en NM-O2a gesloten; EN *The Gatehouse* blijft (`wereld.md` OW-11) |
