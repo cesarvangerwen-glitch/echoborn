@@ -18,7 +18,7 @@ MENU_SLOT_DETAILS,%s   Light %d   %s,%s   Licht %d   %s,"Regel onder een plaats 
 MENU_SLOT_TIME_MIN,%d min,%d min,Speeltijd onder 1 uur. %d = minuten.
 MENU_SLOT_TIME_HM,%d h %02d min,%d u %02d min,"Speeltijd vanaf 1 uur. %d = uren, %02d = minuten (twee cijfers)."
 MENU_SLOT_EMPTY,Empty,Leeg,Stand LEEG: geen save en geen back-up.
-MENU_SLOT_RESTORED,Restored from backup,Hersteld uit back-up,"Stand HERSTELD: de save was kapot, de back-up laadt. Staat naast de details."
+MENU_SLOT_RESTORED,Restored from backup,Hersteld uit back-up,"Stand HERSTELD: de save was kapot, de back-up laadt. Staat rechts op regel 1, naast MENU_SLOT_NAME."
 MENU_SLOT_BROKEN,Damaged: cannot be loaded,Beschadigd: kan niet laden,Stand KAPOT: save en back-up zijn kapot. Alleen 'nieuw spel hier' werkt.
 MENU_SLOT_NEWER,Made with a newer version: cannot be loaded,Gemaakt met een nieuwere versie: kan niet laden,Stand NIEUWER: save van een nieuwere versie van het spel.
 MENU_SLOT_LOAD,Load,Laden,Knophint A op een plaats met een spel (OK of HERSTELD).
@@ -30,6 +30,6 @@ MENU_OVERWRITE,Overwrite,Overschrijven,Tweede keuze in de bevestiging; nooit de 
 COMMON_BACK,Back,Terug,Terug-knop en eerste keuze (standaard) in een bevestiging.
 MENU_SLOT_SAVE_FAILED,Saving failed. This slot is now empty.,Opslaan mislukt. Deze plaats is nu leeg.,"Nieuw spel gestart, maar de eerste save mislukte (MN-24). Het oude spel is al gewist."
 HUD_SAVE_RESTORED,Save restored,Spel hersteld,"Melding na laden van een plaats met stand HERSTELD (één keer, hud-menus.md §4.6). Regel 1."
-HUD_SAVE_RESTORED_SUB,Back at the previous pumping station,Terug bij het vorige gemaal,"Melding HERSTELD, regel 2: de voortgang sinds het vorige checkpoint is weg."
+HUD_SAVE_RESTORED_SUB,Some recent progress was lost,Je bent wat voortgang kwijt,"Melding HERSTELD, regel 2: de voortgang sinds het vorige checkpoint is weg. Bewust geen plek: de back-up ligt vaak op dezelfde plek als de save."
 HUD_SAVE_FAILED,Saving failed,Opslaan mislukt,"Melding als een autosave mislukt (signaal saved met fout, §4.6). Regel 1."
 HUD_SAVE_FAILED_SUB,Is the disk full?,Is de schijf vol?,"Melding opslaan mislukt, regel 2."

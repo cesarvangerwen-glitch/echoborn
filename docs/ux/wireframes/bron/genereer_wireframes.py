@@ -698,7 +698,7 @@ def blad_hoofdmenu():
 def blad_spelbestanden():
     """Slot-menu (hud-menus.md par. 4.7): de stand van elke plaats en de dwingende bevestiging.
 
-    Boven: de lijst met plaats 1 (OK), 2 (beschadigd) en 3 (leeg); de cursor staat op
+    Boven: de lijst met plaats 1 (HERSTELD), 2 (beschadigd) en 3 (leeg); de cursor staat op
     het laatst gespeelde. Onder: overschrijven van plaats 1, cursor op TERUG.
     Geen vraagteken in het wireframe-font; de echte tekst staat in strings.csv.
     """
@@ -718,14 +718,17 @@ def blad_spelbestanden():
                     rect(img, 38 + k, y + 14 + k, 1, 7 - 2 * k, C["amber"])
             txt(img, kop, 60, y + 7, C["tekst"])
             txt(img, sub, 60, y + 21, kl)
+            if i == 0:
+                # Stand HERSTELD: rechts op regel 1, naast PLAATS n (MN-22).
+                t = "HERSTELD UIT BACK-UP"
+                txt(img, t, 48 + 400 - 12 - text_width(t, 1), y + 7, C["tekst_d"])
         return img
 
     a = lijst(menu_basis("grijs", 0.55), 0)
     noot(a, 1, 452, 72)
     noot(a, 2, 452, 116)
     noot(a, 3, 452, 160)
-    txt(a, "HERSTELD UIT BACK-UP (ALS DE .BAK LAADDE)", 60, 216, C["tekst_d"])
-    noot(a, 4, 316, 214)
+    noot(a, 4, 452, 84)
     hintbalk(a, [("A", "LADEN"), ("X", "NIEUW SPEL HIER"), ("B", "TERUG")])
     noot(a, 5, 400, 328)
     label(a, "SPELBESTANDEN: STAND PER PLAATS (MN-21, MN-22)")
@@ -741,8 +744,9 @@ def blad_spelbestanden():
     menulijst(b, x + 34, y + 80, ["TERUG", "OVERSCHRIJVEN"], 0, stap=20, breedte=170)
     noot(b, 1, x + 214, y + 78)
     noot(b, 2, x + 214, y + 98)
-    txt(b, "EERST LOSLATEN, DAN OMLAAG + A. GEEN WRAP.", x + 14, y + 124, C["tekst_d"])
-    noot(b, 3, x + 300, y + 122)
+    # Notitie (geen tekst van het venster, geen sleutel): buiten het kader, in magenta.
+    noot(b, 3, x, y + h + 8)
+    txt(b, "NOTITIE: EERST LOSLATEN, DAN OMLAAG + A. GEEN WRAP.", x + 14, y + h + 10, C["noot"])
     hintbalk(b, [("A", "KIES"), ("B", "TERUG")])
     label(b, "BEVESTIGING OVERSCHRIJVEN: DWINGEND (MN-23)")
     opslaan(np.concatenate([a, b], 0), "menu_spelbestanden_x2_placeholder.png", 2)
