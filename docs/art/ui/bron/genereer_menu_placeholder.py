@@ -223,7 +223,11 @@ def mock_logboek():
             U.tekst(img, TEKST4[1], x + 6, y + 18, WIT[7], "groot")
             U.tekst(img, TEKST4[2], x + 6, y + 32, WIT[7], "groot")
         lb, rb = ("lb", "rb") if app == "xbox" else ("l1", "r1")
-        M.hints(img, [(lb, "Gebied"), (rb, "Gebied"), ("b", "Terug")], app, g)
+        groot = g == "groot"
+        # één hint *Gebied* met beide glyphs (LB/RB naast elkaar, 1 px ertussen); als beeld doorgegeven
+        a1, a2 = M.glyph(app, lb, groot), M.glyph(app, rb, groot)
+        paar = np.concatenate([a1, np.zeros((a1.shape[0], 1, 4), np.uint8), a2], 1)
+        M.hints(img, [(paar, "Gebied"), (M.glyph(app, "b", groot), "Terug")], "toetsenbord", g)
         uit.append(img)
     return stapel(*uit)
 
@@ -239,7 +243,7 @@ CREDITS = [("Polderlight", ["Een spel van de studio"]),
            ("Rol", ["Naam", "Naam", "Naam"]),
            ("Gemaakt met", ["Godot Engine"]),
            ("Merken", None),          # merkenregel, docs/business/knop-glyphs-check.md par. 3 punt 4
-           ("Licenties", ["uit docs/licenties.md"])]
+           ("Licenties", ["Tekst volgt"])]        # plaatshouder; inhoud: Producer en BLA (UX §7 punt 18)
 
 
 def mock_credits():
