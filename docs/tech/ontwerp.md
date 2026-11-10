@@ -376,7 +376,7 @@ Spelers maskeren 1 + 4, echo's 1 + 5. Zo kan een echo door een lichtmuur heen en
 - **Streng vóór de eerste test** (#82): de runner laadt eerst elk `.gd`-bestand onder `scripts/`, `scenes/`, `prototypes/` en `tests/` en controleert dat elke autoload uit `project.godot` bestaat. Een script dat niet laadt, is een FAIL, ook als de fout in een script valt waar een test van afhangt. De runner preloadt zelf alleen `error_log.gd`: faalt een preload van de runner, dan start Godot hem niet en is de exitcode 0 (nagemeten: een parse-fout in `sim.gd` gaf zo exitcode 0). Een fout buiten een test (bij het laden, tussen twee tests, na de laatste) telt ook als FAIL.
 - Geen testhaken in gameplaycode. Tests luisteren naar signalen, zoals `Sim.actor_stepping(tick, phase, actor)` (#30).
 - Open punt: een fout in een signaalhandler (bv. een test die naar `actor_stepping` luistert) geeft één foutregel per tick. De test wordt terecht FAIL, maar de uitvoer is lang; ontdubbelen in de runner kan later.
-- ~~Schuld: geen test bewaakt de runner zelf. Verdwijnt `OS.add_logger()` of de time-out-lus uit `run_tests.gd`, dan blijft de suite groen. Plan: bij de overstap op GUT (R2) of de CI-workflow (R6) een meta-run toevoegen die een kapotte test draait en exit 1 verwacht.~~ **Opgelost** (#70, PR #94): de meta-run in `.github/workflows/tests.yml` eist exitcode 1 met 2 FAIL's, op Linux en Windows.
+- ~~Schuld: geen test bewaakt de runner zelf. Verdwijnt `OS.add_logger()` of de time-out-lus uit `run_tests.gd`, dan blijft de suite groen. Plan: bij de overstap op GUT (R2) of de CI-workflow (R6) een meta-run toevoegen die een kapotte test draait en exit 1 verwacht.~~ **Opgelost** (#70, PR #94): de meta-run in `.github/workflows/tests.yml` eist exitcode 1, op Linux en Windows. Sinds #82 bewaakt hij ook de strenge start: `meta_broken_dep.gd` (een parse-fout, gepreload door `test_meta_broken_dep.gd`) moet vóór de eerste test als FAIL gemeld worden; in totaal 5 FAIL's (`setup.md` §6). Lokaal nagemeten: zonder `_check_scripts_and_autoloads()` faalt de meta-run (3 FAIL's, de melding vóór de eerste test ontbreekt).
 - Huidige tests:
 
 | Test | Bewijst |
@@ -436,7 +436,7 @@ De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gave
 
 ## 12. Open punten
 
-- **Tools Programmer:** (1) de Node 20-waarschuwing van de `@v4`-actions in `tests.yml` oplossen; (2) in de meta-run (`.github/ci/test_meta_broken.gd`) een geval toevoegen voor een scriptfout in een script waar een test van afhangt, vóór de eerste test: de runner vangt dat sinds #82 op (§9), de meta-run bewaakt het nog niet.
+- ~~**Tools Programmer:** (1) de Node 20-waarschuwing van de `@v4`-actions in `tests.yml` oplossen; (2) in de meta-run een geval toevoegen voor een scriptfout in een script waar een test van afhangt, vóór de eerste test.~~ **Opgelost** (#82): (1) `checkout@v7`, `cache@v6`, `upload-artifact@v7` (Node 24); (2) `meta_broken_dep.gd` + `test_meta_broken_dep.gd` in `.github/ci/` (§9, `setup.md` §6).
 - **Lead Game Designer:** de keuzes (c) (P2 in een ontladen kamer = C-06) en (d) (vijanden in gestreamde inhoud komen bij elk opnieuw laden terug) uit §3a bevestigen of wijzigen.
 - **Gameplay Programmer (C-06):** `AreaLoader.partner_in_ontladen_kamer` (keuze (c), §3a) koppelen aan `Sim.dissolve_partner`, met een eigen oorzaak naast `fellicht`, `gevaar`, `val` en `leiband`.
 - **Gameplay Programmer (T16c):** `valid_from` (`geldig_vanaf`) staat op de `TailEcho`-node en gaat verloren als C-01 hem weghaalt; E-09 in co-op en C-05 vragen dat hij bij P1 hoort.
