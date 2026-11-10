@@ -3,12 +3,19 @@ extends RefCounted
 ## voor de flownormen, vooral norm (1) stilstand (MP-1), norm (2) echo-acties
 ## (MP-2), R-V12 (MP-3) en echo Leeg (MP-4).
 ##
-## Luistert alleen naar signalen en leest na elke tick de toestand van P1
-## (standaarden §6: geen testhaken in gameplaycode). Deterministisch: dezelfde
+## Luistert alleen naar signalen en leest na elke tick de toestand van P1 en,
+## in co-op, van P2 (standaarden §6: geen testhaken in gameplaycode). Deterministisch: dezelfde
 ## `ScriptedInput` en dezelfde D geven dezelfde regels. Kolommen:
 ## `tick, kamer, event, waarde, bron, x, y`. Kamers, LP, POMP en
 ## DROP_IN … P2_TERUG schrijft de flow-kamer (`flow_meetlog.gd`); hier staan
 ## de springplank-events van P1 en, in co-op, van P2 (bron = de drager).
+##
+## MP-1 (`STIL_START`, `STIL_EIND`) geldt voor P1 (bron `p1`) en, in co-op,
+## ook voor P2 (bron `p2`, MP-7 b, #125). Werkaanname W5 (testplan-f0 §6):
+## voor P2 dezelfde definitie op zijn middelpunt; ticks dat P2 opgelost is
+## tellen niet mee (een open stilstand sluit bij `P2_OPGELOST` en bij een
+## drop-out) en na `P2_TERUG` gelden 60 ticks niet, zoals na een respawn.
+## Lezers die alleen P1 willen, filteren op bron `p1`.
 
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
@@ -37,6 +44,12 @@ var _still_since := -1
 var _chain := 0
 var _chain_p2 := 0
 var _closed := false
+## MP-1 voor P2: zelfde velden als voor P1, per P2-lichaam.
+var _p2: Node2D
+var _p2_positions: Array[Vector2] = []
+var _p2_last_move_tick := -1_000_000
+var _p2_grace_until := 0
+var _p2_still_since := -1
 
 
 ## Begint het log op de volgende tick van `sim`. `echo` mag null zijn (co-op).
@@ -48,6 +61,10 @@ func _init(sim: Node, p1: PlayerActor, echo: Node2D) -> void:
 	_grace_until = _start_tick + RUN_GRACE
 	_add(_start_tick, "RUN_START", "", "", p1.position)
 	sim.tick_finished.connect(_on_tick)
+	if sim.has_signal("partner_returned"):
+		sim.partner_returned.connect(func(tick: int, _at: Vector2) -> void:
+			_p2_grace_until = tick + RESPAWN_GRACE
+			_p2_positions.clear())
 	var combat: RefCounted = sim.combat
 	combat.mark_set.connect(func(tick: int, mark: RefCounted) -> void:
 		_add(tick, "MERK_GEZET", "", str(mark.id), mark.center()))
@@ -69,6 +86,9 @@ func finish() -> void:
 	if _still_since >= 0:
 		_add(tick, "STIL_EIND", str(tick - _still_since + 1), "p1", _p1.position)
 		_still_since = -1
+	if _p2_still_since >= 0:
+		_add(tick, "STIL_EIND", str(tick - _p2_still_since + 1), "p2", _p2.position)
+		_p2_still_since = -1
 	_add(tick, "RUN_EIND", "", "", _p1.position)
 	# Daarna komt er niets meer bij, ook niet als de Sim nog een tick draait.
 	_closed = true
@@ -121,6 +141,7 @@ func _on_tick(tick: int) -> void:
 	if ev & (Motor.EV_JUMP | Motor.EV_DASH):
 		_last_move_tick = tick
 	_update_still(tick)
+	_update_still_p2(tick, p2)
 
 
 ## SPRINGPLANK, BOUNCE, VANGEN en LANCERING van één springer; `n` (LM-02) per
@@ -162,6 +183,49 @@ func _update_still(tick: int) -> void:
 	elif not still and _still_since >= 0:
 		_add(tick, "STIL_EIND", str(tick - _still_since), "p1", _p1.position)
 		_still_since = -1
+
+
+## MP-1 voor P2 (MP-7 b, W5): als `_update_still`, op het middelpunt van P2.
+func _update_still_p2(tick: int, p2: PlayerActor) -> void:
+	if p2 != _p2:
+		# Drop-in, drop-out of een nieuw P2-lichaam: opnieuw beginnen.
+		_close_still_p2(tick)
+		_p2 = p2
+		_p2_positions.clear()
+		_p2_last_move_tick = -1_000_000
+	if p2 == null:
+		return
+	if p2.dissolved:
+		_close_still_p2(tick)
+		_p2_positions.clear()
+		return
+	if p2.move_events & (Motor.EV_JUMP | Motor.EV_DASH):
+		_p2_last_move_tick = tick
+	_p2_positions.append(p2.position)
+	if _p2_positions.size() > STILL_WINDOW + 1:
+		_p2_positions.pop_front()
+	var still := tick >= _grace_until and tick >= _p2_grace_until \
+		and _p2_positions.size() == STILL_WINDOW + 1 and tick - _p2_last_move_tick >= STILL_WINDOW
+	if still:
+		var origin := _p2_positions[0]
+		for at in _p2_positions:
+			if at.distance_to(origin) > STILL_RADIUS:
+				still = false
+				break
+	if still and _p2_still_since < 0:
+		_p2_still_since = tick
+		_add(tick, "STIL_START", "", "p2", p2.position)
+	elif not still:
+		_close_still_p2(tick)
+
+
+## Sluit een open stilstand van P2 op `tick` (die tick is niet meer stil).
+func _close_still_p2(tick: int) -> void:
+	if _p2_still_since < 0:
+		return
+	var at: Vector2 = _p2.position if _p2 != null and is_instance_valid(_p2) else Vector2.ZERO
+	_add(tick, "STIL_EIND", str(tick - _p2_still_since), "p2", at)
+	_p2_still_since = -1
 
 
 func _add(tick: int, event: String, value: String, source: String, at: Vector2) -> void:
