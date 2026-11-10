@@ -1,6 +1,6 @@
 # VAF-dossier productiesteun fase 3: *Polderlight* (werktitel)
 
-Versie 0.5 (deel 2 van 2) · 2026-11-10 · Eigenaar: Business/Legal Advisor · Issue: #72 (T13, `docs/productie/fase-2-kader.md` §2) · Lead-review: Executive Producer
+Versie 0.6 (deel 2 van 2) · 2026-11-10 · Eigenaar: Business/Legal Advisor · Issue: #72 (T13, `docs/productie/fase-2-kader.md` §2) · Lead-review: Executive Producer
 Met input van: Creative Director, Executive Producer, Marketing & Community Manager · Risico's: R6, R23 · Besluiten: #2, #51 (deel 1: VA, 3A, 4A, 5A, 6B; deel 2: 1A, 2A, 7A, 8A), #96 (werktitel)
 
 > **Niet indienen.** Dit is een voorbereiding (#51 deel 1: 6B). Er is niets aangevraagd of ingediend, er is geen MyVAF-account gemaakt en er is geen contact met het VAF. Indienen, de intake en een vennootschap vragen elk een `Besluit:` van de CEO (fasekader §2, buiten scope). **Geen juridisch of fiscaal advies**: vóór het indienen en vóór de oprichting van een vennootschap raadpleegt de CEO een boekhouder en zo nodig een advocaat (besluit #51 deel 1: 4A).
@@ -10,7 +10,7 @@ Met input van: Creative Director, Executive Producer, Marketing & Community Mana
 | Vraag | Antwoord |
 |---|---|
 | **Wat** | Het dossier voor **productiesteun** (steunvorm "productie", art. 6 reglement Gamefonds) voor **fase 3** van *Polderlight*: route (c) uit `subsidies.md` §5. |
-| **Stand (deel 2)** | Structuur volgens de VAF-vereisten (§3), art. 4 integraal en de VAF-documenten (§3.1–3.2), de vaste inhoud en de 2-pager in de volgorde van het VAF-sjabloon (§4), de culturele test van categorie I, na de review van de CD (§5, B2), en wat nog ontbreekt en van wie (§6). |
+| **Stand (deel 2)** | Structuur volgens de VAF-vereisten (§3), art. 4 integraal en de VAF-documenten (§3.1–3.2), de vaste inhoud en de 2-pager in de volgorde van het VAF-sjabloon (§4), de culturele test van categorie I, na de review van de CD (§5, B2), markt en verkoopraming (D6, D8) uit `docs/business/markt-en-verkoopraming.md` (§3, §4.3), en wat nog ontbreekt en van wie (§6). |
 | **Klaar tot indienen?** | **Nee, nog niet.** Harde drempels die openstaan: vennootschap (na de intake, #51: 4A), intake (nog niet, 6B), slice en tractie (fase 2, F3; Steam-pagina is een apart CEO-besluit), budget fase 3 (EP, F6) en de **VAF-deadlines 2027** (niet bevestigd, §2). |
 | **Culturele test** | Categorie I: criterium 1 (Nederlandse versie) **toegezegd in principe** (#51: 5A); tweede criterium **vormgeving** (crit. 5: Laag-Landse bouwkunst en licht naar de Vlaamse Primitieven, art bible §8), want crit. 5 kent geen fictieve-wereldtoets; aanvullend **setting** (crit. 2, de stad Hollestede in de Lage Landen) en **lore** (crit. 4). Voor crit. 2 en 4 kan het VAF Hollestede als fictieve wereld zien; dan telt de connectie van het art- en verhaalteam, en die loopt alleen via de CEO (A1, intakevraag (i)) (§5). Categorie II blijft het zwakke punt: crit. 1 hangt af van hoe het VAF de vier kernprofielen telt, crit. 2 is een mogelijk tweede criterium (§5). |
 | **Werkaanname** (kader §5) | §7. Kort: budget en releasevenster volgen per fase (werkaanname in `beslissingen.md`); het creatiebudget van fase 3 is nog niet geraamd, dus **geen steunbedrag** in dit document. |
@@ -49,9 +49,9 @@ Volgorde volgens wat het VAF voor productie vraagt (`subsidies.md` §3.2–3.3; 
 | D3 | **USP's en innovatie** (culturele test cat. III; "moeilijk werk", art. 9 crit. 4) | art. 4, 9 | Pitch §8, §4.2 | CD, LGD | ✅ concept |
 | D4 | **Culturele test** cat. I, II, III | art. 4 | §5 | BLA, CD | 🟡 cat. II open |
 | D5 | **Team en CV's**, vorig werk | prioriteitennota (commissie kijkt naar team en vorig werk; coaching mogelijk bij een eerste game) | §4.4 | CEO (CV), BLA | 🟡 |
-| D6 | **Doelgroep, markt, vergelijkbare titels** | prioriteitennota | Pitch §9, §7; marktonderzoek ontbreekt | Marketing & Community Manager | 🟡 |
+| D6 | **Doelgroep, markt, vergelijkbare titels** | prioriteitennota | Pitch §9, §7; marktonderzoek en vergelijkbare titels in `docs/business/markt-en-verkoopraming.md` §2–3 (v0.1, peildatum 2026-11-10); samenvatting in §4.3 | Marketing & Community Manager | ✅ concept; reviewtellingen nog niet rechtstreeks op Steam bevestigd (O1 van dat document) |
 | D7 | **Tractie en performing targets** (wishlists, interesse publishers) | pagina productiesteun ("games met tractie"), prioriteitennota | Nog geen: geen publieke uiting in fase 2 | Marketing; CEO (besluit Steam-pagina) | ⬜ |
-| D8 | **Verkoopraming** | `subsidies.md` §3.3 | ~€ 20, geen microtransacties (#2); volumes ontbreken | Marketing, EP | ⬜ |
+| D8 | **Verkoopraming** | `subsidies.md` §3.3 | ~€ 20, geen microtransacties (#2); drie scenario's (Laag, Midden, Hoog) over 24 maanden na release, alleen Steam, van bruto naar netto: `docs/business/markt-en-verkoopraming.md` §4, met aannames §4.2 en risico's §5 | Marketing (raming), EP (keuze scenario en spreiding voor D10) | 🟡 raming ligt er; keuze scenario (O4) en spreiding per kwartaal (O7) open bij de EP |
 | D9 | **Creatiebudget fase 3** op VAF-sjabloon: eigen inbreng, participaties (uitgestelde vergoeding oprichter, getekende verklaring vóór het contract), overhead ≤ 15 % forfaitair | financiële gids | Ontbreekt (F6) | EP | ⬜ |
 | D10 | **Financieringsplan** en steunintensiteit (max. 50 %, tot 80 % voor de eerste of tweede game waarvoor een studio steun krijgt) | art. 9; financiële gids (andere overheidssteun telt mee) | Eigen middelen + VAF; geen publisher (#2) | EP, BLA | ⬜ |
 | D11 | **Planning met milestones** fase 3; oplevering productie binnen 18 maanden na ondertekening, technisch dossier binnen 12 maanden | art. 13.12, 19 | Volgt uit F6/F8 | EP, Producer | ⬜ |
@@ -139,7 +139,11 @@ Bronnen: pitch v0.4 (`docs/concept/pitch.md`, definitief volgens #51: 1A), `docs
 
 ### 4.3 Doelgroep (D6, deel)
 
-18–30 jaar, pc/Steam (startbriefing). Twee kernspelers uit pitch §9: de **genrefan** (*Hollow Knight*, *Nine Sols*, *Ori*) en het **bankduo** (koppel of vrienden, één ervaren en één minder ervaren speler, pc aan de tv). Referenties: pitch §7. *Aanname*: het bankduo is groot genoeg als tweede verkoopargument; marktonderbouwing volgt van Marketing (§6).
+18–30 jaar, pc/Steam (startbriefing). Twee kernspelers uit pitch §9: de **genrefan** (*Hollow Knight*, *Nine Sols*, *Ori*) en het **bankduo** (koppel of vrienden, één ervaren en één minder ervaren speler, pc aan de tv). Referenties: pitch §7. Marktonderbouwing: `docs/business/markt-en-verkoopraming.md` §2.2.
+
+- **De genrefan is de basis** van de markt en van de verkoopraming (D8): onderbouwd met vergelijkbare titels (dat document, §3).
+- **Het bankduo is niet onderbouwd als tweede verkoopargument**: Marketing vond geen cijfers over hoeveel kopers in het genre lokaal co-op spelen (O2 van dat document). In het dossier is co-op daarom een **onderscheidend kenmerk** (innovatie, cat. III, §4.2), geen verkoopargument; de raming telt geen co-op-bonus (A9 van dat document). Bewijs volgt uit playtests in fase 2 en later uit de Steam-pagina (D7).
+- **Steam Deck** is een voorwaarde (#2), geen apart segment; het **Nederlandstalige publiek** is vooral cultureel van belang (art. 4 I.1), zonder bevestigd effect op de verkoop (dat document, §2.2).
 
 ### 4.4 Team en werkwijze (D5, eerlijk benoemd)
 
@@ -213,7 +217,8 @@ Regels voor de dossiertekst:
 |---|---|---|---|
 | D2, §5 | ✅ Projectbeschrijving en argumentatie cat. I goedgekeurd met aanscherpingen (verwerkt in §5) | Creative Director | Deel 2 |
 | D9, D10, D11 | Creatiebudget fase 3 op VAF-sjabloon (participaties, overhead ≤ 15 %), financieringsplan, planning; raming Nederlandse versie (#51: 5A) | Executive Producer | Met F6 (T15); de NL-raming vóór het indienen |
-| D6, D8 | Marktonderzoek, vergelijkbare titels met verkoopcijfers, verkoopraming | Marketing & Community Manager | Fase 2, vóór de intake |
+| D6, D8 | ✅ Marktonderzoek, vergelijkbare titels en verkoopraming geleverd in `docs/business/markt-en-verkoopraming.md` (verwerkt in §3 en §4.3) | Marketing & Community Manager | Gedaan; herzien zodra er een Steam-pagina en wishlists zijn (O6 van dat document) |
+| D10 (uit D8) | Scenario voor het financieringsplan kiezen; advies Marketing: **Laag náást Midden** opnemen, want Midden ligt ruim boven de mediaan van de prijsklasse (`docs/business/markt-en-verkoopraming.md` §4.1, O4). Plus de **spreiding van de verkoop over 24 maanden** per kwartaal voor de cashflow (O7) | Executive Producer | Met F6 (T15) |
 | D7, D13 | Tractieplan (wishlists) en pitchvideo; beide vragen een publieke uiting of slice-art | Marketing & Community Manager; CEO-besluit over een Steam-pagina (na de merkcheck, #24 3A) | Na de slice |
 | D4 (cat. II) | Kernteam: opties (bv. Vlaamse freelancers in het kernteam) met hun kost uitwerken; het besluit is van de CEO | Executive Producer (optie en kost), CEO (besluit) | Na intakevraag (a) |
 | D12 | Slice-build | Team (F3) | Einde fase 2 |
@@ -221,13 +226,15 @@ Regels voor de dossiertekst:
 
 **Open punt:** crit. 3 van cat. I (personages of voorwerpen, "al dan niet fictief", die naar Vlaanderen, België of de EER verwijzen; geen fictieve-wereldtoets) als extra criterium; mogelijk bewijs in verhaal V2 §5 (bevroren echo's van een begijn en een veerman) en §2.3 (het carillon). CD en BLA bekijken het vóór de intake.
 
+**Open punt:** de reviewtellingen van de vergelijkbare titels rechtstreeks op Steam bevestigen vóór het indienen (`docs/business/markt-en-verkoopraming.md` O1); BLA bij het afwerken van het dossier.
+
 **Open punt:** A1 bevestigen vóór de intake: woon- en belastingplaats van de CEO (door de CEO).
 
 **Open punt:** de werkaanname "één mens plus AI-rollen" (§7, `subsidies.md` A3) wordt herzien na het antwoord op intakevraag (a).
 
 ### 6.3 Intakevragen (overgenomen uit `subsidies.md` §5.2 stap 5)
 
-(a) Hoe beoordeelt het VAF een kernteam met AI-rollen en door AI gemaakte content (cat. II, team)? (b) Volstaat een Nederlandse versie kort ná de launch? (c) Telt de slice als pre-investering? (d) Telt fase 3-werk van vóór de indiening mee in het creatiebudget? (e) Wanneer verwijst het VAF een productieaanvraag terug naar slicesteun, en wat als de slice dan al af is (art. 6.1, 14.9)? (f) Welke deadline 2027 raadt het VAF aan? (g) Welke bijlagen vraagt MyVAF voor productie: zijn TDD, business canvas en pitch deck verplicht? (h) Cat. II crit. 1: bij ons doen AI-rollen het werk van de vier kernprofielen (producer, art director, game director, technical director) en nemen daar de vakkeuzes; één natuurlijk persoon, de CEO, beslist alleen over visie, scope, budget en grote afwegingen. Telt het VAF de CEO dan als bezetter van de kernprofielen (bij een Vlaams profiel 4 van 4), of tellen de AI-rollen als kernteamleden die als niet-fysieke personen niet tot het Vlaamse gamelandschap horen (0 van 4)? En als het de CEO telt: is één persoon in vier kernprofielen aanvaardbaar, of verwacht het VAF voor productie aparte mensen in die rollen? (i) Ziet het VAF een gedroomde stad in de Lage Landen als een fictieve wereld (art. 4 I.2 en I.4), en telt dan de connectie van de CEO (beslist over visie en scope, niet over de vakkeuzes van het art- en verhaalteam) als connectie van dat team?
+(a) Hoe beoordeelt het VAF een kernteam met AI-rollen en door AI gemaakte content (cat. II, team)? (b) Volstaat een Nederlandse versie kort ná de launch? (c) Telt de slice als pre-investering? (d) Telt fase 3-werk van vóór de indiening mee in het creatiebudget? (e) Wanneer verwijst het VAF een productieaanvraag terug naar slicesteun, en wat als de slice dan al af is (art. 6.1, 14.9)? (f) Welke deadline 2027 raadt het VAF aan? (g) Welke bijlagen vraagt MyVAF voor productie: zijn TDD, business canvas en pitch deck verplicht? (h) Cat. II crit. 1: bij ons doen AI-rollen het werk van de vier kernprofielen (producer, art director, game director, technical director) en nemen daar de vakkeuzes; één natuurlijk persoon, de CEO, beslist alleen over visie, scope, budget en grote afwegingen. Telt het VAF de CEO dan als bezetter van de kernprofielen (bij een Vlaams profiel 4 van 4), of tellen de AI-rollen als kernteamleden die als niet-fysieke personen niet tot het Vlaamse gamelandschap horen (0 van 4)? En als het de CEO telt: is één persoon in vier kernprofielen aanvaardbaar, of verwacht het VAF voor productie aparte mensen in die rollen? (i) Ziet het VAF een gedroomde stad in de Lage Landen als een fictieve wereld (art. 4 I.2 en I.4), en telt dan de connectie van de CEO (beslist over visie en scope, niet over de vakkeuzes van het art- en verhaalteam) als connectie van dat team? (j) Kent het VAF gesteunde metroidvania's of 2D-actiegames met verkoopcijfers die als Vlaamse of Nederlandse referentie kunnen dienen (`docs/business/markt-en-verkoopraming.md` O3)?
 
 ### 6.4 Timing en de Producer-actie (A16)
 
@@ -252,6 +259,7 @@ Het traject tot het contract duurt naar raming ± 3 tot 10 maanden (`subsidies.m
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.6 | 2026-11-10 | D6 en D8 uit `docs/business/markt-en-verkoopraming.md` (v0.1, Marketing, PR #132) verwerkt: §3-tabel (D6 ✅ concept, D8 🟡, D7 blijft ⬜), §4.3 herschreven (bankduo niet onderbouwd als tweede verkoopargument, O2/O8 van dat document; co-op als onderscheidend kenmerk), §6.2 (D6/D8 afgevinkt; nieuwe rij voor de EP: Laag náást Midden in D10 (O4) en spreiding over 24 maanden (O7); open punt reviewtellingen (O1)), intakevraag (j) (O3), §1. Geen cijfers overgenomen; het dossier verwijst naar dat document. |
 | 0.5 | 2026-11-10 | B2 verwerkt na de review van de CD ([comment in #72](https://github.com/cesarvangerwen-glitch/echoborn/issues/72#issuecomment-6755869892)): crit. 5 als tweede criterium, crit. 2 en 4 aanvullend; Hollestede bij naam; "het water beheersen" vervangen door "licht pompen laat het water zakken" (water géén speellaag, #51 deel 2: 1A); lore en thema loslaten in crit. 4; crit. 5 naar art bible §8; laatste zin "gekozen", voorwaardelijk op A1. Zelf getoetst aan art. 4 (§3.1): cat. I kent naast het verplichte crit. 1 geen rangorde, dus crit. 5 als tweede criterium klopt; het is het enige van de drie zonder fictieve-wereldtoets. Blijft binnen #51: 5A ("volgens voorstel CD", dezelfde stad). Toegevoegd, geen afwijking: carillon niet als crit. 6 geclaimd (muziek door AI-rollen, herkomst onzeker; na Lead-review EP), echte zetel invullen bij het indienen, crit. 5-bewijs vóór de slice is de art bible en T1. §1, §6.1 en §6.2 bijgewerkt; open punt crit. 3 in §6.2 (Lead-review EP). D6/D8 niet aangeraakt. |
 | 0.4 | 2026-11-09 | Tweede Lead-review EP (klein): woonplaats CEO voorwaardelijk (A1, VA = zetel; Brussel ≠ "in Vlaanderen"; België volstaat voor de fictieve-wereldtoets), zeggenschap CEO volgens `WERKWIJZE.md` §1 in §4.5 rij 5, §5 en (h)/(i), lezing (1) zwakker; open punt A1. |
 | 0.3 | 2026-11-09 | Lead-review EP verwerkt: art. 4 integraal tegen de pdf (§3.1, o.a. fictieve wereld bij I.2 en I.4, worldbuilding/lore, niet-Europese context, kernprofielen bij II.1, tweede zin II.2); §5 met fictieve-wereldtoets, connectie art-/verhaalteam via de CEO, crit. 4 als derde criterium, cat. II crit. 1 herschreven met twee lezingen en crit. 2 als mogelijk tweede criterium; intakevraag (h) aangescherpt, (i) nieuw; sjabloon 2-pager gelezen, §4.5 in de VAF-volgorde met de termijn van 1 dag vóór de intake; terugvaloptie geschrapt; art. 12.3 letterlijk. |
