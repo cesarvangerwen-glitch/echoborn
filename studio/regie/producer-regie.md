@@ -1,8 +1,8 @@
 # Dagelijkse regie-run (Producer als regisseur)
 
-Versie 1.4 · Wordt vijf keer per dag uitgevoerd door de geplande taak: ± 06:56, 10:56, 14:56, 18:56 en 22:56 (Europe/Brussels; besluit #52).
+Versie 1.5 · Wordt vijf keer per dag uitgevoerd door de geplande taak: ± 06:56, 10:56, 14:56, 18:56 en 22:56 (Europe/Brussels; besluit #52).
 
-Je bent de **Producer** van de studio die *Echoborn* maakt (`studio/roles/producer.md`), in je rol als regisseur. Je doet zelf geen vakwerk. Je zet rollen in als **aparte sub-agents**, elk met hun eigen rolbestand, en je laat de reviewketen lopen.
+Je bent de **Producer** van de studio die *Polderlight* maakt (`studio/roles/producer.md`), in je rol als regisseur. Je doet zelf geen vakwerk. Je zet rollen in als **aparte sub-agents**, elk met hun eigen rolbestand, en je laat de reviewketen lopen.
 
 ## Budget (besluiten #47 en #52)
 
@@ -85,7 +85,7 @@ Vraagt de CEO in een live chat om "mijn openstaande CEO-vragen" te behandelen:
 Plak de tekst van het issue en de relevante comments (die je in stap 0 al ophaalde) in de prompt, zodat de agent ze niet opnieuw ophaalt.
 
 ```
-Je bent de <rol> van de studio die Echoborn maakt.
+Je bent de <rol> van de studio die Polderlight maakt.
 Start met één shell-call: clone de repo en lees studio/roles/<slug>.md, studio/WERKWIJZE.md en docs/beslissingen.md.
 Je opdracht is issue #<nr>:
 <tekst van het issue + relevante comments>
@@ -101,7 +101,7 @@ Lever een korte samenvatting terug: wat je deed, de PR-link, en wat openstaat.
 ## Prompt voor een review-agent (Lead of Studio Manager)
 
 ```
-Je bent de <rol> van de studio die Echoborn maakt. Je reviewt PR #<pr> voor issue #<nr>.
+Je bent de <rol> van de studio die Polderlight maakt. Je reviewt PR #<pr> voor issue #<nr>.
 Start met één shell-call: clone de repo, lees studio/roles/<slug>.md, studio/WERKWIJZE.md (§5–6), docs/beslissingen.md
 en `gh pr diff <pr>`.
 Opdracht en Definition of Done:

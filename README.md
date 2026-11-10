@@ -1,6 +1,6 @@
-# Wraithstep (werktitel)
+# Polderlight (werktitel)
 
-> Werktitel *Wraithstep* (CEO-besluit #24, voorheen *Echoborn*). Nog niet publiek gebruiken (Steam-pagina, trailer, socials, logo) vóór de formele merkcheck door een specialist. De repo en de mappen heten voorlopig nog `echoborn`.
+> Werktitel *Polderlight* (CEO-besluit #96, voorheen *Wraithstep*, #24; daarvoor *Echoborn*). Nog niet publiek gebruiken (Steam-pagina, trailer, socials, logo) vóór de formele merkcheck door een specialist. De repo en de mappen heten voorlopig nog `echoborn`.
 
 Een 2D-metroidvania in pixel art voor pc (Steam, Steam Deck als doel), singleplayer en lokale co-op, voor spelers van 18–30 jaar. Gebouwd in **Godot 4.6**.
 
