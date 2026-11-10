@@ -1,9 +1,9 @@
 # UX-spec HUD en menu's *Polderlight*
 
-Versie 0.2 · Eigenaar: UX Designer (met de UI Artist voor de eind-art) · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10, `docs/productie/fase-2-kader.md` §2) · Review: Lead Game Designer
+Versie 0.3 · Eigenaar: UX Designer (met de UI Artist voor de eind-art) · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10, `docs/productie/fase-2-kader.md` §2) · Review: Lead Game Designer
 Co-op, drop-in/drop-out en de gedeelde camera: **`docs/ux/coop.md`**. Wireframes: **`docs/ux/wireframes/`** (bron: `bron/genereer_wireframes.py`, draait vanaf de repo-root en print de metingen van §2.3).
 
-Bronnen: `docs/design/gdd.md` v0.6.2 (§2.5–2.9, §2.12, O-2), `kernloop.md` §4, `wereld.md` §2.5 (rij T10) en WS-08, `gemaalmeester.md` GM-03/GM-08, `docs/art/bible.md` §2, §3, §5–7, `docs/audio/bible.md` §6.1, `docs/tech/input.md`, `docs/tech/ontwerp.md` §7 (slots, stand van een slot) en §8a, `docs/art/ui-stijlgids.md` §6, §7 en §10 (punten 1–3), `docs/tech/performance-flowkamer.md` §7 (punt 14, 15), pitch v0.4 (P2: "zichtbaar zonder icoon of uitleg").
+Bronnen: `docs/design/gdd.md` v0.6.2 (§2.5–2.9, §2.12, O-2), `kernloop.md` §4, `wereld.md` §2.5 (rij T10) en WS-08, `gemaalmeester.md` GM-03/GM-08, `docs/art/bible.md` §2, §3, §5–7, `docs/audio/bible.md` §6.1, `docs/tech/input.md`, `docs/tech/ontwerp.md` §7 (slots, stand van een slot) en §8a, `docs/art/ui-stijlgids.md` §6, §7, §10 (punten 1–3, 11–13, 18) en §12–§13, `docs/tech/performance-flowkamer.md` §7 (punt 14, 15), pitch v0.4 (P2: "zichtbaar zonder icoon of uitleg").
 
 ## 0. Werkaannames (kader §5)
 
@@ -16,7 +16,7 @@ Bronnen: `docs/design/gdd.md` v0.6.2 (§2.5–2.9, §2.12, O-2), `kernloop.md` �
 | W5 | Interne resolutie **640×360** (pc) en **640×400** (Steam Deck), alleen integer schalen. | besluit #18, art bible §2 |
 | W6 | Talen **EN** (bron) en **NL** bij release ("in principe ja"); de infrastructuur is er (T14). | besluit #51 deel 1 (5A), `ontwerp.md` §8a |
 | W7 | **F0 is nog niet gehaald**: deze spec is de versie vóór F0. De HUD wordt na F0 bijgesteld (kader, open punt bij T10). Getallen van de UX Designer (§6, `coop.md` §5) zijn startwaarden. | fasekader fase 2 v0.2 |
-| W8 | Tekst in de wireframes staat in het 5×7-pixelfont van de Art Director (alleen hoofdletters). Het echte lettertype kiest de UI Artist, met licentie in `docs/licenties.md`. | `docs/art/stijltests/bron/pixelfont.py` |
+| W8 | Tekst in de wireframes staat in het 5×7-pixelfont van de Art Director (alleen hoofdletters). Het echte lettertype kiest de UI Artist, met licentie in `docs/licenties.md`. Het font heeft geen *·*: in de wireframes staan **drie spaties** waar de tekst *·* heeft (bv. *LICHT 40   12 MIN* = *Licht 40 · 12 min*); de sleutels in `strings.csv` gelden. | `docs/art/stijltests/bron/pixelfont.py` |
 | W9 | **3 spelbestanden**, 1-based, met de standen van `SaveService.SlotStatus` en schema v1 (zonder lampglas en vaardigheden). Het slot-menu (§4.7) volgt schema v2 zodra dat er is. | `ontwerp.md` §7 (werkaanname kader §5) |
 
 ## 1. Principes
@@ -219,7 +219,7 @@ Schermflow: `schermflow_placeholder.svg`. Alle menu's werken met controller, toe
 | — | **Opties** | §4.4 |
 | — | **Credits** | scrollende lijst; B = terug |
 | — | **Afsluiten** | Ook op de Deck (Valve staat het toe; de Steam-knop blijft werken). Geen bevestiging: er is niets om te verliezen in het hoofdmenu. |
-| 2 | Regel onder *Doorgaan*: wijk, licht, speeltijd | zodat het duo weet welk spel het is |
+| 2 | Regel onder *Doorgaan*, op **twee regels**: wijk / licht · speeltijd (`MENU_CONTINUE_DETAILS`) | Zodat het duo weet welk spel het is. Op één regel past het niet in de zijband (ui-stijlgids §12.5: al 169 px van 165). Regel 1 is de wijknaam, regel 2 *Licht 40 · 12 min*. **Grens: een wijknaam is ≤ 165 px** in Polderletter normaal (± 36 tekens), **in elke taal, ook EN**; dat is de breedte van de zijband vanaf x 41. Bij *Tekstgrootte: groot* wordt de zijband 260 px (stijlgids §12.5), dus dezelfde naam past dan ook. Langer: de Narrative Designer kort de naam in, nooit kleiner zetten of afbreken (§6). Gemeten: *Wijk 3.2 De Verzonken Gemaalpolder* 160 px past, *District 3.2 The Sunken Pumping Polder* 176 px niet. Dezelfde grens houdt regel 2 in het slot-menu op één regel (§4.7a). |
 | 3 | **Taal** (MN-03) | |
 | 4 | **"2e speler: druk op Start"** | Staat er zodra er een tweede apparaat is. P2 kan al in het hoofdmenu meedoen en start dan mee (`coop.md` CO-02). Er is **geen apart co-op-menu**: co-op is geen modus (pitch §5, L-02). |
 
@@ -232,7 +232,7 @@ Schermflow: `schermflow_placeholder.svg`. Alle menu's werken met controller, toe
 | **MN-12** | **Regels:** *Verder* · *Logboek* · *Opties* · *Speler 2 stopt* (alleen in co-op; een tweede weg naast het vasthouden, `coop.md` CO-06) · *Naar hoofdmenu*. Rechts: wijk, trap van het gemaal, lampglas, logbladzijden, "opgeslagen bij het gemaal". |
 | **MN-13** | **Naar hoofdmenu:** slaat op (LM-12: bij afsluiten) en vraagt **geen** bevestiging, want er gaat niets verloren behalve de plek (je begint bij het gemaal). De pauze toont dat al: "Opgeslagen bij het gemaal". |
 | **MN-14** | **Automatisch pauzeren** bij: focusverlies (alt-tab, Steam-overlay; `input.md` §2), de Deck in slaap, en een **controller van P1 die wegvalt** (`coop.md` CO-09). |
-| **MN-15** | **Logboek:** alle gelezen bladzijden, per gebied, met lege plekken voor wat je nog mist (geen plaats, geen hint; WS-08 zegt al waar ze liggen). |
+| **MN-15** | **Logboek:** alle gelezen bladzijden, per gebied, met lege plekken voor wat je nog mist (geen plaats, geen hint; WS-08 zegt al waar ze liggen). Indeling en bediening: §4.8 (MN-30–MN-34). |
 
 ### 4.4 Opties (`menu_opties_toegankelijkheid_x2_placeholder.png`, `menu_opties_besturing_x2_placeholder.png`)
 
@@ -253,6 +253,16 @@ Tabbladen met **LB/RB** (toetsenbord Q/E of Tab); elke regel heeft onderaan een 
 - **Vaste uitzonderingen:** B/Esc in menu's blijft "terug" en Menu/Start blijft "pauze" op de controller, zodat niemand zichzelf buitensluit. Toetsen zijn fysiek (W7 in `input.md`): op AZERTY toont het menu de echte toets ("A" op de plek van Q).
 - Op de Deck verwijst een regel bovenaan naar Steam Input ("Ook in Steam: controllerinstellingen"); de game zelf blijft herbindbaar.
 - Knopiconen volgen het **laatst gebruikte apparaat** van die speler (Deck-glyphs op de Deck).
+
+**De kolom kiezen** (`menu_herbinden_kolom_x2_placeholder.png`; antwoord op ui-stijlgids §10 punt 13). De art toont de gekozen cel met `cel_focus` binnen de keuzebalk van de regel.
+
+| ID | Regel |
+|---|---|
+| **MN-40** | **Links/rechts wisselt van kolom** binnen de gekozen regel (d-pad, stick, pijltjes of A/D); **omhoog/omlaag** gaat naar een andere regel en **houdt de kolom**. Geen wrap: links stopt bij *Toetsenbord 1*, rechts bij *Controller*. De kolom *Actie* is geen cel. Waarom zo: het is een raster, en links/rechts doet in Opties al "de waarde van deze regel"; hier is de waarde de cel. De knophint toont het d-pad-kruis (`dpad_horizontaal`, stijlgids §13) met *Kolom* (`MENU_COLUMN`). |
+| **MN-41** | **Startkolom:** bij het openen van het tabblad staat de cursor in de kolom van het **apparaat dat het menu stuurt** (pad → *Controller*; toetsenbord van P1 → *Toetsenbord 1*, van P2 → *Toetsenbord 2*), op de eerste regel. Daarna onthoudt het tabblad regel en kolom (§4). De muis: een klik op een cel kiest die cel en is meteen A. |
+| **MN-42** | **Wachten op een knop** (`herbind_wacht`, `MENU_PRESS_KEY`, 5 s): alleen een knop van **het soort apparaat van de kolom** telt. *Toetsenbord 1/2*: een toets; *Controller*: een knop van **elke** pad (één profiel voor elke pad). Een knop van het andere soort doet niets. **Esc of B annuleert altijd**, van elk apparaat, en wordt dus nooit zelf gebonden (de vaste uitzondering hierboven). Wie met een pad een toetsenbordkolom herbindt, kan dus zonder toetsenbord nog terug. |
+| **MN-43** | **Eén regel = één actie met één richting = één knop per cel.** *Links / rechts* (`input.md` §2a: LEFT en RIGHT zijn twee bits) staat daarom als **twee regels**, *Links* en *Rechts*, elk met een eigen cel per kolom. Zo bindt A altijd precies wat er in de regel staat, en kan rechts nooit zonder knop raken. Waarom splitsen en niet twee keer wachten (*Druk op links*, dan *Druk op rechts*): één regel en één wachtstand is het patroon van elke andere actie, er is geen tweede time-out en geen half-gebonden toestand als je na de eerste knop annuleert. De **stick als as** is geen cel en niet herbindbaar (de stick stuurt altijd links/rechts op de controller); de cel *Controller* toont het d-pad, de stick staat in een gedimde regel eronder (*Ook: linker stick*). **X = standaard** zet alleen de gekozen cel terug. **Herstel alles** (`MENU_RESET_ALL`, onderaan het tabblad) zet alle cellen van alle kolommen terug, na een bevestiging **volgens MN-23**: titel *Alle knoppen terugzetten?* (`MENU_CONFIRM_RESET_ALL`), tekst `MENU_CONFIRM_RESET_ALL_BODY`, *Terug* bovenaan en standaard, *Herstellen* (`MENU_RESET`) alleen met omlaag + A, eerst loslaten en 0,25 s echte tijd, geen wrap. **Besloten door de LGD** (Lead-review PR #144). |
+| **MN-44** | **Regels zonder kolommen** in hetzelfde tabblad: de cel-focus is daar weg. Alleen bij *Stickdrempel* schuift links/rechts de waarde. Bij *Herstel alles* doet links/rechts niets en opent A de bevestiging (MN-43). Terug in het raster komt de onthouden kolom terug. |
 
 ### 4.6 Meldingen en opslaan
 
@@ -285,6 +295,48 @@ Antwoord op `ontwerp.md` §12 (UX Designer, T10). Bron: `ontwerp.md` §7, *Slots
 
 Lampglas en andere voortgang uit LM-12 staan niet in schema v1 (`ontwerp.md` §7); ze komen in regel 2 zodra schema v2 er is (§7 punt 13). Tot dan: wijk, licht en speeltijd. De wijknaam komt uit `state.gebied` (§7 punt 13).
 
+### 4.7a Spelbestand kiezen: indeling voor de art
+
+Antwoord op ui-stijlgids §10 punt 11. Er is **geen apart scherm "nieuw spel → kies een plaats"**: *Spelbestanden* (§4.7) ís het kiezen. Een nieuw spel start je met A op een lege plaats of met X (*Nieuw spel hier*) op een volle; alleen bij de eerste start (alle plaatsen leeg) start *Nieuw spel* in het hoofdmenu meteen in plaats 1 (§4.2). Overschrijven heeft **B als standaard**: de cursor staat op *Terug* en B is altijd terug (MN-23). Het scherm gebruikt alleen onderdelen uit stijlgids §12.2; er is **geen nieuw asset nodig** behalve het slot-kader in twee staten (hieronder). Wireframe: `menu_spelbestanden_x2_placeholder.png` (normaal, bevestiging, groot).
+
+| Wat | Onderdeel (stijlgids §12.2) | Waar en hoe groot (interne pixels; Deck: zelfde getallen) | Groot (TG-10) |
+|---|---|---|---|
+| Achtergrond | verduistering lucht 0 op 72 % over het titelbeeld (zoals Opties; geen zijband, de kaders zijn te breed) | heel scherm | gelijk |
+| Titel *Spelbestanden* | `Titel` (×2) | (28, 8), zoals Opties | gelijk |
+| Plaats, zonder focus | `kader_9slice` (variant `Uitleg`, plaat 78 %) | x 28, y 40 + 44 × i, **400 × 36** (MN-21: 8 px ertussen) | **584 × 50**, y 40 + 58 × i |
+| Plaats, met focus | `keuzebalk_9slice` over het hele kader + `keuze_lamp` op (x + 3, midden) | idem; hover en ingedrukt als §12.3 | idem |
+| Regel 1: *Plaats n* | tekst gevel wit 5, met focus 7 | (x + 13, y + 8) | (x + 13, y + 9) |
+| Regel 1 rechts: *Hersteld uit back-up* | `Gedimd` | rechts uitgelijnd, eindigt op x + 400 − 8 | x + 584 − 8 |
+| Regel 2: de stand (MN-22) | `Gedimd`; `KAPOT`/`NIEUWER` in gloed 6; *Leeg* in gevel wit 3 | (x + 13, y + 20), **één regel**, max. 379 px | (x + 13, y + 27), max. 563 px |
+| Lampglas (na schema v2) | achteraan regel 2, na *·*: *Lampglas 1/4* (`MENU_SLOT_LAMPGLAS`) | in dezelfde regel | idem |
+| Melding MN-24 (5 s) | `kader_9slice`, tekst gevel wit 7 | (28, 176), 400 × 16 | (28, 216), 584 × 20 |
+| Knophints | glyphs van de set (§13) | rechtsonder (§12.4): A *Laden* / *Nieuw spel*, X *Nieuw spel hier*, B *Terug*; een hint die niets doet, staat er niet | gelijk |
+| Bevestiging (MN-23) | `paneel_9slice`; lijst erachter nog eens 50 % verduisterd | **400 × 128** op (120, 116): titel `Titel` (x + 16, y + 12); details `Gedimd` (x + 16, y + 38); tekst gevel wit 7 vanaf (x + 16, y + 50), autowrap op 368 px, max. 2 regels om de 10 px; *Terug* en *Overschrijven* als Button 160 breed op (x + 16, y + 80) en (x + 16, y + 96) | **480 × 168** op (80, 96); tekst om de 14 px; knoppen 200 × 20 op y + 100 en y + 120 |
+
+**Past het?** Gemeten in Polderletter (`docs/art/ui/bron/polderletter.py`): regel 2 met de langste testwijk binnen de grens van §4.2 (165 px) plus *· Licht 100 · 12 h 59 min · Lamp glass 4/4* (190 px) is 355 px van 379; groot ± 434 van 563. De langste bevestigingstekst (`MENU_CONFIRM_SET_ASIDE_BODY`, NL) is 356 px: één regel normaal, twee bij groot. *Gemaakt met een nieuwere versie: kan niet laden* is 215 px. Daarom één regel voor de stand in het slot-menu, en twee in de zijband van het hoofdmenu (§4.2): het kader hier is breder.
+
+**Staten van het kader** (voor de art): normaal (kader), focus (keuzebalk + lamp), hover = focus (stijlgids §9: de muis neemt de focus), ingedrukt (keuzebalk ingedrukt). Een `KAPOT`- of `NIEUWER`-plaats is wél te kiezen (X werkt), dus geen staat *uit*. Geen rood en geen waarschuwingskleur op *Overschrijven*: de bescherming zit in de bediening (MN-23), en rood is van vijanden.
+
+### 4.8 Logboek (MN-15; `menu_logboek_x2_placeholder.png`)
+
+Antwoord op ui-stijlgids §10 punt 12. Uit de pauze (*Logboek*); het spel blijft stilstaan. Alleen onderdelen uit stijlgids §12.2 en het logkader van de HUD.
+
+| ID | Regel |
+|---|---|
+| **MN-30** | **Indeling (normaal):** verduistering 72 %, titel *Logboek* (`MENU_LOGBOOK`, `Titel`) op (28, 8); tabbalk zoals Opties (LB/RB, y 34) met **één tab per gebied waar je geweest bent**, met de **gebiedsnaam** (*De polderwijk*, `wereld.md` §1; geen wijknaam), en de proloog als eigen tab; geen tabs voor gebieden die je nog niet kent, zodat er niets verklapt wordt. Onder de tablijn `Gedimd` op (28, 56): *3 van 7 gevonden* (`MENU_LOG_COUNT`). Lijst links: Buttons van 160 breed op x 28, y 74 + 16 × i. Rechts het **logkader van de HUD** (`kader_9slice`, 360 × 32, binnen 348) op (232, 74), met kop *Logbladzijde n* in gloed 6 en de 2 regels: precies wat de speler zag bij het oppakken (§3.7). |
+| **MN-31** | **Een regel per bladzijde van dat gebied**, op volgorde van n (hetzelfde nummer als `HUD_LOG_KOP`). Gevonden: *Logbladzijde n*. Nog niet gevonden: **"– – –"** in de staat *uit* (gevel wit 3, geen lamp); de cursor **slaat die over**. Zo zie je hoeveel er nog ligt, maar niet waar (MN-15). ± 7 per gebied (WS-08), dus de lijst past zonder scrollen (7 × 16 = 112 px; groot 140). |
+| **MN-32** | **Bediening:** omhoog/omlaag kiest een bladzijde; het kader rechts **volgt de cursor meteen** (geen A nodig; A doet niets). LB/RB (Q/E, Tab) wisselt van gebied. **B = terug naar de pauze.** In co-op stuurt wie de pauze opende (MN-11). Openen: het tabblad van het gebied waar je nu bent, de cursor op de laatst gevonden bladzijde daar. Geen gevonden bladzijde in dit gebied: het kader toont *Nog geen bladzijden in dit gebied.* (`MENU_LOG_NONE`) en er is geen cursor in de lijst. MN-32 is **besloten door de LGD** (Lead-review PR #144). |
+| **MN-33** | **Tekstgrootte groot:** Buttons 200 × 20 (y 74 + 20 × i), en het kader gaat **onder** de lijst: het grote logkader (540 × 48, §3.7) op (50, 222). Naast de lijst past het niet. |
+| **MN-34** | Geen "nieuw"-merkje en geen sortering: ± 30 bladzijden, en de HUD toonde elke bladzijde al 6 s (§3.7). Na T11 bekijken of spelers bladzijden terugzoeken (§7 punt 9). |
+
+### 4.9 Credits (`menu_credits_x2_placeholder.png`)
+
+| ID | Regel |
+|---|---|
+| **MN-35** | **Indeling:** verduistering 72 % over het titelbeeld; één **kolom van 320 px, gecentreerd** (x 160–480), tekst gecentreerd. Blokken van een kop (de rol of het onderdeel, gloed 6) met de namen eronder (gevel wit 7), **12 px per regel, 14 px tussen blokken** (groot 16 en 18). Een `RichTextLabel` in een `ScrollContainer` zonder zichtbare scrollbalk; het Theme dekt de rest (stijlgids §14). |
+| **MN-36** | **Bediening:** de kolom schuift vanzelf **20 px/s** omhoog (± 1,7 regel per seconde, rustig leesbaar). **Omlaag vasthouden = 4× zo snel**, **omhoog vasthouden = terugschuiven**; muiswiel scrolt. Aan het eind blijft de laatste regel staan. **B/Esc = terug** naar het hoofdmenu, altijd. Knophints: d-pad verticaal met *Sneller* (`MENU_CREDITS_FASTER`), B *Terug*. Geen pauzeknop: omhoog vasthouden of terugschuiven is genoeg. **Besloten door de LGD** (Lead-review PR #144); na T11 bekeken (§7 punt 20). |
+| **MN-37** | **Inhoud** (niet van de UX Designer): de namen en rollen, *Gemaakt met Godot Engine* en de licentieteksten die verplicht zijn (`docs/licenties.md`). Welke tekst er moet staan, beslissen de Producer en de Business/Legal Advisor (§7 punt 18); namen worden niet vertaald, de koppen wel (`CREDITS_*`). |
+
 ## 5. Toegankelijkheid
 
 Wireframe: `menu_opties_toegankelijkheid_x2_placeholder.png`. Elke optie staat in het tabblad Toegankelijkheid; de standaard is het spel zoals ontworpen.
@@ -308,7 +360,8 @@ Wireframe: `menu_opties_toegankelijkheid_x2_placeholder.png`. Elke optie staat i
 
 ## 6. Taal en tekst
 
-- **Sleutels** (`ontwerp.md` §8a): prefix per scherm, `HUD_`, `MENU_`, `COMMON_`, plus `OPT_` voor opties en `A11Y_` voor de uitleg bij toegankelijkheid. Nieuwe sleutels uit deze spec (voorstel; de Gameplay Programmer zet ze in `strings.csv` bij de bouw): `HUD_LAMPGLAS`, `HUD_LOG_KOP`, `HUD_BOSS_GEMAALMEESTER`, `HUD_P2_JOINED`, `HUD_P2_STOP_HOLD`, `HUD_P2_LEAVING`, `HUD_PAD_JOIN_HINT`, `HUD_PAD_LOST`, `MENU_PRESS_ANY`, `MENU_LANGUAGE_HINT`, `MENU_CONTINUE`, `MENU_NEW_GAME`, `MENU_OPTIONS`, `MENU_CREDITS`, `MENU_QUIT`, `MENU_RESUME`, `MENU_LOGBOOK`, `MENU_P2_LEAVE`, `MENU_TO_TITLE`, `MENU_SAVED_AT_PUMP`, `MENU_CONFIRM_OVERWRITE`, `MENU_PRESS_KEY`, `MENU_KEY_TAKEN`, `MENU_PAUSED_BY`, `HUD_PAD_NAME`.
+- **Sleutels** (`ontwerp.md` §8a): prefix per scherm, `HUD_`, `MENU_`, `COMMON_`, plus `OPT_` voor opties en `A11Y_` voor de uitleg bij toegankelijkheid. Sleutels uit deze spec die **nog niet** in `strings.csv` staan (voorstel; de Gameplay Programmer zet ze erin bij de bouw, de sleutels hieronder staan er al): `HUD_LAMPGLAS`, `HUD_LOG_KOP`, `HUD_BOSS_GEMAALMEESTER`, `HUD_P2_JOINED`, `HUD_P2_STOP_HOLD`, `HUD_P2_LEAVING`, `HUD_PAD_JOIN_HINT`, `HUD_PAD_LOST`, `MENU_PRESS_ANY`, `MENU_LANGUAGE_HINT`, `MENU_CONTINUE`, `MENU_NEW_GAME`, `MENU_OPTIONS`, `MENU_QUIT`, `MENU_RESUME`, `MENU_P2_LEAVE`, `MENU_TO_TITLE`, `MENU_SAVED_AT_PUMP`, `MENU_CONFIRM_OVERWRITE`, `MENU_PRESS_KEY`, `MENU_KEY_TAKEN`, `MENU_PAUSED_BY`, `HUD_PAD_NAME`.
+- **Nieuw in `strings.csv`** (v0.3): `MENU_CONTINUE_DETAILS` (§4.2 regel 2), `MENU_SLOT_LAMPGLAS` (pas na schema v2), `MENU_LOGBOOK`, `MENU_LOG_COUNT`, `MENU_LOG_NONE` (§4.8), `MENU_CREDITS`, `MENU_CREDITS_FASTER` (§4.9), `MENU_COLUMN`, `MENU_RESET_ALL`, `MENU_CONFIRM_RESET_ALL`, `MENU_CONFIRM_RESET_ALL_BODY`, `MENU_RESET`, `MENU_ALSO_STICK` (§4.5, MN-43), `HUD_LOG_KOP` (§3.7, ook de regels in het logboek) en `MENU_LOG_PROLOGUE` (logboektab *Proloog*, §4.8). **Volgen nog:** de gebiedsnamen als tabnaam (`COMMON_AREA_1` … `COMMON_AREA_4`, ook voor de pauze en de wijkregel), geschreven door de Narrative Designer met de World & Level Designer (§7 punt 17). `MENU_SLOT_DETAILS` heeft nu *·* als scheiding, zoals de regel onder *Doorgaan*.
 - **Al in `strings.csv`** (EN en NL, met context; v0.2): de teksten van het slot-menu en de opslagmeldingen (§4.6, §4.7): `MENU_NEW_GAME`, `MENU_SLOTS`, `MENU_SLOT_NAME`, `MENU_SLOT_DETAILS`, `MENU_SLOT_TIME_MIN`, `MENU_SLOT_TIME_HM`, `MENU_SLOT_EMPTY`, `MENU_SLOT_RESTORED`, `MENU_SLOT_BROKEN`, `MENU_SLOT_NEWER`, `MENU_SLOT_LOAD`, `MENU_SLOT_NEW_HERE`, `MENU_CONFIRM_OVERWRITE`, `MENU_CONFIRM_OVERWRITE_BODY`, `MENU_CONFIRM_SET_ASIDE_BODY`, `MENU_OVERWRITE`, `COMMON_BACK`, `MENU_SLOT_SAVE_FAILED`, `HUD_SAVE_RESTORED`, `HUD_SAVE_RESTORED_SUB`, `HUD_SAVE_FAILED`, `HUD_SAVE_FAILED_SUB`. De Narrative Designer mag de toon nog bijschaven; de sleutels blijven.
 - **`HUD_PAD_JOIN_HINT` op twee regels** (ui-stijlgids §7 bevinding 1, §10 punt 2; overgenomen): op één regel is het NL 195 px en past het niet in een melding (184 px binnen). Nu: regel 1 *Controller 2* in cyaan (`HUD_PAD_NAME`, EN/NL "Controller %d"), regel 2 *Druk op Start om mee te doen* (`HUD_PAD_JOIN_HINT`, EN "Press Start to join"). Waarom twee regels en niet korter: korter ("Start = meedoen") is minder duidelijk voor een tweede speler die het spel niet kent, en dat is precies wie deze melding leest (10 s om mee te doen, `coop.md` §1); de kop *Controller 2* zegt meteen welk apparaat bedoeld is, en het patroon kop + regel is dat van *P2 doet mee* (CO-04). `HUD_PAD_LOST` gebruikt dezelfde kop. Beide sleutels staan nog niet in `strings.csv`; de Gameplay Programmer zet ze erin bij de bouw (§7 punt 2), *Start* wordt dan de knop-glyph van het apparaat (§4.5).
 - **Lengte:** elk tekstvak is ontworpen voor de Engelse tekst **+ 35 %** (NL is gemiddeld langer, en sommige woorden veel: *Toegankelijkheid* tegenover *Accessibility*). Een tekst die niet past, wordt korter geschreven, nooit kleiner gezet.
@@ -332,14 +385,21 @@ Wireframe: `menu_opties_toegankelijkheid_x2_placeholder.png`. Elke optie staat i
 | 10 | **NL-tekst per vak meten** (+35 %, §6) met het eerste lettertype van de UI Artist: past elk vak (logkader, meldingen, menu's, tabbladen)? | UI Artist, UX Designer | Bij het eerste font (§7 punt 1, na F1) |
 | 11 | `docs/ux/besturing.md`, `docs/ux/onboarding.md` en `docs/ux/toegankelijkheid.md` (rolbestand) volgen in een eigen issue; deze spec dekt de opties van toegankelijkheid al | UX Designer | Fase 2, na T10 |
 | 12 | **Volgorde in `new_game`**: nu wist het de bestanden van een goede plaats vóór de eerste save, dus een mislukte eerste save laat de plaats leeg (MN-24). Voorstel: eerst het nieuwe spel schrijven (`.tmp`), dan pas het oude opzijzetten of wissen; dan kan MN-24 zeggen "het oude spel staat er nog". MN-23 blijft dwingend, ook dan. En: de **laatst gespeelde plaats** onthouden (voor *Doorgaan* en de cursor, MN-21), in het instellingenbestand (punt 3). | Technical Director | Met T8a |
-| 13 | Het slot-menu bouwen (§4.7) met `SaveService.slot_info`; de **wijknaam** uit `state.gebied` (een tabel gebied → wijk, met de World & Level Designer); na schema v2 lampglas in regel 2 | Gameplay Programmer | Met T8a |
-| 14 | ui-stijlgids §10 punten 1–3 zijn overgenomen (§2.3 plaat 66 %; §6 `HUD_PAD_JOIN_HINT` op twee regels; HUD-M5/HUD-M6 melding 196 px en omhoog boven logkader **en boss-balk**). Verwerken in de stijlgids, ook de boss-balk (28 px) en *groot* (52 px). Eind-art van het slot-menu en de bevestiging (deel 3) | UI Artist | Bij deel 3 |
+| 13 | Het slot-menu bouwen (§4.7, indeling §4.7a) met `SaveService.slot_info`; de **wijknaam** uit `state.gebied` (een tabel gebied → wijk, met de World & Level Designer); na schema v2 lampglas in regel 2 | Gameplay Programmer | Met T8a |
+| 14 | ui-stijlgids §10 punten 1–3 zijn overgenomen (§2.3 plaat 66 %; §6 `HUD_PAD_JOIN_HINT` op twee regels; HUD-M5/HUD-M6 melding 196 px en omhoog boven logkader **en boss-balk**). Verwerken in de stijlgids, ook de boss-balk (28 px) en *groot* (52 px). Eind-art van het slot-menu en de bevestiging: zie punt 16 | UI Artist | Bij deel 3 |
 | 15 | MN-25 opnieuw bekijken na T11: missen spelers een wisknop, vooral om een `KAPOT`-plaats op te ruimen? | UX Designer | Na T11 |
+| 16 | **Nu op te pakken door de UI Artist, als placeholder-mock-ups; eind-art pas na F1** (T10) (antwoord op ui-stijlgids §10 punten 11–13 en 18): **(a)** mock-up van *Spelbestanden* en de bevestiging, normaal en groot, volgens §4.7a; enige nieuwe vorm is het slot-kader (400 × 36 / 584 × 50) in de staten normaal en focus, uit bestaande 9-slices; **(b)** mock-ups van het **Logboek** (§4.8) en de **Credits** (§4.9), normaal en groot; **(c)** herbinden: `cel_focus` klopt met MN-40–MN-44, de hint *Kolom* gebruikt `dpad_horizontaal`; **(d)** punt 18 is overgenomen in §4.2 (twee regels, ≤ 165 px). Daarna de punten 11–13 en 18 in de stijlgids sluiten. | UI Artist (review AD) | Volgende run van de UI Artist |
+| 17 | **Wijknamen ≤ 165 px** in Polderletter normaal, in EN én NL (§4.2): bij het schrijven van de namen meten met `docs/art/ui/bron/polderletter.py` (`text_width`). | Narrative Designer, met de World & Level Designer | Bij de wijknamen in `strings.csv` |
+| 18 | **Inhoud van de credits** (MN-37): welke namen en rollen, en welke licentieteksten verplicht zijn (Godot, MIT; eigen font). | Producer, Business/Legal Advisor | Vóór de eerste publieke build |
+| 19 | Logboek, credits en de kolomkeuze bij herbinden bouwen (§4.5, §4.8, §4.9; *Links* en *Rechts* als twee regels, MN-43); voor het logboek per bladzijde het gebied en n bewaren (LM-12) | Gameplay Programmer | Met T8a |
+| 20 | Na T11: lezen spelers de licentieteksten in de credits bij 20 px/s, of willen ze toch een pauze (MN-36)? | UX Designer | Na T11 |
+| 21 | Eind van de credits: nu blijft de laatste regel staan, zonder automatische terugkeer naar het hoofdmenu (alleen B); herzien samen met punt 20. | UX Designer | Na T11 |
 
 ## 8. Wijzigingen
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.3 | 2026-11-10 | ui-stijlgids §10 punten 11–13 en 18 (#87): indeling *Spelbestand kiezen* voor de art (§4.7a, met maten normaal en groot, gemeten in Polderletter); Logboek (§4.8, MN-30–MN-34) en Credits (§4.9, MN-35–MN-37); herbinden: de kolom kiezen (§4.5, MN-40–MN-44); regel onder *Doorgaan* op twee regels met de grens ≤ 165 px (§4.2). Nieuwe teksten in `strings.csv` (§6). Wireframes: nieuw `menu_logboek`, `menu_credits`, `menu_herbinden_kolom`; `menu_spelbestanden` en `menu_hoofdmenu` op de plaatsing van stijlgids §12.4; schermflow bijgewerkt. §7 punten 16–20. Na de Lead-review (PR #144): *Links / rechts* gesplitst in *Links* en *Rechts* (MN-43); bevestiging bij *Herstel alles* volgens MN-23 met eigen sleutels; MN-44 (alleen *Stickdrempel* schuift); MN-32, MN-36 en MN-43 besloten door de LGD; logboektab = gebiedsnaam. Na de SM-review: §6 opgeschoond, `HUD_LOG_KOP` en `MENU_LOG_PROLOGUE` in `strings.csv`, W8 (*·* in wireframes), §7 punt 16 (placeholder, eind-art na F1) en 21. |
 | 0.2 | 2026-11-10 | ui-stijlgids §10 punten 1–3 (#87): plaat 62 → **66 %** met nieuwe metingen (§2.3); `HUD_PAD_JOIN_HINT` op twee regels met kop `HUD_PAD_NAME` (§6); melding max. 196 px (HUD-M5) en omhoog boven logkader én boss-balk (HUD-M6, §3.7). `ontwerp.md` §12 (UX): slot-menu *Spelbestanden* (§4.7, MN-20–MN-25) met de standen uit `ontwerp.md` §7 en een dwingende bevestiging bij overschrijven; hoofdmenu *Spelbestanden* (§4.2); meldingen opslaan mislukt en hersteld (§4.6); teksten in `strings.csv`; W9; open punten 12–15 (MN-23 en MN-25 besloten door de LGD, Lead-review PR #139; `MENU_SLOT_RESTORED` op regel 1; `HUD_SAVE_RESTORED_SUB` zonder plek; 0,25 s echte tijd). Wireframes: plaat 66 %, melding boven het logkader, nieuw `menu_spelbestanden_x2_placeholder.png`, hoofdmenu en schermflow bijgewerkt. |
 | 0.1.2 | 2026-11-10 | Na de SM-review (PR #129): logkader in px (360×32, groot 540×48); feedback per verplicht boss-moment (GM-09); de finisher in de HUD (§3.8a); TG-01 met de twee gevallen x+1…x+11 en x+12…x+19; open punt NL-tekst meten. |
 | 0.1.1 | 2026-11-10 | Na de Lead-review (PR #129): TG-01 bij de lanceerhouding met de regel van de LGD (virtuele knop); keuzes LGD: boss-balk ja, tikken bij genezen, Loslaten en stoppen ja, spelsnelheid nee, hulpmodus na T11; MN-14 verwijst naar CO-09. |

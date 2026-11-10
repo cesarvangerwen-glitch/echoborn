@@ -676,15 +676,71 @@ def hintbalk(img, hints):
         x -= 10
 
 
+# Onderdelen uit ui-stijlgids par. 12.2-12.3, als placeholder (v0.3). Maten in interne pixels.
+def zijband(img, w=214):
+    """Zijband links (hoofdmenu, pauze): plaat 78 %, rand rechts gevel wit 2."""
+    rect(img, 0, 0, w, img.shape[0], C["plaat"], 0.78)
+    rect(img, w - 1, 0, 1, img.shape[0], C["wf_d"])
+
+
+def verduister(img, alpha=0.72):
+    """Verduistering in lucht 0 (`ColorRect`), zoals achter Opties."""
+    return (img * (1 - alpha) + np.asarray(C["zwart"]) * alpha).astype(np.uint8)
+
+
+def lamp(img, x, y):
+    """Het lantaarntje (7x9) van de keuzebalk: placeholder als driehoek."""
+    for k in range(4):
+        rect(img, x + k, y + 1 + k, 1, 7 - 2 * k, C["amber"])
+
+
+def regel(img, x, y, tekst, gekozen=False, breedte=160, uit=False, h=15):
+    """Menuregel (Button): keuzebalk + lamp bij focus; tekst op x + 13 (par. 12.3)."""
+    if gekozen:
+        rect(img, x, y, breedte, h, C["gloed"][0], 0.7)
+        frame(img, x, y, breedte, h, C["gloed"][5])
+        lamp(img, x + 3, y + (h - 9) // 2)
+    kl = C["kader_d"] if uit else (C["tekst"] if gekozen else C["tekst_d"])
+    txt(img, tekst, x + 13, y + (h - 7) // 2, kl)
+
+
+def paneel(img, x, y, w, h):
+    """Dialoog: ijzeren plaat met klinknagels (paneel_9slice), plaat 85 %."""
+    plaat(img, x, y, w, h, 0.85)
+    frame(img, x, y, w, h, C["wf"], 2)
+    for px, py in ((x + 3, y + 3), (x + w - 5, y + 3), (x + 3, y + h - 5), (x + w - 5, y + h - 5)):
+        rect(img, px, py, 2, 2, C["kader"])
+
+
+def kader(img, x, y, w, h, alpha=0.78):
+    """Kader (`Uitleg`, kader_9slice van de HUD)."""
+    plaat(img, x, y, w, h, alpha)
+    frame(img, x, y, w, h, C["kader_d"])
+
+
+def maat(img, x, y, tekst):
+    """Maatnotitie in magenta (geen tekst van het scherm)."""
+    txt(img, tekst, x, y, C["noot"])
+
+
 def blad_hoofdmenu():
+    """Hoofdmenu op de plaatsing van ui-stijlgids par. 12.4 (zijband 214 px).
+
+    v0.3: de regel onder DOORGAAN staat op twee regels (wijk / licht - speeltijd), par. 4.2 nr. 2.
+    """
     img = menu_basis("grijs", 0.35)
-    rect(img, 0, 120, 330, 120, C["plaat"], 0.8)
-    txt(img, "POLDERLIGHT", 48, 64, C["tekst"], scale=4)
-    txt(img, "WERKTITEL", 48, 102, C["tekst_d"])
-    menulijst(img, 56, 140, ["DOORGAAN", "SPELBESTANDEN", "OPTIES", "CREDITS", "AFSLUITEN"], 0)
-    txt(img, "WIJK 1.1 DE KADEWIJK   LICHT 40   12 MIN", 56, 224, C["tekst_d"])
-    noot(img, 1, 34, 136)
-    noot(img, 2, 300, 222)
+    zijband(img)
+    txt(img, "POLDERLIGHT", 28, 44, C["tekst"], scale=3)
+    txt(img, "WERKTITEL", 30, 80, C["tekst_d"])
+    regel(img, 28, 108, "DOORGAAN", True)
+    txt(img, "WIJK 1.1 DE KADEWIJK", 41, 124, C["tekst_d"])
+    txt(img, "LICHT 40   12 MIN", 41, 134, C["tekst_d"])
+    dashed(img, 40, 122, 167, 21, C["noot"])
+    for i, t in enumerate(["SPELBESTANDEN", "OPTIES", "CREDITS", "AFSLUITEN"]):
+        regel(img, 28, 148 + 16 * i, t)
+    noot(img, 1, 190, 104)
+    noot(img, 2, 216, 126)
+    txt(img, "MAX. 165 PX", 232, 128, C["noot"])
     knop(img, 8, 343, "Y")
     txt(img, "TAAL: NEDERLANDS", 21, 345, C["tekst_d"])
     noot(img, 3, 124, 342)
@@ -696,60 +752,239 @@ def blad_hoofdmenu():
 
 
 def blad_spelbestanden():
-    """Slot-menu (hud-menus.md par. 4.7): de stand van elke plaats en de dwingende bevestiging.
+    """Slot-menu (hud-menus.md par. 4.7 en 4.7a): indeling in interne pixels.
 
-    Boven: de lijst met plaats 1 (HERSTELD), 2 (beschadigd) en 3 (leeg); de cursor staat op
-    het laatst gespeelde. Onder: overschrijven van plaats 1, cursor op TERUG.
+    Paneel 1: lijst normaal (plaats 1 HERSTELD en gekozen, 2 beschadigd, 3 leeg).
+    Paneel 2: de dwingende bevestiging (MN-23), cursor op TERUG.
+    Paneel 3: lijst bij Tekstgrootte groot (kader 584 x 50).
     Geen vraagteken in het wireframe-font; de echte tekst staat in strings.csv.
     """
-    def lijst(img, gekozen):
-        txt(img, "SPELBESTANDEN", 48, 32, C["tekst"], scale=2)
-        rijen = [
-            ("PLAATS 1", "WIJK 1.1 DE KADEWIJK   LICHT 40   1 U 12 MIN", C["tekst_d"]),
-            ("PLAATS 2", "BESCHADIGD: KAN NIET LADEN", C["gloed"][6]),
-            ("PLAATS 3", "LEEG", C["kader_d"]),
-        ]
-        for i, (kop, sub, kl) in enumerate(rijen):
-            y = 72 + i * 44
-            plaat(img, 48, y, 400, 36, 0.78)
-            frame(img, 48, y, 400, 36, C["amber"] if i == gekozen else C["kader_d"], 2 if i == gekozen else 1)
+    RIJEN = [
+        ("PLAATS 1", "WIJK 1.1 DE KADEWIJK   LICHT 40   1 U 12 MIN", C["tekst_d"]),
+        ("PLAATS 2", "BESCHADIGD: KAN NIET LADEN", C["gloed"][6]),
+        ("PLAATS 3", "LEEG", C["kader_d"]),
+    ]
+
+    def lijst(img, gekozen, groot=False):
+        w, h, stap = (584, 50, 58) if groot else (400, 36, 44)
+        r1, r2 = (9, 27) if groot else (8, 20)
+        txt(img, "SPELBESTANDEN", 28, 8, C["tekst"], scale=2)
+        for i, (kop, sub, kl) in enumerate(RIJEN):
+            y = 40 + i * stap
             if i == gekozen:
-                for k in range(4):
-                    rect(img, 38 + k, y + 14 + k, 1, 7 - 2 * k, C["amber"])
-            txt(img, kop, 60, y + 7, C["tekst"])
-            txt(img, sub, 60, y + 21, kl)
+                rect(img, 28, y, w, h, C["gloed"][0], 0.7)
+                frame(img, 28, y, w, h, C["gloed"][5])
+                lamp(img, 31, y + (h - 9) // 2)
+            else:
+                kader(img, 28, y, w, h)
+            txt(img, kop, 41, y + r1, C["tekst"] if i == gekozen else C["tekst_d"])
+            txt(img, sub, 41, y + r2, kl)
             if i == 0:
                 # Stand HERSTELD: rechts op regel 1, naast PLAATS n (MN-22).
                 t = "HERSTELD UIT BACK-UP"
-                txt(img, t, 48 + 400 - 12 - text_width(t, 1), y + 7, C["tekst_d"])
+                txt(img, t, 28 + w - 8 - text_width(t, 1), y + r1, C["tekst_d"])
+                # Na schema v2: lampglas achteraan regel 2 (par. 7 punt 13).
+                lx = 41 + text_width(sub, 1) + 18
+                dashed(img, lx - 3, y + r2 - 3, text_width("LAMPGLAS 1/4", 1) + 6, 13, C["noot"])
+                txt(img, "LAMPGLAS 1/4", lx, y + r2, C["kader_d"])
         return img
 
-    a = lijst(menu_basis("grijs", 0.55), 0)
-    noot(a, 1, 452, 72)
-    noot(a, 2, 452, 116)
-    noot(a, 3, 452, 160)
-    noot(a, 4, 452, 84)
-    hintbalk(a, [("A", "LADEN"), ("X", "NIEUW SPEL HIER"), ("B", "TERUG")])
-    noot(a, 5, 400, 328)
-    label(a, "SPELBESTANDEN: STAND PER PLAATS (MN-21, MN-22)")
+    basis = verduister(laad("r5_grijs_640x360.png"))
 
-    b = lijst(menu_basis("grijs", 0.55), 0)
-    b = (b * 0.4 + C["plaat"] * 0.6).astype(np.uint8)
-    x, y, w, h = 120, 100, 400, 140
-    plaat(b, x, y, w, h, 0.92)
-    frame(b, x, y, w, h, C["gloed"][6], 2)
-    txt(b, "PLAATS 1 OVERSCHRIJVEN", x + 14, y + 12, C["tekst"], scale=2)
-    txt(b, "WIJK 1.1 DE KADEWIJK   1 U 12 MIN", x + 14, y + 38, C["tekst_d"])
-    txt(b, "DIT SPEL WORDT GEWIST. DAT KAN NIET TERUG.", x + 14, y + 50, C["tekst"])
-    menulijst(b, x + 34, y + 80, ["TERUG", "OVERSCHRIJVEN"], 0, stap=20, breedte=170)
-    noot(b, 1, x + 214, y + 78)
-    noot(b, 2, x + 214, y + 98)
-    # Notitie (geen tekst van het venster, geen sleutel): buiten het kader, in magenta.
+    a = lijst(basis.copy(), 0)
+    noot(a, 1, 432, 40)
+    noot(a, 2, 432, 84)
+    noot(a, 3, 432, 128)
+    noot(a, 4, 432, 66)
+    maat(a, 448, 68, "LAMPGLAS: NA SCHEMA V2")
+    maat(a, 28, 30, "X 28")
+    maat(a, 432, 54, "400 X 36")
+    maat(a, 432, 98, "8 PX ERTUSSEN")
+    kader(a, 28, 176, 400, 16)
+    txt(a, "(MN-24, 5 S) OPSLAAN MISLUKT. DEZE PLAATS IS NU LEEG.", 41, 180, C["tekst"])
+    noot(a, 5, 432, 178)
+    hintbalk(a, [("A", "LADEN"), ("X", "NIEUW SPEL HIER"), ("B", "TERUG")])
+    noot(a, 6, 380, 328)
+    label(a, "SPELBESTANDEN: INDELING NORMAAL (MN-21, MN-22, 4.7A)")
+
+    b = lijst(basis.copy(), 0)
+    b = verduister(b, 0.5)
+    x, y, w, h = 120, 116, 400, 128
+    paneel(b, x, y, w, h)
+    txt(b, "PLAATS 1 OVERSCHRIJVEN", x + 16, y + 12, C["tekst"], scale=2)
+    txt(b, "WIJK 1.1 DE KADEWIJK   1 U 12 MIN", x + 16, y + 38, C["tekst_d"])
+    txt(b, "DIT SPEL WORDT GEWIST. DAT KAN NIET TERUG.", x + 16, y + 50, C["tekst"])
+    dashed(b, x + 16, y + 48, 368, 21, C["noot"])
+    regel(b, x + 16, y + 80, "TERUG", True)
+    regel(b, x + 16, y + 96, "OVERSCHRIJVEN")
+    noot(b, 1, x + 180, y + 80)
+    noot(b, 2, x + 180, y + 96)
+    maat(b, x + 200, y + 82, "A EN B = TERUG")
+    maat(b, x + 200, y + 98, "ALLEEN OMLAAG + A")
+    maat(b, x + 14, y + h + 22, "PANEEL 400 X 128 OP (120, 116); LIJST EXTRA 50 % VERDUISTERD")
+    maat(b, x + 252, y + 72, "TEKST 2 REGELS")
     noot(b, 3, x, y + h + 8)
-    txt(b, "NOTITIE: EERST LOSLATEN, DAN OMLAAG + A. GEEN WRAP.", x + 14, y + h + 10, C["noot"])
+    maat(b, x + 14, y + h + 10, "NOTITIE: EERST LOSLATEN, 0,25 S. GEEN WRAP. CURSOR ALTIJD OP TERUG.")
     hintbalk(b, [("A", "KIES"), ("B", "TERUG")])
-    label(b, "BEVESTIGING OVERSCHRIJVEN: DWINGEND (MN-23)")
-    opslaan(np.concatenate([a, b], 0), "menu_spelbestanden_x2_placeholder.png", 2)
+    label(b, "BEVESTIGING OVERSCHRIJVEN: DWINGEND, B = STANDAARD (MN-23)")
+
+    c = lijst(basis.copy(), 0, groot=True)
+    maat(c, 28, 220, "TEKSTGROOTTE GROOT: KADER 584 X 50, OM DE 58 PX; REGEL 2 OP Y + 27")
+    maat(c, 28, 232, "PANEEL GROOT 480 X 168 OP (80, 96); KNOPPEN 200 X 20")
+    hintbalk(c, [("A", "LADEN"), ("X", "NIEUW SPEL HIER"), ("B", "TERUG")])
+    label(c, "SPELBESTANDEN: TEKSTGROOTTE GROOT")
+    opslaan(np.concatenate([a, b, c], 0), "menu_spelbestanden_x2_placeholder.png", 2)
+
+
+def blad_logboek():
+    """Logboek (MN-15, MN-30-MN-34): tabs per gebied, lijst links, bladzijde rechts.
+
+    Paneel 1: normaal. Paneel 2: Tekstgrootte groot (bladzijde onder de lijst, 540 x 48).
+    """
+    def basis(groot=False):
+        img = laad("r5_kleur_640x360.png")
+        img = verduister(img)
+        txt(img, "LOGBOEK", 28, 8, C["tekst"], scale=2)
+        tabbalk(img, ["PROLOOG", "DE POLDERWIJK"], 1, y=38)
+        txt(img, "3 VAN 7 GEVONDEN", 28, 58, C["tekst_d"])
+        return img
+
+    rijen = [("LOGBLADZIJDE 3", True), ("LOGBLADZIJDE 4", True), ("-  -  -", False),
+             ("LOGBLADZIJDE 6", True), ("-  -  -", False), ("-  -  -", False), ("-  -  -", False)]
+
+    a = basis()
+    for i, (t, gevonden) in enumerate(rijen):
+        regel(a, 28, 74 + 16 * i, t, gekozen=(i == 1), uit=not gevonden)
+    kader(a, 232, 74, 360, 32)
+    txt(a, "LOGBLADZIJDE 4", 238, 78, C["gloed"][6])
+    txt(a, "DE SLUISWACHTER SCHREEF HET PEIL OP DE MUUR,", 238, 88, C["tekst"])
+    txt(a, "ELKE AVOND EEN STREEP HOGER.", 238, 97, C["tekst"])
+    noot(a, 1, 200, 36)
+    noot(a, 2, 132, 56)
+    noot(a, 3, 190, 92)
+    noot(a, 4, 190, 108)
+    noot(a, 5, 596, 74)
+    maat(a, 232, 112, "ZELFDE KADER ALS HUD-07: 360 X 32, BINNEN 348")
+    maat(a, 232, 124, "VOLGT DE CURSOR METEEN; GEEN A NODIG")
+    maat(a, 28, 190, "LEGE PLEK = UIT (GEVEL WIT 3), CURSOR SLAAT HEM OVER")
+    hintbalk(a, [("L", "GEBIED"), ("R", "GEBIED"), ("B", "TERUG")])
+    label(a, "LOGBOEK (PAUZE): NORMAAL")
+
+    b = basis(groot=True)
+    for i, (t, gevonden) in enumerate(rijen):
+        regel(b, 28, 74 + 20 * i, t, gekozen=(i == 1), uit=not gevonden, breedte=200, h=20)
+    kader(b, 50, 222, 540, 48)
+    txt(b, "LOGBLADZIJDE 4", 58, 228, C["gloed"][6])
+    txt(b, "DE SLUISWACHTER SCHREEF HET PEIL OP DE MUUR,", 58, 242, C["tekst"])
+    txt(b, "ELKE AVOND EEN STREEP HOGER.", 58, 256, C["tekst"])
+    maat(b, 260, 120, "GROOT: REGELS 200 X 20; BLADZIJDE ONDER DE LIJST")
+    maat(b, 260, 132, "KADER 540 X 48 OP (50, 222), ZOALS HET GROTE LOGKADER")
+    hintbalk(b, [("L", "GEBIED"), ("R", "GEBIED"), ("B", "TERUG")])
+    label(b, "LOGBOEK: TEKSTGROOTTE GROOT")
+    opslaan(np.concatenate([a, b], 0), "menu_logboek_x2_placeholder.png", 2)
+
+
+def blad_credits():
+    """Credits (MN-35-MN-37): een kolom in het midden die vanzelf omhoog schuift."""
+    def kolom(img, y0):
+        y = y0
+        blokken = [("POLDERLIGHT", ["EEN SPEL VAN DE STUDIO"]),
+                   ("ROL", ["NAAM", "NAAM"]),
+                   ("ROL", ["NAAM"]),
+                   ("ROL", ["NAAM", "NAAM", "NAAM"]),
+                   ("GEMAAKT MET", ["GODOT ENGINE"]),
+                   ("LICENTIES", ["UIT DOCS/LICENTIES.MD"])]
+        for kop, namen in blokken:
+            if 16 < y < 330:
+                txt(img, kop, 320 - text_width(kop, 1) // 2, y, C["gloed"][6])
+            y += 12
+            for n in namen:
+                if 16 < y < 330:
+                    txt(img, n, 320 - text_width(n, 1) // 2, y, C["tekst"])
+                y += 12
+            y += 14
+        return y
+
+    a = verduister(laad("r5_grijs_640x360.png"))
+    dashed(a, 160, 16, 320, 314, C["noot"])
+    kolom(a, 40)
+    noot(a, 1, 484, 16)
+    maat(a, 484, 30, "KOLOM 320 BREED")
+    maat(a, 484, 42, "GECENTREERD")
+    noot(a, 2, 484, 60)
+    maat(a, 484, 74, "ROL: GLOED 6")
+    maat(a, 484, 86, "NAAM: GEVEL WIT 7")
+    maat(a, 484, 98, "12 PX PER REGEL")
+    maat(a, 484, 110, "14 PX TUSSEN BLOKKEN")
+    noot(a, 3, 484, 130)
+    maat(a, 484, 144, "SCHUIFT 20 PX/S OMHOOG")
+    maat(a, 484, 156, "OMLAAG VAST = X4")
+    maat(a, 484, 168, "OMHOOG VAST = TERUG")
+    hintbalk(a, [("+", "SNELLER"), ("B", "TERUG")])
+    label(a, "CREDITS (HOOFDMENU)")
+    opslaan(a, "menu_credits_x2_placeholder.png", 2)
+
+
+def blad_herbinden_kolom():
+    """Herbinden: de kolom kiezen (MN-40-MN-44). Paneel 1: cel gekozen. Paneel 2: wachten op een knop."""
+    kol = [20, 196, 326, 466]
+    # MN-43: Links en Rechts zijn twee regels; de stick is geen cel (gedimde regel eronder).
+    rijen = [("LINKS", "A", "PIJL LINKS", "D-PAD LINKS"),
+             ("RECHTS", "D", "PIJL RECHTS", "D-PAD RECHTS"),
+             ("~", "", "", "OOK: LINKER STICK"),
+             ("SPRINGEN", "SPATIE", "ENTER", "A"),
+             ("AANVAL", "E", "R-CTRL", "X"),
+             ("INTERACTIE (GENEZEN)", "F", "/", "Y"),
+             ("ECHO (LOSLATEN)", "Q", ".", "LB"),
+             ("DASH", "L-SHIFT", "R-SHIFT", "RB")]
+
+    def tabel(img, rij, cel, wacht=False):
+        txt(img, "OPTIES", 28, 8, C["tekst"], scale=2)
+        tabbalk(img, TABS, 3)
+        for x, t in zip(kol, ["ACTIE", "TOETSENBORD 1", "TOETSENBORD 2", "CONTROLLER"]):
+            txt(img, t, x + 13, 58, C["gloed"][6])
+        for i, r in enumerate(rijen):
+            y = 74 + i * 18
+            if i == rij:
+                rect(img, 20, y, 588, 15, C["gloed"][0], 0.7)
+                frame(img, 20, y, 588, 15, C["gloed"][5])
+                lamp(img, 23, y + 3)
+            if r[0] == "~":
+                txt(img, r[3], kol[3] + 13, y + 4, C["kader_d"])
+                continue
+            for j, (x, t) in enumerate(zip(kol, r)):
+                if i == rij and j == cel:
+                    rechts = (kol[j + 1] - 7) if j + 1 < len(kol) else 604
+                    if wacht:
+                        rect(img, x + 10, y + 2, rechts - x - 10, 11, C["gloed"][5])
+                        txt(img, "DRUK EEN KNOP...", x + 13, y + 4, C["zwart"], schaduw=False)
+                        continue
+                    frame(img, x + 10, y + 2, rechts - x - 10, 11, C["gloed"][6])
+                txt(img, t, x + 13, y + 4, C["tekst"] if i == rij else C["tekst_d"])
+        return img
+
+    basis = verduister(laad("r5_grijs_640x360.png"))
+    a = tabel(basis.copy(), 3, 3)
+    noot(a, 1, 610, 74)
+    noot(a, 2, 610, 92)
+    maat(a, 300, 228, "LINKS / RECHTS: VAN KOLOM WISSELEN (GEEN WRAP)")
+    maat(a, 300, 240, "OMHOOG / OMLAAG: ANDERE REGEL, ZELFDE KOLOM")
+    maat(a, 300, 252, "START IN DE KOLOM VAN HET APPARAAT DAT STUURT")
+    maat(a, 300, 264, "ACTIE IS GEEN CEL: LINKS STOPT BIJ TOETSENBORD 1")
+    maat(a, 300, 276, "(2) LINKS EN RECHTS: TWEE REGELS; STICK GEEN CEL")
+    noot(a, 3, 280, 228)
+    hintbalk(a, [("+", "KOLOM"), ("A", "HERBIND"), ("X", "STANDAARD"), ("B", "TERUG")])
+    label(a, "HERBINDEN: KOLOM GEKOZEN MET CEL_FOCUS (MN-40, MN-41)")
+
+    b = tabel(basis.copy(), 3, 3, wacht=True)
+    noot(b, 1, 610, 74)
+    maat(b, 300, 228, "ALLEEN EEN KNOP VAN DIT SOORT APPARAAT TELT:")
+    maat(b, 300, 240, "CONTROLLER = ELKE PAD; TOETSENBORD = TOETSEN")
+    maat(b, 300, 252, "ESC OF B ANNULEERT, VAN ELK APPARAAT; 5 S")
+    noot(b, 2, 280, 228)
+    hintbalk(b, [("B", "ANNULEREN")])
+    label(b, "HERBINDEN: WACHTEN OP EEN KNOP (MN-42)")
+    opslaan(np.concatenate([a, b], 0), "menu_herbinden_kolom_x2_placeholder.png", 2)
 
 
 def blad_pauze():
@@ -843,7 +1078,8 @@ def blad_opties_besturing():
     kol = [44, 200, 330, 470]
     for x, t in zip(kol, ["ACTIE", "TOETSENBORD 1", "TOETSENBORD 2", "CONTROLLER"]):
         txt(img, t, x, 62, C["noot"])
-    rijen = [("LINKS / RECHTS", "A / D", "PIJLEN", "STICK, D-PAD"),
+    rijen = [("LINKS", "A", "PIJL LINKS", "D-PAD L (+ STICK)"),
+             ("RECHTS", "D", "PIJL RECHTS", "D-PAD R (+ STICK)"),
              ("SPRINGEN", "SPATIE", "ENTER", "A"),
              ("AANVAL", "E", "R-CTRL", "X"),
              ("INTERACTIE (GENEZEN)", "F", "/", "Y"),
@@ -854,18 +1090,18 @@ def blad_opties_besturing():
              ("STOPPEN (VASTHOUDEN)", "-", "BACKSPACE", "VIEW")]
     for i, r in enumerate(rijen):
         y = 80 + i * 18
-        if i == 4:
+        if i == 5:
             rect(img, 36, y - 4, 568, 15, C["plaat"], 0.95)
             frame(img, 36, y - 4, 568, 15, C["amber"])
         for j, (x, t) in enumerate(zip(kol, r)):
-            if i == 4 and j == 3:
+            if i == 5 and j == 3:
                 rect(img, x - 3, y - 3, 60, 13, C["amber"])
                 txt(img, "DRUK...", x, y, C["zwart"], schaduw=False)
             else:
-                txt(img, t, x, y, C["tekst"] if i == 4 else C["tekst_d"])
-    txt(img, "BEZET DOOR DASH: WISSELEN?", 300, 252, C["gloed"][6])
+                txt(img, t, x, y, C["tekst"] if i == 5 else C["tekst_d"])
+    txt(img, "BEZET DOOR DASH: WISSELEN?", 300, 266, C["gloed"][6])
     noot(img, 1, 610, 150)
-    noot(img, 2, 460, 250)
+    noot(img, 2, 460, 264)
     hintbalk(img, [("A", "HERBIND"), ("X", "STANDAARD"), ("B", "TERUG")])
     label(img, "OPTIES: BESTURING (HERBINDEN PER APPARAAT)")
     opslaan(img, "menu_opties_besturing_x2_placeholder.png", 2)
@@ -958,9 +1194,9 @@ def svg_schermflow():
         "opties": (340, 340, "Opties", "Algemeen · Beeld · Geluid · Besturing · Toegankelijkheid"),
         "spel": (40, 340, "Spel (HUD)", "solo of co-op; drop-in/out zonder menu"),
         "pauze": (40, 460, "Pauze", "Verder · Logboek · Opties · Speler 2 stopt · Hoofdmenu"),
-        "log": (340, 460, "Logboek", "gelezen bladzijden, per gebied"),
+        "log": (340, 460, "Logboek (§4.8)", "tabs per gebied; lege plekken; B = pauze"),
         "pad": (340, 580, "Controller kwijt (P1)", "spel pauzeert; wacht op een knop"),
-        "credits": (640, 220, "Credits", ""),
+        "credits": (640, 220, "Credits (§4.9)", "schuift vanzelf; B = terug"),
     }
     pijlen = [("start", "titel", ""), ("titel", "hoofd", "knop"), ("hoofd", "slots", "Spelbestanden"),
               ("hoofd", "spel", "Doorgaan"), ("slots", "spel", ""), ("hoofd", "opties", "Opties"),
@@ -1026,6 +1262,9 @@ if __name__ == "__main__":
     blad_pauze()
     blad_opties_toegankelijkheid()
     blad_opties_besturing()
+    blad_herbinden_kolom()
+    blad_logboek()
+    blad_credits()
     blad_coop_storyboard()
     svg_schermflow()
     metingen()

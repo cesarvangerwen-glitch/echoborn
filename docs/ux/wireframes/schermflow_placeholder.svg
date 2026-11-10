@@ -45,14 +45,14 @@
 <text x="50" y="484" fill="#ece2cc" font-size="14" font-weight="bold">Pauze</text>
 <text x="50" y="504" fill="#a8a19f" font-size="10.5">Verder · Logboek · Opties · Speler 2 stopt · Hoofdmenu</text>
 <rect x="340" y="460" width="250" height="64" rx="4" fill="#0c0c1d" stroke="#5b576e" stroke-width="2"/>
-<text x="350" y="484" fill="#ece2cc" font-size="14" font-weight="bold">Logboek</text>
-<text x="350" y="504" fill="#a8a19f" font-size="10.5">gelezen bladzijden, per gebied</text>
+<text x="350" y="484" fill="#ece2cc" font-size="14" font-weight="bold">Logboek (§4.8)</text>
+<text x="350" y="504" fill="#a8a19f" font-size="10.5">tabs per gebied; lege plekken; B = pauze</text>
 <rect x="340" y="580" width="250" height="64" rx="4" fill="#0c0c1d" stroke="#5b576e" stroke-width="2"/>
 <text x="350" y="604" fill="#ece2cc" font-size="14" font-weight="bold">Controller kwijt (P1)</text>
 <text x="350" y="624" fill="#a8a19f" font-size="10.5">spel pauzeert; wacht op een knop</text>
 <rect x="640" y="220" width="250" height="64" rx="4" fill="#0c0c1d" stroke="#5b576e" stroke-width="2"/>
-<text x="650" y="244" fill="#ece2cc" font-size="14" font-weight="bold">Credits</text>
-<text x="650" y="264" fill="#a8a19f" font-size="10.5"></text>
+<text x="650" y="244" fill="#ece2cc" font-size="14" font-weight="bold">Credits (§4.9)</text>
+<text x="650" y="264" fill="#a8a19f" font-size="10.5">schuift vanzelf; B = terug</text>
 <text x="640" y="380" fill="#3ee6f4" font-size="11">Overal: een vrije controller + Start</text>
 <text x="640" y="396" fill="#3ee6f4" font-size="11">= P2 doet mee (ook in menu’s en pauze).</text>
 </svg>
