@@ -130,6 +130,20 @@ func is_current_checkpoint(positie: Vector2) -> bool:
 	return state.checkpoint_positie == positie
 
 
+## Is er een checkpoint om op te respawnen (E-04b, C-08; deel 3b, `Respawn`)?
+## Alleen als er een loader gekoppeld is, `state` een checkpoint heeft in
+## het gebied van die loader (dus niet bij een nieuw spel, en niet in een
+## nieuw gebied vóór zijn eerste checkpoint) en dat checkpoint in een kamer
+## van dat gebied ligt. Anders respawnt P1 op het begin van de kamer.
+func has_checkpoint_in_area() -> bool:
+	if not is_instance_valid(_loader) or state.gebied == &"" or state.gebied != _loader.gebied:
+		return false
+	if _loader.room_at(state.checkpoint_positie) == &"":
+		push_warning("Progress: checkpoint %s ligt in geen kamer van gebied '%s'; respawn op het begin van de kamer" % [state.checkpoint_positie, state.gebied])
+		return false
+	return true
+
+
 ## Schrijft de stand van de wereld naar `state`: de objecten in de geladen
 ## kamers (`AreaLoader.store_objects`), de lichtmeter en de gemalen.
 ## `SaveService` roept dit vlak vóór elke save aan.
