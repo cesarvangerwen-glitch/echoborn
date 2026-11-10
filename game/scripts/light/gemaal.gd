@@ -14,6 +14,15 @@ extends "res://scripts/objects/sim_object.gd"
 ##
 ## Alles in de tick (stap 4 via `Combat.hit`, stap 5 via `sim_update`), zonder
 ## Area2D-signalen (ontwerp.md §4a).
+##
+## Twee manieren om het op te zetten (architectuur-aansluiting T5b deel 3b,
+## #82; ontwerp.md §3a):
+## - in code: `setup_gemaal(meter, pomprad, sluis, straat, y_hoog, y_laag)`,
+##   dan `connect_combat` (zoals de flow-kamer);
+## - in een scène (ook in de gestreamde `inhoud` van een kamer): vul
+##   `pomprad_path`, `sluice_path`, `street`, `y_high` en `y_low` in. De
+##   AreaLoader geeft het gemaal bij het laden de lichtmeter (via `Progress`),
+##   verbindt het met `Combat` en bindt zijn stand (`Progress.bind_gemaal`).
 
 signal pumped(tick: int, amount: int, who: String)
 signal full(tick: int)
@@ -33,10 +42,14 @@ var meter: RefCounted
 var pomprad: Node2D
 ## De sluisdoorgang (wereldgeometrie, laag 1).
 var sluice: StaticBody2D
-## Straat met water: x-bereik en de vloer (`end.y`); de bovenkant is de waterlijn.
-var street := Rect2()
-var y_high := 0.0
-var y_low := 0.0
+## In een scène: het pomprad (een node met `pomprad.gd`) en de sluis.
+@export var pomprad_path: NodePath
+@export var sluice_path: NodePath
+## Straat met water, in wereldcoördinaten: x-bereik en de vloer (`end.y`);
+## de bovenkant is de waterlijn.
+@export var street := Rect2()
+@export var y_high := 0.0
+@export var y_low := 0.0
 ## Aantal pompslagen per lichaam (MP-6).
 var strokes := {}
 
@@ -50,7 +63,6 @@ var _drained := false
 
 func setup_gemaal(p_meter: RefCounted, p_pomprad: Node2D, p_sluice: StaticBody2D,
 		p_street: Rect2, p_y_high: float, p_y_low: float) -> void:
-	setup(Layers.LIGHT | Layers.SHADOW, Vector2(1, 1))
 	name = "Gemaal"
 	meter = p_meter
 	pomprad = p_pomprad
@@ -58,6 +70,29 @@ func setup_gemaal(p_meter: RefCounted, p_pomprad: Node2D, p_sluice: StaticBody2D
 	street = p_street
 	y_high = p_y_high
 	y_low = p_y_low
+	_setup_common()
+
+
+## In een scène: de verwijzingen uit de geëxporteerde paden. Het pomprad
+## krijgt hier zijn soort en hurtbox (`setup_pomprad`; die worden niet in de
+## scène bewaard); de namen blijven staan (ze zitten in de id van het gemaal
+## in de save, §3a).
+func _ready() -> void:
+	if pomprad != null or pomprad_path.is_empty():
+		return
+	pomprad = get_node_or_null(pomprad_path)
+	sluice = get_node_or_null(sluice_path) as StaticBody2D
+	if pomprad == null:
+		push_error("Gemaal '%s': pomprad_path '%s' wijst nergens heen" % [name, pomprad_path])
+	elif pomprad.has_method("setup_pomprad"):
+		var own_name := pomprad.name
+		pomprad.setup_pomprad()
+		pomprad.name = own_name
+	_setup_common()
+
+
+func _setup_common() -> void:
+	setup(Layers.LIGHT | Layers.SHADOW, Vector2(1, 1))
 	_water_visual = Polygon2D.new()
 	_water_visual.color = Color(0.25, 0.35, 0.45, 0.7)
 	add_child(_water_visual)
@@ -92,7 +127,14 @@ func restore_state(vulstand: int, vol: bool) -> void:
 
 ## Verbindt met `Combat.hit` van de Sim (stap 4).
 func connect_combat(combat: RefCounted) -> void:
-	combat.hit.connect(_on_hit)
+	if not combat.hit.is_connected(_on_hit):
+		combat.hit.connect(_on_hit)
+
+
+## Het omgekeerde, bij het ontladen van de kamer (AreaLoader).
+func disconnect_combat(combat: RefCounted) -> void:
+	if combat.hit.is_connected(_on_hit):
+		combat.hit.disconnect(_on_hit)
 
 
 ## Waterlijn op `tick` (LM-06).

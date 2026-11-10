@@ -65,7 +65,7 @@ godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd
 Verwachte uitvoer (verkort):
 
 ```
-Echoborn tests - Godot 4.6.3-stable (official), physics 60 Hz
+Polderlight tests - Godot 4.6.3-stable (official), physics 60 Hz
 
 res://tests/test_runner.gd
   PASS test_zero_checks_is_fail (1 checks)

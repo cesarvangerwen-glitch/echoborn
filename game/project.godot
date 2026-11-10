@@ -1,14 +1,16 @@
 ; Engine configuration file.
-; Echoborn - spike echo-opname (issue #5). Zie docs/tech/ontwerp.md.
+; Polderlight (werktitel, besluit #96) - spike echo-opname (issue #5). Zie docs/tech/ontwerp.md.
 
 config_version=5
 
 [application]
 
-config/name="Echoborn"
+config/name="Polderlight"
 config/description="Spike: echo-opname en -afspelen, 2 lokale spelers."
 run/main_scene="res://levels/flowkamer/flowkamer.tscn"
 config/features=PackedStringArray("4.6")
+config/use_custom_user_dir=true
+config/custom_user_dir_name="godot/app_userdata/Echoborn"
 
 [autoload]
 

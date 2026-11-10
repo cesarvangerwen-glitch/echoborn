@@ -22,6 +22,10 @@ extends Node
 ##   (`<gebied>/<kamer_id>/<pad in de inhoud>`), zodat hij na opnieuw laden
 ##   terugkomt. Hernoem je een kamer of object, zet dan de oude vlag in
 ##   `flag_renames`; `unknown_flags` vindt vlaggen die nergens meer bij horen.
+## - Een `Gemaal` in de inhoud (deel 3b) krijgt bij het laden de lichtmeter en
+##   zijn stand via `progress` (`Progress.bind_gemaal`, id `gemaal_id`) en
+##   wordt verbonden met `Combat`; bij het ontladen gaat zijn stand naar
+##   `game_state` (`Progress.unbind_gemaal`) en wordt het losgemaakt.
 ##
 ## Geen eigen `_physics_process`: de Sim roept `sim_track` aan na stap (3)
 ## van E-07b, vóór de echo de resets van P1 verwerkt. Een wijziging in wat
@@ -32,6 +36,7 @@ extends Node
 const Kamer = preload("res://scripts/world/kamer.gd")
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 const SimObject = preload("res://scripts/objects/sim_object.gd")
+const Gemaal = preload("res://scripts/light/gemaal.gd")
 
 ## P1 ging van kamer `van` naar `naar`. `reset` = geen buur (E-04a).
 signal kamer_gewisseld(tick: int, van: StringName, naar: StringName, reset: bool)
@@ -54,6 +59,10 @@ var sim: Node = null
 ## (`GameState`, R10). Null = niet bewaren: na opnieuw laden begint een
 ## object dan in zijn standaardstand.
 var game_state: RefCounted = null
+## De autoload `Progress` (of een eigen node in een test), gezet door
+## `Progress.bind_area_loader`. Nodig voor een gemaal in gestreamde inhoud
+## (deel 3b): zonder `progress` krijgt dat geen lichtmeter en geen stand.
+var progress: Node = null
 ## Het gebied (de gebiedsscène) van deze kamers; het eerste deel van de vlag
 ## van een object (`object_flag`). Kamer-id's zijn alleen binnen een gebied
 ## uniek. Gezet door `Progress.bind_area_loader`; leeg = geen voorvoegsel
@@ -233,21 +242,22 @@ func known_object_flags() -> Dictionary:
 			continue
 		var root := kamer.inhoud.instantiate()
 		for node in _walk(root):
-			if node is SimObject and node.has_persistent_state():
+			if node is Gemaal or (node is SimObject and node.has_persistent_state()):
 				known[object_flag(id, root.get_path_to(node), gebied)] = true
 		root.free()
 	return known
 
 
-## De vlaggen in `state` die bij dit gebied horen maar bij geen object in de
-## inhoud (gesorteerd): hernoemd of verwijderd zonder `flag_renames`. Een
+## De vlaggen en gemaal-id's (`state.gemalen`, deel 3b) in `state` die bij
+## dit gebied horen maar bij geen object in de inhoud (gesorteerd): hernoemd
+## of verwijderd zonder `flag_renames`. Een
 ## vlag hoort bij dit gebied als hij begint met `<gebied>/`, of (zonder
 ## gebied) met `<kamer_id>/` van een kamer hier. Andere vlaggen (een sluis,
 ## een ander gebied) tellen niet.
 func unknown_flags(state: RefCounted) -> PackedStringArray:
 	var known := known_object_flags()
 	var unknown := PackedStringArray()
-	for flag in state.vlaggen:
+	for flag in state.vlaggen.keys() + state.gemalen.keys():
 		var text := String(flag)
 		if _is_own_flag(text) and not known.has(StringName(text)):
 			unknown.append(text)
@@ -256,13 +266,19 @@ func unknown_flags(state: RefCounted) -> PackedStringArray:
 
 
 ## Zet elke oude vlag uit `flag_renames` die in `state` staat om naar zijn
-## nieuwe naam. Geeft het aantal omgezette vlaggen.
+## nieuwe naam; ook de id van een gemaal in `state.gemalen` (deel 3b). Geeft
+## het aantal omgezette vlaggen en id's.
 func apply_flag_renames(state: RefCounted) -> int:
 	var moved := 0
 	for old in flag_renames:
+		var new := StringName(flag_renames[old])
 		if state.has_flag(StringName(old)):
 			state.set_flag(StringName(old), false)
-			state.set_flag(StringName(flag_renames[old]))
+			state.set_flag(new)
+			moved += 1
+		if state.gemalen.has(StringName(old)):
+			state.gemalen[new] = state.gemalen[StringName(old)]
+			state.gemalen.erase(StringName(old))
 			moved += 1
 	return moved
 
@@ -361,6 +377,8 @@ func _attach_objects(kamer: Kamer) -> void:
 	for object in found:
 		if game_state != null and object.has_persistent_state():
 			object.set_persistent_state(game_state.has_flag(_flag_of(kamer, object)))
+		if object is Gemaal:
+			_bind_gemaal(kamer, object)
 		if sim != null:
 			sim.add_object(object)
 
@@ -370,6 +388,8 @@ func _detach_objects(kamer: Kamer) -> void:
 		return
 	_store(kamer.id())
 	for object: SimObject in _objects[kamer.id()]:
+		if object is Gemaal:
+			_unbind_gemaal(kamer, object)
 		if sim != null:
 			sim.remove_object(object)
 	_objects.erase(kamer.id())
@@ -382,6 +402,30 @@ func _store(id: StringName) -> void:
 	for object: SimObject in _objects[id]:
 		if object.has_persistent_state():
 			game_state.set_flag(_flag_of(kamer, object), object.get_persistent_state())
+
+
+## De id van een gemaal in de inhoud van `kamer` in `GameState.gemalen`:
+## dezelfde vorm als een vlag (`object_flag`), dus ook met `flag_renames`.
+func gemaal_id(kamer: Kamer, gemaal: Node) -> StringName:
+	return _flag_of(kamer, gemaal)
+
+
+## Deel 3b: stand en lichtmeter via `progress`, vóór het aanmelden bij de
+## Sim (zoals de stand van een hendel), dan `Combat`.
+func _bind_gemaal(kamer: Kamer, gemaal: Gemaal) -> void:
+	if progress != null:
+		progress.bind_gemaal(gemaal, gemaal_id(kamer, gemaal))
+	else:
+		push_error("AreaLoader: gemaal '%s' in kamer '%s', maar geen Progress (eerst Progress.bind_area_loader)" % [kamer.inhoud_node.get_path_to(gemaal), kamer.id()])
+	if sim != null:
+		gemaal.connect_combat(sim.combat)
+
+
+func _unbind_gemaal(kamer: Kamer, gemaal: Gemaal) -> void:
+	if progress != null:
+		progress.unbind_gemaal(gemaal, gemaal_id(kamer, gemaal))
+	if sim != null:
+		gemaal.disconnect_combat(sim.combat)
 
 
 func _flag_of(kamer: Kamer, object: Node) -> StringName:
