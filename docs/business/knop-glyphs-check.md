@@ -1,6 +1,6 @@
 # Korte check: knop-glyphs en apparaatnamen
 
-Versie 1.1 · 2026-11-10 · Eigenaar: Business/Legal Advisor · Issue: [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10 UX + UI) · Lead-review: Executive Producer
+Versie 1.2 · 2026-11-10 · Eigenaar: Business/Legal Advisor · Issue: [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10 UX + UI) · Lead-review: Executive Producer
 Hoort bij: `docs/art/ui-stijlgids.md` §10 punt 15 en §13; `docs/ux/hud-menus.md` §4.4 (*Knopiconen*) · Volgt: formele merkcheck door een specialist (besluit #24, 3A; raming besluit #51 deel 1, 3A)
 
 > **Voorlopige check, geen juridisch advies.** Alleen openbare richtlijnen en wetteksten gelezen; niets aangevraagd of aan derden gevraagd. De Business/Legal Advisor is geen advocaat of merkengemachtigde. Waar een specialist nodig is, staat dat in §4.
@@ -60,8 +60,8 @@ Hoort bij: `docs/art/ui-stijlgids.md` §10 punt 15 en §13; `docs/ux/hud-menus.m
 | 1 | **Vraag voor de specialist** (meenemen in de formele merkcheck, binnen de raming van besluit #51 (3A); valt de offerte hoger uit, dan via de EP naar de CEO): "Bevestig dat eigen, monochrome knop-glyphs (A/B/X/Y, LB/RT, ✕ ○ □ △ elk apart) en de woorden *Xbox*, *PlayStation* en *Steam Deck* in een instellingenmenu, met een merkenregel in de credits, binnen de beperking van art. 14 UMV en de Benelux-regel (BVIE) vallen, en in de VS onder *nominative fair use*." | BLA zet de vraag in de opdracht; EP bij de offerte | Vóór de eerste publieke build |
 | 2 | Steam Deck Verified-eis: "on-screen glyphs must match the inputs being used" (S8). Dat is een technische eis, geen licentiekwestie; de herkenning van het apparaat ligt bij de Engine & Platform Programmer (stijlgids §13). | Engine & Platform Programmer | Bij de Deck-build ([#79](https://github.com/cesarvangerwen-glitch/echoborn/issues/79)) |
 | 3 | De **Steam Deck brand guidelines** (PDF, S9) en de volledige Steam Deck-compatibiliteitspagina zijn niet volledig gelezen (pagina niet bereikbaar voor de tool). Nalezen vóór Deck-vermelding in marketing. | BLA | Vóór de Steam-pagina |
-| 4 | Merkenregel in de credits (§3 punt 4) opnemen. | Narrative Designer, met de BLA | Bij de credits |
-| 5 | Optioneel: de vormen ook opnemen in `docs/licenties.md` als "eigen werk" (net als Polderletter, stijlgids §10 punt 7). | BLA | Geen haast |
+| 4 | Merkenregel in de credits (§3 punt 4) opnemen; de definitieve tekst staat in `docs/productie/credits.md` §5.3. | Narrative Designer, met de BLA | Bij de credits |
+| 5 | ~~De vormen opnemen in `docs/licenties.md` als "eigen werk"~~ **Afgerond:** staat in `docs/licenties.md` §2. | — | — |
 | 6 | De merkenregel noemt de werktitel *Polderlight*; mee wijzigen na de formele merkcheck (#24, 3A). | BLA | Na de merkcheck |
 
 ## 5. Bronnen (geraadpleegd 2026-11-10)
@@ -80,5 +80,6 @@ Hoort bij: `docs/art/ui-stijlgids.md` §10 punt 15 en §13; `docs/ux/hud-menus.m
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 1.2 | 2026-11-10 | §4 punt 5 afgerond (eigen werk in `docs/licenties.md` §2); punt 4 verwijst naar credits.md §5.3 (#87, PR #159). |
 | 1.1 | 2026-11-10 | Na de Lead-review van de EP (PR #145): namen 🟠 (met voorwaarden), blogbron over EUIPO geschrapt, DUALSHOCK-bron als niet geverifieerd gemarkeerd, budgetregel specialist, open punt 6. |
 | 1.0 | 2026-11-10 | Eerste versie (#87, stijlgids §10 punt 15). |
