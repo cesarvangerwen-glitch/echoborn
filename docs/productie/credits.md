@@ -4,7 +4,7 @@ Versie 0.1 · 2026-11-10 · eigenaar: Producer, met de Business/Legal Advisor (B
 
 Dit document geeft de **inhoud** van het credits-scherm (`docs/ux/hud-menus.md` MN-37, §7 punt 18). Indeling en bediening staan in hud-menus §4.9 (MN-35, MN-36); de mock-up is `menu_credits_x2_placeholder.png` (`docs/art/ui-stijlgids.md` §12.6, script `docs/art/ui/bron/genereer_menu_placeholder.py`).
 
-**Werkaanname (fase-2-kader §5):** W7 en W8 van hud-menus §0: het scherm is een placeholder vóór F0, het font is Polderletter (eigen werk, stijlgids §4). Verder: de namen en rollen in §3 zijn een voorstel tot de CEO beslist (§4); de licentieteksten in §5 zijn wat `docs/licenties.md` nu vraagt, tot de BLA bevestigt (§6).
+**Werkaanname (fase-2-kader §5):** hud-menus W7 (de spec is de versie vóór F0), stijlgids W7 (de credits-mock-up is een placeholder) en stijlgids §4 (het font is Polderletter, eigen werk). Verder: de namen en rollen in §3 zijn een voorstel tot de CEO beslist (§4); de licentieteksten in §5 zijn wat `docs/licenties.md` nu vraagt, tot de BLA bevestigt (§6).
 
 ## 1. Opbouw en volgorde
 
@@ -14,7 +14,7 @@ Blokken van een kop met de regels eronder (MN-35). Van boven naar beneden:
 |---|---|---|---|---|
 | 1 | Titel | — (`GAME_TITLE`, bestaat al) | *Polderlight* | besluit #96 |
 | 2 | Makers | `CREDITS_MADE_BY` | Wie het spel maakt: zie §3 en CEO-vraag §4 | — |
-| 3 | Rollen | `CREDITS_ROLES` (of een kop per vakgebied, zie §4) | De AI-rollen, volgens de keuze in §4 | `studio/roles/` |
+| 3 | Rollen | per vakgebied `CREDITS_TEAM_*` (§3; optie 1A, zie §4) | De AI-rollen, volgens de keuze in §4 | `studio/roles/` |
 | 4 | Gemaakt met | `CREDITS_MADE_WITH` | *Godot Engine* | MN-37 |
 | 5 | Lettertype | `CREDITS_FONT` | *Polderletter*, eigen werk van de studio (geen licentie van derden) | stijlgids §4, §10 punt 7 |
 | 6 | Merken | `CREDITS_TRADEMARKS` | De merkenregel (§5.3) | `docs/business/knop-glyphs-check.md` §3 punt 4 |
@@ -25,9 +25,10 @@ Waarom deze volgorde: eerst wie het maakte (wat spelers zoeken), dan het gereeds
 
 ## 2. Taal
 
-- **Koppen** worden vertaald (EN bron, NL). Voorstel EN/NL: *Made by / Gemaakt door*, *Roles / Rollen*, *Made with / Gemaakt met*, *Font / Lettertype*, *Trademarks / Merken*, *Licenses / Licenties*, *Thank you for playing / Bedankt voor het spelen*. De Narrative Designer schrijft de definitieve tekst.
+- **Koppen** worden vertaald (EN bron, NL). Voorstel EN/NL: *Made by / Gemaakt door*, de 7 vakgebieden (§3), *Made with / Gemaakt met*, *Font / Lettertype*, *Trademarks / Merken*, *Licenses / Licenties*, *Thank you for playing / Bedankt voor het spelen*. De Narrative Designer schrijft de definitieve tekst.
 - **Namen** worden niet vertaald (MN-37), ook *Godot Engine*, *Polderletter* en de merknamen niet (glyph-check §3 punt 6).
-- **Licentie- en merkteksten** blijven Engels in beide talen: het is de originele tekst die meegeleverd moet worden. Of een NL-vertaling ernaast moet of mag: BLA (§6 punt 3).
+- **Roltitels** (*Art Director*, *QA Lead*, …) gelden als **namen**: ze worden niet vertaald en komen niet in `strings.csv` (MN-37); alleen de vakgebied-koppen erboven worden vertaald. Zo blijven ze gelijk aan `studio/roles/`.
+- **Licentie- en merkteksten**: werkaanname tot de BLA beslist (§6 punt 3): in beide talen de originele Engelse tekst, zonder vertaling.
 
 ## 3. Namen en rollen (voorstel)
 
@@ -35,15 +36,15 @@ De studio is de CEO (een mens) en 26 AI-rollen (`studio/roles/`, Claude van Anth
 
 De rollen per vakgebied (voor optie 1A), in de volgorde van het organigram:
 
-| Vakgebied | Rollen |
-|---|---|
-| Leiding en productie | Executive Producer, Producer, Studio Manager, Workflow & Process Optimization Lead |
-| Ontwerp | Creative Director, Lead Game Designer, Systems Designer, Combat Designer, World & Level Designer, UX Designer, Narrative Designer |
-| Art | Art Director, Concept Artist, 2D Environment Artist, Animator, Technical Artist, UI Artist |
-| Audio | Audio Director, Composer/Sound Designer |
-| Code | Technical Director, Gameplay Programmer, Engine & Platform Programmer, Tools Programmer |
-| Kwaliteit | QA Lead |
-| Business | Business/Legal Advisor, Marketing & Community Manager |
+| Vakgebied (kop) | Sleutel (voorstel) | EN / NL (voorstel) | Rollen (namen, niet vertaald) |
+|---|---|---|---|
+| Leiding en productie | `CREDITS_TEAM_PRODUCTION` | Leadership & production / Leiding en productie | Executive Producer, Producer, Studio Manager, Workflow & Process Optimization Lead |
+| Ontwerp | `CREDITS_TEAM_DESIGN` | Design / Ontwerp | Creative Director, Lead Game Designer, Systems Designer, Combat Designer, World & Level Designer, UX Designer, Narrative Designer |
+| Art | `CREDITS_TEAM_ART` | Art / Art | Art Director, Concept Artist, 2D Environment Artist, Animator, Technical Artist, UI Artist |
+| Audio | `CREDITS_TEAM_AUDIO` | Audio / Audio | Audio Director, Composer/Sound Designer |
+| Code | `CREDITS_TEAM_CODE` | Programming / Code | Technical Director, Gameplay Programmer, Engine & Platform Programmer, Tools Programmer |
+| Kwaliteit | `CREDITS_TEAM_QA` | Quality / Kwaliteit | QA Lead |
+| Business | `CREDITS_TEAM_BUSINESS` | Business / Business | Business/Legal Advisor, Marketing & Community Manager |
 
 ## 4. CEO-vraag: namen en rollen in de credits
 
@@ -63,7 +64,7 @@ De credits moeten vóór de eerste publieke build zeggen wie het spel maakte (hu
 - **D. Geen vermelding van AI in de credits**: niet aanbevolen; staat los van een eventuele AI-melding op de Steam-pagina (BLA, §6 punt 5); € 0.
 
 **2. Hoe staat de CEO bovenaan?**
-- **A. Met de eigen naam, als maker en regie (bv. "Creative lead & producer")** ⭐ Aanbevolen: de mens achter het spel is zichtbaar; € 0.
+- **A. Met de eigen naam onder de kop *Made by* / *Gemaakt door*, zonder roltitel** (botst dan niet met de AI-rollen) ⭐ Aanbevolen: de mens achter het spel is zichtbaar; € 0.
 - **B. Alleen een studionaam (later te kiezen, met naamcheck)**: anoniemer; vraagt een naamkeuze en check (± 2–3 runs, € 0 tot de formele merkcheck).
 - **C. Eigen naam én een studionaam**: B en A samen; zelfde kost als B.
 
@@ -136,4 +137,5 @@ De definitieve tekst stemt de Narrative Designer af met de BLA (glyph-check §4 
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.1.1 | 2026-11-10 | Na de Lead-review van de EP (PR #156): werkaanname correct geciteerd; 7 kopsleutels `CREDITS_TEAM_*` met EN/NL; roltitels = namen (niet vertaald); voorbeeld bij 2A zonder roltitel; Engelse licentietekst als werkaanname. |
 | 0.1 | 2026-11-10 | Eerste versie (#87): opbouw, sleutels (voorstel), rollen, CEO-vraag namen en rollen, Godot-licentie, merkenregel, open punten voor de BLA. |
