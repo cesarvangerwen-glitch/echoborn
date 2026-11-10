@@ -6,18 +6,18 @@ extends "res://scripts/objects/sim_object.gd"
 ## autosave: `Progress.reach_checkpoint` meldt `checkpoint_reached`, en de
 ## autoload `SaveService` schrijft het slot (met `store_world` vlak ervoor).
 ##
-## - Alleen P1 (laag 2, E-05): de echo en P2 zetten geen checkpoint (C-08:
-##   in co-op respawnen beiden op het checkpoint van P1).
+## - Het vlak voelt alleen P1 (laag 2, E-05; LM-08: "aanraken telt alleen
+##   voor P1"). In co-op respawnen beiden op dat checkpoint (C-08).
 ## - De plek is `global_position + spawn_offset`: zet het object op de vloer.
 ## - Een gemaal is een checkpoint (LM-08: "het laatste gemaal dat P1
-##   aanraakte of pompte"): zet er een `Checkpoint` naast en wijs met
-##   `gemaal_path` (of `watch_gemaal`) naar het gemaal (deel 3b). Dan zet ook
-##   een pompslag van P1 dit checkpoint, zonder dat P1 in het vlak komt;
+##   aanraakte of dat P1 of P2 pompte"): zet er een `Checkpoint` naast en wijs
+##   met `gemaal_path` (of `watch_gemaal`) naar het gemaal (deel 3b). Dan zet
+##   ook een pompslag van P1 of P2 dit checkpoint, zonder dat P1 in het vlak komt;
 ##   alleen als het nog niet het checkpoint van nu is (`Progress.
 ##   is_current_checkpoint`), zodat pompen niet elke slag een save schrijft.
 ##   Wordt het gemaal vol terwijl dit het checkpoint van nu is, dan volgt nog
-##   één autosave (de volle stand bewaard). Werkaanname: een pompslag van de
-##   echo of van P2 zet geen checkpoint (LM-08 noemt P1; C-08).
+##   één autosave (de volle stand bewaard). Een pompslag van de echo zet geen
+##   checkpoint (LM-08): hij herhaalt alleen slagen van P1.
 ## - Geen blijvende stand: na laden begint het checkpoint los; een P1 die op
 ##   het checkpoint verschijnt, telt op die eerste tick als binnenkomen, maar
 ##   dat schrijft dezelfde plek nog een keer weg.
@@ -25,7 +25,8 @@ extends "res://scripts/objects/sim_object.gd"
 ##
 ## Werkt in stap (5) van E-07b, met een directe vormtest (A2).
 
-## P1 bereikte het checkpoint deze tick: in het vlak gekomen of gepompt.
+## P1 bereikte het checkpoint deze tick (in het vlak gekomen), of P1 of P2
+## pompte het gemaal.
 ## Hooguit één keer per tick.
 signal reached(tick: int)
 
@@ -59,7 +60,7 @@ func spawn_point() -> Vector2:
 	return global_position + spawn_offset
 
 
-## Een pompslag van P1 op dit gemaal zet dit checkpoint (LM-08, deel 3b).
+## Een pompslag van P1 of P2 op dit gemaal zet dit checkpoint (LM-08, deel 3b).
 func watch_gemaal(gemaal: Node) -> void:
 	_gemaal = gemaal
 	if not gemaal.pumped.is_connected(_on_pumped):
@@ -80,7 +81,7 @@ func sim_update(tick: int, bodies: Array[Node2D]) -> void:
 
 ## Stap (4), via `Gemaal.pumped` uit `Combat.hit`.
 func _on_pumped(tick: int, _amount: int, who: String) -> void:
-	if who != "p1":
+	if who != "p1" and who != "p2":
 		return
 	var target := _progress()
 	if target != null and target.is_current_checkpoint(spawn_point()):

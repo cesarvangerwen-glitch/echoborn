@@ -26,6 +26,13 @@ extends Node
 ##   zijn stand via `progress` (`Progress.bind_gemaal`, id `gemaal_id`) en
 ##   wordt verbonden met `Combat`; bij het ontladen gaat zijn stand naar
 ##   `game_state` (`Progress.unbind_gemaal`) en wordt het losgemaakt.
+## - Vijanden in de inhoud (LM-13): `verslagen` is een blijvende stand. Bij
+##   het laden van de inhoud, bij een kamerwissel van P1 en bij een respawn
+##   van P1 (de kamer van P1) blijft een verslagen vijand weg, behalve een
+##   terugkerende vijand (`CombatTarget.is_returning`) in een wijk waarvan het
+##   gemaal (`Kamer.wijk_gemaal`) niet vol is: die staat weer op zijn
+##   startplek met vol leven. Een weggebleven vijand is niet bij de Sim
+##   aangemeld en niet zichtbaar.
 ##
 ## Geen eigen `_physics_process`: de Sim roept `sim_track` aan na stap (3)
 ## van E-07b, vóór de echo de resets van P1 verwerkt. Een wijziging in wat
@@ -37,6 +44,7 @@ const Kamer = preload("res://scripts/world/kamer.gd")
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 const SimObject = preload("res://scripts/objects/sim_object.gd")
 const Gemaal = preload("res://scripts/light/gemaal.gd")
+const CombatTarget = preload("res://scripts/combat/combat_target.gd")
 
 ## P1 ging van kamer `van` naar `naar`. `reset` = geen buur (E-04a).
 signal kamer_gewisseld(tick: int, van: StringName, naar: StringName, reset: bool)
@@ -78,6 +86,8 @@ var flag_renames: Dictionary = {}
 var _order: Array[StringName] = []
 ## Per kamer de aangemelde objecten uit zijn inhoud, in boomvolgorde.
 var _objects: Dictionary = {}
+## Verslagen vijanden die niet bij de Sim zijn aangemeld (LM-13), {node: true}.
+var _away: Dictionary = {}
 var _partner_outside := false
 var _forced_unloaded: Dictionary = {}
 var _last_tick := -1
@@ -126,6 +136,9 @@ func validate() -> PackedStringArray:
 				errors.append("kamer '%s' heeft onbekende buur '%s'" % [id, buur])
 			elif not (kamers[buur] as Kamer).buren.has(String(id)):
 				errors.append("'%s' is buur van '%s', maar niet andersom (E-04a: altijd wederzijds)" % [buur, id])
+		var wijk := String(kamer.wijk_gemaal)
+		if wijk != "" and not kamers.has(StringName(wijk.get_slice("/", 0))):
+			errors.append("kamer '%s': wijk_gemaal '%s' begint niet met een kamer van dit gebied (<kamer_id>/<pad>)" % [id, wijk])
 	return errors
 
 
@@ -174,6 +187,9 @@ func start_errors(position: Vector2, kamer_id: StringName = &"") -> PackedString
 func sim_track(tick: int, p1: PlayerActor) -> bool:
 	_last_tick = tick
 	var switched := _track_p1(tick, p1)
+	# LM-13(c), (5): binnenkomen of respawnen in de kamer van P1.
+	if switched or p1.died:
+		enter_room(huidige)
 	# C-08: stierf P1, dan zet de Sim P2 na deze stap naast hem (ook in een
 	# kamer die nu pas laadt). De plek van P2 van vóór de respawn telt dan
 	# niet als "in een ontladen kamer" (keuze (c), §3a).
@@ -212,6 +228,57 @@ func _track_partner(tick: int) -> void:
 	if outside and not _partner_outside:
 		partner_in_ontladen_kamer.emit(tick, p2, kamer)
 	_partner_outside = outside
+
+
+## LM-13(c): P1 komt kamer `id` binnen (kamerwissel of respawn). Elke
+## verslagen vijand die terugkomt, staat weer op zijn startplek met vol
+## leven; een weggebleven vijand wordt weer aangemeld, in boomvolgorde.
+## Levende vijanden blijven zoals ze zijn (LM-13d). Een kamer die net laadde,
+## heeft dit al bij het laden gehad; dan doet het niets meer.
+func enter_room(id: StringName) -> void:
+	if not _objects.has(id):
+		return
+	var kamer: Kamer = kamers[id]
+	for object: SimObject in _objects[id]:
+		if object is CombatTarget and not object.alive and _comes_back(kamer, object):
+			_revive(kamer, object)
+
+
+## LM-13(c): komt verslagen vijand `target` in `kamer` terug?
+func _comes_back(kamer: Kamer, target: CombatTarget) -> bool:
+	return target.has_persistent_state() and target.is_returning() and not is_wijk_full(kamer)
+
+
+## Is het gemaal van de wijk van `kamer` vol (LM-04)? Zonder wijk: nee. De
+## stand komt via `progress` (gebonden gemaal of `state`), anders uit
+## `game_state`.
+func is_wijk_full(kamer: Kamer) -> bool:
+	if kamer.wijk_gemaal == &"":
+		return false
+	var id := wijk_gemaal_id(kamer)
+	if progress != null:
+		return progress.is_gemaal_full(id)
+	if game_state != null:
+		return bool(game_state.gemalen.get(id, {}).get("vol", false))
+	return false
+
+
+## De id in `GameState.gemalen` van het gemaal van de wijk van `kamer`:
+## `<gebied>/<wijk_gemaal>`, of `wijk_gemaal` zonder gebied.
+func wijk_gemaal_id(kamer: Kamer) -> StringName:
+	if gebied == &"":
+		return kamer.wijk_gemaal
+	return StringName("%s/%s" % [gebied, kamer.wijk_gemaal])
+
+
+func _revive(kamer: Kamer, target: CombatTarget) -> void:
+	target.revive()
+	if game_state != null:
+		game_state.set_flag(_flag_of(kamer, target), false)
+	if _away.has(target):
+		_away.erase(target)
+		if sim != null:
+			sim.add_object(target)
 
 
 ## Staat P2 nu in een kamer die niet geladen is (stand van de laatste tick)?
@@ -381,10 +448,19 @@ func _attach_objects(kamer: Kamer) -> void:
 	if sim == null and not found.is_empty():
 		push_error("AreaLoader: kamer '%s' heeft %d objecten in zijn inhoud, maar er is geen Sim (eerst Sim.set_area_loader)" % [kamer.id(), found.size()])
 	for object in found:
+		if object is CombatTarget:
+			object.remember_start()
 		if game_state != null and object.has_persistent_state():
 			object.set_persistent_state(game_state.has_flag(_flag_of(kamer, object)))
 		if object is Gemaal:
 			_bind_gemaal(kamer, object)
+		# LM-13(c): een verslagen vijand blijft weg, of komt terug.
+		if object is CombatTarget and not object.alive:
+			if _comes_back(kamer, object):
+				_revive(kamer, object)
+			else:
+				_away[object] = true
+				continue
 		if sim != null:
 			sim.add_object(object)
 
@@ -396,7 +472,9 @@ func _detach_objects(kamer: Kamer) -> void:
 	for object: SimObject in _objects[kamer.id()]:
 		if object is Gemaal:
 			_unbind_gemaal(kamer, object)
-		if sim != null:
+		if _away.has(object):
+			_away.erase(object)
+		elif sim != null:
 			sim.remove_object(object)
 	_objects.erase(kamer.id())
 

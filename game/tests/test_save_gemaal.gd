@@ -6,8 +6,8 @@ extends RefCounted
 ##   en sluis (geëxporteerde paden), de lichtmeter en zijn stand (via
 ##   `Progress.bind_gemaal`) en een verbinding met `Combat`; bij ontladen gaat
 ##   zijn stand naar `state` en wordt het losgemaakt.
-## - Een pompslag van P1 zet het checkpoint naast het gemaal, ook zonder in
-##   het vlak te komen; de echo en P2 niet (werkaanname).
+## - Een pompslag van P1 of P2 zet het checkpoint naast het gemaal, ook
+##   zonder in het vlak te komen; de echo niet (LM-08).
 ##
 ## Elke test maakt een eigen `Progress` (en zo nodig `SaveService`) met een
 ## eigen map; de echte autoloads en `user://saves` blijven onaangeroerd.
@@ -193,10 +193,12 @@ func test_gemaal_in_streamed_room(t) -> void:
 	await t.cleanup()
 
 
-## Pompen zet een checkpoint (deel 3b, punt 2; LM-08 "aanraakte of
-## pompte"): P1 komt niet in het vlak. Treffers van de echo of P2 zetten
-## niets; de eerste pompslag van P1 wel (met autosave, G al bijgewerkt);
-## volgende slagen niet opnieuw; vol worden geeft nog één save.
+## Pompen zet een checkpoint (deel 3b, punt 2; LM-08 "aanraakte of dat P1
+## of P2 pompte"): P1 komt niet in het vlak. Een treffer van de echo zet
+## niets; de eerste pompslag van P2 wel (met autosave, G al bijgewerkt);
+## volgende slagen (ook van P1) niet opnieuw; vol worden geeft nog één save.
+## Na een ander checkpoint zet een slag van P1 het gemaal weer, een slag van
+## de echo niet (gdd §4.6, LM-08: het checkpoint blijft het andere).
 func test_pump_sets_checkpoint(t) -> void:
 	_clear()
 	var sim_first = Fx.world(t)
@@ -230,22 +232,26 @@ func test_pump_sets_checkpoint(t) -> void:
 	var cp_ticks: Array = []
 	checkpoint.reached.connect(func(tick: int) -> void: cp_ticks.append(tick))
 	_strike(sim, "echo", Layers.SHADOW)
-	_strike(sim, "p2", Layers.SHADOW)
-	t.check(gemaal.fill == 20 and reached.is_empty(), "echo of P2 zette een checkpoint: %s (G %d)" % [reached, gemaal.fill])
+	t.check(gemaal.fill == 10 and reached.is_empty(), "echo zette een checkpoint: %s (G %d)" % [reached, gemaal.fill])
 	await t.run_ticks(sim, 1)
-	_strike(sim, "p1", Layers.LIGHT)
+	await t.run_ticks(sim, 1)
+	_strike(sim, "p2", Layers.SHADOW)
 	t.check(not checkpoint.overlaps(p1), "P1 staat in het vlak (testopzet)")
 	t.check(reached == [[&"C", checkpoint.spawn_point()]] and cp_ticks == [sim.tick],
-		"pompslag van P1 zette geen checkpoint: %s" % [reached])
+		"pompslag van P2 zette geen checkpoint: %s" % [reached])
 	var stored: GameState = SaveService.read(service.path_of(2))["state"]
 	t.check(saves.size() == 1 and saves[0] == [2, "checkpoint", OK] and stored != null
 		and stored.checkpoint_kamer == &"C" and stored.gebied == GEBIED
-		and stored.gemalen.get(id) == {"vulstand": 30, "vol": false},
+		and stored.gemalen.get(id) == {"vulstand": 20, "vol": false},
 		"autosave na de pompslag: %s %s" % [saves, stored.to_dict() if stored else null])
 	await t.run_ticks(sim, 1)
 	_strike(sim, "p1", Layers.LIGHT)
-	t.check(reached.size() == 1 and saves.size() == 1 and gemaal.fill == 40,
+	t.check(reached.size() == 1 and saves.size() == 1 and gemaal.fill == 30,
 		"tweede pompslag schreef opnieuw: %d saves" % saves.size())
+	await t.run_ticks(sim, 1)
+	_strike(sim, "p1", Layers.LIGHT)
+	t.check(reached.size() == 1 and saves.size() == 1 and gemaal.fill == 40,
+		"derde pompslag schreef opnieuw: %d saves" % saves.size())
 	# Vol: nog één save, met het volle gemaal.
 	gemaal.fill = 90
 	await t.run_ticks(sim, 1)
@@ -259,6 +265,10 @@ func test_pump_sets_checkpoint(t) -> void:
 	await t.run_ticks(sim, 1)
 	gemaal.fill = 50
 	gemaal.full_tick = -1
+	_strike(sim, "echo", Layers.SHADOW)
+	t.check(saves.size() == before and progress.state.checkpoint_positie == IN_B,
+		"echo zette het gemaal terug als checkpoint: %s" % [progress.state.checkpoint_positie])
+	await t.run_ticks(sim, 1)
 	_strike(sim, "p1", Layers.LIGHT)
 	t.check(saves.size() == before + 1 and progress.state.checkpoint_positie == checkpoint.spawn_point(),
 		"pompen na een ander checkpoint: %s" % [progress.state.checkpoint_positie])

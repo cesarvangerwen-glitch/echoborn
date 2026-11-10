@@ -344,3 +344,30 @@ func test_no_checkpoint_respawn_without_death(t) -> void:
 		and p1.health == int(Tuning.combat()["p1_health"]) - 1,
 		"terugzetten: P1 op %s, died %s, %d levenspunten" % [p1.position, p1.died, p1.health])
 	await t.cleanup()
+
+
+## Randgeval (§7): P1 valt op 0 en bereikt daarna, nog vóór de respawntick,
+## een nieuw checkpoint (stap 5 van `t0 − 1`, hier `reach_checkpoint` tussen
+## de ticks). Dan respawnt P1 op het nieuwe checkpoint, dat ook in de save
+## staat, en `requested` meldt de nieuwe plek. Na de respawn verplaatst een
+## nieuw checkpoint de respawn niet meer.
+func test_checkpoint_after_last_hit_is_respawn_point(t) -> void:
+	var p := _progress(t, false)
+	var progress: Progress = p["progress"]
+	var w := _world(t, p["sim"], progress)
+	var sim = w["sim"]
+	var p1: PlayerActor = w["p1"]
+	await _reach_checkpoint_then_leave(w, t)
+	t.check(progress.state.checkpoint_positie == CHECKPOINT_AT, "eerste checkpoint niet gezet")
+	var t0 := _kill(p1, sim)
+	var nieuw := IN_A + Vector2(80, 0)
+	progress.reach_checkpoint(nieuw)
+	t.check(w["requests"] == [[t0, CHECKPOINT_AT, true], [t0, nieuw, true]], "verzoeken: %s" % [w["requests"]])
+	await t.run_ticks(sim, 1)
+	t.check(p1.died and p1.position.distance_to(nieuw) < 1.0 and progress.state.checkpoint_positie == nieuw,
+		"respawn op %s, save heeft %s (verwacht %s)" % [p1.position, progress.state.checkpoint_positie, nieuw])
+	progress.reach_checkpoint(IN_A)
+	await t.run_ticks(sim, 1)
+	t.check(not p1.died and p1.position.distance_to(nieuw) < 3.0 and w["requests"].size() == 2,
+		"checkpoint na de respawn verplaatste P1: %s, %s" % [p1.position, w["requests"]])
+	await t.cleanup()

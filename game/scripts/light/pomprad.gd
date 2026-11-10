@@ -10,6 +10,13 @@ extends "res://scripts/combat/combat_target.gd"
 const HURTBOX := Vector2(32, 48)
 
 
+## Geen blijvende stand (LM-13 geldt niet): ook vóór `setup_pomprad`, als de
+## soort nog op ENEMY staat (`AreaLoader.known_object_flags` maakt de inhoud
+## buiten de boom aan).
+func has_persistent_state() -> bool:
+	return false
+
+
 func setup_pomprad() -> void:
 	setup_target(Kind.DUMMY)
 	name = "Pomprad"
