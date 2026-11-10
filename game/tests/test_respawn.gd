@@ -388,6 +388,8 @@ func test_checkpoint_after_last_hit_is_respawn_point(t) -> void:
 ## respawntick, met x, y = de plek waar P1 werkelijk verschijnt (het nieuwe
 ## checkpoint), en telt één respawn. Het log leest `echo_reset` van P1 na de
 ## tick, niet `requested`: twee meldingen geven zo nooit twee regels.
+## Twee `RESPAWN`-regels op één tick zijn volgens gdd §4.5 een fout in het
+## log: een tweede regel laat deze test falen (`rows.size() == 1`).
 func test_meetlog_one_respawn_row_when_requested_twice(t) -> void:
 	var p := _progress(t, false)
 	var progress: Progress = p["progress"]
