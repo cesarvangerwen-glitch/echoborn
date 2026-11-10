@@ -1,8 +1,8 @@
 # Kamers: de grijze flow-kamer (mijlpaal 1, F0)
 
-Versie 0.3 · Eigenaar: World & Level Designer (met Gameplay Programmer) · Taak T16b (`docs/productie/fase-2-kader.md` §2) · Reviewer: Lead Game Designer
+Versie 0.4 · Eigenaar: World & Level Designer (met Gameplay Programmer) · Taak T16b (`docs/productie/fase-2-kader.md` §2) · Reviewer: Lead Game Designer
 Bron: `docs/design/gdd.md` v0.4 §2.5a, §2.12, §4 (flow-kamer-spec, bouwstenen B1–B4, FK-1–FK-6, MP-1–MP-7) en `docs/concept/pitch.md` v0.4.
-Scène: `game/levels/flowkamer/flowkamer.tscn` (hoofdscène van het project). Code: `game/levels/flowkamer/` (kamer, maten, vijanden, meetlog, gescripte run, normberekening) en `game/scripts/light/` (lichtmeter, gemaal, pomprad). Tests: `game/tests/test_flowkamer.gd`.
+Scène: `game/levels/flowkamer/flowkamer.tscn` (hoofdscène van het project). Code: `game/levels/flowkamer/` (kamer, maten, vijanden, meetlog, gescripte run, normberekening) en `game/scripts/light/` (lichtmeter, gemaal, pomprad). Tests: `game/tests/test_flowkamer.gd` (solo) en `game/tests/test_flowtest_duo.gd` (co-op, [#125](https://github.com/cesarvangerwen-glitch/echoborn/issues/125)).
 
 ![Gescripte geoefende run bij D = 120](img/flowkamer_run_D120.png)
 
@@ -39,7 +39,7 @@ Alle maten uit gdd §4.3; per bouwsteen alleen wat ik koos of moest kiezen.
 
 | Bouwsteen | Ligging | Echolijn | Langzame lijn | Keuzes |
 |---|---|---|---|---|
-| **B4 Lanceerkloof** | Vloer 610, kloof x 1190–1350 (160 px), bodem 700; aanloop 90 px; ≥ 180 px vrij boven kloof en aanloop | Lancering (C-11): solo slaan en AANVAL ≥ 30 ticks vasthouden aan de rand, op de echo springen. **Werkt pas met T16c (#78)**; de maten liggen er nu al voor | Kloof in, 160 px, trede van 45 en dan de vloer | Ligt aan het begin van de run, met de gezichtsrichting naar links (naar de kloof). De landing aan de overkant (± 190 px) blijft vrij van het plafond van de startgang (x < 1150). Nog niet getest met een lancering |
+| **B4 Lanceerkloof** | Vloer 610, kloof x 1190–1350 (160 px), bodem 700; aanloop 90 px; ≥ 180 px vrij boven kloof en aanloop | Lancering (C-11). Solo: aan de rand (x 1352) slaan en AANVAL 32 ticks vasthouden, springen als de echo nog 24 px van je is; je landt op hem terwijl hij in houding staat. Co-op: P1 staat in houding aan de rand, P2 springt op hem; P1 neemt de langzame lijn | Kloof in, 160 px, trede van 45 en dan de vloer | Ligt aan het begin van de run, met de gezichtsrichting naar links (naar de kloof). De landing aan de overkant (± 190 px, gemeten x ± 1164 met LEFT vast na de lanceerstaat) blijft net vrij van het plafond van de startgang (x < 1150). Getest solo en co-op, alle D |
 | **B3 Lus** | Kom links onder: vloer 190 px (x 140–330), blok van 45 px tegen de linkerwand met bovenkant B = D − 60 (30 / 60 / 120), galerij op 70 px (y = 540) die 40 px de kom in steekt | Door de kom, op het blok, keren, **van de blokrand afspringen** en op de echo landen die net door de ingang komt, bounce (zo nodig dash) naar de galerij | Eenrichtingstrede van 35 px (x 250–290) en dan de galerij | Gespiegeld (ingang rechts, blok links), want de route komt van rechts. De trede is een dunne eenrichtingsrichel: P1 en de echo lopen eronder door de kom in. Het blok wisselt van breedte met D (debugmenu start dan een nieuwe run) |
 | **B1 Keren-opstap** | Gang van 320 px op y = 540 (x 330–650), wand rechts, galerij op 90 px (y = 450) over de hele gang | Naar de wand, keren, op de echo als hij ± 130 px vóór je is, bounce naar de galerij | Eenrichtingstrede op 45 px tegen de wand, dan de wandtop | De gang is ook de B3-galerij; de wandtop is de vloer van B2 |
 | **B2 Zigzag omhoog** | Schacht x 650–1130 (480 px), vloer 450, richels van 416 px op 90 / 180 / 270 / 360 (y 360, 270, 180, 90), om en om tegen links en rechts | Per verdieping keren, op de echo, bounce naar de volgende richel | Per verdieping een eenrichtingstrede op 45 px tegen de keerwand | Ingang links onder; de vierde richel loopt over in de bovenroute |
@@ -88,6 +88,7 @@ Elke run schrijft `user://meetlog_<datum-tijd>_<solo|coop>_D<D>_p1.csv` (gdd §4
 | Norm | Wat in de CSV | Event(s) |
 |---|---|---|
 | (1) stilstand, MP-1 | Elke stilstand van P1 met lengte | `STIL_START`, `STIL_EIND` (definitie T16a, `meetlog.gd`) |
+| MP-7 (b), co-op | Elke stilstand van P2 met lengte, in dezelfde CSV (werkaanname W5, `testplan-f0.md` §6; [#125](https://github.com/cesarvangerwen-glitch/echoborn/issues/125)) | `STIL_START`, `STIL_EIND` met bron `p2`; voor MP-1 van P1 filter je op bron `p1` |
 | (2) echo-acties, MP-2 | Springplank-landing, merksprong met ontploffing (eerste schakel), later lancering en vang | `SPRINGPLANK`, `BOUNCE`, `MERKSPRONG`, `ONTPLOFFING`, (`LANCERING`, `VANGEN`: T16c) |
 | (3) vloeiend, MP-5 | Score 1–5 per kamer na de run | `SCORE` (waarde = score, bron = kamer) |
 | R-V12, MP-3 | Landingen en de stilstanden ervoor | `SPRINGPLANK` + `STIL_*` |
@@ -101,26 +102,53 @@ Elke run schrijft `user://meetlog_<datum-tijd>_<solo|coop>_D<D>_p1.csv` (gdd §4
 
 - **Spelen**: open `game/` in Godot 4.6.3 en start het project (F5). P1: A/D lopen, spatie springen, linker Shift dash, E aanval/pompen, Q 0,5 s = Loslaten. P2: Enter doet mee, Backspace 1 s stopt (via de InputRouter; de echte drop-in/out is T16c).
 - **Debugmenu** (§4.1): F1/F2/F3 = D 90/120/180 (nieuwe run, met het B3-blok van die D), F4 = echo aan/uit (nieuwe run), F5 = meetlog aan/uit, F6 = herstart. Na de run: 1–5 per kamer.
-- **Headless**: `godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd`. `test_flowkamer.gd` bouwt de kamer per D, draait de gescripte run (moet `RUN_EIND` en de normen halen), speelt de run van D = 90 opnieuw af met een `ScriptedInput` (zelfde log), en draait per D de run met echo uit (FK-2). De run met echo uit bij D = 180 duurt 6020 ticks; de runner geeft een test 7200 frames.
+- **Headless**: `godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd`. `test_flowkamer.gd` bouwt de kamer per D, draait de gescripte run (moet `RUN_EIND` en de normen halen), speelt de run van D = 90 opnieuw af met een `ScriptedInput` (zelfde log), en draait per D de run met echo uit (FK-2). De run met echo uit bij D = 180 duurt 6020 ticks; de runner geeft een test 7200 frames. `test_flowtest_duo.gd` draait per D de gescripte co-op-run (`flow_duo.gd`, §9) en die van D = 120 twee keer (zelfde log).
 
 ## 9. Gemeten met de gescripte geoefende run
 
-Solo, uit het meetlog berekend (`flow_report.gd`). Dit zijn geen speltestresultaten: de bot laat zien dat de kamer de normen **kan** halen (gdd §4.5). Mensen meten in T17.
+Uit het meetlog berekend (`flow_report.gd`; co-op met de MP-7-code van `test_flowtest_t17.gd`). Dit zijn geen speltestresultaten: de runs laten zien dat de kamer de normen **kan** halen (gdd §4.5). Mensen meten in T17.
+
+**Solo** (`flow_bot.gd`, sinds #125 met de lancering in B4):
 
 | | D = 90 | D = 120 | D = 180 | Norm |
 |---|---|---|---|---|
-| Runtijd | 63,5 s | 65,4 s | 76,6 s | ≤ 120 s |
-| LP na K1 + één keer K2 | 108 | 108 | 108 | ≥ 100 |
+| Runtijd | 64,4 s | 66,8 s | 78,9 s | ≤ 120 s |
+| LP na K1 + één keer K2 | 115 | 115 | 115 | ≥ 100 |
 | MP-1 langste stilstand | 107 ticks | 137 | 197 | ≤ 300 |
-| MP-2 echo-acties/min (K1 / K2) | 14,2 (8,8 / 39,9) | 12,8 (8,6 / 34,4) | 11,0 (8,1 / 22,3) | ≥ 3,0, ook per kamer |
+| MP-2 echo-acties/min (K1 / K2) | 15,8 (11,5 / 39,9) | 14,4 (11,1 / 34,4) | 12,2 (10,3 / 22,3) | ≥ 3,0, ook per kamer |
 | MP-2 langste gat | 13,5 s | 12,8 s | 14,9 s | ≤ 40 s |
-| MP-3 landingen/min, zonder wachten | 4,7 / 100 % | 4,6 / 100 % | 3,9 / 100 % | ≥ 75 % |
+| MP-3 landingen/min, zonder wachten | 5,6 / 83 % | 5,4 / 83 % | 4,6 / 83 % | ≥ 75 % |
 | MP-4 echo Leeg | 2 % | 3 % | 4 % | ≤ 40 % |
-| MP-6 LP met de echo, pompslagen echo | 81 %, 5 | 81 %, 5 | 81 %, 5 | ≥ 40 %, ≥ 1 |
+| MP-6 LP met de echo, pompslagen echo | 83 %, 5 | 83 %, 5 | 83 %, 5 | ≥ 40 %, ≥ 1 |
 | Echo breekt | 0 | 0 | 0 | 0 (FK-4) |
-| **Echo uit** (FK-2): runtijd, terugkeren K2 | 98,8 s (1,55×), 2 | 99,3 s (1,52×), 2 | 100,3 s (1,31×), 2 | ≤ 2×, ≤ 4 |
+| **Echo uit** (FK-2): runtijd, terugkeren K2 | 98,8 s (1,53×), 2 | 99,3 s (1,49×), 2 | 100,3 s (1,27×), 2 | ≤ 2×, ≤ 4 |
 
-De langste stilstand zit telkens aan de waterkant in K3: P1 wacht tot de echo zijn pompslagen herhaald heeft en het water zakt (± D + 40 ticks).
+De langste stilstand zit telkens aan de waterkant in K3: P1 wacht tot de echo zijn pompslagen herhaald heeft en het water zakt (± D + 40 ticks). De lancering in B4 kost een wachttijd aan de rand (P1 springt pas als de echo eraan komt, ± D − 12 ticks na zijn slag) en is daarom de enige landing met stilstand ervoor (MP-3 83 %, 6 van 7). Ze is solo **trager** dan de langzame lijn: de runtijd gaat + 0,9 / + 1,4 / + 2,3 s omhoog bij D = 90 / 120 / 180 (vóór #125: 63,5 / 65,4 / 76,6 s). Dat volgt uit gdd §4.3 ("je wacht 69 / 99 / 159 ticks"); ze levert wel een actie en licht op (LP na K1 + K2: 108 → 115). Punt voor de LGD, bij antwoord 1 in §12.
+
+**Co-op** (`flow_duo.gd`, #125): een geoefend duo, P1 en P2 allebei gescript. B4: P1 in houding aan de rand, P2 vliegt over. B3, B1 en B2: op elk niveau loopt de drager heen en weer onder het volgende niveau, de springer springt al lopend op hem en bounct omhoog, de drager neemt de trede; de rollen wisselen elk niveau (springer P1 in B3, B2-0, B2-2; P2 in B4, B1, B2-1, B2-3). K2: wie een merk van de ander ziet, laat het knallen; anders zet hij een merk. K3: beiden pompen, aan elke kant van het pomprad één. P2 doet mee vóór de eerste tick.
+
+| | D = 90 | D = 120 | D = 180 | Norm |
+|---|---|---|---|---|
+| Runtijd | 57,5 s | 57,5 s | 57,5 s | — |
+| MP-1 langste stilstand P1 | 86 ticks | 86 | 86 | ≤ 300 |
+| MP-2 samenwerkingsacties/min (K1 / K2) | 19,8 (12,4 / 57,1) | gelijk | gelijk | ≥ 3,0, ook per kamer |
+| MP-2 langste gat | 531 ticks (8,9 s) | gelijk | gelijk | ≤ 2400 |
+| MP-3 landingen/min, zonder wachten | 8,4 / 88 % | gelijk | gelijk | ≥ 75 % |
+| Lancering (B4) · bounce P1 / P2 · merk-combo (K2) | 1 (1) · 3 / 3 · 10 (10) | gelijk | gelijk | vraag 8: lancering ≥ 1 |
+| MP-4 zonder tweede lichaam (W4) | 0 % | 0 % | 0 % | ≤ 40 % |
+| MP-6 LP met P2 of samen; pompslagen P2 | 92 % van 120; 5 | gelijk | gelijk | ≥ 40 %; ≥ 1 |
+| MP-7 (a) runtijd co-op ÷ solo | 0,89 | 0,86 | 0,73 | ≥ 0,5 |
+| MP-7 (b) langste stilstand P2 (W5) | 73 ticks | 73 | 73 | ≤ 300 |
+| MP-7 (c) samenwerkingsacties/min per speler (W6) | 19,8 | 19,8 | 19,8 | ≥ 1,0 |
+| MP-7 (d) P2 opgelost | 0 % | 0 % | 0 % | ≤ 10 % |
+
+Wat dit zegt:
+
+- **De kamer kan de normen in co-op halen**, bij elke D, met de lancering, bounce in beide richtingen, merk-combo's en pompslagen van P2. MP-1, MP-2, MP-4, MP-6 en MP-7 (b)–(d) zijn daarom checks in de test (zoals de solo-run in `test_flowkamer.gd`); MP-3 en MP-7 (a) staan alleen in de uitvoer.
+- **In co-op maakt D voor deze kamer niets uit**: er is geen echo (C-01), D zit alleen nog in de levensduur van een merk (D + 30), en het duo laat elk merk ruim binnen 120 ticks knallen. Het B3-blok gebruikt het duo niet: de drager gaat gewoon onder de galerij staan.
+- **Een geoefend duo is sneller dan solo** (0,73–0,89×), maar ver binnen "niet meer dan 2× zo snel". P1 is na 38,8 s in K2: in K1 neemt elke drager de langzame lijn, dus daar wint het duo weinig. De winst zit vooral in K2 (twee slagers die elkaars merken laten knallen) en K3 (twee pompers; 117 LP na één keer K2, dus geen terugkeer).
+- **Lancering en vang zijn één actie** (LGD, antwoord 6 in §12): MP-2 en MP-7 (c) in `test_flowtest_duo.gd` tellen een lancering nu nog twee keer (`SPRINGPLANK` en `LANCERING` op dezelfde tick); MP-3 telt haar al als één landing (`flow_report.gd` telt alleen `SPRINGPLANK`). Met één actie per contact blijven MP-2 en MP-7 (c) ruim gehaald (één actie minder per run).
+- **MP-3 in co-op meet de stilstand van de springer** (LGD, antwoord 7 in §12). De 88 % hierboven komt nog uit de stilstand van P1, ook als P1 de drager is: tot punt 3 van #125 klaar is, is het alleen indicatief.
 
 ## 10. Checklist levelregels (WLD; review LGD)
 
@@ -132,7 +160,7 @@ De langste stilstand zit telkens aan de waterkant in K3: P1 wacht tot de echo zi
 | FK-4 echo breekt niet | ja | Geen schaduwgeometrie, `FelLicht` of `Schaduwgevaar`; 0 × `BREEK` |
 | FK-5 pomprad in de route | ja | 30 px boven de vloer, lopend en springend te raken, geen vijand binnen 80 px |
 | FK-6 maten | ja | Echolijnen 70–90 px; treden ≤ 45 px; te overspringen gaten ≤ 64 px (B2, trap). De kloof van B4 (160) en het gat van B3 (150) hoef je niet over te springen: de langzame lijn gaat erdoorheen |
-| C-15 optioneel samenwerken | ja (solo) | Geen object of poort vraagt een samenwerkingsactie; één kamer voor solo en co-op. De co-op-run (C-15 (2)) volgt met T16c |
+| C-15 optioneel samenwerken | ja | Geen object of poort vraagt een samenwerkingsactie; één kamer voor solo en co-op. Met een meeloper ≤ 2× de run met echo uit (`test_coop_deel2.gd`); de gescripte co-op-run haalt de normen (§9) |
 | L-02 | ja | Elke plek op de route is lopend te halen; geen plek alleen voor een live P2 |
 | L-03 | ja | De enige poort (sluis) gaat open door het gemaal |
 
@@ -146,8 +174,11 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 4. **K3 heeft een trap terug naar K2**, zodat wie te weinig licht heeft niet vastzit achter de dichte sluis.
 5. **`SCORE`** als extra event voor norm (3), in dezelfde CSV.
 6. **Drop-in/out is een plaatshouder** (P2 verschijnt op de echo of op P1); C-03–C-13 komen in T16c. In co-op telt de lichtmeter P2 als drager en ontsteker.
-7. **B4 neemt nu de langzame lijn**; de lancering werkt pas na T16c.
+7. **B4: de bot lanceert** (#125). Hij kijkt naar de echo, niet naar de klok: springen als de echo nog 24 px van P1 is (12 ticks vóór hij stilstaat), zodat de landing midden in de houding valt (gdd §4.3: afzet op T + D − 21 … T + D − 3). Wacht de bot 300 ticks zonder echo, of mist hij, dan de langzame lijn.
 8. Een wissel van D of echo aan/uit in het debugmenu start een nieuwe run (één CSV per D).
+9. **De gescripte geoefende co-op-run is een duo van twee bots** (`flow_duo.gd`, #125), elk een inputbron, net als `flow_bot.gd` alleen met wat spelers zien. Het duo gebruikt niet de proxy `_CoopView` uit `test_flowtest_t17.gd`: die laat de solo-bot P2 als echo lezen, en een levend lichaam kan, anders dan de echo, niet zelf omhoog zonder plank (`docs/qa/rapport-f0-flowtest.md` §4). Wel de MP-7-code van dat script, met W4–W6 (`docs/qa/testplan-f0.md` §6).
+10. **Het duo begint samen**: P2 doet mee vóór de eerste tick (C-03, echo Leeg: P2 verschijnt bij P1). Een geoefend duo drukt samen op start; de ondergrenzen van T17 laten P2 pas op tick D + 1 meedoen.
+11. **De drager wacht lopend** (± 30 px rond zijn plek) en blijft pas staan als de springer afzet; de springer springt al lopend (aanloop ≤ 66 px). Zo meet MP-3 geen wachten dat bij een geoefend duo niet hoort.
 
 ## 12. Bevindingen, antwoorden en open punten
 
@@ -158,13 +189,18 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 3. B3: afspringen van het blok wordt na T16c een vang (C-13); zo is het bedoeld.
 4. Diepwater vóór het gemaal vol: klopt met LM-06 en E-04b; er gaat geen LP verloren, wat de echo niet pompt, blijft in de meter.
 5. MP-1: de definitie uit T16a is de maat; `flow_report.gd` blijft zoals het is.
+6. Lancering (#125, PR #131): één contact = één actie (gdd §4.5 blijft). Een lancering of vang telt in MP-2 en MP-7 (c) één keer en in MP-3 als één landing; het log houdt beide events.
+7. MP-3 in co-op (#125, PR #131): de stilstand van de **springer** in de 120 ticks vóór zijn landing (R-V12: wie op zijn plank wacht). Wachten van de drager valt onder MP-1 en MP-7 (b).
 
 **Open punten**
 
 - K1–K3 worden na de AreaLoader (T5b) `Kamer`-nodes met de AreaLoader, in plaats van `Layout.NEIGHBOURS` (WLD).
 - Gameplay Programmer, in T16c: review van de fix in `tail_echo.gd` (E-08a negeert eenrichtingsrichels, `_is_free`).
 - Gameplay Programmer, in T16c: P1 die een richting vasthoudt tegen een wand op de vloer, is niet `on_floor` en springt niet (de bot laat één tick los).
-- WLD met Gameplay Programmer: B3 werkt met de vang (getest); B4 met de lancering nog toetsen, de gescripte run neemt daar nog de langzame lijn.
+- Gameplay Programmer, met punt 3 van #125: `flow_report.gd` en MP-7 (c) tellen `SPRINGPLANK` + `LANCERING`/`VANGEN` van dezelfde springer op dezelfde tick als één actie (antwoord 6); MP-3 in co-op meet de stilstand van de springer (antwoord 7).
+- LGD of QA Lead (uit de TD-review van PR #127): de CSV `…_p1.csv` bevat in co-op ook P2-regels, terwijl gdd §4.5 `_<speler>` zegt: bevestigen of gdd §4.5 aanpassen.
+- QA Lead (T17 deel 2, [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80)): de co-op-cijfers van het duo (§9) en de nieuwe solo-cijfers met lancering. Omdat de bot nu in B4 lanceert, veranderen ook de solo-runs van T17 (64,4 / 66,8 / 78,9 s, was 63,5 / 65,4 / 76,6 s) en de co-op-ondergrenzen (de schaduwpartner lanceert P1 in B4).
+- QA Lead of Gameplay Programmer bij T17 deel 2 ([#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80)), of de LGD past gdd §4.6 aan: co-op-replay per speler (de `recorded` van beide stoelen van `flow_duo.gd` afspelen als twee `ScriptedInput`s, met hetzelfde log; gdd §4.5/§4.6). De duo-test draait nu de bots twee keer opnieuw.
 - Gameplay Programmer: de springplank-reeks `n` opnieuw laten beginnen bij aflopen van de echo kan van `flow_meetlog.gd` naar `meetlog.gd`.
 - LGD: gdd §4.2 en FK-2 naar 4 + 5 vijanden.
 - LGD na T17: in B3 geeft de vang +3 tegen +5 voor landen plus bounce; met 4 + 5 vijanden haalt de gescripte run 108 LP na K1 + K2 (marge 8).
@@ -176,3 +212,4 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 | 0.1 | Eerste blockout van de flow-kamer (T16b) |
 | 0.3 | Lead-review: vijfde basisvijand in golf 2 (108 LP na K1 + K2), FK-2-grens en metingen bijgewerkt |
 | 0.2 | Merge met co-op 7A (#78): vang en lancering tellen in de lichtmeter (+3, +4), B3 landt met een vang; metingen bijgewerkt. Lead-review: FK-2-grens voor 4 + 4 vijanden voorgerekend (§4), FK-2-test per D, antwoorden van de LGD en open punten (§12) |
+| 0.4 | #125: de bot lanceert in B4 (solo); gescripte co-op-run `flow_duo.gd` met test per D; §9 solo bijgewerkt en co-op erbij; werkaannames 7, 9–11; Lead-review: antwoorden 6 en 7 van de LGD, open punten; SM-review: B4-check op de rolverdeling, open punt co-op-replay |

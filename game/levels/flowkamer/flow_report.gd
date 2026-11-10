@@ -14,6 +14,8 @@ var end := 0
 var duration := 0
 ## MP-1: langste stilstand van P1 (ticks).
 var longest_still := 0
+## MP-7 (b): langste stilstand van P2 (ticks; 0 solo of in een log van vóór #125).
+var longest_still_p2 := 0
 ## MP-2: echo-acties (tick, kamer).
 var actions: Array = []
 var actions_per_min := 0.0
@@ -72,8 +74,12 @@ func _compute(rows: Array, has_echo: bool) -> void:
 					seen_k3 = true
 			"STIL_EIND":
 				var n := int(row[3])
-				longest_still = maxi(longest_still, n)
-				still_runs.append([tick - n, tick - 1])
+				# Bron `p2` is MP-7 (b); P1 (bron `p1`) blijft MP-1 en MP-3.
+				if row[4] == "p2":
+					longest_still_p2 = maxi(longest_still_p2, n)
+				else:
+					longest_still = maxi(longest_still, n)
+					still_runs.append([tick - n, tick - 1])
 			"SPRINGPLANK", "LANCERING", "VANGEN":
 				actions.append([tick, row[1]])
 				if event == "SPRINGPLANK":

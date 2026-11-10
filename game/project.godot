@@ -21,9 +21,12 @@ SaveService="*res://scripts/save/save_service.gd"
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
-window/size/viewport_width.deck=1280
-window/size/viewport_height.deck=800
+window/size/viewport_width.deck=640
+window/size/viewport_height.deck=400
 window/size/mode.deck=3
+window/size/window_width_override.deck=1280
+window/size/window_height_override.deck=800
+window/stretch/mode.deck="viewport"
 window/vsync/vsync_mode.deck=1
 
 [internationalization]
