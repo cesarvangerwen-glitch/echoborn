@@ -84,7 +84,7 @@ De Business/Legal Advisor (BLA) neemt eruit over wat het dossier nodig heeft; de
 | **Bruto consumentenomzet** (incl. btw) | € 47.960 | € 194.850 | € 629.550 |
 | − btw/sales tax (gem. 12 %) | € 42.821 | € 173.973 | € 562.098 |
 | − terugbetalingen (10 %) | € 38.539 | € 156.576 | € 505.888 |
-| − Steam-aandeel (30 %) | **€ 26.977** | **€ 109.603** | **€ 354.122** |
+| − Steam-aandeel (30 %) | **€ 26.978** | **€ 109.603** | **€ 354.122** |
 | Netto per kopie voor de studio | € 6,74 | € 7,31 | € 7,87 |
 
 Rekenregel: netto = kopieën × gem. prijs incl. btw (afgerond zoals in de tabel) ÷ 1,12 × 0,90 × 0,70; bedragen afgerond op de euro. Bedragen zijn vóór vennootschapsbelasting en vóór eventuele kosten van een uitgever (we hebben er geen, #2).
