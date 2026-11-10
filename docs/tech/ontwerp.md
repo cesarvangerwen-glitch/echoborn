@@ -38,7 +38,7 @@ Main (Node2D, scenes/main.tscn)
 
 ```
 Main
-├── GameState (autoload)      fase, voortgang, vlaggen; enige bron voor save
+├── Progress (autoload)       voortgang (een GameState), vlaggen; enige bron voor save
 ├── InputRouter (autoload)    koppelt apparaten aan spelers, drop-in/drop-out
 ├── SaveService (autoload)    lezen/schrijven user://, versies, migratie
 ├── AreaLoader                laadt één gebied (scène per gebied), streamt kamers
@@ -108,13 +108,14 @@ Gebieden zijn losse scènes, zodat World & Level Designers parallel kunnen werke
 ### Objecten in gestreamde kamers (deel 2, R10)
 
 - **Aan- en afmelden**: na het `instantiate` van de inhoud zoekt de loader alle `SimObject`-nodes in boomvolgorde en meldt ze bij de Sim aan; ze doen in dezelfde tick al mee in stap (4) en (5). Bij ontladen meldt hij ze eerst af, daarna gaat de inhoud weg. De volgorde in `Sim.objects` hangt zo alleen af van de volgorde van laden, dus blijft deterministisch.
-- **Stand bewaren**: een object met een blijvende stand (nu de hendel, E-13) bewaart die als vlag in `loader.game_state` (een `GameState`, §7) onder `<kamer_id>/<pad in de inhoud>` (`AreaLoader.object_flag`). Schema v1 hoeft daarvoor niet te veranderen: vlaggen zijn al "alleen ware vlaggen". Bij laden zet de loader de stand terug vóór het aanmelden, zonder signaal; wie op een hendel reageert, leest `on` bij het laden. `store_objects()` schrijft de standen van de geladen kamers weg, vlak vóór een save. Zonder `game_state` begint een object na opnieuw laden in zijn standaardstand.
-- **Geen blijvende stand**: een drukplaat volgt de lichamen en begint na laden los. Vijanden (`CombatTarget`) mogen in de inhoud staan; afmelden haalt ze uit Combat en dooft hun merk, maar hun leven wordt niet bewaard: ze komen bij elk opnieuw laden terug (keuze (d)). Het gemaal bewaart zijn stand al apart in `GameState.gemalen` (LM-06) en hoort in de gebiedsscène, niet in gestreamde inhoud, tot T5b deel 3 het via de autoload koppelt.
+- **Stand bewaren**: een object met een blijvende stand (nu de hendel, E-13) bewaart die als vlag in `loader.game_state` (een `GameState`, §7) onder `<gebied>/<kamer_id>/<pad in de inhoud>` (`AreaLoader.object_flag`; zonder gebied `<kamer_id>/<pad>`). Het gebied staat erin omdat een kamer-id alleen binnen zijn gebied uniek is (deel 3a). Schema v1 hoeft daarvoor niet te veranderen: vlaggen zijn al "alleen ware vlaggen". Bij laden zet de loader de stand terug vóór het aanmelden, zonder signaal; wie op een hendel reageert, leest `on` bij het laden. `store_objects()` schrijft de standen van de geladen kamers weg, vlak vóór een save. Zonder `game_state` begint een object na opnieuw laden in zijn standaardstand.
+- **Geen blijvende stand**: een drukplaat volgt de lichamen en begint na laden los. Vijanden (`CombatTarget`) mogen in de inhoud staan; afmelden haalt ze uit Combat en dooft hun merk, maar hun leven wordt niet bewaard: ze komen bij elk opnieuw laden terug (keuze (d)). Het gemaal bewaart zijn stand apart in `GameState.gemalen` (LM-06) via `Progress.bind_gemaal` (deel 3a, §7) en hoort in de gebiedsscène, niet in gestreamde inhoud, tot deel 3b (§12).
+- **Hernoemen** (deel 3a): de vlag bevat de namen van kamer en object, dus hernoemen kost een bestaande save zijn stand. Daarom: (1) `AreaLoader.flag_renames` = `{oude vlag: nieuwe vlag}`, gezet in het script van de gebiedsscène, en toegepast door `Progress.bind_area_loader` vóór het laden; (2) `AreaLoader.unknown_flags(state)` geeft de vlaggen van dit gebied die bij geen object in de inhoud meer horen (`known_object_flags` maakt elke inhoud daarvoor even aan, buiten de boom); `bind_area_loader` geeft ze terug en logt ze als waarschuwing. Een vlag van een ander gebied of zonder kamer (een sluis) telt niet. Geen schemamigratie: vlaggen zijn inhoud, geen schema.
 - **Niet tijdens stap (4) of (5)**: `force_unloaded` vanuit een signaal van een object (stap 4/5) zou de lijst objecten veranderen terwijl de Sim erdoor loopt. Het debugmenu roept het tussen twee ticks aan.
 
 ### Gebruik (World & Level Designer, #77)
 
-Zet per kamer een `Area2D` met `kamer.gd` en een `CollisionShape2D` met een `RectangleShape2D` in de gebiedsscène; vul `kamer_id` en `buren` in (altijd wederzijds). In het script van de scène: `loader.collect(gebied)`, `sim.set_area_loader(loader)` en `loader.start(sim.tick, p1.position)`, na het plaatsen van P1. Het resultaat van `start` is de lijst fouten (leeg = goed). Objecten (`SimObject`) mogen in de `inhoud` van een kamer staan (deel 2); zet `loader.game_state` als hun stand moet blijven, en geef elk object een vaste naam (die zit in de vlag).
+Zet per kamer een `Area2D` met `kamer.gd` en een `CollisionShape2D` met een `RectangleShape2D` in de gebiedsscène; vul `kamer_id` en `buren` in (altijd wederzijds). In het script van de scène: `loader.collect(gebied)`, `sim.set_area_loader(loader)` en `loader.start(sim.tick, p1.position)`, na het plaatsen van P1. Het resultaat van `start` is de lijst fouten (leeg = goed). Objecten (`SimObject`) mogen in de `inhoud` van een kamer staan (deel 2); roep `Progress.bind_area_loader(loader, &"<gebied>")` aan (deel 3a, §7: zet `loader.game_state` en `loader.gebied`) als hun stand moet blijven, en geef elk object een vaste naam (die zit in de vlag). Hernoem je toch een kamer of een object met een stand, zet dan de oude vlag in `loader.flag_renames`.
 
 ## 4. Echo-systeem
 
@@ -279,7 +280,32 @@ De Sim laat hooguit één schaduwlichaam toe: een echo óf P2. `add_echo` weiger
 - **Deterministisch**: gesorteerde sleutels en getallen op volle precisie (`JSON.stringify(…, full_precision = true)`): dezelfde inhoud geeft hetzelfde bestand, en een positie komt exact terug.
 - **Laden op een checkpoint**: `AreaLoader.start(tick, checkpoint.positie, checkpoint.kamer)` begint in die kamer met zijn buren geladen, zonder kamerwissel.
 - `user://` is de map die Steam Cloud synchroniseert (Engine & Platform Programmer, nog te controleren op de Deck in T7).
-- Nog niet in v1: de autoloads `GameState` en `SaveService` uit §3, slots en menu's, autosave bij een checkpoint en bij afsluiten (§12).
+- Laden en opslaan via de autoloads hieronder (deel 3a); menu's en de teksten erbij komen met T10 (UX Designer, UI Artist).
+
+### Slots en autosave (deel 3a)
+
+**Werkaanname** (fasekader §5): LM-08 en LM-12 uit `gdd.md` v0.5 (een gemaal is een checkpoint; opslaan bij elk checkpoint en bij afsluiten), E-04b, C-08 (in co-op respawnen beiden op het checkpoint van P1); 3 slots (de UX Designer kan dat in T10 wijzigen). Levenspunten, waterstand per wijk `s`, vaardigheden en verzamelobjecten uit LM-12 staan nog niet in schema v1: die komen met versie 2 en een migratie, zodra T3c en de Gameplay Programmer ze bouwen.
+
+| Onderdeel | Rol |
+|---|---|
+| Autoload `Progress` (`scripts/save/progress.gd`) | Het lopende spel: `state` (een `GameState`, het schema) en `slot` (-1 = geen spel: dan wordt niets geschreven). Bindt de delen van de wereld die hun stand pas vlak vóór een save wegschrijven: `bind_area_loader(loader, gebied)` (begint een nieuw gebied; past `flag_renames` toe en geeft de onbekende vlaggen, §3a), `bind_meter`, `bind_gemaal(gemaal, id)` (zet de stand meteen terug, zonder signalen), `bind_sim` (speeltijd in ticks). `store_world()` schrijft alles naar `state`: eerst `AreaLoader.store_objects()`, dan lichtmeter en gemalen. `reach_checkpoint(positie)` zet het checkpoint (kamer via de loader) en meldt `checkpoint_reached`. |
+| Autoload `SaveService` (`scripts/save/save_service.gd`) | Dezelfde file als de statische laag (`write`, `read`, `migrate` blijven statisch). Daarbovenop: `slot_info(slot)` voor het menu, `load_slot`, `new_game`, `save_now(reden)`. Luistert naar `Progress.checkpoint_reached` (autosave) en maakt bij `NOTIFICATION_WM_CLOSE_REQUEST` een autosave bij afsluiten; het checkpoint blijft dan het laatste. Elke save roept eerst `Progress.store_world()` aan. Signaal `saved(slot, reden, fout)`. |
+| `Checkpoint` (`scripts/save/checkpoint.gd`) | Een `SimObject` (stap 5, directe vormtest, A2) dat alleen P1 voelt (laag 2). Komt P1 in het vlak (flank), dan `Progress.reach_checkpoint(global_position + spawn_offset)` en dus een autosave. Mag in gestreamde inhoud staan. Een gemaal is een checkpoint (LM-08): zet er een `Checkpoint` naast. |
+| `Gemaal.restore_state(vulstand, vol)`, `is_full()` | Een vol gemaal laadt meteen in zijn eindstand: water laag, sluis open, `full_tick = 0` (dus `full_tick >= 0` blijft "vol"), zonder `full` of `sluice_opened` opnieuw te melden. |
+
+De autoload heet `Progress` en niet `GameState` (zoals in de eerste doelstructuur): in GDScript gaat een autoload als typenaam vóór een lokale `const GameState = preload(...)`, en dan breekt elk script dat het schema zo gebruikt (nagemeten: parse-fouten in `test_save.gd`).
+
+**Stand van een slot** (`SaveService.SlotStatus`) en wat het spel toont (de teksten zelf: UX Designer en UI, T10, via Localization):
+
+| Stand | Wanneer | Menu |
+|---|---|---|
+| `LEEG` | Geen save en geen `.bak` | "Nieuw spel" |
+| `OK` | De save laadt | Laden |
+| `HERSTELD` | De save is kapot, de `.bak` laadt | Laden; het spel meldt één keer dat de voortgang sinds het vorige checkpoint weg is. De volgende save herstelt het slot (§7: een kapotte save vervangt nooit een goede back-up). |
+| `KAPOT` | Save én `.bak` kapot (of alleen een kapotte save) | Het slot is "beschadigd" en laadt niet; geen crash, geen half spel (`load_slot` verandert dan niets). Alleen "nieuw spel in dit slot": dan worden beide bestanden opzijgezet als `<pad>.kapot` en `<pad>.bak.kapot` (ongewijzigd, voor support), niet gewist. |
+| `NIEUWER` | Een save van een nieuwere versie van het spel | "Kan niet laden: nieuwere versie". Nieuw spel zet de bestanden ook opzij; ze worden nooit overschreven. |
+
+Een autosave tijdens een tick (het checkpoint in stap 5) schrijft synchroon; het bestand is klein (< 1 kB). Of dat op de Deck een hapering geeft, meet de Engine & Platform Programmer mee in T7 (R9).
 
 ## 8. Licht- en schaduwlagen
 
@@ -349,6 +375,7 @@ Spelers maskeren 1 + 4, echo's 1 + 5. Zo kan een echo door een lichtmuur heen en
 | `test_combat.gd` (20 tests) | E-10 en E-10a met de staart, schaduwmerk E-14, merksprong E-02m (incl. INTERACTIE op de opgenomen positie), C-11e, C-12 |
 | `test_meetlog.gd` (2 tests) | Meetlog deterministisch en volledig; stilstand MP-1 |
 | `test_area_loader.gd` (10 tests) | E-04a (1)–(5) en E-04e uit gdd §4.6: wissel naar een buur zonder reset en de echo door dezelfde doorgang (alle D), teleport naar een kamer die geen buur is = reset (alle D), Buiten bij een ontladen kamer (P1 valt door de plank, geen INTERACTIE), validatie, P2 wisselt nooit; streamen van inhoud en een doorloop door drie kamers zonder reset (FK-3, alle D). Deel 2: objecten in gestreamde inhoud doen mee vanaf de tick van laden en zijn weg na ontladen, een Eenmalige hendel komt via GameState terug (R10); `remove_object` voor een vijand; P2 in een ontladen kamer wordt één keer gemeld (keuze (c)); de startcontrole |
+| `test_save_slots.gd` (5 tests) | Deel 3a: stand van een slot (LEEG, OK, HERSTELD, KAPOT, NIEUWER), save én `.bak` kapot laadt niets en nieuw spel zet ze opzij; checkpoint → één autosave met de hendel vlak vóór de save weggeschreven (`store_objects`), flank, autosave bij afsluiten houdt het checkpoint, laden in de kamer van het checkpoint met de hendel om; alleen P1 zet een checkpoint; lichtmeter en gemaal terug (vol = water laag, sluis open, geen signalen); onbekende vlaggen en `flag_renames` |
 | `test_save.gd` (7 tests) | Opslaan → laden exact en bytegelijk; back-up bij een kapotte save; versies en migratie; laden op een checkpoint in de goede kamer met een Lege echo; een kapotte save vervangt geen goede back-up; een achtergebleven `.tmp` na een crash (twee crashpunten); bereikcontrole in `from_dict` |
 | `test_localization.gd` (7 tests) | Lokalisatie §8a: CSV geldig met Engels per sleutel, NL met dezelfde opmaakcodes als EN, elke gebruikte sleutel bestaat, geen harde spelerstekst in code of scènes (en de lint vangt die echt), taalkeuze, taalwissel EN/NL |
 
@@ -367,7 +394,7 @@ De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gave
 | R6 | Geen CI: tests draaien alleen als een agent of mens ze start. | Risico | GitHub Actions-workflow met dezelfde download en hetzelfde commando. Vraagt een besluit over Actions-minuten (EP). |
 | R7 | Spike-code (blokje, `spike_world.gd`) is geen productiecode. | Schuld | Vervangen in preproductie. `Motor` wordt de echte speler-controller van de Gameplay Programmer, met de regels uit §2. |
 | R9 | De AreaLoader streamt synchroon (§3a). Een grote kamer kan bij het laden een hapering geven op de Steam Deck. | Risico | Meten in T7 (Engine & Platform Programmer). Zo nodig de buren van de buren vooraf laden met `ResourceLoader.load_threaded_request`; de logische regel (wat geladen is) blijft gelijk, dus de echo-tests ook. |
-| R10 | ~~Objecten (`SimObject`) in gestreamde inhoud worden nog niet bij de Sim aan- en afgemeld, en hun stand gaat bij ontladen verloren.~~ | Afgelost | T5b deel 2 (§3a): aanmelden bij laden, afmelden bij ontladen, de stand via `GameState`-vlaggen; bewezen door `test_r10_objects_in_streamed_rooms`. Rest: het gemaal in gestreamde inhoud (deel 3). |
+| R10 | ~~Objecten (`SimObject`) in gestreamde inhoud worden nog niet bij de Sim aan- en afgemeld, en hun stand gaat bij ontladen verloren.~~ | Afgelost | T5b deel 2 (§3a): aanmelden bij laden, afmelden bij ontladen, de stand via `GameState`-vlaggen; bewezen door `test_r10_objects_in_streamed_rooms`. Rest: het gemaal in gestreamde inhoud (deel 3b, §12). |
 
 ## 11. Open vragen
 
@@ -385,8 +412,13 @@ De tests zijn ook zonder `--fixed-fps` (in echte tijd, ±2 min) gedraaid en gave
 - **Lead Game Designer:** de keuzes (c) (P2 in een ontladen kamer = C-06) en (d) (vijanden in gestreamde inhoud komen bij elk opnieuw laden terug) uit §3a bevestigen of wijzigen.
 - **Gameplay Programmer (C-06):** `AreaLoader.partner_in_ontladen_kamer` (keuze (c), §3a) koppelen aan `Sim.dissolve_partner`, met een eigen oorzaak naast `fellicht`, `gevaar`, `val` en `leiband`.
 - **Gameplay Programmer (T16c):** `valid_from` (`geldig_vanaf`) staat op de `TailEcho`-node en gaat verloren als C-01 hem weghaalt; E-09 in co-op en C-05 vragen dat hij bij P1 hoort.
-- **T5b deel 3, vlag van een object:** de vlag `<kamer_id>/<nodepad>` (§3a) verliest zijn stand als een level designer de kamer of het object hernoemt; een controle (bekende vlaggen tegen de inhoud) of een migratie hoort bij deel 3.
-- **T5b deel 3, kapotte back-up:** zijn de save én de `.bak` allebei kapot, dan geeft `read` alleen de fouten; deel 3 beslist wat het spel dan toont (melding, slot leeg of herstel) en test dat geval.
 - **Debugmenu, `force_unloaded`:** zodra het debugmenu het aanroept, een `push_error`-guard als het tijdens stap (4) of (5) gebeurt (§3a).
-- **T5b, volgend deel** (Technical Director met de Engine & Platform Programmer): (3) de autoloads `GameState` en `SaveService` met slots, checkpoint-objecten en autosave (met `AreaLoader.store_objects()` vlak vóór elke save), het gemaal in gestreamde inhoud, Steam Cloud op de Deck, en zo nodig threaded laden (R9).
+- **T5b deel 3b** (Technical Director met de Engine & Platform Programmer). Deel 3a (autoloads `Progress` en `SaveService`, slots, `Checkpoint`, autosave, vlagcontrole, kapot slot; §3a, §7) is af. Over blijft:
+  1. **Gemaal in gestreamde inhoud:** `Gemaal` heeft nu verwijzingen die in code gezet worden (`setup_gemaal`: meter, pomprad, sluis, straat). Nodig: geëxporteerde paden voor pomprad en sluis, de meter via de Sim of `Progress`, `connect_combat` bij het aanmelden, en `Progress.bind_gemaal` vanuit de AreaLoader bij laden (en afmelden bij ontladen, met de stand naar `state`).
+  2. **Pompen zet een checkpoint** (LM-08: "aanraakte of pompte"): nu alleen via een `Checkpoint` naast het gemaal; een pompslag zonder in het vlak te komen zet er geen.
+  3. **Respawn op het checkpoint** bij 0 levenspunten (E-04b, C-08) leest `Progress.state.checkpoint_*`: Gameplay Programmer, samen met de levenspunten.
+  4. **Schema v2** met levenspunten, `s` per wijk, vaardigheden en verzamelobjecten (LM-12), met een migratie 1 → 2 in `builtin_migrations()`: na T3c.
+  5. **Steam Cloud op de Deck** (Engine & Platform Programmer, T7): `user://` synchroniseren, wat er gebeurt bij een conflict, en of `NOTIFICATION_WM_CLOSE_REQUEST` op de Deck komt bij afsluiten en bij slaapstand (anders ook `NOTIFICATION_APPLICATION_PAUSED`).
+  6. **Threaded laden (R9):** pas na de meting in T7.
+- **UX Designer (T10):** menu voor de slots met de vijf standen uit §7 en hun teksten in de Localization-CSV.
 

@@ -14,6 +14,8 @@ config/features=PackedStringArray("4.6")
 
 InputRouter="*res://scripts/input/input_router.gd"
 Localization="*res://scripts/locale/localization.gd"
+Progress="*res://scripts/save/progress.gd"
+SaveService="*res://scripts/save/save_service.gd"
 
 [display]
 
