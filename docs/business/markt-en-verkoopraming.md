@@ -78,16 +78,16 @@ De Business/Legal Advisor (BLA) neemt eruit over wat het dossier nodig heeft; de
 |---|---|---|---|
 | Verkochte kopieën (24 mnd) | 4.000 | 15.000 | 45.000 |
 | Ongeveer gelijk aan (reviews, bij 25–35×) | ± 115–160 | ± 430–600 | ± 1.300–1.800 |
-| Plaats t.o.v. het genre (§2.1) | Rond de mediaan van $15–20 (174 reviews) | Tussen mediaan en top | Top ± 15–35 % van de prijsklasse (1.000+ reviews) |
-| Vergelijkbaar met | *Curse of the Sea Rats*, *Koira* | *Haiku* in zijn eerste maanden | *Constance*, *MIO*, *Islets* |
+| Plaats t.o.v. het genre (§2.1) | Onder de mediaan van $15–20 (174 reviews) | Tussen mediaan en top | Top ± 15–35 % van de prijsklasse (1.000+ reviews) |
+| Vergelijkbaar met | *Curse of the Sea Rats*, *Koira* | *Haiku* in zijn eerste zes weken | *Constance*, *MIO*, *Islets* |
 | Gemiddelde betaalde prijs incl. btw (lijst € 19,99) | 60 % = € 11,99 | 65 % = € 12,99 | 70 % = € 13,99 |
-| **Bruto consumentenomzet** (incl. btw) | € 47.976 | € 194.902 | € 629.685 |
-| − btw/sales tax (gem. 12 %) | € 42.836 | € 174.020 | € 562.219 |
-| − terugbetalingen (10 %) | € 38.552 | € 156.618 | € 505.997 |
-| − Steam-aandeel (30 %) | **€ 26.986** | **€ 109.633** | **€ 354.198** |
-| Netto per kopie voor de studio | € 6,75 | € 7,31 | € 7,87 |
+| **Bruto consumentenomzet** (incl. btw) | € 47.960 | € 194.850 | € 629.550 |
+| − btw/sales tax (gem. 12 %) | € 42.821 | € 173.973 | € 562.098 |
+| − terugbetalingen (10 %) | € 38.539 | € 156.576 | € 505.888 |
+| − Steam-aandeel (30 %) | **€ 26.977** | **€ 109.603** | **€ 354.122** |
+| Netto per kopie voor de studio | € 6,74 | € 7,31 | € 7,87 |
 
-Rekenregel: netto = kopieën × gem. prijs incl. btw ÷ 1,12 × 0,90 × 0,70. Bedragen zijn vóór vennootschapsbelasting en vóór eventuele kosten van een uitgever (we hebben er geen, #2).
+Rekenregel: netto = kopieën × gem. prijs incl. btw (afgerond zoals in de tabel) ÷ 1,12 × 0,90 × 0,70; bedragen afgerond op de euro. Bedragen zijn vóór vennootschapsbelasting en vóór eventuele kosten van een uitgever (we hebben er geen, #2).
 
 **Hoe te lezen voor het dossier.** *Midden* is het scenario dat ik aanraad als basis voor het financieringsplan (D10): realistisch voor een goed ontvangen eerste game zonder uitgever en zonder marketingbudget. *Laag* is wat er gebeurt als de wishlist-opbouw tegenvalt. *Hoog* vraagt een sterke launch (Next Fest, pers, ± 30.000+ wishlists) en is geen verwachting.
 
@@ -109,7 +109,7 @@ Rekenregel: netto = kopieën × gem. prijs incl. btw ÷ 1,12 × 0,90 × 0,70. Be
 | # | Risico | Effect | Wat helpt |
 |---|---|---|---|
 | R1 | **Boxleiter is grof**: per game kan de ratio 2–3× afwijken | Alle schattingen in §3 kunnen een factor 2 fout zijn | Altijd bandbreedtes; waar een bevestigd cijfer bestaat (*Haiku*), dat voorrang geven |
-| R2 | **Overlevingsbias**: de vergelijkbare titels zijn bekend omdat ze slaagden | *Midden* en *Hoog* te optimistisch | *Laag* staat rond de genremediaan; de mediaan zelf is 22 reviews over alle prijzen |
+| R2 | **Overlevingsbias**: de vergelijkbare titels zijn bekend omdat ze slaagden | *Midden* en *Hoog* te optimistisch | *Laag* is geen worst case: het ligt al onder de mediaan van $15–20 (174 reviews), en de echte bodem zit niet in de scenario's: de genremediaan over alle prijzen is 22 reviews, ≈ 450–900 kopieën (20–40×) |
 | R3 | **Late wishlist-opbouw**: geen publieke pagina in fase 2 (#24, 3A) | Minder wishlists bij de launch → richting *Laag* | Steam-pagina zo vroeg als de merkcheck toelaat (CEO-besluit, D7) |
 | R4 | **Geen uitgever, geen marketingbudget** (#2, fase 2 € 0) | Minder zichtbaarheid dan *MIO* of *Constance* | Next Fest, festivals, pers; budget per fase via de EP |
 | R5 | **Groeiende concurrentie**: ± 290 metroidvania's in 2025, +9 % in 2026 | Moeilijker op te vallen | De eigen draai (echo, licht, Lage Landen) zichtbaar in één GIF |
