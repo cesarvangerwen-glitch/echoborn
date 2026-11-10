@@ -739,7 +739,7 @@ def blad_opties_toegankelijkheid():
     tabbalk(img, TABS, 4)
     rijen = [
         ("VASTHOUDEN OF TIKKEN", "VASTHOUDEN", None),
-        ("SCHERMSCHOK", "", 0.5),
+        ("SCHERMSCHOK", "", 1.0),
         ("FLITSEN VERMINDEREN", "UIT", None),
         ("ECHO-RAND DIKKER", "UIT", None),
         ("MERK-RING GROTER", "UIT", None),
@@ -754,9 +754,10 @@ def blad_opties_toegankelijkheid():
         optierij(img, 64 + i * 18, n, w, gekozen=(i == 0), schuif=s)
     rect(img, 36, 268, 568, 52, C["plaat"], 0.95)
     frame(img, 36, 268, 568, 52, C["kader_d"])
-    txt(img, "TIKKEN: LOSLATEN, GENEZEN, LANCEERHOUDING EN STOPPEN", 44, 276, C["tekst"])
-    txt(img, "WERKEN MET EEN DRUK IN PLAATS VAN VASTHOUDEN.", 44, 288, C["tekst"])
-    txt(img, "NOG EEN DRUK, SPRONG OF TREFFER BREEKT HET AF.", 44, 300, C["tekst_d"])
+    txt(img, "TIKKEN: LOSLATEN, GENEZEN EN STOPPEN MET EEN DRUK. NOG EEN DRUK,", 44, 274, C["tekst"])
+    txt(img, "SPRONG OF TREFFER BREEKT AF. LANCEERHOUDING: SNEL TWEE KEER AANVAL", 44, 286, C["tekst"])
+    txt(img, "(BINNEN 19 TICKS). EEN TIK GEEFT NOOIT HOUDING.", 44, 298, C["tekst"])
+    txt(img, "HOUDING STOPT BIJ AANVAL, DASH, LANCERING OF NA 2 S.", 44, 310, C["tekst_d"])
     noot(img, 1, 610, 62)
     noot(img, 2, 610, 268)
     hintbalk(img, [("A", "WIJZIG"), ("X", "STANDAARD"), ("B", "TERUG")])

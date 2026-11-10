@@ -1,6 +1,6 @@
 # UX-spec HUD en menu's *Polderlight*
 
-Versie 0.1 · Eigenaar: UX Designer (met de UI Artist voor de eind-art) · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10, `docs/productie/fase-2-kader.md` §2) · Review: Lead Game Designer
+Versie 0.1.1 · Eigenaar: UX Designer (met de UI Artist voor de eind-art) · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10, `docs/productie/fase-2-kader.md` §2) · Review: Lead Game Designer
 Co-op, drop-in/drop-out en de gedeelde camera: **`docs/ux/coop.md`**. Wireframes: **`docs/ux/wireframes/`** (bron: `bron/genereer_wireframes.py`, draait vanaf de repo-root en print de metingen van §2.3).
 
 Bronnen: `docs/design/gdd.md` v0.6.2 (§2.5–2.9, §2.12, O-2), `kernloop.md` §4, `wereld.md` §2.5 (rij T10) en WS-08, `gemaalmeester.md` GM-03/GM-08, `docs/art/bible.md` §2, §3, §5–7, `docs/audio/bible.md` §6.1, `docs/tech/input.md`, `docs/tech/ontwerp.md` §8a, `docs/tech/performance-flowkamer.md` §7 (punt 14, 15), pitch v0.4 (P2: "zichtbaar zonder icoon of uitleg").
@@ -162,7 +162,7 @@ Het merk zit **op het object**, niet in de HUD. Het moet in één blik zeggen: v
 
 ### 3.8 Boss-balk (HUD-09)
 
-- **Waarom een balk:** de Gemaalmeester heeft fasen op 60 % en 20 % en een Wankel-moment op ≤ 20 % (GM-03, GM-08). Zonder balk ziet de speler niet hoe dicht de finisher is; dat kost bij een boss van 8–12 min (wereld §2.1) te veel spanning. Het is de enige plek waar we van "de wereld eerst" afwijken; de LGD mag dit terugdraaien (§7).
+- **Waarom een balk:** de Gemaalmeester heeft fasen op 60 % en 20 % en een Wankel-moment op ≤ 20 % (GM-03, GM-08). Zonder balk ziet de speler niet hoe dicht de finisher is; dat kost bij een boss van 8–12 min (wereld §2.1) te veel spanning. Het is de enige plek waar we van "de wereld eerst" afwijken. **Besloten door de LGD** (Lead-review PR #129); de Combat Designer voegt niets toe.
 - **Vorm:** 240×4 px onder in het midden, met de naam erboven (`HUD_BOSS_GEMAALMEESTER`) en **fasestrepen op 60 % en 20 %**. Bij Wankel knippert de streep van 20 % in de kleur van gloed 6 en verschijnt de merkplek op de ketel (GM-08): de balk wijst, de wereld toont.
 - In co-op gelijk; één balk.
 
@@ -206,7 +206,7 @@ Schermflow: `schermflow_placeholder.svg`. Alle menu's werken met controller, toe
 | **MN-11** | **Wie stuurt:** het apparaat dat pauzeerde. De andere speler ziet bovenaan "Pauze van P1/P2" en kan alleen zelf ook Start drukken om het menu over te nemen. Waarom: twee cursors in één menu leiden tot ruzie op de bank. |
 | **MN-12** | **Regels:** *Verder* · *Logboek* · *Opties* · *Speler 2 stopt* (alleen in co-op; een tweede weg naast het vasthouden, `coop.md` CO-06) · *Naar hoofdmenu*. Rechts: wijk, trap van het gemaal, lampglas, logbladzijden, "opgeslagen bij het gemaal". |
 | **MN-13** | **Naar hoofdmenu:** slaat op (LM-12: bij afsluiten) en vraagt **geen** bevestiging, want er gaat niets verloren behalve de plek (je begint bij het gemaal). De pauze toont dat al: "Opgeslagen bij het gemaal". |
-| **MN-14** | **Automatisch pauzeren** bij: focusverlies (alt-tab, Steam-overlay; `input.md` §2), de Deck in slaap, en een **controller van P1 die wegvalt** (`coop.md` CO-08). |
+| **MN-14** | **Automatisch pauzeren** bij: focusverlies (alt-tab, Steam-overlay; `input.md` §2), de Deck in slaap, en een **controller van P1 die wegvalt** (`coop.md` CO-09). |
 | **MN-15** | **Logboek:** alle gelezen bladzijden, per gebied, met lege plekken voor wat je nog mist (geen plaats, geen hint; WS-08 zegt al waar ze liggen). |
 
 ### 4.4 Opties (`menu_opties_toegankelijkheid_x2_placeholder.png`, `menu_opties_besturing_x2_placeholder.png`)
@@ -240,7 +240,7 @@ Wireframe: `menu_opties_toegankelijkheid_x2_placeholder.png`. Elke optie staat i
 
 | ID | Optie | Standaard | Wat het doet | Afhankelijk van |
 |---|---|---|---|---|
-| **TG-01** | **Vasthouden of tikken** | vasthouden | Loslaten (E-09), genezen (LM-07), lanceerhouding (C-11a) en stoppen (C-05) werken met één druk: de handeling loopt dezelfde ticks door en een tweede druk, sprong of treffer breekt hem af. Lanceerhouding: één druk zet de houding aan, de volgende AANVAL is de lancering. | LGD bevestigt dat C-11a met een tik niet makkelijker wordt dan bedoeld (§7) |
+| **TG-01** | **Vasthouden of tikken** | vasthouden | **Loslaten (E-09), genezen (LM-07) en stoppen (C-05)** werken met één druk: de handeling loopt evenveel ticks door, met dezelfde regels om af te breken (een tweede druk, een sprong of een treffer), dus het geeft geen voordeel. **Lanceerhouding (C-11a), alleen met *tikken*** (regel van de LGD): een **tweede AANVAL-druk binnen de herhaaltijd** (tick x+1…x+19 na een AANVAL-event op x; die druk geeft toch geen event, E-10) zet `aanval_vast` aan als **virtuele knop**. De houding loopt dan volgens C-11a vanaf x+12, tot de volgende AANVAL-flank, een DASH, de lanceertick (C-11d) of 120 ticks. De recorder neemt de virtuele bit op, zodat de echo hetzelfde doet. **Eén tik geeft nooit houding**: een bounce wordt niet per ongeluk een lancering. De lancering zelf komt zoals altijd door de landing van de springer (C-11b). | Besloten door de LGD (Lead-review PR #129) |
 | **TG-02** | Schermschok | 100 % | 0–100 %, ook voor de ontploffingen | — |
 | **TG-03** | Flitsen verminderen | uit | Geen witte flits bij een volle meter, een ontploffing of een fasewissel; in plaats daarvan een rand van 2 px | Technical Artist |
 | **TG-04** | Echo-rand dikker | uit | Rand van de echo en P2 2 px in plaats van 1 (art bible §6) | Art Director |
@@ -253,7 +253,7 @@ Wireframe: `menu_opties_toegankelijkheid_x2_placeholder.png`. Elke optie staat i
 | **TG-11** | HUD | altijd | *Automatisch*: levens en meter vervagen na 4 s zonder verandering naar 30 % en komen terug bij elke verandering, bij een gevecht en bij het gemaal. *Uit*: alleen voor opnames | — |
 | **TG-12** | Mono | uit | (in Geluid) | — |
 
-**Bewust (nog) niet:** een spelsnelheid en een moeilijkheidsgraad of hulpmodus. Beide raken de flownormen en de vensters van pillar 1 (en een trager spel raakt de vaste tick van de Sim). Dat is een ontwerpkeuze voor de LGD (§7), na F0.
+**Niet:** een **spelsnelheid**: nee, definitief (keuze LGD). Ze raakt de vaste tick van de Sim en de flownormen van pillar 1. Een **hulpmodus** of moeilijkheidsgraad komt niet in de slice; de LGD beslist na T11 (§7).
 
 ## 6. Taal en tekst
 
@@ -273,14 +273,14 @@ Wireframe: `menu_opties_toegankelijkheid_x2_placeholder.png`. Elke optie staat i
 | 4 | Knop-glyphs per apparaattype en het laatst gebruikte apparaat per speler; Steam Input op de Deck; Valves tekstmaat op de Deck bevestigen | Engine & Platform Programmer | Bij de Deck-build (#79) |
 | 5 | Trillen per carillonslag (TG-06), de "vol"-tik van de meter, de genees-klank (gelukt, afgebroken, te weinig) en de lijst voor geluidsbijschriften (TG-09) | Audio Director | Met de slice-audio (T8d) |
 | 6 | Kleurprofielen voor spelers en merken (TG-07), plus de dikkere rand (TG-04), gemeten met de ΔE-regel | Art Director | Bible v1 |
-| 7 | **Boss-balk** (§3.8): akkoord of liever zonder balk | Lead Game Designer, Combat Designer | Vóór T8b |
-| 8 | **TG-01 tikken in plaats van vasthouden** bij de lanceerhouding en het genezen: bevestigen dat het de bedoeling van C-11a en LM-07 niet breekt | Lead Game Designer | Vóór T8a |
-| 9 | Spelsnelheid en hulpmodus (§5, *bewust nog niet*) | Lead Game Designer | Na F0 |
-| 10 | HUD bijstellen na F0 en na de eerste playtest van de slice (T11): verstaan spelers het echo-icoon en de klokring zonder uitleg? | UX Designer, QA Lead | Na F0 en T11 |
-| 11 | `docs/ux/besturing.md`, `docs/ux/onboarding.md` en `docs/ux/toegankelijkheid.md` (rolbestand) volgen in een eigen issue; deze spec dekt de opties van toegankelijkheid al | UX Designer | Fase 2, na T10 |
+| 7 | **TG-01** bouwen: tik bij Loslaten, genezen en stoppen; bij de lanceerhouding de virtuele knop `aanval_vast` (tweede AANVAL-druk binnen x+1…x+19, houding vanaf x+12 tot de volgende AANVAL-flank, DASH, lanceertick of 120 ticks; de recorder neemt de bit op) | Gameplay Programmer | Met T8a |
+| 8 | Hulpmodus: beslist de LGD na T11, op basis van playtestdata | Lead Game Designer | Na T11 |
+| 9 | HUD bijstellen na F0 en na de eerste playtest van de slice (T11): verstaan spelers het echo-icoon en de klokring zonder uitleg? | UX Designer, QA Lead | Na F0 en T11 |
+| 10 | `docs/ux/besturing.md`, `docs/ux/onboarding.md` en `docs/ux/toegankelijkheid.md` (rolbestand) volgen in een eigen issue; deze spec dekt de opties van toegankelijkheid al | UX Designer | Fase 2, na T10 |
 
 ## 8. Wijzigingen
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.1.1 | 2026-11-10 | Na de Lead-review (PR #129): TG-01 bij de lanceerhouding met de regel van de LGD (virtuele knop); keuzes LGD: boss-balk ja, tikken bij genezen, Loslaten en stoppen ja, spelsnelheid nee, hulpmodus na T11; MN-14 verwijst naar CO-09. |
 | 0.1 | 2026-11-10 | Eerste versie (T10 deel 1, #87): HUD solo, merk-aftelling, grijs/kleur en Deck, menu's, opties, toegankelijkheid, taal; wireframes in `docs/ux/wireframes/`. |

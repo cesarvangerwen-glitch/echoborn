@@ -75,7 +75,7 @@ Alle waarden blijven de startwaarden van de gdd; ze worden gemeten in T17 en T11
 | Drop-out: stopknop vasthouden (C-05) | **60 ticks** (1 s) | Niet per ongeluk, maar ook geen wachten; de ring maakt het zichtbaar. |
 | P2 buiten beeld voor oplossen (C-07) | **60 ticks** | Met de pijl en de ring is 1 s genoeg om terug te keren; langer laat P1 wachten. |
 | P2 terugkeer na oplossen (C-06) | **120 ticks** (2 s) | Gelijk aan D: het voelt als "je schaduw komt terug", net als de echo. |
-| Lanceerhouding (C-11a, met LGD) | **12 ticks** | Ongewijzigd; met TG-01 ook als tik (`hud-menus.md` §7 punt 8). |
+| Lanceerhouding (C-11a, met LGD) | **12 ticks** | Ongewijzigd. Met TG-01 (*tikken*) alleen via een tweede AANVAL-druk binnen de herhaaltijd; één tik geeft nooit houding (`hud-menus.md` TG-01). |
 | Camera: maximale zoom-uit | **960×540** | CA-03 |
 
 ## 7. Open punten
