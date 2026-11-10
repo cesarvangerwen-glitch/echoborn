@@ -201,6 +201,11 @@ func test_gemaal_in_streamed_room(t) -> void:
 ## volgende slagen (ook van P1) niet opnieuw; vol worden geeft nog één save.
 ## Na een ander checkpoint zet een slag van P1 het gemaal weer, een slag van
 ## de echo niet (gdd §4.6, LM-08: het checkpoint blijft het andere).
+## De slagen zijn handmatige `_strike`-aanroepen met `attacker` = "echo",
+## "p1" of "p2" via `Combat.attack` (de echte weg vanaf stap 4), geen echo die
+## een opgenomen slag van P1 D ticks later herhaalt: `Checkpoint` kijkt
+## alleen naar `who` van `Gemaal.pumped`, en dat is voor een echo-slag altijd
+## "echo" (E-10a, `test_combat.gd`).
 func test_pump_sets_checkpoint(t) -> void:
 	_clear()
 	var sim_first = Fx.world(t)

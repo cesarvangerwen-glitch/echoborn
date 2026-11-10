@@ -349,8 +349,9 @@ func test_no_checkpoint_respawn_without_death(t) -> void:
 ## Randgeval (§7): P1 valt op 0 en bereikt daarna, nog vóór de respawntick,
 ## een nieuw checkpoint (stap 5 van `t0 − 1`, hier `reach_checkpoint` tussen
 ## de ticks). Dan respawnt P1 op het nieuwe checkpoint, dat ook in de save
-## staat, en `requested` meldt de nieuwe plek. Na de respawn verplaatst een
-## nieuw checkpoint de respawn niet meer.
+## staat, en `requested` meldt de nieuwe plek. Hetzelfde checkpoint nog eens
+## (dezelfde plek) meldt niets. Na de respawn verplaatst een nieuw checkpoint
+## de respawn niet meer.
 func test_checkpoint_after_last_hit_is_respawn_point(t) -> void:
 	var p := _progress(t, false)
 	var progress: Progress = p["progress"]
@@ -360,7 +361,10 @@ func test_checkpoint_after_last_hit_is_respawn_point(t) -> void:
 	await _reach_checkpoint_then_leave(w, t)
 	t.check(progress.state.checkpoint_positie == CHECKPOINT_AT, "eerste checkpoint niet gezet")
 	var t0 := _kill(p1, sim)
+	progress.reach_checkpoint(CHECKPOINT_AT)
+	t.check(w["requests"] == [[t0, CHECKPOINT_AT, true]], "zelfde plek meldde opnieuw: %s" % [w["requests"]])
 	var nieuw := IN_A + Vector2(80, 0)
+	progress.reach_checkpoint(nieuw)
 	progress.reach_checkpoint(nieuw)
 	t.check(w["requests"] == [[t0, CHECKPOINT_AT, true], [t0, nieuw, true]], "verzoeken: %s" % [w["requests"]])
 	await t.run_ticks(sim, 1)

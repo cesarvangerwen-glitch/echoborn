@@ -26,7 +26,8 @@ extends RefCounted
 ## Randgeval (§7): de laatste treffer valt in stap (5) van tick `t0 − 1`.
 ## Zet een object later in die stap nog een nieuw checkpoint (binnenlopen),
 ## dan geldt dat nieuwe: `Progress.checkpoint_reached` vóór de respawntick
-## verplaatst de respawn erheen en meldt `requested` opnieuw. Zo klopt de
+## verplaatst de respawn erheen en meldt `requested` opnieuw (niet als het
+## dezelfde plek is). Zo klopt de
 ## respawnplek altijd met de save.
 ##
 ## Niet hier: terugzetten na een gemiste sprong, diep water of doorns
@@ -52,6 +53,8 @@ var progress: Node
 
 ## Tick van de laatste treffer zolang de respawn nog moet komen, anders -1.
 var _pending_tick := -1
+## De respawnplek van die respawn.
+var _pending_at := Vector2.ZERO
 
 
 func _init(p_p1: PlayerActor, p_room_start: Callable, p_progress: Node = null) -> void:
@@ -83,15 +86,20 @@ func _on_health_changed(tick: int, health: int) -> void:
 	_pending_tick = tick
 	var on_checkpoint := has_checkpoint()
 	var at: Vector2 = progress.state.checkpoint_positie if on_checkpoint else room_start.call()
+	_pending_at = at
 	p1.respawn_at(at, true)
 	requested.emit(tick, at, on_checkpoint)
 
 
 ## Randgeval (§7): een nieuw checkpoint nadat P1 op 0 viel, maar vóór de
-## respawntick, wordt de respawnplek.
+## respawntick, wordt de respawnplek. Dezelfde plek als nu: niets, en geen
+## tweede `requested`.
 func _on_checkpoint_reached(_kamer: StringName, _positie: Vector2) -> void:
 	if _pending_tick < 0 or not has_checkpoint():
 		return
 	var at: Vector2 = progress.state.checkpoint_positie
+	if at == _pending_at:
+		return
+	_pending_at = at
 	p1.respawn_at(at, true)
 	requested.emit(_pending_tick, at, true)
