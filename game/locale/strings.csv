@@ -11,3 +11,25 @@ HUD_ECHO_EMPTY,Empty,Leeg,Echo-toestand Leeg (gdd E-03).
 HUD_DEBUG_KEYS,F1/F2/F3 D 90/120/180 · F4 echo on/off · F5 measurement log %s · F6 restart,F1/F2/F3 D 90/120/180 · F4 echo aan/uit · F5 meetlog %s · F6 herstart,"Debugtoetsen van de flow-kamer. %s = COMMON_ON of COMMON_OFF."
 HUD_RUN_DONE,Run finished in %.1f s. Did %s feel smooth/satisfying? Press 1–5.,Run klaar in %.1f s. Voelde %s vloeiend/satisfying? Druk 1–5.,"Scorevraag na de run (F0). %.1f = runtijd in s, %s = kamer K1–K3."
 HUD_THANKS,Thank you. Measurement log: %s,Bedankt. Meetlog: %s,%s = pad van het meetlog (CSV).
+MENU_NEW_GAME,New game,Nieuw spel,"Hoofdmenu zonder spelbestanden (start meteen in plaats 1) en de regel bij een lege plaats (hud-menus.md §4.7, MN-22)."
+MENU_SLOTS,Save files,Spelbestanden,Hoofdmenu: naar het slot-menu (hud-menus.md §4.7).
+MENU_SLOT_NAME,Slot %d,Plaats %d,"%d = nummer van de plaats, 1 tot en met 3 (1-based, zoals slot_<n>.json)."
+MENU_SLOT_DETAILS,%s   Light %d   %s,%s   Licht %d   %s,"Regel onder een plaats met een spel. %s = wijknaam, %d = lichtmeter (LP), %s = speeltijd (MENU_SLOT_TIME_MIN of MENU_SLOT_TIME_HM)."
+MENU_SLOT_TIME_MIN,%d min,%d min,Speeltijd onder 1 uur. %d = minuten.
+MENU_SLOT_TIME_HM,%d h %02d min,%d u %02d min,"Speeltijd vanaf 1 uur. %d = uren, %02d = minuten (twee cijfers)."
+MENU_SLOT_EMPTY,Empty,Leeg,Stand LEEG: geen save en geen back-up.
+MENU_SLOT_RESTORED,Restored from backup,Hersteld uit back-up,"Stand HERSTELD: de save was kapot, de back-up laadt. Staat naast de details."
+MENU_SLOT_BROKEN,Damaged: cannot be loaded,Beschadigd: kan niet laden,Stand KAPOT: save en back-up zijn kapot. Alleen 'nieuw spel hier' werkt.
+MENU_SLOT_NEWER,Made with a newer version: cannot be loaded,Gemaakt met een nieuwere versie: kan niet laden,Stand NIEUWER: save van een nieuwere versie van het spel.
+MENU_SLOT_LOAD,Load,Laden,Knophint A op een plaats met een spel (OK of HERSTELD).
+MENU_SLOT_NEW_HERE,New game here,Nieuw spel hier,Knophint X op een plaats die niet leeg is; opent de bevestiging (MN-23).
+MENU_CONFIRM_OVERWRITE,Overwrite slot %d?,Plaats %d overschrijven?,"Titel van de dwingende bevestiging (MN-23). %d = nummer van de plaats, 1–3."
+MENU_CONFIRM_OVERWRITE_BODY,This game will be deleted. This cannot be undone.,Dit spel wordt gewist. Dat kan niet terug.,Bevestiging bij een plaats met stand OK of HERSTELD: het oude spel is echt weg.
+MENU_CONFIRM_SET_ASIDE_BODY,"The old file is kept for support, but this slot starts over.","Het oude bestand blijft bewaard voor support, maar deze plaats begint opnieuw.","Bevestiging bij stand KAPOT of NIEUWER: de bestanden worden opzijgezet, niet gewist."
+MENU_OVERWRITE,Overwrite,Overschrijven,Tweede keuze in de bevestiging; nooit de standaard (MN-23).
+COMMON_BACK,Back,Terug,Terug-knop en eerste keuze (standaard) in een bevestiging.
+MENU_SLOT_SAVE_FAILED,Saving failed. This slot is now empty.,Opslaan mislukt. Deze plaats is nu leeg.,"Nieuw spel gestart, maar de eerste save mislukte (MN-24). Het oude spel is al gewist."
+HUD_SAVE_RESTORED,Save restored,Spel hersteld,"Melding na laden van een plaats met stand HERSTELD (één keer, hud-menus.md §4.6). Regel 1."
+HUD_SAVE_RESTORED_SUB,Back at the previous pumping station,Terug bij het vorige gemaal,"Melding HERSTELD, regel 2: de voortgang sinds het vorige checkpoint is weg."
+HUD_SAVE_FAILED,Saving failed,Opslaan mislukt,"Melding als een autosave mislukt (signaal saved met fout, §4.6). Regel 1."
+HUD_SAVE_FAILED_SUB,Is the disk full?,Is de schijf vol?,"Melding opslaan mislukt, regel 2."
