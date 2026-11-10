@@ -73,6 +73,8 @@ Netto is vóór vennootschapsbelasting en zonder kosten van een uitgever (§4.1)
 | P2 | Verkoop afzetten tegen het budget fase 3 (tweede helft O4) | Executive Producer | Met F6 (T15), naar de CEO via het gate-voorstel (F8) |
 | P3 | Spreiding herzien met echte wishlists en het kortingsplan (R9 van de raming) | Marketing & Community Manager, EP | Na de Steam-pagina (D7) |
 
+Verwijzing (BLA, 2026-11-10): P1 is uitgewerkt in `docs/business/vaf-dossier-productie.md` §3.3 (termijn, drempel, munt, formulieren en de kwartalen op kasbasis); afvinken door de EP.
+
 ## 7. Logboek wijzigingen
 
 | Versie | Datum | Wijziging |

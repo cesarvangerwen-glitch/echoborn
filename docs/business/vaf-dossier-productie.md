@@ -1,7 +1,10 @@
 # VAF-dossier productiesteun fase 3: *Polderlight* (werktitel)
 
-Versie 0.6 (deel 2 van 2) · 2026-11-10 · Eigenaar: Business/Legal Advisor · Issue: #72 (T13, `docs/productie/fase-2-kader.md` §2) · Lead-review: Executive Producer
+Versie 0.7 (deel 2 van 2) · 2026-11-10 · Eigenaar: Business/Legal Advisor · Issue: [#72](https://github.com/cesarvangerwen-glitch/echoborn/issues/72) (T13, `docs/productie/fase-2-kader.md` §2) · Lead-review: Executive Producer
 Met input van: Creative Director, Executive Producer, Marketing & Community Manager · Risico's: R6, R23 · Besluiten: #2, #51 (deel 1: VA, 3A, 4A, 5A, 6B; deel 2: 1A, 2A, 7A, 8A), #96 (werktitel)
+
+**Wijzigingen sinds 0.6:** D10 verwijst naar de verkoopspreiding van de EP (`docs/productie/verkoopspreiding-d10.md`: Laag náást Midden, Laag als rekenscenario); nieuw §3.3: uitbetalingstermijn, drempel, munt en belastingformulieren van Steam, met de kwartaaltabel K1–K9 op het moment van uitbetaling (open punt P1 van de EP); kop gelijkgezet met het logboek (§9).
+**Open punten (stand 0.7):** VAF-deadlines 2027 (CEO, `Info:` in #51; dan de Producer, §6.4) · A1, woon- en belastingplaats van de CEO (vóór de intake) · budget, financieringsplan en planning fase 3 (EP, F6) · verkoop tegen het budget fase 3 (EP, P2) · fiscale vragen bij de Steam-uitbetaling voor de boekhouder (§3.3, U1–U3) · crit. 3 cat. I (CD, BLA) · reviewtellingen op Steam (BLA) · cat. II en de werkaanname A3 (na intakevraag (a)). Details in §6.
 
 > **Niet indienen.** Dit is een voorbereiding (#51 deel 1: 6B). Er is niets aangevraagd of ingediend, er is geen MyVAF-account gemaakt en er is geen contact met het VAF. Indienen, de intake en een vennootschap vragen elk een `Besluit:` van de CEO (fasekader §2, buiten scope). **Geen juridisch of fiscaal advies**: vóór het indienen en vóór de oprichting van een vennootschap raadpleegt de CEO een boekhouder en zo nodig een advocaat (besluit #51 deel 1: 4A).
 
@@ -10,7 +13,7 @@ Met input van: Creative Director, Executive Producer, Marketing & Community Mana
 | Vraag | Antwoord |
 |---|---|
 | **Wat** | Het dossier voor **productiesteun** (steunvorm "productie", art. 6 reglement Gamefonds) voor **fase 3** van *Polderlight*: route (c) uit `subsidies.md` §5. |
-| **Stand (deel 2)** | Structuur volgens de VAF-vereisten (§3), art. 4 integraal en de VAF-documenten (§3.1–3.2), de vaste inhoud en de 2-pager in de volgorde van het VAF-sjabloon (§4), de culturele test van categorie I, na de review van de CD (§5, B2), markt en verkoopraming (D6, D8) uit `docs/business/markt-en-verkoopraming.md` (§3, §4.3), en wat nog ontbreekt en van wie (§6). |
+| **Stand (deel 2)** | Structuur volgens de VAF-vereisten (§3), art. 4 integraal en de VAF-documenten (§3.1–3.2), de vaste inhoud en de 2-pager in de volgorde van het VAF-sjabloon (§4), de culturele test van categorie I, na de review van de CD (§5, B2), markt en verkoopraming (D6, D8) uit `docs/business/markt-en-verkoopraming.md` (§3, §4.3), de uitbetaling door Steam voor de cashflow van D10 (§3.3), en wat nog ontbreekt en van wie (§6). |
 | **Klaar tot indienen?** | **Nee, nog niet.** Harde drempels die openstaan: vennootschap (na de intake, #51: 4A), intake (nog niet, 6B), slice en tractie (fase 2, F3; Steam-pagina is een apart CEO-besluit), budget fase 3 (EP, F6) en de **VAF-deadlines 2027** (niet bevestigd, §2). |
 | **Culturele test** | Categorie I: criterium 1 (Nederlandse versie) **toegezegd in principe** (#51: 5A); tweede criterium **vormgeving** (crit. 5: Laag-Landse bouwkunst en licht naar de Vlaamse Primitieven, art bible §8), want crit. 5 kent geen fictieve-wereldtoets; aanvullend **setting** (crit. 2, de stad Hollestede in de Lage Landen) en **lore** (crit. 4). Voor crit. 2 en 4 kan het VAF Hollestede als fictieve wereld zien; dan telt de connectie van het art- en verhaalteam, en die loopt alleen via de CEO (A1, intakevraag (i)) (§5). Categorie II blijft het zwakke punt: crit. 1 hangt af van hoe het VAF de vier kernprofielen telt, crit. 2 is een mogelijk tweede criterium (§5). |
 | **Werkaanname** (kader §5) | §7. Kort: budget en releasevenster volgen per fase (werkaanname in `beslissingen.md`); het creatiebudget van fase 3 is nog niet geraamd, dus **geen steunbedrag** in dit document. |
@@ -53,7 +56,7 @@ Volgorde volgens wat het VAF voor productie vraagt (`subsidies.md` §3.2–3.3; 
 | D7 | **Tractie en performing targets** (wishlists, interesse publishers) | pagina productiesteun ("games met tractie"), prioriteitennota | Nog geen: geen publieke uiting in fase 2 | Marketing; CEO (besluit Steam-pagina) | ⬜ |
 | D8 | **Verkoopraming** | `subsidies.md` §3.3 | ~€ 20, geen microtransacties (#2); drie scenario's (Laag, Midden, Hoog) over 24 maanden na release, alleen Steam, van bruto naar netto: `docs/business/markt-en-verkoopraming.md` §4, met aannames §4.2 en risico's §5 | Marketing (raming), EP (keuze scenario en spreiding voor D10) | ✅ concept; raming ligt er; scenario (O4: Laag náást Midden, Laag als rekenscenario) en spreiding per kwartaal (O7) in `docs/productie/verkoopspreiding-d10.md`. Herzien met wishlists (O6) |
 | D9 | **Creatiebudget fase 3** op VAF-sjabloon: eigen inbreng, participaties (uitgestelde vergoeding oprichter, getekende verklaring vóór het contract), overhead ≤ 15 % forfaitair | financiële gids | Ontbreekt (F6) | EP | ⬜ |
-| D10 | **Financieringsplan** en steunintensiteit (max. 50 %, tot 80 % voor de eerste of tweede game waarvoor een studio steun krijgt) | art. 9; financiële gids (andere overheidssteun telt mee) | Eigen middelen + VAF; geen publisher (#2). Scenario (Laag náást Midden, Laag als rekenscenario) en verkoopspreiding per kwartaal: `docs/productie/verkoopspreiding-d10.md` | EP, BLA | 🟡 scenario en spreiding liggen er; financieringsplan zelf volgt met F6 |
+| D10 | **Financieringsplan** en steunintensiteit (max. 50 %, tot 80 % voor de eerste of tweede game waarvoor een studio steun krijgt) | art. 9; financiële gids (andere overheidssteun telt mee) | Eigen middelen + VAF; geen publisher (#2). Scenario (Laag náást Midden, Laag als rekenscenario) en verkoopspreiding per kwartaal: `docs/productie/verkoopspreiding-d10.md`; uitbetaling door Steam en kwartalen op kasbasis: §3.3 | EP, BLA | 🟡 scenario, spreiding en uitbetalingstermijn liggen er; financieringsplan zelf volgt met F6 |
 | D11 | **Planning met milestones** fase 3; oplevering productie binnen 18 maanden na ondertekening, technisch dossier binnen 12 maanden | art. 13.12, 19 | Volgt uit F6/F8 | EP, Producer | ⬜ |
 | D12 | **Speelbare build** (slice) als bewijs | `subsidies.md` §3.3 | Verticale slice, F3 | TD, team | ⬜ (fase 2) |
 | D13 | **Pitchvideo** max. 2 minuten | pagina productiesteun | Na de slice, op slice-art | Marketing, Art | ⬜ |
@@ -116,6 +119,40 @@ Reglement art. 12 en de pagina productiesteun geven **geen volledige bijlagenlij
 | Technisch dossier productie (`Technischdossier_gf_productiesteun-NIEUW.docx`) | na goedkeuring |
 
 Niet van toepassing (geen coproductie, #2): Letter of intent en Overeenkomst coproductie. Of TDD, business canvas en pitch deck verplicht zijn voor productie, zegt de bron niet: vraag (g) in §6.3.
+
+### 3.3 Uitbetaling door Steam (D10, cashflow; P1 van `verkoopspreiding-d10.md`)
+
+De kwartaaltabel van de EP staat op het **moment van verkoop**. Voor de cashflow telt het moment dat Valve **uitbetaalt**. Gelezen op **2026-11-10** (WebFetch, alleen lezen; geen account, niets ingediend):
+
+| Bron | Wat er staat |
+|---|---|
+| [Steamworks: Payments and Sales Reporting](https://partner.steamgames.com/doc/finance/payments_salesreporting?l=english) | "Valve issues payment for sales 30 days after they are made, usually at the end of the month", met het voorbeeld "payments for February sales will be made at the end of March". Uitbetaling als de vorige maand verkoop had en "exceeded the minimum $100 threshold". Betaling per EFT: ACH voor Amerikaanse banken, "USD SWIFT wires for banks located outside of the US". Het maandrapport bevat de aftrekposten (terugbetalingen, chargebacks, belastingen) en "reflects the actual amount you will be paid". Geen reserve of holdback vermeld. |
+| [Steamworks: Payments FAQ](https://partner.steamgames.com/doc/finance/payments_salesreporting/faq?l=english) | "We pay out by the 30th of the month following sales"; het geld kan enkele werkdagen later op de rekening staan. "We may hold your payment until a minimum of $100 payout is earned." "We pay in US Dollars only." "You must provide us with all completed bank and tax information before we can make payments to you." "We do not need to be invoiced." |
+| [Steamworks: Tax FAQ](https://partner.steamgames.com/doc/finance/taxfaq) | Een niet-Amerikaanse partner vult in het **tax interview** een W-8-formulier in (de pagina noemt W-8BEN); "At the conclusion of the tax interview, the withholding rate % will be provided to you." Standaard 30 % Amerikaanse bronheffing; "A reduced rate, including exemption, may apply if there is a tax treaty". Jaarlijks een **1042-S** met het Amerikaanse inkomen. Valve int de btw zelf in de landen op zijn lijst; "Steam pricing is VAT inclusive". Verder: "consult with your tax advisors on your own tax obligations." |
+| [Belastingverdrag VS–België 2006, Senate Executive Report 110-2](https://www.govinfo.gov/content/pkg/CRPT-110erpt2/html/CRPT-110erpt2.htm) | Royalty's "may be taxed only by the residence country": geen Amerikaanse bronheffing voor een Belgische inwoner die het verdrag inroept. Of Steam-inkomsten onder royalty's vallen en welk tarief het tax interview geeft, is niet bevestigd (U1). |
+
+**Wat dat betekent voor ons (aannames, geen fiscaal advies):**
+- **Termijn.** Verkoop in maand *m* wordt uiterlijk eind maand *m* + 1 uitbetaald: **30 tot ± 60 dagen** na de verkoop, plus enkele werkdagen. Het eerste geld komt **ten vroegste ± 1 maand en uiterlijk ± 2 maanden na de release** binnen. Kosten tot dan (en de launch zelf) komen uit eigen middelen.
+- **Drempel** van $ 100 per maand: geen rol in de kwartaaltabel (Laag zit ook in K8 ruim boven $ 100 per maand).
+- **Munt.** Valve betaalt in **USD**; ons plan rekent in euro (VAF: budget en financieringsplan in euro, art. 12.7). De tabel hieronder staat in euro vóór wisselkoers en bankkosten van de SWIFT-overschrijving; het werkelijke bedrag schommelt met de koers.
+- **Btw.** Valve int de btw bij de consument in de EU en draagt die af; dat is de ÷ 1,12 van de EP. Hoe de vennootschap de uitbetaling van Valve (een Amerikaanse onderneming) zelf in de Belgische btw-aangifte zet, is een vraag voor de boekhouder (U2).
+- **Formulieren.** Zonder volledige bank- en belastinggegevens betaalt Valve niet uit. Het tax interview gebeurt op naam van de partij die de Steamworks-overeenkomst sluit; voor de VAF-aanvraag is dat de vennootschap (D1), dus het tax interview volgt na de oprichting en ruim vóór de release. Voor een vennootschap is het W-8-formulier volgens de IRS normaal W-8BEN-E (niet op de Steam-pagina bevestigd; U1). Lukt het verdragstarief niet, dan houdt Valve 30 % in: Laag K1 wordt dan ± € 9.802 in plaats van € 14.003.
+
+**Kwartaaltabel op kasbasis (uitbetaling).** Rekenregel: verkoop van maand *m* valt in de uitbetaling van maand *m* + 1 (release op de eerste dag van een maand, K1 = maand 1–3 zoals A10). De netto per kwartaal komt uit `verkoopspreiding-d10.md` §3 (niet gewijzigd); binnen K1 verdeel ik de 55 % volgens de herleiding van de EP (50 % in zes weken, 5 % in week 7–13) over de maanden: **36,1 % / 15,8 % / 3,1 %**; binnen K2–K8 gelijk over de drie maanden. K9 (maand 25–27) bevat alleen de uitbetaling van de verkoop in maand 24. Afgerond op de euro; het afrondingsverschil zit in K9, zodat de totalen gelijk zijn aan die van de EP.
+
+| Netto, uitbetaald (€, vóór wisselkoers) | K1 | K2 | K3 | K4 | K5 | K6 | K7 | K8 | K9 | **Totaal** |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **Laag** (rekenscenario) | 14.003 | 2.634 | 2.338 | 1.978 | 1.709 | 1.439 | 1.349 | 1.169 | 359 | **26.978** |
+| Laag cumulatief | 14.003 | 16.637 | 18.975 | 20.953 | 22.662 | 24.101 | 25.450 | 26.619 | 26.978 | |
+| Midden | 56.890 | 10.699 | 9.499 | 8.037 | 6.941 | 5.845 | 5.480 | 4.750 | 1.462 | **109.603** |
+| Midden cumulatief | 56.890 | 67.589 | 77.088 | 85.125 | 92.066 | 97.911 | 103.391 | 108.141 | 109.603 | |
+
+**Gevolg voor D10.** Het verschil met de verkooptabel is klein (Laag K1 € 835 lager, dat schuift naar K2), want de termijn is één maand. Wat wél telt: **in maand 1 en het grootste deel van maand 2 na de release komt er geen geld binnen**, en het geld komt in USD. Het financieringsplan rekent de verkoop daarom (zoals de EP vastlegde) alleen als terugverdienen na de release, met deze kasbasis-tabel voor Laag; fase 3 hangt er niet van af (EP §1, punt 4). Bij een release later in de maand komt het eerste geld sneller (release op de 15e: ± 6 weken na de release); de tabel, met release op de eerste dag, is dus voorzichtig.
+
+**Vragen voor de boekhouder** (bij de oprichting van de vennootschap, #51 deel 1: 4A; geen CEO-besluit nodig):
+- **U1.** Welk W-8-formulier en welk verdragstarief (VS–België) gelden voor de vennootschap op Steam-inkomsten, en welke gegevens (bv. Belgisch ondernemingsnummer als buitenlands TIN) vraagt het tax interview?
+- **U2.** Hoe gaat de uitbetaling van Valve in de Belgische btw-aangifte en de boekhouding (factuur voor eigen administratie, plaats van de dienst), en hoe wordt de wisselkoers geboekt?
+- **U3.** Een rekening die USD ontvangt of omzet: welke bankkosten en welk koersrisico, en is een USD-rekening zinvol?
 
 ## 4. Inhoud die nu al vastligt
 
@@ -218,7 +255,7 @@ Regels voor de dossiertekst:
 | D2, §5 | ✅ Projectbeschrijving en argumentatie cat. I goedgekeurd met aanscherpingen (verwerkt in §5) | Creative Director | Deel 2 |
 | D9, D10, D11 | Creatiebudget fase 3 op VAF-sjabloon (participaties, overhead ≤ 15 %), financieringsplan, planning; raming Nederlandse versie (#51: 5A) | Executive Producer | Met F6 (T15); de NL-raming vóór het indienen |
 | D6, D8 | ✅ Marktonderzoek, vergelijkbare titels en verkoopraming geleverd in `docs/business/markt-en-verkoopraming.md` (verwerkt in §3 en §4.3) | Marketing & Community Manager | Gedaan; herzien zodra er een Steam-pagina en wishlists zijn (O6 van dat document) |
-| D10 (uit D8) | ✅ Scenario gekozen en spreiding geleverd in `docs/productie/verkoopspreiding-d10.md`: **Laag náást Midden**, met **Laag als rekenscenario** voor de cashflow; Hoog alleen als bovengrens; verkoop is geen financieringsbron voor fase 3 (§1). Kwartaaltabel K1–K8, bruto naar netto, voor Laag en Midden (§3). Open: uitbetalingstermijn Steam (BLA, P1) en verkoop tegen het budget fase 3 (EP, P2) | Executive Producer; BLA (P1) | Gedaan; P1 bij het afwerken van D10, P2 met F6 (T15) |
+| D10 (uit D8) | ✅ Scenario gekozen en spreiding geleverd in `docs/productie/verkoopspreiding-d10.md`: **Laag náást Midden**, met **Laag als rekenscenario** voor de cashflow; Hoog alleen als bovengrens; verkoop is geen financieringsbron voor fase 3 (§1). Kwartaaltabel K1–K8, bruto naar netto, voor Laag en Midden (§3). ✅ Uitbetalingstermijn Steam (P1) uitgewerkt in §3.3, met de tabel op kasbasis; fiscale vragen U1–U3 voor de boekhouder. Open: verkoop tegen het budget fase 3 (EP, P2) | Executive Producer; BLA (P1) | Gedaan; P2 met F6 (T15); U1–U3 bij de oprichting van de vennootschap |
 | D7, D13 | Tractieplan (wishlists) en pitchvideo; beide vragen een publieke uiting of slice-art | Marketing & Community Manager; CEO-besluit over een Steam-pagina (na de merkcheck, #24 3A) | Na de slice |
 | D4 (cat. II) | Kernteam: opties (bv. Vlaamse freelancers in het kernteam) met hun kost uitwerken; het besluit is van de CEO | Executive Producer (optie en kost), CEO (besluit) | Na intakevraag (a) |
 | D12 | Slice-build | Team (F3) | Einde fase 2 |
@@ -227,8 +264,6 @@ Regels voor de dossiertekst:
 **Open punt:** crit. 3 van cat. I (personages of voorwerpen, "al dan niet fictief", die naar Vlaanderen, België of de EER verwijzen; geen fictieve-wereldtoets) als extra criterium; mogelijk bewijs in verhaal V2 §5 (bevroren echo's van een begijn en een veerman) en §2.3 (het carillon). CD en BLA bekijken het vóór de intake.
 
 **Open punt:** de reviewtellingen van de vergelijkbare titels rechtstreeks op Steam bevestigen vóór het indienen (`docs/business/markt-en-verkoopraming.md` O1); BLA bij het afwerken van het dossier.
-
-**Open punt:** de kop van dit dossier staat op versie 0.6, het logboek op 0.7; BLA zet de kop gelijk bij de volgende wijziging.
 
 **Open punt:** A1 bevestigen vóór de intake: woon- en belastingplaats van de CEO (door de CEO).
 
@@ -261,6 +296,7 @@ Het traject tot het contract duurt naar raming ± 3 tot 10 maanden (`subsidies.m
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.7 | 2026-11-10 | BLA (P1 van `verkoopspreiding-d10.md`): nieuw §3.3, uitbetaling door Steam (30 dagen na de verkoop, uiterlijk de 30e van de volgende maand; drempel $ 100; alleen USD; bank- en belastinggegevens vóór de eerste betaling; tax interview, W-8, verdrag VS–België), met bronnen en datum (2026-11-10), kwartaaltabel K1–K9 op kasbasis voor Laag en Midden (totalen gelijk aan die van de EP), gevolg voor D10, vragen U1–U3 voor de boekhouder. §3-tabel D10, §1 en §6.2 bijgewerkt; kop naar 0.7 met de wijzigingen en de open punten; open punt over de kop geschrapt. `verkoopspreiding-d10.md`: alleen een verwijzing bij P1. |
 | 0.7 | 2026-11-10 | EP (D10 uit D8, O4/O7 van de raming): §3-tabel D8 naar ✅ concept en D10 naar 🟡 (verwijzing toegevoegd), §6.2 rij D10 (uit D8) afgevinkt, met verwijzing naar `docs/productie/verkoopspreiding-d10.md` (Laag náást Midden, Laag als rekenscenario, kwartaaltabel over 24 maanden). Geen cijfers overgenomen. Kop en §1 niet aangeraakt (eigenaar BLA; open punt in §6.2). |
 | 0.6 | 2026-11-10 | D6 en D8 uit `docs/business/markt-en-verkoopraming.md` (v0.1, Marketing, PR #132) verwerkt: §3-tabel (D6 ✅ concept, D8 🟡, D7 blijft ⬜), §4.3 herschreven (bankduo niet onderbouwd als tweede verkoopargument, O2/O8 van dat document; co-op als onderscheidend kenmerk), §6.2 (D6/D8 afgevinkt; nieuwe rij voor de EP: Laag náást Midden in D10 (O4) en spreiding over 24 maanden (O7); open punt reviewtellingen (O1)), intakevraag (j) (O3), §1. Geen cijfers overgenomen; het dossier verwijst naar dat document. |
 | 0.5 | 2026-11-10 | B2 verwerkt na de review van de CD ([comment in #72](https://github.com/cesarvangerwen-glitch/echoborn/issues/72#issuecomment-6755869892)): crit. 5 als tweede criterium, crit. 2 en 4 aanvullend; Hollestede bij naam; "het water beheersen" vervangen door "licht pompen laat het water zakken" (water géén speellaag, #51 deel 2: 1A); lore en thema loslaten in crit. 4; crit. 5 naar art bible §8; laatste zin "gekozen", voorwaardelijk op A1. Zelf getoetst aan art. 4 (§3.1): cat. I kent naast het verplichte crit. 1 geen rangorde, dus crit. 5 als tweede criterium klopt; het is het enige van de drie zonder fictieve-wereldtoets. Blijft binnen #51: 5A ("volgens voorstel CD", dezelfde stad). Toegevoegd, geen afwijking: carillon niet als crit. 6 geclaimd (muziek door AI-rollen, herkomst onzeker; na Lead-review EP), echte zetel invullen bij het indienen, crit. 5-bewijs vóór de slice is de art bible en T1. §1, §6.1 en §6.2 bijgewerkt; open punt crit. 3 in §6.2 (Lead-review EP). D6/D8 niet aangeraakt. |
