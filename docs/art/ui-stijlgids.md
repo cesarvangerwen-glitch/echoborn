@@ -1,13 +1,14 @@
 # UI-stijlgids *Polderlight*
 
-Versie 0.2.1 · Eigenaar: UI Artist · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10 deel 2: eind-UI-art; deel 3: menu's, glyphs, Theme) · Review: Art Director
-Basis: UX-spec `docs/ux/hud-menus.md` v0.1.2 (menu's: §4 en de wireframes in `docs/ux/wireframes/`) en `docs/ux/coop.md`, art bible v0 (`docs/art/bible.md` §2, §3, §6, §7), assetlijst S-17.
+Versie 0.3 · Eigenaar: UI Artist · Issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10 deel 2: eind-UI-art; deel 3: menu's, glyphs, Theme) · Review: Art Director
+Basis: UX-spec `docs/ux/hud-menus.md` v0.3 (menu's: §4 en de wireframes in `docs/ux/wireframes/`) en `docs/ux/coop.md`, art bible v0 (`docs/art/bible.md` §2, §3, §6, §7), assetlijst S-17.
 
 Alles in deze gids is **eigen werk** en wordt gemaakt door twee scripts, zonder externe assets:
 
 ```
 python3 docs/art/ui/bron/genereer_ui.py      # vanaf de repo-root, ± 3 s: font, HUD, wereld (deel 2)
 python3 docs/art/ui/bron/genereer_menu.py    # daarna, ± 3 s: menu's, glyphs, Theme (deel 3)
+python3 docs/art/ui/bron/genereer_menu_placeholder.py   # daarna, ± 2 s: placeholder-mock-ups (§12.6), alleen naar docs/art/ui/
 ```
 
 De scripts schrijven de assets naar `game/art/ui/`, de previews naar `docs/art/ui/` en printen de metingen van §6, §7 en §12.5.
@@ -22,6 +23,8 @@ De scripts schrijven de assets naar `game/art/ui/`, de previews naar `docs/art/u
 | W4 | Talen **EN en NL**, tekstvakken voor EN + 35 %. | besluit #51 deel 1 (5A), UX §6 |
 | W5 | **F1 is gehaald**; F0 nog niet. Na F0 kan de UX Designer maten bijstellen (UX W7); de assets zijn dan met het script snel aan te passen. | fasekader fase 2, UX §7 punt 1 |
 | W6 | De HUD hangt op een **CanvasLayer** en doet niet mee met de saturatiepass van de wijk: in grijs en kleur gelijk. | UX §2.3 |
+| W7 | De mock-ups van §12.6 zijn **placeholders** (`_placeholder` in de naam): de indeling en maten van UX §4.5, §4.7a, §4.8 en §4.9 kloppen, de eind-art van die schermen volgt later. Het slot-kader is geen nieuw bestand maar een combinatie van bestaande 9-slices. | UX §7 punt 16 |
+| W8 | **3 spelbestanden**, schema v1 (zonder lampglas); *Lampglas n/4* staat in de meting, nog niet in de mock-up. | UX W9 |
 
 ## 1. Wat deze gids dekt
 
@@ -32,7 +35,7 @@ De scripts schrijven de assets naar `game/art/ui/`, de previews naar `docs/art/u
 2. **Knop-glyphs per apparaat** (§13): toetsenbord en muis, Xbox-stijl, PlayStation-stijl en Steam Deck, normaal (11 px) en groot (15 px). Eigen tekeningen, generieke vormen, geen logo's of merkkleuren.
 3. **Godot Theme** (§14): `polderlight_menu.tres` en `polderlight_menu_groot.tres` met Polderletter, de menu-art en type-varianten, zodat de Gameplay Programmer de menu's niet per scherm hoeft te stijlen.
 
-**Nog niet:** het scherm *Spelbestand kiezen*, het logboek (MN-15) en de credits als eigen mock-up (§10, punt 11–12). Het Theme dekt hun onderdelen wel.
+**Deel 3, vervolg (placeholder):** mock-ups van *Spelbestanden* met de bevestiging, het Logboek, de Credits en herbinden met de kolomkeuze, normaal en groot (§12.6). Ze gebruiken alleen bestaande onderdelen; de eind-art van deze schermen volgt later (werkaanname W7).
 
 ## 2. Beeldtaal
 
@@ -144,7 +147,7 @@ Op de Deck (640×400) gelden dezelfde getallen met H = 400: de HUD staat dan in 
 | **66 % (gekozen)** | 35,9 | **43,0** |
 | 70 % | 32,3 | 46,5 |
 
-**Keuze:** de plaat gaat naar **66 %**. Dat haalt ΔL\* ≥ 40 met 3 punten marge, en de plaat blijft doorschijnend genoeg om de stad te zien. Daarbovenop heeft elk element een contour van bijna-zwart (L\* 1,8): de rand van de meter staat nooit direct tegen de achtergrond (ΔL\* rand/contour 77,0). Dit wijzigt het getal 62 % in UX §2.3: open punt 1 in §10.
+**Keuze:** de plaat gaat naar **66 %**. Dat haalt ΔL\* ≥ 40 met 3 punten marge, en de plaat blijft doorschijnend genoeg om de stad te zien. Daarbovenop heeft elk element een contour van bijna-zwart (L\* 1,8): de rand van de meter staat nooit direct tegen de achtergrond (ΔL\* rand/contour 77,0). Overgenomen in UX §2.3 (v0.2): de plaat is 66 % (open punt 1 gesloten).
 
 **Contrastparen** (ΔE76 normaal / deuteranopie / ΔL\*; regel bible §7.1: ΔE ≥ 30 en ≥ 25 bij deuteranopie, anders ΔL\* ≥ 20 of vorm):
 
@@ -192,8 +195,8 @@ Gemeten in Polderletter normaal met **testteksten** (EN en NL, in het script, `V
 **Tekens per regel in het logkader** (lopende tekst): normaal 348 px = **± 77 tekens** NL (4,5 px per teken); groot 528 px = **± 97 tekens**. De EN-regel van **258 px** (348 / 1,35, UX §3.7) is in Polderletter **± 56 tekens EN**, ruimer dan de 43 van het wireframe-font. De Narrative Designer kan dus EN-regels tot 56 tekens schrijven.
 
 **Bevindingen:**
-1. Alles past, behalve **`HUD_PAD_JOIN_HINT`** in NL op één regel van een melding (195 px). Voorstel: twee regels, *Controller 2* / *Druk op Start om mee te doen* (zoals CO-04 al twee regels gebruikt). Open punt 2.
-2. Een melding van max. 196 px rechtsonder **overlapt het logkader** (x 140–500) zodra ze breder is dan 128 px en beide tegelijk staan. Voorstel: staat het logkader er, dan schuift de melding 36 px omhoog (boven het kader). Open punt 3.
+1. Alles past, behalve **`HUD_PAD_JOIN_HINT`** in NL op één regel van een melding (195 px). **Overgenomen** in UX §6 (v0.2): twee regels, kop *Controller 2* in cyaan (`HUD_PAD_NAME`) en *Druk op Start om mee te doen* (`HUD_PAD_JOIN_HINT`); `HUD_PAD_LOST` gebruikt dezelfde kop. Open punt 2 gesloten.
+2. Een melding van max. 196 px rechtsonder **overlapt het logkader** (x 140–500) zodra ze breder is dan 128 px en beide tegelijk staan. **Overgenomen** in UX HUD-M5/HUD-M6 (v0.2): een melding is max. **196 px** breed (binnen 184, groot 294) en schuift in 6 ticks omhoog tot 4 px boven het element onder in het midden: **36 px** boven het logkader, **52 px** boven het logkader op *groot*, **28 px** boven de boss-balk met naam. Open punt 3 gesloten.
 3. NL is in de test gemiddeld maar 3 % langer per teken dan EN; het verschil zit in losse woorden (*Afsluiten* +138 %, *Stoppen (vasthouden)* +100 %). De regel EN + 35 % blijft dus nodig voor korte vakken (menuregels, knoppen), niet voor lopende tekst.
 
 ## 8. Previews (in `docs/art/ui/`)
@@ -215,13 +218,20 @@ Gemeten in Polderletter normaal met **testteksten** (EN en NL, in het script, `V
 | `menu_opties_besturing_herbinden_x2.png` | Opties, tab *Besturing*: herbinden, cel *Druk een knop…* en de dialoog *Bezet door Dash* (UX §4.5) |
 | `menu_opties_groot_x2.png` | Opties bij *Tekstgrootte: groot*: regel 20 px, lijst scrolt (TG-10) |
 | `menu_elementen_x4.png` | Alle menu-onderdelen en hun staten |
-| `knop_glyphs_x4.png` | Alle knop-glyphs, per apparaat, normaal en groot |
+| `knop_glyphs_x4.png` | Alle knop-glyphs, per apparaat, normaal en groot (intern werkblad: de vier PS-vormen staan er naast elkaar, dus niet publiek gebruiken, `knop-glyphs-check.md` §2.1) |
+| `menu_spelbestanden_x2_placeholder.png` | *Spelbestanden* normaal: plaats 1 `HERSTELD` met focus, plaats 2 `KAPOT`, plaats 3 *Leeg*, melding MN-24; eronder de bevestiging MN-23 (*Terug* gekozen), Xbox-stijl (UX §4.7a) |
+| `menu_spelbestanden_groot_x2_placeholder.png` | Idem bij *Tekstgrootte: groot* (584 × 50), focus op de `KAPOT`-plaats (geen hint A); bevestiging 480 × 168 met `MENU_CONFIRM_SET_ASIDE_BODY`, Deck-glyphs |
+| `menu_slot_kader_x2_placeholder.png` | Het slot-kader in de staten normaal, focus, hover en ingedrukt; normaal (400 × 36) en groot (584 × 50) |
+| `menu_logboek_x2_placeholder.png` | Logboek normaal (logkader rechts, Xbox-stijl) en groot (kader onder de lijst, Deck) (UX §4.8) |
+| `menu_credits_x2_placeholder.png` | Credits normaal (Xbox-stijl) en groot (toetsenbord), met de merkenregel; namen zijn plaatshouders (UX §4.9) |
+| `menu_herbinden_kolom_x2_placeholder.png` | Besturing: cel-focus in *Controller* (de pad stuurt, MN-41) en in *Toetsenbord 1*; *Links* en *Rechts* als twee regels, *Ook: linker stick*, *Herstel alles*; hint *Kolom* met `dpad_horizontaal` (UX §4.5) |
 
 ## 9. Regels voor wie UI bouwt (Gameplay Programmer)
 
 - **Filter Nearest** via de projectinstelling `rendering/textures/canvas_textures/default_texture_filter` of `texture_filter` op de HUD-CanvasLayer (in Godot 4 geen importoptie meer); geen mipmaps; geen schaal of rotatie op HUD-nodes (bible §2). De pijl van P2 draait alleen in stappen van 90°.
 - Zet de HUD op een **CanvasLayer** op de interne resolutie (640×360 / 640×400), niet op 1280×720: een asset van 7×9 moet 7×9 interne pixels blijven.
 - Plaatsing ten opzichte van de schermrand, nooit ten opzichte van het 16:9-beeld (HUD-M1).
+- **Meldingen** (HUD-08): max. 196 px breed en twee regels; schuiven in 6 ticks omhoog tot 4 px boven logkader of boss-balk (36 / 52 groot / 28 px, UX HUD-M6).
 - Tekst: Polderletter (`.fnt`) op `font_size` 11 (groot 16), nooit een andere maat; `font_color` gevel wit 7, schaduw `#06060f` op (1, 1). Kop van het logkader in gloed 6, tweede regel van een melding in gevel wit 5, P2-meldingen in cyaan met `kader_9slice_cyaan`.
 - **Tekstgrootte groot**: wissel naar `polderletter_groot.fnt` en het grote logkader; de HUD (meter, levens, badge) blijft gelijk (TG-10).
 - **Menu's** (deel 3): zet `polderlight_menu.tres` als `theme` op de wortel-Control van elk menuscherm; bij *Tekstgrootte: groot* wissel je naar `polderlight_menu_groot.tres` (§14). Menuregels zijn `Button`s met `alignment = Left`; de lamp en de keuzebalk komen uit het Theme. Laat de muis de focus nemen (`mouse_entered` → `grab_focus()`), dan is er altijd maar één lamp.
@@ -232,29 +242,34 @@ Gemeten in Polderletter normaal met **testteksten** (EN en NL, in het script, `V
 
 | # | Wat | Wie | Wanneer |
 |---|---|---|---|
-| 1 | **Wijziging UX §2.3**: plaat 62 % → **66 %** (meetpunt haalt dan ΔL\* 43,0). Graag overnemen in de UX-spec. | UX Designer | Volgende versie van `hud-menus.md` |
-| 2 | **Wijziging UX/tekst**: `HUD_PAD_JOIN_HINT` in NL op twee regels (*Controller 2* / *Druk op Start om mee te doen*), of korter. | UX Designer, Narrative Designer | Bij `strings.csv` (T8a) |
-| 3 | **Wijziging UX §2.1 / §3.7**: een melding schuift 36 px omhoog zolang het logkader staat (anders overlapt ze bij > 128 px breed). Voorstel max. breedte melding: 196 px. | UX Designer | Volgende versie van `hud-menus.md` |
+| 1 | **Gesloten:** plaat 66 % staat in UX §2.3 (v0.2); §6 bijgewerkt. | — | — |
+| 2 | **Gesloten:** `HUD_PAD_JOIN_HINT` op twee regels met kop `HUD_PAD_NAME` staat in UX §6 (v0.2); §7 bevinding 1. De sleutels zet de Gameplay Programmer in `strings.csv` bij de bouw (UX §7 punt 2). | — | — |
+| 3 | **Gesloten:** melding max. 196 px en omhoog boven logkader (36 px, groot 52 px) én boss-balk (28 px) staat in UX HUD-M5/HUD-M6 (v0.2); §7 bevinding 2 en §9. | — | — |
 | 4 | `#ff475c` vastleggen als vijandkern/-rand in bible §6 (ook de rode bovenrand van de boss-balk). | Art Director | Bible v1 |
 | 5 | Vervallen: de map is `game/art/ui/` (AD-review PR #137). | — | — |
 | 6 | **Viewport en filter**: `project.godot` heeft op pc 1280×720 zonder stretch-modus, en zet nog geen standaardfilter Nearest (`rendering/textures/canvas_textures/default_texture_filter`). De UI gaat uit van 640×360 met integer schalen (bible §2). | Technical Director | Bij de bouw van de HUD (T8a) |
 | 7 | **Licentieregister**: Polderletter is eigen werk; geen licentie van derden. Wil de Business/Legal Advisor het toch als regel "eigen werk" in `docs/licenties.md` (rolbestand UI Artist: "lettertypes hebben een licentie in licenties.md")? | Business/Legal Advisor | Geen haast |
 | 8 | Nog te testen op een echte Steam Deck: leesbaarheid van Polderletter normaal (7 px = ± 1,7 mm), de arcering van het echo-icoon (11×17) en de ring van 2 px. | Engine & Platform Programmer, met de UI Artist | Bij de Deck-build (#79) |
 | 9 | Kleurprofielen TG-07 (amber/wit-blauw, geel/magenta): de assets zijn per eigenaar in aparte bestanden, zodat een profiel alleen kleuren wisselt. Varianten tekenen zodra de AD de paren kiest. | Art Director, daarna UI Artist | Bible v1 |
-| 10 | **Deel 3** geleverd: menu-art, knop-glyphs per apparaat en het Godot Theme (§12–§14). Wat nog openstaat: punt 11–18. | UI Artist (review AD) | — |
-| 11 | **Spelbestand kiezen** (UX §4.2, *Nieuw spel*: 3 plaatsen met wijk, licht, speeltijd, lampglas; overschrijven met B als standaard): nog geen wireframe of indeling, dus geen art in deel 3. Het bouwt op keuzebalk, paneel en dialoog (§12). Art volgt na de indeling van de UX Designer. | UX Designer, daarna UI Artist | Na de volgende versie van `hud-menus.md` |
-| 12 | **Logboek (MN-15) en credits**: geen eigen mock-up; het Theme dekt de onderdelen (RichTextLabel, scrollbalk, kader). Mock-up na een wireframe. | UX Designer, daarna UI Artist | Na de wireframes |
-| 13 | **Herbinden: de kolom kiezen.** De art toont de gekozen kolom met `cel_focus` (open rand gloed 6) binnen de gekozen regel. UX §4.5 zegt niet hoe je van kolom wisselt (links/rechts in de regel?). Graag bevestigen. | UX Designer | Volgende versie van `hud-menus.md` |
+| 10 | **Deel 3** geleverd: menu-art, knop-glyphs per apparaat en het Godot Theme (§12–§14), plus placeholder-mock-ups van de overige menu's (§12.6). Nog open van deel 3: 16, 17 en 19–22. | UI Artist (review AD) | — |
+| 11 | **Gesloten:** *Spelbestanden* (UX §4.7a) als placeholder-mock-up, normaal en groot, met de bevestiging MN-23 (§12.6). Enige nieuwe vorm is het slot-kader, gemaakt uit `kader_9slice` en `keuzebalk_9slice` (§12.2). | — | — |
+| 12 | **Gesloten:** Logboek (UX §4.8) en Credits (UX §4.9) als placeholder-mock-up, normaal en groot (§12.6). | — | — |
+| 13 | **Gesloten:** UX §4.5 MN-40–MN-44 bevestigt de kolomkeuze (links/rechts in de regel, geen wrap, startkolom = apparaat dat stuurt). `cel_focus` in de mock-up klopt daarmee; *Links* en *Rechts* staan als twee regels, de hint *Kolom* gebruikt `dpad_horizontaal` (§12.6). Zie ook punt 20. | — | — |
 | 14 | **Besloten door de AD (Lead-review PR #142):** glyphs monochroom, zonder merkkleur (kleur blijft voor licht en spelers). Knoptekst zonder schaduw mag, met als menunorm **ΔL\* ≥ 34** (worst case), zolang een menuregel altijd op de zijband, op de verduistering (≥ 72 %) of op de keuzebalk staat. Voor de HUD blijft ΔL\* ≥ 40. | Art Director | Besloten |
-| 15 | **Glyphs in Xbox- en PlayStation-stijl**: eigen tekeningen van generieke vormen (letters, kruis, rondje, vierkant, driehoek), geen logo's. Graag een korte check of die vormen en de namen in *Knopiconen* zonder licentie in een Steam-release mogen. | Business/Legal Advisor | Vóór de eerste publieke build |
+| 15 | **Gesloten** met de check van de Business/Legal Advisor (`docs/business/knop-glyphs-check.md` v1.1): de getekende glyphs mogen blijven (🟢). Regels in §13 aangevuld: monochroom, de vier PS-vormen nooit samen als rij of embleem en nooit in merkkleur, geen Xbox-, PS- of Steam-knop en geen controller-silhouet (🔴). Het overzichtsblad blijft intern. Merkenregel staat in de credits-mock-up; de definitieve tekst is van de Narrative Designer met de BLA (check §4 punt 4). | — | — |
 | 16 | **Theme nog niet in Godot geopend** (geen editor in de werkomgeving van de UI Artist). Graag laden bij de bouw van de menu's en fouten melden in #87; het hangt ook af van punt 6 (filter Nearest). | Gameplay Programmer | Met T8a |
 | 17 | **Spelnaam als tekst**, geen logo (bible: geen naam of logo in de art), tot na de merkcheck van *Polderlight* (besluit #96). Een logo is een eigen opdracht. | Art Director | Na de merkcheck |
-| 18 | **Lengte van wijknamen** (regel onder *Doorgaan*, §12.5): de regel staat op twee regels (wijk / licht · speeltijd), want op één regel past hij al niet. Graag overnemen in UX §4.2. De wijknaam moet dan ≤ 165 px blijven (± 36 tekens, ook in het EN), anders wordt de zijband breder. | UX Designer, Narrative Designer | Bij de wijknamen in `strings.csv` |
+| 18 | **Gesloten:** overgenomen in UX §4.2 nr. 2 (twee regels; wijknaam ≤ 165 px in Polderletter normaal, in EN én NL). Het meten bij het schrijven van de namen is UX §7 punt 17 (Narrative Designer, World & Level Designer). | — | — |
+| 19 | **Theme-variant `Slot`** voor het slot-kader (Button: *normal* `kader_9slice`, *focus* keuzebalk, *pressed* ingedrukt, *hover* hover; icoon = lamp; twee Labels erin) toevoegen aan `genereer_menu.py` en de twee `.tres`. Nu niet gedaan: de mock-ups zijn placeholders (W7). | UI Artist (review AD) | Bij de eind-art, vóór de bouw van het slot-menu (UX §7 punt 13, T8a) |
+| 20 | **Stijlvraag `cel_focus`:** de cel is even hoog als de regel (15 px), dus boven en onder valt haar rand samen met die van de keuzebalk; je herkent de gekozen cel aan de staanders links en rechts en de lichtere rand (gloed 6 tegen 5). Leesbaar in de mock-up, maar minder sterk dan een eigen vlak. Zo laten, of bij de eind-art een cel met vulling gloed 1? | Art Director | Bij de review van deze PR |
+| 21 | **Ter info voor de UX Designer:** `MENU_CONFIRM_SET_ASIDE_BODY` (NL) past bij *groot* op **één** regel (426 van 448 px binnen het paneel van 480), niet op twee zoals UX §4.7a zegt. Geen wijziging nodig: het paneel heeft ruimte voor twee regels. | UX Designer | Volgende versie van `hud-menus.md` |
+| 22 | **Credits:** de merkenregel uit de glyph-check is 6 regels in de kolom van 320 px (normaal en groot). De inhoud (namen, rollen, licentieteksten) is van de Producer en de Business/Legal Advisor (UX §7 punt 18); de mock-up gebruikt plaatshouders. | Producer, Business/Legal Advisor | Vóór de eerste publieke build |
 
 ## 11. Wijzigingen
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.3 | 2026-11-10 | UX §7 punt 16 (#87): placeholder-mock-ups *Spelbestanden* met bevestiging, slot-kader, Logboek, Credits en herbinden met kolomkeuze, normaal en groot (§12.6, §8, script `genereer_menu_placeholder.py`); slot-kader in §12.2; open punten 1–3, 11–13, 15 en 18 gesloten, 19–22 nieuw; regels uit de glyph-check in §13; W7, W8. |
 | 0.2.1 | 2026-11-10 | Na de Lead-review van de AD (PR #142): lamp ook bij hover (§12.3, Theme `icon_hover_color`); herbinden met glyphs en de dialoog in de set van het apparaat (§12.4); regel onder *Doorgaan* op twee regels en in de meting (§12.5, open punt 18); Menu-glyph in de P2-hint; *Pauze van P1* bovenaan (MN-11); Deck-glyphs in ijzer 5 (§13); open punt 14 besloten. |
 | 0.2 | 2026-11-10 | T10 deel 3 (#87): menu-art (§12), knop-glyphs per apparaat (§13), Godot Theme normaal en groot (§14), fonts titel ×2 en spelnaam ×3 (§4), previews (§8), regels voor menu's (§9), open punten 10–17. |
 | 0.1.1 | 2026-11-10 | Na de Lead-review van de AD (PR #137): klokring P2 `#e8ffff` in plaats van `#bff4fc`; map `game/art/ui/`; Godot 4-filter en `font_size` 11/16; open punten 4–6 bijgewerkt. |
@@ -292,6 +307,7 @@ De **indeling** (welke regels, welke volgorde, wat waar staat) is van de UX Desi
 | `paneel_9slice.png` | 11×11, 4 | dialoog (bevestigen, *Bezet door …*): ijzer 2 px met klinknagels, plaat 85 % | `PanelContainer`, `Panel` |
 | `zijband_9slice.png` | 5×5, 2 | band links achter hoofdmenu en pauze: plaat 78 %, rand gevel wit 2 rechts | variant `Zijband` |
 | `../hud/kader_9slice.png` | 7×7, 2 | uitleg onder de opties, info in de pauze (zelfde kader als logkader en meldingen) | variant `Uitleg` |
+| **slot-kader** (geen eigen bestand) | 400 × 36, groot 584 × 50 | een plaats in *Spelbestanden*: normaal = `kader_9slice`; focus en hover = `keuzebalk_9slice` over het hele kader + `keuze_lamp` op (x + 3, midden); ingedrukt = `keuzebalk_ingedrukt_9slice` eronder. Geen staat *uit* (UX §4.7a) | variant `Slot` (open punt 19) |
 
 Geen asset: de **verduistering** achter Opties is een `ColorRect` in lucht 0 (`#06060f`) op **72 %**; de pauze verduistert de wereld 35 % en zet de zijband erover (de HUD blijft staan, UX §4.3).
 
@@ -362,6 +378,7 @@ Alle bestanden in `game/art/ui/glyphs/<apparaat>/`, als losse PNG per knop; `<na
 - **Toetsenbord**: de toets is een 9-slice met de **echte** toetsnaam als tekst, zodat AZERTY en andere indelingen kloppen (UX §4.5, `input.md` W7). Tekst gevel wit 7 zonder schaduw.
 - Welke set: *Knopiconen* in Opties (automatisch = het laatst gebruikte apparaat van die speler; Deck-glyphs op de Deck), UX §4.4–4.5. De herkenning van het apparaat is van de Engine & Platform Programmer (UX §7 punt 4).
 - Niet getekend: de Steam- en de …-knop van de Deck (de game bindt ze niet) en de PS-knop/Xbox-knop (idem).
+- **Grenzen uit de glyph-check** (`docs/business/knop-glyphs-check.md` §3, open punt 15): de glyphs mogen blijven zoals ze zijn (🟢). Nooit (🔴): de vier PlayStation-vormen samen als rij of embleem (ook niet als decor, loading screen of op de Steam-pagina), de PS-vormen of Xbox-letters in hun merkkleuren, de Xbox-, PS- of Steam-knop, een controller-silhouet. Het overzichtsblad `knop_glyphs_x4.png` is intern. Knophints tonen per scherm alleen de knoppen die iets doen, dus nooit alle vier de vormen tegelijk. Nieuwe glyphs (Switch, silhouet): eerst een check bij de BLA.
 
 ## 14. Godot Theme
 
@@ -396,3 +413,18 @@ Wat het Theme **niet** kan en de bouwer per node zet:
 - **Tekstschaduw in een Button** bestaat in Godot niet; zie §12.5. Wie toch schaduw wil, zet een Label in de Button.
 - De verduistering (`ColorRect`, §12.2), de keuzepijlen naast een waarde en de glyphs in de knophints.
 - Filter Nearest: via de projectinstelling of `texture_filter` op de wortel van het menu (§9, open punt 6).
+
+### 12.6 Placeholder-mock-ups: Spelbestanden, Logboek, Credits, kolomkeuze (UX §7 punt 16)
+
+Gemaakt door `genereer_menu_placeholder.py` uit de onderdelen van §12.2, met de maten van UX §4.5, §4.7a, §4.8 en §4.9 (die gelden; hier alleen wat de art toevoegt). Bestanden: §8. Placeholder (W7): de indeling klopt, de eind-art volgt.
+
+| Scherm | Wat de art doet |
+|---|---|
+| *Spelbestanden* | Verduistering 72 %, `Titel`, drie slot-kaders (§12.2). Regel 1 *Plaats n* in gevel wit 5, met focus 7 (ingedrukt gloed 6); *Hersteld uit back-up* rechts in `Gedimd`; regel 2 `Gedimd`, `KAPOT`/`NIEUWER` in gloed 6, *Leeg* in gevel wit 3. Melding MN-24 in `kader_9slice`, tekst gevel wit 7. Knophints volgen de stand: op een `KAPOT`-plaats geen A. |
+| Bevestiging (MN-23) | Lijst nog eens 50 % verduisterd, `paneel_9slice` (ijzer met klinknagels). *Terug* met keuzebalk en lamp, *Overschrijven* als gewone regel in gevel wit 5: **geen rood en geen waarschuwingskleur** (rood is van vijanden, open punt 4); de bescherming zit in de bediening. |
+| Logboek | Tabbalk zoals Opties (gekozen tab gloed 6); niet gevonden = *– – –* in de staat *uit* (gevel wit 3, geen lamp); het kader is het logkader van de HUD (kop gloed 6), groot onder de lijst. |
+| Credits | Kop gloed 6, namen gevel wit 7, gecentreerd in 320 px; geen scrollbalk; tekst boven de knophints wordt afgesneden door de `ScrollContainer`. Hints: d-pad verticaal *Sneller* (toetsenbord: pijl omlaag), B/Esc *Terug*. |
+| Herbinden, kolom | `cel_focus` loopt van 4 px vóór de glyphs tot 4 px vóór de volgende kolom (in *Controller* tot x 604, binnen de keuzebalk). *Ook: linker stick* in gevel wit 3 met de stick-glyph: geen cel, geen focus (MN-43). Hint *Kolom* met `dpad_horizontaal`. Zie open punt 20. |
+
+**Meting** (script, Polderletter): regel 2 met de langste testwijk + *· Licht 100 · 12 u 59 min · Lampglas 4/4* is 342 px van 379 (groot 417 van 563); *Gemaakt met een nieuwere versie: kan niet laden* 215 px (groot 258); alle bevestigingsteksten passen op één regel normaal (≤ 368 px) en groot (≤ 448); titel ×2 *Plaats 3 overschrijven?* 216 px; logbladzijde en `MENU_LOG_NONE` ≤ 200 px van 348; merkenregel in de credits 6 regels.
+
