@@ -1,6 +1,6 @@
 # Wereld en slice *Polderlight*
 
-Versie 0.1.2 (GDD v1, deel 2) · Eigenaar: Lead Game Designer (met World & Level Designer voor §1–§2, Systems Designer voor de lichtbalans, Combat Designer voor de vijandtypes) · Issue [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (T3c), `docs/productie/fase-2-kader.md` §2
+Versie 0.1.3 (GDD v1, deel 2) · Eigenaar: Lead Game Designer (met World & Level Designer voor §1–§2, Systems Designer voor de lichtbalans, Combat Designer voor de vijandtypes) · Issue [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (T3c) en [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10, namen), `docs/productie/fase-2-kader.md` §2
 Hoort bij `docs/design/gdd.md` v0.6.2 (regels E-, C-, L-, LM-, V-) en `docs/design/kernloop.md` v0.5.1 (aantallen, rekensom, terugkeerregels K-01–K-05). De boss van de slice staat apart in `docs/design/gemaalmeester.md`.
 Bronnen: `docs/concept/pitch.md` v0.4 (P1–P3, §4 puzzeldefinitie en normen, §5 rondgangen, R-V4), `docs/narrative/verhaal-v2.md` (gebieden, bosses, bevroren echo's, logboeken), `docs/beslissingen.md`.
 
@@ -35,16 +35,39 @@ Een stad die je wijk voor wijk aanzet (pillar 2), met een route die altijd in be
 
 ### 1.3 De gebieden
 
-Thema's, bosses en fragmenten volgen `verhaal-v2.md` §4.2. Poorten volgen gdd §3.2.
+Thema's, bosses en fragmenten volgen `verhaal-v2.md` §4.2. Poorten volgen gdd §3.2. De namen van gebieden en wijken volgen `docs/narrative/namen.md` §2; de EN-namen en de vaste id's staan in §1.3a.
 
 | | Gebied | Wijken | Vaardigheid (in wijk *n*.3) | Boss (werknaam) | Wat de ruimte vraagt | Ingang (K-02) |
 |---|---|---|---|---|---|---|
 | Proloog | **De ringdijk** (10–15 min) | — (één polderpomp, 1 trap) | — | — | Lopen, springen, dash, aanval, de eerste echo; bounce en merk leren in de flow-kamervorm (B1, K2-arena) | Start |
 | 1 | **De polderwijk** | 1.1 *De Dijkvoet*, 1.2 *De Grachtenrij*, 1.3 *De Kadewijk* (slice) | V-01 **Neerslag** | **De Gemaalmeester** (`gemaalmeester.md`) | Kades, bruggen en grachten op één hoogte: keren (B1), lussen (B3), lanceerkloven (B4) over grachten; luiken in kades en bruggen | Vanaf de proloog |
-| 2 | **Het begijnhof** | 2.1 *De Poort*, 2.2 *De Omgang*, 2.3 *De Binnentuin* | V-02 **Snijlijn** | **De Wake** | Omgangen en een binnentuin: lussen (B3) en merk-arena's met groepen; rietgordijnen als hagen en netten | In 1.2, achter een **luik** (V-01) |
-| 3 | **De markt en de waag** | 3.1 *De Kramen*, 3.2 *De Lakenhal*, 3.3 *De Waag* | V-03 **Wandgreep** | **De Waag** | De drukste merk-arena's (veel types door elkaar), hoge gevels met hijsbalken: omhoog (B2) en terugvallen (B5) | In 2.2, achter een **rietgordijn** (V-02) |
+| 2 | **Het begijnhof** | 2.1 *De Poorttoren*, 2.2 *De Omgang*, 2.3 *De Binnentuin* | V-02 **Snijlijn** | **De Wake** | Omgangen en een binnentuin: lussen (B3) en merk-arena's met groepen; rietgordijnen als hagen en netten | In 1.2, achter een **luik** (V-01) |
+| 3 | **De markt en de waag** | 3.1 *De Kramen*, 3.2 *De Lakenhal*, 3.3 *Het Waagplein* | V-03 **Wandgreep** | **De Waag** | De drukste merk-arena's (veel types door elkaar), hoge gevels met hijsbalken: omhoog (B2) en terugvallen (B5) | In 2.2, achter een **rietgordijn** (V-02) |
 | 4 | **Het belfort** | 4.1 *De Torenvoet*, 4.2 *De Uurwerkzaal*, 4.3 *De Klokkenkamer* | V-04 **Meerlijn** | **Het Uurwerk** | Verticaal: greepschachten, zigzag omhoog (B2), terugvalbochten (B5), kloven tussen balken met meerringen. De waterstand is die van de **torenbakken** (het water van het uurwerk), met dezelfde regels (LM-10) | In 3.3, achter een **kale schacht** (V-03) |
 | Finale | **De grote sluis** (5–8 min route) | — | — | **De Grendel** (eindboss), daarna **Wards tien seconden** (gdd C-17) | De eindboss-route (K-04): over de daken van het belfort en langs de ringdijk, met elke vaardigheid minstens één keer, in beweging | In 4.3, na het Uurwerk |
+
+### 1.3a Wijk-id's (NM-O1, NM-O5)
+
+Elke wijk, de proloog en de finale hebben een **vaste id**: ascii, snake_case, zonder lidwoord, en nooit hernoemd (ook niet als de naam later verandert; dan verandert alleen de sleutel in `strings.csv`). De id is wat de save en de code gebruiken om de wijkregel onder *Doorgaan* en in `MENU_SLOT_DETAILS` (`hud-menus.md` §4.2, §4.7) te kiezen: `state.gebied` bevat alleen het gebied (`docs/tech/ontwerp.md` §7). Hoe de id in de save komt, staat in OW-9. De namen zijn die van `namen.md` §2 en `game/locale/strings.csv`; bij verschil geldt `strings.csv`.
+
+| Gebied | Wijk | Id | Sleutel | NL | EN |
+|---|---|---|---|---|---|
+| Proloog | — | `ringdijk` | `COMMON_DISTRICT_PROLOGUE` | De Ringdijk | The Ring Dyke |
+| 1 *De polderwijk* | 1.1 | `dijkvoet` | `COMMON_DISTRICT_1_1` | De Dijkvoet | Dykefoot |
+| 1 | 1.2 | `grachtenrij` | `COMMON_DISTRICT_1_2` | De Grachtenrij | Canal Row |
+| 1 | 1.3 (slice) | `kadewijk` | `COMMON_DISTRICT_1_3` | De Kadewijk | The Quayside |
+| 2 *Het begijnhof* | 2.1 | `poorttoren` | `COMMON_DISTRICT_2_1` | De Poorttoren (zie OW-10) | The Gatehouse |
+| 2 | 2.2 | `omgang` | `COMMON_DISTRICT_2_2` | De Omgang | The Cloister Walk |
+| 2 | 2.3 | `binnentuin` | `COMMON_DISTRICT_2_3` | De Binnentuin | The Inner Garden |
+| 3 *De markt en de waag* | 3.1 | `kramen` | `COMMON_DISTRICT_3_1` | De Kramen | The Stalls |
+| 3 | 3.2 | `lakenhal` | `COMMON_DISTRICT_3_2` | De Lakenhal | The Cloth Hall |
+| 3 | 3.3 | `waagplein` | `COMMON_DISTRICT_3_3` | Het Waagplein | Weigh House Square |
+| 4 *Het belfort* | 4.1 | `torenvoet` | `COMMON_DISTRICT_4_1` | De Torenvoet | Towerfoot |
+| 4 | 4.2 | `uurwerkzaal` | `COMMON_DISTRICT_4_2` | De Uurwerkzaal | The Clockwork Hall |
+| 4 | 4.3 | `klokkenkamer` | `COMMON_DISTRICT_4_3` | De Klokkenkamer | The Bell Chamber |
+| Finale | — | `grote_sluis` | `COMMON_DISTRICT_FINALE` | De Grote Sluis | The Great Sluice |
+
+**Wijk 2.1 heet *De Poorttoren*, niet *De Poort*** (NM-O2a; keuze van de World & Level Designer). Waarom: in de ontwerpdocumenten is *poort* de spelterm voor elke vaardigheidspoort (terugkeerpoort K-01, K-02-poort, eindboss-poort K-04, L-03); "de poort in De Poort" maakt regels en kamerdocumenten dubbelzinnig, en een speler die *De Poort · Licht 40* leest, denkt eerder aan een doorgang dan aan een plek. *De Poorttoren* is een gebouw (NM-2), botst niet met een boss, vaardigheid of gebied (NM-4), ligt dichter bij de EN-naam *The Gatehouse*, en de terugkeerpoort van 2.1 lag er al in (§1.4). Breedte: 63 / 76 px (normaal / groot, `polderletter.py` `text_width`), binnen 165 px (NM-1). De EN-naam blijft. De id is meteen `poorttoren`.
 
 ### 1.4 Terugkeerpoorten (K-01, WS-06)
 
@@ -53,7 +76,7 @@ Thema's, bosses en fragmenten volgen `verhaal-v2.md` §4.2. Poorten volgen gdd �
 | 1.1 *De Dijkvoet* | Rietgordijn voor een steeg | V-02 | Logbladzijde + snelkoppeling naar de proloog |
 | 1.2 *De Grachtenrij* | Kale schacht in een pakhuis | V-03 | Snelkoppeling naar 1.3 + logbladzijde |
 | 1.3 *De Kadewijk* | Brede gracht met meerringen | V-04 | Logbladzijde (in de slice zichtbaar, niet bereikbaar) |
-| 2.1 *De Poort* | Kale schacht in de poorttoren | V-03 | Logbladzijde + snelkoppeling |
+| 2.1 *De Poorttoren* | Kale schacht in de toren | V-03 | Logbladzijde + snelkoppeling |
 | 2.3 *De Binnentuin* | Kloof boven de kapel met meerringen | V-04 | Logbladzijde |
 | 3.1 *De Kramen* | Kloof tussen twee daken | V-04 | Logbladzijde + snelkoppeling |
 | 3.2 *De Lakenhal* | Kloof over de hal | V-04 | Logbladzijde |
@@ -69,9 +92,9 @@ flowchart LR
     P[Proloog<br/>de ringdijk] --> G11[1.1 Dijkvoet]
     G11 --> G12[1.2 Grachtenrij<br/>minibaas] --> G13[1.3 Kadewijk<br/>V-01, Gemaalmeester<br/>= slice]
     G13 -- lus --> G12
-    G12 -- "luik (V-01)" --> G21[2.1 Poort] --> G22[2.2 Omgang<br/>minibaas] --> G23[2.3 Binnentuin<br/>V-02, De Wake]
+    G12 -- "luik (V-01)" --> G21[2.1 Poorttoren] --> G22[2.2 Omgang<br/>minibaas] --> G23[2.3 Binnentuin<br/>V-02, De Wake]
     G23 -- lus --> G22
-    G22 -- "rietgordijn (V-02)" --> G31[3.1 Kramen] --> G32[3.2 Lakenhal<br/>minibaas] --> G33[3.3 Waag<br/>V-03, De Waag]
+    G22 -- "rietgordijn (V-02)" --> G31[3.1 Kramen] --> G32[3.2 Lakenhal<br/>minibaas] --> G33[3.3 Waagplein<br/>V-03, De Waag]
     G33 -- "kale schacht (V-03)" --> G41[4.1 Torenvoet] --> G42[4.2 Uurwerkzaal<br/>minibaas] --> G43[4.3 Klokkenkamer<br/>V-04, Het Uurwerk]
     G43 -- "K-04: route met V-01–V-04" --> F[Finale: de grote sluis<br/>De Grendel, Wards 10 s]
     G11 -.V-02.-> T1((terug))
@@ -183,13 +206,15 @@ Alle drie zijn `Merkbaar`. De kost per type (runs, animaties) meet de EP in F6 t
 | # | Punt | Wie | Wanneer |
 |---|---|---|---|
 | OW-1 | **Bijstellen na F0** ([#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80)): D vastzetten, de duur per wijk (WS-05) en de lichtbalans (SL-01) met de gemeten flow-kamerwaarden herrekenen | LGD, World & Level Designer, Systems Designer | Na F0, vóór T8a |
-| OW-2 | Namen van wijken zijn werknamen; afstemmen met het verhaal (`verhaal-v2.md` §10, punt 1) | Narrative Designer | Bij het splitsen in `gebieden.md` |
+| OW-2 | ~~Namen van wijken zijn werknamen; afstemmen met het verhaal~~ **Afgestemd** in `docs/narrative/namen.md`; overgenomen in §1.3–§1.5 en §1.3a (v0.1.3) | — | — |
 | OW-3 | De waterstand in het belfort (torenbakken, §1.3) leest misschien niet als "water zakt, wijk gaat aan" | Art Director, World & Level Designer | Fase 3, bij gebied 4 |
 | OW-4 | Of de 4e vijandtype-plek in de slice nodig is | Combat Designer | T8b, na de eerste playtest |
 | OW-5 | Bovengrens 410 van 420 min, dus na F0 nog ± 10 min marge: gaat WS-05 omhoog, dan eerst minder kamers per wijk, geen extra wijk | LGD, World & Level Designer | Na F0 |
 | OW-6 | De 4 minibazen komen bovenop de 5 bosses: hun kost apart meten in F6, naast R-V4 | Executive Producer | T15 |
 | OW-7 | C-17 wijkt af van de rolverdeling uit 7A (max. twee lichamen blijft); geen CEO-vraag (8A legt de 10 s bij het einde), wel een melding in het fase-2-statusrapport | Executive Producer | T15 |
 | OW-8 | De EP leidt in T15 de kost per kamer af uit T8a en T11, en legt het moment van de terugval naar 3 gebieden (§1.7) vast vóór de start van fase 3 | Executive Producer | T15 |
+| OW-9 | **Wijk-id in de save** (NM-O5): `state.gebied` heeft geen wijk (`ontwerp.md` §7); hoe de id uit §1.3a in de save komt (bv. een veld naast het checkpoint), kiezen GP en TD in schema v2. `wijk_gemaal` en het begin per kamer volgen met de slice-wijk (T8a, [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83)) | Gameplay Programmer, Technical Director | Schema v2, vóór T8a |
+| OW-10 | **Naam 2.1 *De Poorttoren*** (§1.3a, NM-O2a): `COMMON_DISTRICT_2_1` NL van *De Poort* naar *De Poorttoren* in `namen.md` §2.3 en `strings.csv` (gemeten 63 px, ≤ 165 px); EN *The Gatehouse* blijft | Narrative Designer | Bij de volgende versie van `namen.md` |
 
 ---
 
@@ -197,6 +222,7 @@ Alle drie zijn `Merkbaar`. De kost per type (runs, animaties) meet de EP in F6 t
 
 | Versie | Wat |
 |---|---|
+| 0.1.3 | Namen uit `namen.md` (#87, NM-O2, NM-O2a, NM-O5): wijk 3.3 *Het Waagplein* en 2.1 *De Poorttoren* in §1.3–§1.5; nieuwe §1.3a met de vaste wijk-id's (gebied → wijk → id → sleutel → NL/EN) en de keuze voor *De Poorttoren*; OW-2 afgestemd; open punten OW-9 (wijk-id in de save) en OW-10 (naam 2.1 in `namen.md` en `strings.csv`). |
 | 0.1.2 | Na de SM-review (PR #123): verwijzing naar `kernloop.md` v0.5.1 in §1.6; open punt OW-8. |
 | 0.1.1 | Herstel na de Lead-review van de EP (PR #123): rekensom met het plan als aparte regel (321–404 min ≈ 5,4–6,7 uur) en dezelfde kolommen als `kernloop.md`; open punten OW-5–OW-7. |
 | 0.1 | Eerste versie (GDD v1, deel 2; T3c, [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81)). Wereldstructuur: 4 gebieden van 3 wijken, proloog en finale (WS-01–WS-11), gebieden en ingangen, 7 terugkeerpoorten, wereldkaart, rekensom 5,3–6,8 uur (plan 5,4–6,7), terugvaloptie 3 gebieden. Verzamelobjecten: lampglas en logbladzijde (LM-11). Slice: de Kadewijk, kamers S1–S9, SL-01–SL-06, 3 vijandtypes binnen het plafond van 4 (R-V4), wat T8a–d bouwen, checklist. |
