@@ -845,7 +845,7 @@ def blad_logboek():
         img = laad("r5_kleur_640x360.png")
         img = verduister(img)
         txt(img, "LOGBOEK", 28, 8, C["tekst"], scale=2)
-        tabbalk(img, ["PROLOOG", "WIJK 1.1 DE KADEWIJK"], 1, y=38)
+        tabbalk(img, ["PROLOOG", "DE POLDERWIJK"], 1, y=38)
         txt(img, "3 VAN 7 GEVONDEN", 28, 58, C["tekst_d"])
         return img
 
@@ -859,7 +859,7 @@ def blad_logboek():
     txt(a, "LOGBLADZIJDE 4", 238, 78, C["gloed"][6])
     txt(a, "DE SLUISWACHTER SCHREEF HET PEIL OP DE MUUR,", 238, 88, C["tekst"])
     txt(a, "ELKE AVOND EEN STREEP HOGER.", 238, 97, C["tekst"])
-    noot(a, 1, 250, 36)
+    noot(a, 1, 200, 36)
     noot(a, 2, 132, 56)
     noot(a, 3, 190, 92)
     noot(a, 4, 190, 108)
@@ -928,7 +928,10 @@ def blad_credits():
 def blad_herbinden_kolom():
     """Herbinden: de kolom kiezen (MN-40-MN-44). Paneel 1: cel gekozen. Paneel 2: wachten op een knop."""
     kol = [20, 196, 326, 466]
-    rijen = [("LINKS / RECHTS", "A / D", "PIJLEN", "STICK, D-PAD"),
+    # MN-43: Links en Rechts zijn twee regels; de stick is geen cel (gedimde regel eronder).
+    rijen = [("LINKS", "A", "PIJL LINKS", "D-PAD LINKS"),
+             ("RECHTS", "D", "PIJL RECHTS", "D-PAD RECHTS"),
+             ("~", "", "", "OOK: LINKER STICK"),
              ("SPRINGEN", "SPATIE", "ENTER", "A"),
              ("AANVAL", "E", "R-CTRL", "X"),
              ("INTERACTIE (GENEZEN)", "F", "/", "Y"),
@@ -946,6 +949,9 @@ def blad_herbinden_kolom():
                 rect(img, 20, y, 588, 15, C["gloed"][0], 0.7)
                 frame(img, 20, y, 588, 15, C["gloed"][5])
                 lamp(img, 23, y + 3)
+            if r[0] == "~":
+                txt(img, r[3], kol[3] + 13, y + 4, C["kader_d"])
+                continue
             for j, (x, t) in enumerate(zip(kol, r)):
                 if i == rij and j == cel:
                     rechts = (kol[j + 1] - 7) if j + 1 < len(kol) else 604
@@ -958,22 +964,24 @@ def blad_herbinden_kolom():
         return img
 
     basis = verduister(laad("r5_grijs_640x360.png"))
-    a = tabel(basis.copy(), 1, 3)
+    a = tabel(basis.copy(), 3, 3)
     noot(a, 1, 610, 74)
-    maat(a, 300, 196, "LINKS / RECHTS: VAN KOLOM WISSELEN (GEEN WRAP)")
-    maat(a, 300, 208, "OMHOOG / OMLAAG: ANDERE REGEL, ZELFDE KOLOM")
-    maat(a, 300, 220, "START IN DE KOLOM VAN HET APPARAAT DAT STUURT")
-    maat(a, 300, 232, "ACTIE IS GEEN CEL: LINKS STOPT BIJ TOETSENBORD 1")
-    noot(a, 2, 280, 196)
+    noot(a, 2, 610, 92)
+    maat(a, 300, 228, "LINKS / RECHTS: VAN KOLOM WISSELEN (GEEN WRAP)")
+    maat(a, 300, 240, "OMHOOG / OMLAAG: ANDERE REGEL, ZELFDE KOLOM")
+    maat(a, 300, 252, "START IN DE KOLOM VAN HET APPARAAT DAT STUURT")
+    maat(a, 300, 264, "ACTIE IS GEEN CEL: LINKS STOPT BIJ TOETSENBORD 1")
+    maat(a, 300, 276, "(2) LINKS EN RECHTS: TWEE REGELS; STICK GEEN CEL")
+    noot(a, 3, 280, 228)
     hintbalk(a, [("+", "KOLOM"), ("A", "HERBIND"), ("X", "STANDAARD"), ("B", "TERUG")])
     label(a, "HERBINDEN: KOLOM GEKOZEN MET CEL_FOCUS (MN-40, MN-41)")
 
-    b = tabel(basis.copy(), 1, 3, wacht=True)
+    b = tabel(basis.copy(), 3, 3, wacht=True)
     noot(b, 1, 610, 74)
-    maat(b, 300, 196, "ALLEEN EEN KNOP VAN DIT SOORT APPARAAT TELT:")
-    maat(b, 300, 208, "CONTROLLER = ELKE PAD; TOETSENBORD = TOETSEN")
-    maat(b, 300, 220, "ESC OF B ANNULEERT, VAN ELK APPARAAT; 5 S")
-    noot(b, 2, 280, 196)
+    maat(b, 300, 228, "ALLEEN EEN KNOP VAN DIT SOORT APPARAAT TELT:")
+    maat(b, 300, 240, "CONTROLLER = ELKE PAD; TOETSENBORD = TOETSEN")
+    maat(b, 300, 252, "ESC OF B ANNULEERT, VAN ELK APPARAAT; 5 S")
+    noot(b, 2, 280, 228)
     hintbalk(b, [("B", "ANNULEREN")])
     label(b, "HERBINDEN: WACHTEN OP EEN KNOP (MN-42)")
     opslaan(np.concatenate([a, b], 0), "menu_herbinden_kolom_x2_placeholder.png", 2)
@@ -1070,7 +1078,8 @@ def blad_opties_besturing():
     kol = [44, 200, 330, 470]
     for x, t in zip(kol, ["ACTIE", "TOETSENBORD 1", "TOETSENBORD 2", "CONTROLLER"]):
         txt(img, t, x, 62, C["noot"])
-    rijen = [("LINKS / RECHTS", "A / D", "PIJLEN", "STICK, D-PAD"),
+    rijen = [("LINKS", "A", "PIJL LINKS", "D-PAD L (+ STICK)"),
+             ("RECHTS", "D", "PIJL RECHTS", "D-PAD R (+ STICK)"),
              ("SPRINGEN", "SPATIE", "ENTER", "A"),
              ("AANVAL", "E", "R-CTRL", "X"),
              ("INTERACTIE (GENEZEN)", "F", "/", "Y"),
@@ -1081,18 +1090,18 @@ def blad_opties_besturing():
              ("STOPPEN (VASTHOUDEN)", "-", "BACKSPACE", "VIEW")]
     for i, r in enumerate(rijen):
         y = 80 + i * 18
-        if i == 4:
+        if i == 5:
             rect(img, 36, y - 4, 568, 15, C["plaat"], 0.95)
             frame(img, 36, y - 4, 568, 15, C["amber"])
         for j, (x, t) in enumerate(zip(kol, r)):
-            if i == 4 and j == 3:
+            if i == 5 and j == 3:
                 rect(img, x - 3, y - 3, 60, 13, C["amber"])
                 txt(img, "DRUK...", x, y, C["zwart"], schaduw=False)
             else:
-                txt(img, t, x, y, C["tekst"] if i == 4 else C["tekst_d"])
-    txt(img, "BEZET DOOR DASH: WISSELEN?", 300, 252, C["gloed"][6])
+                txt(img, t, x, y, C["tekst"] if i == 5 else C["tekst_d"])
+    txt(img, "BEZET DOOR DASH: WISSELEN?", 300, 266, C["gloed"][6])
     noot(img, 1, 610, 150)
-    noot(img, 2, 460, 250)
+    noot(img, 2, 460, 264)
     hintbalk(img, [("A", "HERBIND"), ("X", "STANDAARD"), ("B", "TERUG")])
     label(img, "OPTIES: BESTURING (HERBINDEN PER APPARAAT)")
     opslaan(img, "menu_opties_besturing_x2_placeholder.png", 2)

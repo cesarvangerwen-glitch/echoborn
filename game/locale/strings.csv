@@ -41,3 +41,8 @@ MENU_LOG_NONE,No pages found here yet.,Nog geen bladzijden in dit gebied.,"Logbo
 MENU_CREDITS,Credits,Credits,"Hoofdmenuregel en titel van de credits (hud-menus.md §4.9)."
 MENU_CREDITS_FASTER,Faster,Sneller,"Knophint in de credits naast het d-pad: omlaag vasthouden = 4x zo snel (MN-36)."
 MENU_COLUMN,Column,Kolom,"Knophint in Opties > Besturing naast d-pad links/rechts: van kolom wisselen (MN-40)."
+MENU_RESET_ALL,Reset all,Herstel alles,"Laatste regel van Opties > Besturing; opent de bevestiging (hud-menus.md §4.5, MN-43)."
+MENU_CONFIRM_RESET_ALL,Reset all buttons?,Alle knoppen terugzetten?,"Titel van de bevestiging bij Herstel alles (MN-43, volgens MN-23)."
+MENU_CONFIRM_RESET_ALL_BODY,All columns go back to the default buttons.,Alle kolommen krijgen weer de standaardknoppen.,"Tekst van de bevestiging bij Herstel alles. Max. 2 regels in het paneel (368 px)."
+MENU_RESET,Reset,Herstellen,"Tweede keuze in de bevestiging bij Herstel alles; nooit de standaard (MN-23)."
+MENU_ALSO_STICK,Also: left stick,Ook: linker stick,"Gedimde regel onder Links en Rechts in de kolom Controller: de stick is geen cel en niet herbindbaar (MN-43)."
