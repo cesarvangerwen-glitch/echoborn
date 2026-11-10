@@ -21,6 +21,9 @@ extends Node
 ## typenaam vóór een lokale `const GameState = preload(...)`, en dat breekt
 ## elk script dat het schema zo gebruikt.
 ## `bind_area_loader` begint een nieuw gebied: de vorige bindingen vervallen.
+## Een gemaal in de gestreamde inhoud van een kamer bindt de AreaLoader zelf
+## bij het laden en maakt het los bij het ontladen (deel 3b, ontwerp.md §3a);
+## daarom `bind_meter` vóór `loader.start`.
 
 const GameState = preload("res://scripts/save/game_state.gd")
 
@@ -71,10 +74,12 @@ func bind_area_loader(loader: Node, gebied: StringName) -> PackedStringArray:
 	# oude checkpoint, in het oude gebied.
 	loader.gebied = gebied
 	loader.game_state = state
+	if "progress" in loader:
+		loader.progress = self
 	loader.apply_flag_renames(state)
 	var unknown: PackedStringArray = loader.unknown_flags(state)
 	for flag in unknown:
-		push_warning("Progress: vlag '%s' hoort bij geen object in gebied '%s' (hernoemd zonder flag_renames?)" % [flag, gebied])
+		push_warning("Progress: vlag of gemaal-id '%s' hoort bij geen object in gebied '%s' (hernoemd zonder flag_renames?)" % [flag, gebied])
 	return unknown
 
 
@@ -85,14 +90,44 @@ func bind_meter(meter: RefCounted) -> void:
 	meter.value = state.lichtmeter
 
 
-## Een gemaal in de gebiedsscène (LM-03, LM-06): krijgt meteen zijn stand
-## uit `state.gemalen[id]` (zonder signalen) en schrijft hem terug in
-## `store_world`. Een gemaal in gestreamde inhoud kan nog niet (deel 3b).
+## Een gemaal (LM-03, LM-06): krijgt meteen zijn stand uit
+## `state.gemalen[id]` (zonder signalen) en schrijft hem terug in
+## `store_world`. Zonder eigen lichtmeter krijgt het de meter van
+## `bind_meter`. Voor een gemaal in de gebiedsscène roept het script van die
+## scène dit aan; voor een gemaal in gestreamde inhoud doet de AreaLoader dat
+## bij het laden (deel 3b), met `AreaLoader.gemaal_id` als id.
 func bind_gemaal(gemaal: Node, id: StringName) -> void:
 	_gemalen[id] = gemaal
+	if gemaal.meter == null:
+		if _meter == null:
+			push_error("Progress: gemaal '%s' heeft geen lichtmeter (eerst bind_meter, dan loader.start)" % id)
+		gemaal.meter = _meter
 	if state.gemalen.has(id):
 		var entry: Dictionary = state.gemalen[id]
 		gemaal.restore_state(int(entry["vulstand"]), bool(entry["vol"]))
+
+
+## Het gemaal `id` gaat weg (zijn kamer ontlaadt, deel 3b): zijn stand gaat
+## naar `state`, en `store_world` slaat het daarna over. Een ander gemaal
+## onder dezelfde id (al opnieuw gebonden) blijft staan.
+func unbind_gemaal(gemaal: Node, id: StringName) -> void:
+	if _gemalen.get(id) != gemaal:
+		return
+	state.set_gemaal(id, gemaal.fill, gemaal.is_full())
+	_gemalen.erase(id)
+
+
+## Is `id` nu gebonden (tests, debugmenu)?
+func has_gemaal(id: StringName) -> bool:
+	return _gemalen.has(id) and is_instance_valid(_gemalen[id])
+
+
+## Is `positie` in het gebied van de gekoppelde loader het checkpoint van nu
+## (`state`)? Een pompslag zet alleen een nieuw checkpoint (`Checkpoint`).
+func is_current_checkpoint(positie: Vector2) -> bool:
+	if is_instance_valid(_loader) and state.gebied != _loader.gebied:
+		return false
+	return state.checkpoint_positie == positie
 
 
 ## Schrijft de stand van de wereld naar `state`: de objecten in de geladen

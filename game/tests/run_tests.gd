@@ -44,6 +44,7 @@ const TEST_SCRIPTS := [
 	"res://tests/test_flowtest_t17.gd",
 	"res://tests/test_localization.gd",
 	"res://tests/test_save_slots.gd",
+	"res://tests/test_save_gemaal.gd",
 	"res://tests/test_flowtest_duo.gd",
 	"res://tests/test_deck_settings.gd",
 ]
@@ -67,7 +68,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	var started := Time.get_ticks_msec()
-	print("Echoborn tests - Godot %s, physics %d Hz" % [
+	print("Polderlight tests - Godot %s, physics %d Hz" % [
 		Engine.get_version_info().string,
 		Engine.physics_ticks_per_second])
 	_check_scripts_and_autoloads()
