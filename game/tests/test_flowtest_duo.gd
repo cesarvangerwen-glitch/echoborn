@@ -74,9 +74,10 @@ func _run(t, d: int) -> String:
 	# Wat het duo moet doen (#125 punt 1).
 	var launches_b4 := 0
 	for row in rows:
-		if row[2] == "LANCERING" and row[1] == "K1" and float(row[5]) > B4_MIN_X:
+		# Drager P1 (bron), springer P2: de rolverdeling van B4 in `flow_duo.gd`.
+		if row[2] == "LANCERING" and row[1] == "K1" and row[4] == "p1" and float(row[5]) > B4_MIN_X:
 			launches_b4 += 1
-	t.check(launches_b4 >= 1, "duo D=%d: geen lancering in B4" % d)
+	t.check(launches_b4 >= 1, "duo D=%d: geen lancering van P2 over P1 in B4" % d)
 	# MP-6 co-op (zoals T17): LP uit bronnen met P2 of een samenwerkingsactie.
 	var lp_coop := 0
 	for row in rows:

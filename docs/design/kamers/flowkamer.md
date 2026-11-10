@@ -198,7 +198,8 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 - Gameplay Programmer, in T16c: P1 die een richting vasthoudt tegen een wand op de vloer, is niet `on_floor` en springt niet (de bot laat één tick los).
 - Gameplay Programmer, met punt 3 van #125: `flow_report.gd` en MP-7 (c) tellen `SPRINGPLANK` + `LANCERING`/`VANGEN` van dezelfde springer op dezelfde tick als één actie (antwoord 6); MP-3 in co-op meet de stilstand van de springer (antwoord 7).
 - LGD of QA Lead (uit de TD-review van PR #127): de CSV `…_p1.csv` bevat in co-op ook P2-regels, terwijl gdd §4.5 `_<speler>` zegt: bevestigen of gdd §4.5 aanpassen.
-- QA Lead (T17 deel 2, [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80)): de co-op-cijfers van het duo (§9) en de nieuwe solo-cijfers met lancering. Omdat de bot nu in B4 lanceert, veranderen ook de ondergrenzen van T17 (de schaduwpartner lanceert P1 in B4).
+- QA Lead (T17 deel 2, [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80)): de co-op-cijfers van het duo (§9) en de nieuwe solo-cijfers met lancering. Omdat de bot nu in B4 lanceert, veranderen ook de solo-runs van T17 (64,4 / 66,8 / 78,9 s, was 63,5 / 65,4 / 76,6 s) en de co-op-ondergrenzen (de schaduwpartner lanceert P1 in B4).
+- QA Lead of Gameplay Programmer bij T17 deel 2 ([#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80)), of de LGD past gdd §4.6 aan: co-op-replay per speler (de `recorded` van beide stoelen van `flow_duo.gd` afspelen als twee `ScriptedInput`s, met hetzelfde log; gdd §4.5/§4.6). De duo-test draait nu de bots twee keer opnieuw.
 - Gameplay Programmer: de springplank-reeks `n` opnieuw laten beginnen bij aflopen van de echo kan van `flow_meetlog.gd` naar `meetlog.gd`.
 - LGD: gdd §4.2 en FK-2 naar 4 + 5 vijanden.
 - LGD na T17: in B3 geeft de vang +3 tegen +5 voor landen plus bounce; met 4 + 5 vijanden haalt de gescripte run 108 LP na K1 + K2 (marge 8).
@@ -209,5 +210,5 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 |---|---|
 | 0.1 | Eerste blockout van de flow-kamer (T16b) |
 | 0.3 | Lead-review: vijfde basisvijand in golf 2 (108 LP na K1 + K2), FK-2-grens en metingen bijgewerkt |
-| 0.4 | #125: de bot lanceert in B4 (solo); gescripte co-op-run `flow_duo.gd` met test per D; §9 solo bijgewerkt en co-op erbij; werkaannames 7, 9–11; Lead-review: antwoorden 6 en 7 van de LGD, open punten |
 | 0.2 | Merge met co-op 7A (#78): vang en lancering tellen in de lichtmeter (+3, +4), B3 landt met een vang; metingen bijgewerkt. Lead-review: FK-2-grens voor 4 + 4 vijanden voorgerekend (§4), FK-2-test per D, antwoorden van de LGD en open punten (§12) |
+| 0.4 | #125: de bot lanceert in B4 (solo); gescripte co-op-run `flow_duo.gd` met test per D; §9 solo bijgewerkt en co-op erbij; werkaannames 7, 9–11; Lead-review: antwoorden 6 en 7 van de LGD, open punten; SM-review: B4-check op de rolverdeling, open punt co-op-replay |
