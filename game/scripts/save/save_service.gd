@@ -1,7 +1,13 @@
-extends RefCounted
-## Opslaan en laden (T5b, #82; ontwerp.md §7). Statisch, zonder toestand:
-## de autoload `SaveService` uit de doelstructuur (§3) wordt een dunne laag
-## hierover zodra het spel menu's en slots heeft.
+extends Node
+## Opslaan en laden (T5b, #82; ontwerp.md §7), in twee lagen:
+##
+## - **Statisch** (`write`, `read`, `migrate`): bestanden, versies en
+##   migratie, zonder toestand. Tests en tools gebruiken die via `preload`.
+## - **Autoload `SaveService`** (deel 3a): slots, de stand van een slot voor
+##   het menu (`slot_info`), laden en nieuw spel, en de autosave bij een
+##   checkpoint (`Progress.checkpoint_reached`) en bij afsluiten. Vlak vóór
+##   elke save schrijft `Progress.store_world()` de stand van de wereld weg
+##   (`AreaLoader.store_objects`, lichtmeter, gemalen).
 ##
 ## - Eén JSON-bestand per slot: `user://saves/slot_<n>.json`, met `version`.
 ##   `user://` is de map die Steam Cloud synchroniseert.
@@ -141,3 +147,146 @@ static func _read_one(path: String, migrations: Dictionary, target: int) -> Dict
 		return result
 	result["state"] = GameState.from_dict(current, errors)
 	return result
+
+
+# --- Autoload: slots en autosave (T5b deel 3a) ---
+
+## Wat een slot is, voor het menu (ontwerp.md §7, "Slots en autosave"):
+## - LEEG: geen save en geen back-up. Menu: "nieuw spel".
+## - OK: de save laadt.
+## - HERSTELD: de save is kapot, de back-up laadt. Menu: gewoon laden; het
+##   spel meldt één keer dat de laatste voortgang (sinds het vorige
+##   checkpoint) verloren is. De volgende save herstelt het slot.
+## - KAPOT: save én back-up kapot (of alleen een kapotte save). Menu: het
+##   slot is "beschadigd" en laadt niet; alleen "nieuw spel in dit slot",
+##   en dan worden de bestanden opzijgezet (`.kapot`), niet gewist.
+## - NIEUWER: een save van een nieuwere versie van het spel. Menu: "kan niet
+##   laden: nieuwere versie"; nieuw spel zet de bestanden ook opzij.
+## - ONGELDIG: geen slot (buiten 1..SLOT_COUNT); een fout in de aanroeper.
+## De teksten zelf zijn voor de UX Designer en UI (T10), via Localization.
+enum SlotStatus { LEEG, OK, HERSTELD, KAPOT, NIEUWER, ONGELDIG }
+
+## Aantal slots in het menu (werkaanname, UX Designer T10 kan het wijzigen).
+## Slots zijn 1-based: 1 tot en met SLOT_COUNT, zoals in het menu en in de
+## bestandsnaam `slot_<n>.json`.
+const SLOT_COUNT := 3
+## Achtervoegsel voor opzijgezette bestanden van een kapot slot.
+const SET_ASIDE := ".kapot"
+
+## Na elke poging tot opslaan: `reason` is "checkpoint", "afsluiten", "nieuw_spel" of
+## "handmatig"; `error` OK of de fout (de vorige save blijft dan staan).
+signal saved(slot: int, reason: String, error: Error)
+
+## De map met de slots. Een test zet een eigen map.
+var dir := DEFAULT_DIR
+## De autoload `Progress`; gezet in `_ready` of met `use`.
+var progress: Node = null
+
+
+func _ready() -> void:
+	if progress == null:
+		var node := get_node_or_null(^"/root/Progress")
+		if node != null:
+			use(node)
+
+
+## Koppelt aan een `Progress`-node (de autoload, of een eigen in een test).
+func use(p_progress: Node) -> void:
+	if progress != null and progress.checkpoint_reached.is_connected(_on_checkpoint_reached):
+		progress.checkpoint_reached.disconnect(_on_checkpoint_reached)
+	progress = p_progress
+	progress.checkpoint_reached.connect(_on_checkpoint_reached)
+
+
+## Ligt `slot` in 1..SLOT_COUNT?
+static func is_valid_slot(slot: int) -> bool:
+	return slot >= 1 and slot <= SLOT_COUNT
+
+
+func path_of(slot: int) -> String:
+	return slot_path(slot, dir)
+
+
+## De stand van een slot voor het menu, zonder iets te veranderen:
+## {"status": SlotStatus, "state": GameState of null, "errors":
+## PackedStringArray}. Bij HERSTELD staan de fouten van de save zelf in
+## `errors`.
+func slot_info(slot: int) -> Dictionary:
+	if not is_valid_slot(slot):
+		var errors := PackedStringArray()
+		errors.append("slot %d bestaat niet (1..%d)" % [slot, SLOT_COUNT])
+		return {"status": SlotStatus.ONGELDIG, "state": null, "errors": errors}
+	var path := path_of(slot)
+	var result := read(path)
+	var info := {"status": SlotStatus.OK, "state": result["state"], "errors": result["errors"]}
+	if result["state"] != null:
+		info["status"] = SlotStatus.HERSTELD if result["from_backup"] else SlotStatus.OK
+	elif not FileAccess.file_exists(path) and not FileAccess.file_exists(path + ".bak"):
+		info["status"] = SlotStatus.LEEG
+	elif int(result["version"]) > VERSION:
+		info["status"] = SlotStatus.NIEUWER
+	else:
+		info["status"] = SlotStatus.KAPOT
+	return info
+
+
+## Laadt een slot in `progress` als het OK of HERSTELD is; geeft
+## `slot_info`. Bij LEEG, KAPOT, NIEUWER of ONGELDIG verandert er niets.
+func load_slot(slot: int) -> Dictionary:
+	var info := slot_info(slot)
+	if info["status"] == SlotStatus.OK or info["status"] == SlotStatus.HERSTELD:
+		progress.adopt(info["state"], slot)
+	return info
+
+
+## Begint een nieuw spel in `slot` en schrijft het meteen weg. Een kapot
+## slot of een save van een nieuwere versie wordt eerst opzijgezet
+## (`<pad>.kapot`, `<pad>.bak.kapot`; een vorige `.kapot` gaat weg). Een
+## goede save in het slot wordt gewist: het menu vraagt dat eerst.
+func new_game(slot: int, p_state: GameState = null) -> Error:
+	if not is_valid_slot(slot):
+		return ERR_PARAMETER_RANGE_ERROR
+	var status: int = slot_info(slot)["status"]
+	var path := path_of(slot)
+	for file in [path, path + ".bak", path + ".tmp"]:
+		if not FileAccess.file_exists(file):
+			continue
+		var err: Error
+		if (status == SlotStatus.KAPOT or status == SlotStatus.NIEUWER) and not file.ends_with(".tmp"):
+			if FileAccess.file_exists(file + SET_ASIDE):
+				DirAccess.remove_absolute(file + SET_ASIDE)
+			err = DirAccess.rename_absolute(file, file + SET_ASIDE)
+		else:
+			err = DirAccess.remove_absolute(file)
+		if err != OK:
+			return err
+	progress.adopt(p_state, slot)
+	return save_now("nieuw_spel")
+
+
+## Slaat het lopende spel op in zijn slot, met `store_world` vlak ervoor.
+## Zonder lopend spel (slot -1): ERR_UNCONFIGURED, en er wordt niets
+## geschreven. Mislukt het schrijven, dan blijft de vorige save staan; de
+## fout gaat via `saved` naar het spel (melding: UX/UI, T10) en als
+## waarschuwing naar het log (geen `push_error`: een volle schijf is geen
+## programmeerfout).
+func save_now(reason: String = "handmatig") -> Error:
+	if progress == null or progress.slot < 0:
+		return ERR_UNCONFIGURED
+	progress.store_world()
+	var err := write(path_of(progress.slot), progress.state)
+	if err != OK:
+		push_warning("SaveService: opslaan in slot %d mislukt (%s): %s" % [progress.slot, reason, error_string(err)])
+	saved.emit(progress.slot, reason, err)
+	return err
+
+
+func _on_checkpoint_reached(_kamer: StringName, _positie: Vector2) -> void:
+	save_now("checkpoint")
+
+
+## Autosave bij afsluiten (LM-12). Het checkpoint blijft het laatste
+## checkpoint: na laden sta je daar, met de stand van de wereld van nu.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		save_now("afsluiten")

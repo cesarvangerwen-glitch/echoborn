@@ -19,7 +19,9 @@ extends Node
 ## - Objecten (`SimObject`) in de `inhoud` van een kamer worden bij het laden
 ##   bij de Sim aangemeld en bij het ontladen afgemeld (R10). Een object met
 ##   een blijvende stand (een hendel) bewaart die als vlag in `game_state`
-##   (`<kamer_id>/<pad in de inhoud>`), zodat hij na opnieuw laden terugkomt.
+##   (`<gebied>/<kamer_id>/<pad in de inhoud>`), zodat hij na opnieuw laden
+##   terugkomt. Hernoem je een kamer of object, zet dan de oude vlag in
+##   `flag_renames`; `unknown_flags` vindt vlaggen die nergens meer bij horen.
 ##
 ## Geen eigen `_physics_process`: de Sim roept `sim_track` aan na stap (3)
 ## van E-07b, vóór de echo de resets van P1 verwerkt. Een wijziging in wat
@@ -52,6 +54,17 @@ var sim: Node = null
 ## (`GameState`, R10). Null = niet bewaren: na opnieuw laden begint een
 ## object dan in zijn standaardstand.
 var game_state: RefCounted = null
+## Het gebied (de gebiedsscène) van deze kamers; het eerste deel van de vlag
+## van een object (`object_flag`). Kamer-id's zijn alleen binnen een gebied
+## uniek. Gezet door `Progress.bind_area_loader`; leeg = geen voorvoegsel
+## (tests zonder gebied).
+var gebied: StringName = &""
+## Hernoemde vlaggen van dit gebied, {oude vlag: nieuwe vlag}: na het
+## hernoemen van een kamer of een object in de inhoud zet de World & Level
+## Designer hier de oude naam, zodat een bestaande save zijn stand houdt
+## (`apply_flag_renames`). Regels blijven staan zolang oude saves kunnen
+## bestaan.
+var flag_renames: Dictionary = {}
 
 var _order: Array[StringName] = []
 ## Per kamer de aangemelde objecten uit zijn inhoud, in boomvolgorde.
@@ -200,9 +213,65 @@ func store_objects() -> void:
 			_store(id)
 
 
-## De vlag in `GameState` voor een object in de inhoud van kamer `id`.
-static func object_flag(id: StringName, path_in_inhoud: NodePath) -> StringName:
-	return StringName("%s/%s" % [id, path_in_inhoud])
+## De vlag in `GameState` voor een object in de inhoud van kamer `id`:
+## `<gebied>/<kamer_id>/<pad>`, of `<kamer_id>/<pad>` zonder gebied.
+static func object_flag(id: StringName, path_in_inhoud: NodePath, p_gebied: StringName = &"") -> StringName:
+	if p_gebied == &"":
+		return StringName("%s/%s" % [id, path_in_inhoud])
+	return StringName("%s/%s/%s" % [p_gebied, id, path_in_inhoud])
+
+
+## Alle vlaggen die objecten met een blijvende stand in de inhoud van de
+## kamers kunnen zetten, {vlag: true}. Maakt elke inhoud tijdelijk aan (niet
+## in de boom, geen Sim); bedoeld voor het laden van een save en voor tests,
+## niet per tick.
+func known_object_flags() -> Dictionary:
+	var known := {}
+	for id in _order:
+		var kamer: Kamer = kamers[id]
+		if kamer.inhoud == null:
+			continue
+		var root := kamer.inhoud.instantiate()
+		for node in _walk(root):
+			if node is SimObject and node.has_persistent_state():
+				known[object_flag(id, root.get_path_to(node), gebied)] = true
+		root.free()
+	return known
+
+
+## De vlaggen in `state` die bij dit gebied horen maar bij geen object in de
+## inhoud (gesorteerd): hernoemd of verwijderd zonder `flag_renames`. Een
+## vlag hoort bij dit gebied als hij begint met `<gebied>/`, of (zonder
+## gebied) met `<kamer_id>/` van een kamer hier. Andere vlaggen (een sluis,
+## een ander gebied) tellen niet.
+func unknown_flags(state: RefCounted) -> PackedStringArray:
+	var known := known_object_flags()
+	var unknown := PackedStringArray()
+	for flag in state.vlaggen:
+		var text := String(flag)
+		if _is_own_flag(text) and not known.has(StringName(text)):
+			unknown.append(text)
+	unknown.sort()
+	return unknown
+
+
+## Zet elke oude vlag uit `flag_renames` die in `state` staat om naar zijn
+## nieuwe naam. Geeft het aantal omgezette vlaggen.
+func apply_flag_renames(state: RefCounted) -> int:
+	var moved := 0
+	for old in flag_renames:
+		if state.has_flag(StringName(old)):
+			state.set_flag(StringName(old), false)
+			state.set_flag(StringName(flag_renames[old]))
+			moved += 1
+	return moved
+
+
+func _is_own_flag(text: String) -> bool:
+	if gebied != &"":
+		return text.begins_with(String(gebied) + "/")
+	var slash := text.find("/")
+	return slash > 0 and kamers.has(StringName(text.substr(0, slash)))
 
 
 func is_neighbour(a: StringName, b: StringName) -> bool:
@@ -316,7 +385,7 @@ func _store(id: StringName) -> void:
 
 
 func _flag_of(kamer: Kamer, object: Node) -> StringName:
-	return object_flag(kamer.id(), kamer.inhoud_node.get_path_to(object))
+	return object_flag(kamer.id(), kamer.inhoud_node.get_path_to(object), gebied)
 
 
 func _walk(node: Node) -> Array[Node]:

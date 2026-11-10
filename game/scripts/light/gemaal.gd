@@ -44,6 +44,8 @@ var _water_visual: Polygon2D
 var _wet_since := -1
 var _last_dry := Vector2.ZERO
 var _has_dry := false
+## Vol geladen uit een save: het water staat al laag (`restore_state`).
+var _drained := false
 
 
 func setup_gemaal(p_meter: RefCounted, p_pomprad: Node2D, p_sluice: StaticBody2D,
@@ -62,6 +64,32 @@ func setup_gemaal(p_meter: RefCounted, p_pomprad: Node2D, p_sluice: StaticBody2D
 	_update_water_visual(y_high)
 
 
+## Is G = 100 bereikt (LM-03, LM-06)? Dat bewaart de save als `vol`.
+func is_full() -> bool:
+	return full_tick >= 0 or fill >= MAX
+
+
+## Zet de bewaarde stand terug na laden (T5b deel 3a, ontwerp.md §7), zonder
+## signalen. Een vol gemaal staat meteen in zijn eindstand: het water laag en
+## de sluis open, ook als de save midden in het zakken (LM-06) gemaakt werd.
+## `t_v` is na laden onbekend; `full_tick` wordt 0, zodat `full_tick >= 0`
+## blijft betekenen dat het gemaal vol is.
+func restore_state(vulstand: int, vol: bool) -> void:
+	fill = clampi(vulstand, 0, MAX)
+	_drained = vol
+	if not vol:
+		full_tick = -1
+		return
+	full_tick = 0
+	sluice_open = true
+	if sluice:
+		sluice.collision_layer = 0
+		sluice.visible = false
+		if sluice.is_inside_tree():
+			PhysicsServer2D.body_set_collision_layer(sluice.get_rid(), 0)
+	_update_water_visual(y_low)
+
+
 ## Verbindt met `Combat.hit` van de Sim (stap 4).
 func connect_combat(combat: RefCounted) -> void:
 	combat.hit.connect(_on_hit)
@@ -69,6 +97,8 @@ func connect_combat(combat: RefCounted) -> void:
 
 ## Waterlijn op `tick` (LM-06).
 func waterline(tick: int) -> float:
+	if _drained:
+		return y_low
 	if full_tick < 0:
 		return y_high
 	var f := clampf(float(tick - full_tick) / DRAIN_TICKS, 0.0, 1.0)
