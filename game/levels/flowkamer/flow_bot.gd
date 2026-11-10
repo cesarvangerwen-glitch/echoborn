@@ -12,7 +12,7 @@ extends RefCounted
 ## vaste lijst bits; een vaste lijst zou bij elke maatwijziging van de kamer
 ## opnieuw moeten. De bot neemt in elke bouwsteen de echolijn als de echo er
 ## is, anders de langzame lijn (met echo uit: altijd de langzame lijn, FK-2).
-## B4 neemt nu altijd de langzame lijn: de lancering komt in T16c (#78).
+## In B4 is de echolijn de lancering (C-11, gdd §4.3, #125).
 
 const InputBits = preload("res://scripts/input/input_bits.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
@@ -28,6 +28,19 @@ const DASH := InputBits.DASH
 const JUMP_ON_ECHO_PX := 130.0
 ## Bij hoeveel px achterstand op de echo P1 opgeeft en de langzame lijn neemt.
 const GIVE_UP_PX := 260.0
+## B4: hier staat P1 (en D ticks later zijn echo) aan de rand in houding
+## (gdd §4.3: de drager ≤ 8 px van de rand).
+const B4_STANCE_X := Layout.B4_NEAR_EDGE + 2.0
+## B4: zo lang houdt P1 AANVAL vast (gdd §4.3: ≥ 30 ticks).
+const B4_HOLD_TICKS := 32
+## B4: P1 springt als zijn echo nog zo ver van hem is. De echo loopt 2 px/tick
+## en staat dan 12 ticks later stil op `B4_STANCE_X`, in houding van 12 tot
+## 32 ticks na zijn slag; de landing komt ± 33 ticks na de afzet, dus midden
+## in dat venster (gdd §4.3: afzet op T + D − 21 … T + D − 3). Zo kijkt de bot
+## naar de echo, niet naar de klok, en werkt het voor elke D.
+const B4_JUMP_AT_ECHO_PX := 24.0
+## B4: zo lang wacht P1 op de echo; daarna de langzame lijn.
+const B4_GIVE_UP_TICKS := 300
 
 ## De bits per tick van deze run, vanaf de eerste `sample`.
 var recorded := PackedInt32Array()
@@ -165,12 +178,62 @@ func _decide() -> int:
 	return 0
 
 
-## B4, langzame lijn: de kloof in, 160 px lopen, twee treden op.
+## B4 lanceerkloof (gdd §4.3, C-11). Echolijn: naar de rand, slaan en
+## AANVAL vasthouden met het gezicht naar de kloof; de echo loopt D ticks
+## later onder je in en staat dan in houding. Spring als hij er bijna is: je
+## landt op hem en vliegt over. Zonder echo, of als het mislukt: de langzame
+## lijn (de kloof in, 160 px lopen, twee treden op).
 func _leg_b4() -> int:
 	var p := _p1()
 	if p.position.x < Layout.B4_FAR_EDGE - 20.0 and _on_level(Layout.FLOOR):
-		_next_leg(false)
+		_next_leg(sub == "launched")
 		return L
+	match sub:
+		"":
+			if not _room.echo_on or _room.echo == null:
+				sub = "slow"
+				return L
+			if p.position.x > B4_STANCE_X:
+				return L
+			sub = "stance"
+			_since = 0
+			return _tap(A)
+		"stance":
+			if _since < B4_HOLD_TICKS:
+				return A
+			sub = "wait"
+			_since = 0
+			return 0
+		"wait":
+			if _echo_ready():
+				var dx: float = _room.echo.position.x - p.position.x
+				if dx >= 0.0 and dx <= B4_JUMP_AT_ECHO_PX:
+					sub = "air"
+					_since = 0
+					return _tap(J)
+			if not _room.echo_on or _since > B4_GIVE_UP_TICKS:
+				sub = "slow"
+				return L
+			return 0
+		"air":
+			if p.motor.launch_pending or p.motor.launch_left > 0:
+				sub = "launched"
+				return L
+			if _since > 60 or (_since > 2 and _on_level(Layout.FLOOR)):
+				sub = "slow"
+				return L
+			return 0
+		"launched":
+			# Na de lanceerstaat bepaalt LEFT weer v.x: blijf links houden.
+			if _on_level(Layout.KLOOF_BOTTOM):
+				sub = "slow"
+			return L
+	return _slow_b4()
+
+
+## B4, langzame lijn: de kloof in, 160 px lopen, twee treden op.
+func _slow_b4() -> int:
+	var p := _p1()
 	if _stuck >= 1:
 		# Tegen de trede: één tick loslaten, anders is P1 niet `on_floor` en
 		# springt hij niet (bevinding voor de Gameplay Programmer, zie kamerdoc).

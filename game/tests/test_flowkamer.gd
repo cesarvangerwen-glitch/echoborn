@@ -114,11 +114,11 @@ func _check_run(t, room, bot, d: int) -> FlowReport:
 	t.check(room.meetlog.count("BREEK") == 0, "D=%d: echo brak %d keer (FK-4)" % [d, room.meetlog.count("BREEK")])
 	t.check(room.meetlog.count("ECHO_LEEG_START") == 0, "D=%d: echo werd Leeg (FK-3)" % d)
 	t.check(room.room_changes.size() >= 3, "D=%d: kamerwissels %s" % [d, room.room_changes])
-	for leg_name in ["B3", "B1", "B2-0", "B2-1", "B2-2", "B2-3"]:
+	for leg_name in ["B4", "B3", "B1", "B2-0", "B2-1", "B2-2", "B2-3"]:
 		t.check(bot.lines.get(leg_name, false), "D=%d: %s niet via de echolijn" % [d, leg_name])
 	# Elk event van de kamer staat erin (gdd §4.6, meetlog).
 	for event in ["RUN_START", "RUN_EIND", "KAMER", "STIL_START", "STIL_EIND", "ECHO_LEEG_EIND",
-			"SPRINGPLANK", "BOUNCE", "MERK_GEZET", "MERKSPRONG", "ONTPLOFFING", "LP", "POMP", "GEMAAL_VOL"]:
+			"SPRINGPLANK", "BOUNCE", "LANCERING", "MERK_GEZET", "MERKSPRONG", "ONTPLOFFING", "LP", "POMP", "GEMAAL_VOL"]:
 		t.check(room.meetlog.count(event) >= 1, "D=%d: event %s ontbreekt in het meetlog" % [d, event])
 	t.note("D=%d: %s" % [d, rep.summary()])
 	return rep
