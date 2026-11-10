@@ -19,8 +19,10 @@ const GameEvents = preload("res://scripts/events/game_events.gd")
 ## AreaLoader na stap (3).
 enum EchoReset { NONE, RELEASE, RESPAWN, ROOM }
 
-## Een vijandelijke treffer kostte een levenspunt (LM-05). Bij 0 volgt de
-## respawn in de flow-kamer (T16b).
+## De levenspunten van P1 veranderden: een vijandelijke treffer kostte er één
+## (LM-05), of ze zijn weer vol op de respawntick na een dood. Bij 0 zet
+## `scripts/save/respawn.gd` P1 terug (checkpoint of begin van de kamer).
+## Tot die respawntick blijft P1 op 0 en kost een treffer niets meer.
 signal health_changed(tick: int, health: int)
 
 ## Elke inputbron heeft `sample(tick: int) -> int` (DeviceInput, ScriptedInput).
@@ -165,6 +167,10 @@ func sim_step(tick: int, _delta: float) -> void:
 		motor = Motor.State.new()
 		velocity = Vector2.ZERO
 		echo_reset = EchoReset.RESPAWN
+		# Na een dood (C-08, LM-05) zijn de levenspunten weer vol.
+		if died and player_index == 1:
+			health = int(Tuning.combat()["p1_health"])
+			health_changed.emit(tick, health)
 	var bits: int = input_source.sample(tick)
 	last_input = bits
 	tick_events = _detector.detect(tick, bits)
