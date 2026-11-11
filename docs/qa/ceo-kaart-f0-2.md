@@ -1,6 +1,6 @@
 # CEO-kaart F0-2: de nieuwe flow-kamer spelen en scoren (tweede flow-test)
 
-Versie 0.1.2 · 2026-11-11 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA: `docs/qa/testplan-f0-2.md` (lees je pas na het spelen)
+Versie 0.1.3 · 2026-11-11 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA: `docs/qa/testplan-f0-2.md` (lees je pas na het spelen)
 
 **Tijd: ± 20–25 min.** Je speelt alleen solo (besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124)). Geen luistercheck deze keer. Je speelt 8 korte runs, geeft na elke run drie cijfers, beantwoordt een paar vragen en geeft alles in de Claude-chat.
 
@@ -13,9 +13,9 @@ Build: commit `8be9910`. Zip van precies die versie: https://github.com/cesarvan
 1. Open de zip-link bovenaan deze kaart (niet "Download ZIP" van de hoofdpagina: daar kan intussen iets nieuws bij zijn gekomen). Pak uit in een **nieuwe** map (niet over de oude van F0 heen).
 2. **Oude meetlogs opzij:** open `%APPDATA%\godot\app_userdata\Echoborn` (plak in de adresbalk van de Verkenner), maak er een submap `F0` en verplaats alle bestanden `meetlog_*.csv` daarheen. Lukt dat niet: noteer hoe laat je begint (tijd: ____).
 3. Start `Godot_v4.6.3-stable_win64.exe` (dezelfde als bij F0). Kies **Importeren**, wijs `game\project.godot` in de **nieuwe** map aan en open het project. Staat de oude F0-versie ook in de lijst: kies de nieuwe.
-4. Druk in de editor op **F5**. De flow-kamer start.
+4. Het eerste importeren van de nieuwe map duurt even (± 1 min, met een voortgangsbalk; geen paniek). Wacht tot de editor klaar is en druk dan in de editor op **F5**. De flow-kamer start.
 5. Druk daarna **eerst A, D of spatie** (niet een pijltje: dan werkt spatie niet om te springen). Mis? Sluit het spelvenster, druk in de editor opnieuw F5.
-6. Kijk in de HUD: er moet **meetlog aan** staan (Engelse Windows: *measurement log on*). Staat er *meetlog uit*: druk één keer F5 in het spelvenster.
+6. Kijk in de HUD op de regel met de F-toetsen (*F1/F2/F3 … · F5 meetlog …*): daar moet **F5 meetlog aan** staan (Engelse Windows: *F5 measurement log on*). Staat er *meetlog uit*: druk één keer F5 in het spelvenster.
 
 ## 2. Besturing
 
@@ -26,7 +26,7 @@ Build: commit `8be9910`. Zip van precies die versie: https://github.com/cesarvan
 | Run opnieuw | F6 (Fn + F6) |
 | Na de run | drie cijfers **1–5**: K1, K2, K3 (in die volgorde) |
 
-- **Na elke F-toets: kijk in de HUD naar drie dingen.** (1) De goede D: 1,5 s = **D 90**, 2 s = **D 120**, 3 s = **D 180**; zo niet, druk de toets opnieuw (met Fn). (2) **meetlog aan** (*measurement log on*); zo niet, druk één keer F5 in het spelvenster. (3) De echo is **niet uit**; staat er echo uit, druk één keer F4. F4 en F5 blijven ook na een nieuwe run staan: een per ongeluk ingedrukte F4 of F5 maakt alle runs erna ongeldig, tot je dezelfde toets nog een keer drukt.
+- **Na elke F-toets: kijk in de HUD naar drie dingen.** Op de regel *Kamer K1   D = 120   echo Actief   tijd …*: (1) de goede D, als getal in ticks (niet in seconden): 1,5 s = **D = 90**, 2 s = **D = 120**, 3 s = **D = 180**; zo niet, druk de toets opnieuw (met Fn). (2) Daar staat *echo Actief* of *echo Leeg* (goed), niet *echo uit*; staat er *echo uit*, druk één keer F4. (Let niet op de vaste tekst *F4 echo aan/uit* op de regel met de F-toetsen.) (3) Op de regel met de F-toetsen staat **F5 meetlog aan** (*measurement log on*); zo niet, druk één keer F5 in het spelvenster. F4 en F5 blijven ook na een nieuwe run staan: een per ongeluk ingedrukte F4 of F5 maakt alle runs erna ongeldig, tot je dezelfde toets nog een keer drukt.
 - **Na de run** staat op het scorescherm *Run klaar … bij D = …*. De F-toetsen doen pas weer iets als je drie cijfers gaf.
 - **Niet drukken**: Enter of Start (dan doet er een tweede speler mee), F4 (zet de echo uit), F5 in het spelvenster (zet de meetlog uit, ook tijdens het scoren).
 
@@ -40,7 +40,7 @@ Het doel van een run: door K1 (sprongen), K2 (vijanden), K3 (sla op de pompschoe
 |---|---|---|---|
 | Oefenen 1 | F2 (D 120) | oefenrun | drie willekeurige cijfers in het spel |
 | Oefenen 2 | F2 (D 120) | oefenrun | drie willekeurige cijfers |
-| Run 1 | **F3** (D 180) | telt | drie cijfers in het spel **en** in §4: D van het scorescherm, K1/K2/K3, V1 |
+| Run 1 | **F3** (D 180) | telt | drie cijfers in het spel **en** op een kladje: D van het scorescherm, K1/K2/K3, V1 |
 | Run 2 | **F1** (D 90) | telt | idem |
 | Run 3 | **F2** (D 120) | telt | idem |
 | Run 4 | **F1** (D 90) | telt | idem |
@@ -52,7 +52,7 @@ Het doel van een run: door K1 (sprongen), K2 (vijanden), K3 (sla op de pompschoe
 
 ## 4. Antwoordblok (kopieer in de Claude-chat)
 
-Vul de vragen in van boven naar beneden, meteen na run 6.
+Neem na run 6 je kladje over in het blok en vul daarna de vragen in, van boven naar beneden.
 
 ```
 [CEO → QA Lead]: flow-test F0-2 (solo)
@@ -100,3 +100,4 @@ Bijlage: alle meetlog-CSV's van vandaag
 | 0.1 | 2026-11-11 | Eerste versie (#80, T17-2 deel 1): nieuwe build als zip, 2 oefenruns + 6 getelde runs (180, 90, 120, 90, 180, 120), D van het scorescherm per run, M1/M2/H, O1/O2 en daarna S1/S2, CSV's in de Claude-chat; geen luistercheck |
 | 0.1.1 | 2026-11-11 | Na Lead-review EP: HUD-check na elke F-toets op D, meetlog aan en echo aan (F4/F5 blijven staan); oude meetlogs eerst naar een submap of starttijd noteren; zip-link van de ingevulde commit; §6 pas na het versturen van het antwoordblok |
 | 0.1.2 | 2026-11-11 | Build `8be9910` en zip-link ingevuld |
+| 0.1.3 | 2026-11-11 | Na SM-review: HUD-check wijst naar de regel *Kamer … D = … echo …* (D in ticks, *echo Actief/Leeg* goed) en naar *F5 meetlog* op de regel met de F-toetsen; kladje per run, blok na run 6; eerste import duurt ± 1 min |

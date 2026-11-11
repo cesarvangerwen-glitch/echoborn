@@ -1,6 +1,6 @@
 # Testplan F0-2: tweede flow-test op de herontworpen flow-kamer (T17-2)
 
-Versie 0.1.2 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
+Versie 0.1.3 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
 
 Basis: gdd v0.7.3 §4.5 (MP-1–MP-7, keuzeregel), §4.7.1–§4.7.3 en **§4.7.5** (wat het herontwerp nodig heeft), §5 (playtestvragen); `docs/design/kamers/flowkamer.md` (§3 keerpunten, §9 gemeten, §12 antwoord 1 van de LGD); rapport F0 v0.3.1 (`docs/qa/rapport-f0-flowtest.md`, §5–§8, open punten 8–11); het testplan van de eerste flow-test (`docs/qa/testplan-f0.md` v0.3.1, normen §1, W1–W10); fasekader §3 F0; besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B: de CEO speelt alleen solo) en #51 (staart bereik 1,5–3 s).
 
@@ -26,7 +26,7 @@ De sessie vraagt de **hele** herontworpen kamer, ook K3 (W-4). Zonder W-4 meet d
 | D-toetsen | F1 = D 90, F2 = D 120, F3 = D 180 (`DEBUG_TAIL_KEYS` in `flow_room.gd`, `flowkamer.md` §8) |
 | Plek van de schoepen en de sluis in K3 (voor §4.3) | schoepen (middelpunt) x **1980 / 1900 / 1820 / 1740**, 38 px boven de vloer op y = 610 (`PUMP_VANES` in `flow_layout.gd`); kade x 1480–1720; sluisdoorgang x **1440–1460** (`SLUICE`); bovenste trede van de trap x 2000–2026 op y = 385 (`flowkamer.md` v0.6 §5) |
 
-Checklist van QA (afgelopen op `8be9910`, 2026-11-11, headless op Linux met Godot 4.6.3; alles ✅, anders meldt QA in #80 wat ontbreekt en wie aan zet is; de Producer geeft de CEO pas daarna de kaart):
+Checklist van QA (afgelopen op `8be9910`, 2026-11-11, headless op Linux met Godot 4.6.3): alles ✅, behalve de twee regels met [~] en [ ], die in de sessie (D-toetsen) of erna (rekenscript) volgen. Ontbreekt er iets anders, dan meldt QA in #80 wat ontbreekt en wie aan zet is; de Producer geeft de CEO pas daarna de kaart.
 
 - [x] Volledige suite groen op die commit (`godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd`), met `test_flowkamer.gd`, `test_flowkamer_na_f0.gd`, `test_wachtbot.gd`, `test_flowtest_t17.gd` en `test_flowtest_duo.gd`: **239 geslaagd, 0 mislukt** (± 76 s).
 - [x] De gescripte geoefende run haalt per D MP-1, MP-2, MP-4 en MP-6 op de nieuwe K3 (W-5): D = 90 / 120 / 180 runtijd 63,5 / 65,5 / 70,3 s, MP-1 60 / 90 / 150 ticks, MP-2 14,2 / 12,8 / 11,9 per min, MP-4 2 / 3 / 4 %, MP-6 69 / 69 / 66 %; in K3 geen stilstand, `GEMAAL_VOL` 103 / 73 / **13** ticks vóór P1 bij de sluis.
@@ -142,6 +142,8 @@ Draaiboek: `docs/qa/ceo-kaart-f0-2.md`. ± 20–25 min, geen luistercheck (F2 is
 
 **V1** ("wist je waar je echo zou zijn?", grens gdd §5 vraag 1: gemiddeld ≥ 4) telt niet mee in het oordeel: de keuzeregel van gdd §4.5 en F0 noemen hem niet; QA rapporteert V1 per run en per D als bevinding.
 
+Het rapport noteert ook hoe lang de CEO over de sessie deed (geraamd ± 20–25 min), uit de tijden in de logs en zijn eigen opgave.
+
 Het rapport noemt bij elk oordeel hoeveel runs het draagt (één speler, twee runs per D) en of oefening (eerste tegenover tweede helft van de getelde runs) het beeld kan verklaren.
 
 ## 7. Werkaannames (kader §5)
@@ -177,3 +179,4 @@ W1, W2, W7, W8, W9 en W10 uit `docs/qa/testplan-f0.md` §6 blijven gelden (W3–
 | 0.1 | 2026-11-11 | Eerste versie (#80, T17-2 deel 1): normen en keuzeregel per D, twee getelde runs per D, MP-3 per bouwsteen en per keerpunt, stilstand per kamer met plek, M2 en *Nine Sols*, observaties keren en plank-signaal/doelstreep, oordeel en gevolgen, W11–W21 |
 | 0.1.1 | 2026-11-11 | Na Lead-review EP: PR #181 bij naam (§2, §8); V1 alleen bevinding, niet in het oordeel (§6) |
 | 0.1.2 | 2026-11-11 | Build `8be9910` (na PR #181), D-toetsen en K3-coördinaten ingevuld (§2, W17); wachtafstand per keerpunt met de banden van de wachtbot (restgat vanaf 80 px), landing op de bovenste trede en stilstand bij de sluis per D (§4.2, §4.3; `flowkamer.md` §12) |
+| 0.1.3 | 2026-11-11 | Na SM-review: §2-formulering bij de [~]/[ ]-regels; het rapport noteert de duur van de sessie (§6) |
