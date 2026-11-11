@@ -170,7 +170,7 @@ Uit het meetlog berekend (`flow_report.gd`; co-op met de MP-7-code van `test_flo
 | MP-2 echo-acties/min (K1 / K2) | 14,2 (10,7 / 32,4) | 12,8 (10,5 / 25,8) | 11,9 (9,9 / 22,2) | ≥ 3,0, ook per kamer |
 | MP-2 langste gat | 13,6 s | 13,9 s | 14,4 s | ≤ 40 s |
 | MP-3 landingen/min, zonder wachten | 5,7 / 83 % | 5,5 / 83 % | 5,1 / 83 % | ≥ 75 % |
-| MP-3 per keerpunt (B1, B2-0 … B2-3): echolijn zonder stilstand | 5 van 5 | 5 van 5 | 5 van 5 | rapporteren |
+| MP-3 per keerpunt (B1, B2-0 … B2-3): echolijn zonder stilstand (rapportage, geen norm) | 5 van 5 | 5 van 5 | 5 van 5 | geen norm: rapporteren (gdd §4.5) |
 | Keren tot het volgende niveau / langzame lijn vanaf de wand | 80 / 142 ticks | 95 / 142 | 125–133 / 142 | keren sneller, ≤ 2× (FK-2) |
 | MP-4 echo Leeg | 2 % | 3 % | 4 % | ≤ 40 % |
 | MP-6 LP met de echo, pompslagen echo | 69 %, 4 | 69 %, 4 | 66 %, 3 | ≥ 40 %, ≥ 1 |
@@ -215,7 +215,7 @@ Wat dit zegt:
 | 60 | vloer | vloer | De bounce stoot tegen de overhang (40–70 px) en je valt terug |
 | **80, 100** | **omhoog** | **omhoog** | Nog in de keerzone, maar wie na de bounce van de wand af stuurt, komt over de rand op 120 (ook zonder dash) |
 | 120 … 240 | omhoog | omhoog | Het restgat onder de weg omhoog (gdd §4.3) |
-| 260 … 340 | omhoog (tot 300, de ingang) | elders | In B2 ligt hier het dichte stuk van de richel erboven: de bounce stoot ertegen en je valt van je niveau af (op de richel op 135 van het niveau eronder) |
+| 260 … 340 | omhoog (tot 300, de ingang) | valt van het niveau af, op de richel op 135 van het niveau eronder | In B2 ligt hier het dichte stuk van de richel erboven: de bounce stoot ertegen en je valt van je niveau af (op de richel op 135 van het niveau eronder) |
 | **Stilstand vóór de sprong** | **D ticks** (90 / 120 / 180) | gelijk | De echo staat pas onder je als hij D ticks later op jouw plek is |
 
 Het restgat is dus groter dan gdd §4.3 zegt (120–270 px): het begint op **80 px** van de wand. Tegen de wand (0–40 px), waar de CEO in F0 wachtte, brengt wachten je alleen op de langzame lijn. Wie ergens anders wacht, haalt de weg omhoog na D ticks stilstand; de tweede flow-test meet of spelers dat doen (MP-3 per keerpunt). Bevinding voor de LGD in §12.
@@ -299,6 +299,9 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 - Gameplay Programmer: de springplank-reeks `n` opnieuw laten beginnen bij aflopen van de echo kan van `flow_meetlog.gd` naar `meetlog.gd`.
 - LGD: gdd §4.2/FK-2 naar 3 + 3 paren (72 + 36 per terugkeer, 1 terugkeer; was 36 + 18).
 - LGD: L-13 (d) in de gdd gelijktrekken met het besluit over de paren ("een paar binnen K" of "een ketting kan"; de flow-kamer is tot T17-2 een uitzondering).
+- QA Lead (T17-2): per keerpunt noteren op hoeveel px van de keerwand de speler wacht; dat is de invoer voor de keuze bredere overhang of keerzone van 160 px in [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (LGD).
+- QA Lead (T17-2): noteren of de speler na de val door het gat op de bovenste trede van K3 landt, en hoe lang hij daar staat (LGD).
+- QA Lead (T17-2): de stilstand bij de sluis per D meten (LM-04: ≤ 30 ticks); bij D = 180 valt `GEMAAL_VOL` maar 13 ticks vóór de geoefende run bij de sluis is, dus wie op de kade dasht, kan voor een dichte sluis staan (LGD).
 - LGD na T17: in B3 geeft de vang +3 tegen +5 voor landen plus bounce; met 3 + 3 paren en G-3 haalt de gescripte run 121 / 121 / 111 LP na K1 + K2 (marge 11 bij D = 180).
 
 **Na F0, deel 1 (W-1–W-3): afwijkingen van de startmaten (werkaanname LGD (5))**
