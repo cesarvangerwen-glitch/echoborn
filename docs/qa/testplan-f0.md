@@ -1,6 +1,6 @@
 # Testplan F0: flow-test van de grijze flow-kamer (T17)
 
-Versie 0.2 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
+Versie 0.3.1 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
 
 Basis: fasekader fase 2 v0.3 (`docs/productie/fase-2-kader.md` §1, §2 rij T17, §3 F0 en F4b, §4, §5, §9), pitch v0.4 §4 (pillar 1), gdd §4.5 (MP-1–MP-7) en §5 (playtestvragen), ideecheck §2 (slotzin), audio bible §9.4, besluit #51 (1A, 7A: staart ± 2 s, bereik 1,5–3 s), besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B: de CEO speelt F0 alleen solo).
 
@@ -94,6 +94,8 @@ De CEO stuurt de meetlog-CSV's mee (de kamer schrijft ze zelf, `docs/design/kame
 | W6 | MP-7 (c): een springplank, lancering of vang telt voor de drager én de springer; een merk-combo voor beide spelers | Elke samenwerkingsactie heeft twee lichamen (gdd §2.7) |
 | W7 | De CEO is "geoefend" vanaf zijn derde run; de eerste twee tellen niet mee | gdd §4.5 |
 | W8 | De *Nine Sols*-check bij de CEO is een zwak signaal: de CEO koos *Nine Sols* zelf als referentie (#51) | Een speler die de referentie niet kent, is een sterkere toets; die volgt in F4b(c) als er zo'n P2 is; anders blijft R-V9 open in F8 (kader §3, §4) |
+| W9 | De D van een run van de CEO komt uit het meetlog (bestandsnaam, en de eerste `ECHO_LEEG_EIND` op tick D); de koppeling van zijn antwoorden aan een run gaat via de in-game scores (`SCORE`) | In de sessie van 2026-11-11 kwam een F-toets niet aan (rapport §5.1); het label in het antwoordblok is dan niet betrouwbaar |
+| W10 | MP-5 wordt **per run** gerapporteerd: het gemiddelde van K1–K3 van die run; "geen kamer < 3,0" geldt per kamer van die run | gdd §4.5 MP-5 zegt "per modus"; de sessie geeft per D maar één of twee geldige runs (D = 90 twee, D = 120 één) |
 
 W3–W6 gelden in F0 alleen voor de co-op-metingen.
 
@@ -103,3 +105,5 @@ W3–W6 gelden in F0 alleen voor de co-op-metingen.
 |---|---|---|
 | 0.1 | 2026-11-09 | Eerste versie (#80): normen solo én co-op, scripted runs, CEO-sessie met co-op-blok, W1–W8 |
 | 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: slaagcriterium F0 alleen solo (§1, §5); co-op-maten apart als meting met grenzen voor F4b(c) (§1, §3); *Nine Sols*-check in F0 als zwak signaal (§1, §5, W8); CEO-sessie ± 15 min, co-op-blok vervallen en de luistercheck hernummerd naar blok 4 (§2, §4); vraag over P2 eruit (die hoort bij F4b(a), kader §9); na Lead-review EP: in de co-op-tabel alleen norm (3) co-op, C1–C2 en MP-7 als voorwaarde voor F4b(c), MP-4/MP-6 co-op en de sterke check als meting; R-V9 open in F8 zonder geschikte P2 |
+| 0.3 | 2026-11-11 | W9–W10 na de CEO-sessie (§6); het oordeel staat in het rapport §6 |
+| 0.3.1 | 2026-11-11 | W10: MP-5 per run (na Lead-review EP) |
