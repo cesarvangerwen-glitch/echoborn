@@ -49,6 +49,8 @@ De rollen per vakgebied, in de volgorde van het organigram (koppen zoals in `str
 
 ## 4. CEO-vraag: namen en rollen in de credits
 
+**Beslist in #157: 1A, 2A = CesarTheLittle (2026-11-11).**
+
 *In het format van `.github/ISSUE_TEMPLATE/ceo-beslissing.md`; geen apart issue, de regisseur bundelt.*
 
 **Van:** Producer
@@ -111,13 +113,13 @@ SOFTWARE.
 
 De Godot-tekst van §5.1 is **niet genoeg**. Godot bevat code van derden (± 70 componenten, o.a. FreeType, Mbed TLS, ENet, zlib, libpng) met eigen licenties; de Godot-docs vragen daar een vermelding voor (B1). Wat de credits en de build daarom moeten bevatten:
 
-1. **In de credits (blok 7), direct onder de Godot-tekst**, de regel die FreeType letterlijk vraagt (Polderlight toont tekst, dus FreeType zit erin):
+1. **In de credits (blok 7), direct onder de Godot-tekst**, de regel die FreeType letterlijk vraagt (Polderlight toont tekst, dus FreeType zit erin; staat in `CREDITS_LICENSE_FREETYPE`, met `%s` = jaar):
    ```
    Portions of this software are copyright © <year> The FreeType Project (www.freetype.org). All rights reserved.
    ```
    `<year>` is het jaar van de FreeType-versie in de gebruikte Godot-build (editor: *Help > About > Third-party Licenses*, of uit `Engine.get_copyright_info()`); niet zelf invullen of gokken.
 2. **Een bestand naast de game**: `GODOT_COPYRIGHT.txt`, een kopie van `COPYRIGHT.txt` van **precies** de gebruikte Godot-versie (4.6.x), in elke build en elk Steam-depot (Windows, Linux/Steam Deck), naast het uitvoerbare bestand. Daarin staan alle componenten met hun licentietekst, ook Mbed TLS (Apache 2.0, moet mee; uit B1, nog na te lezen) en ENet. Het bestand mag ook gemaakt worden met een Godot-script van dezelfde versie dat `Engine.get_copyright_info()` en `Engine.get_license_info()` uitschrijft (dat zijn runtime-calls).
-3. **In de credits, na de FreeType-regel**, één verwijsregel (EN, voorstel):
+3. **In de credits, na de FreeType-regel**, één verwijsregel (staat in `CREDITS_LICENSE_GODOT_FILE`):
    ```
    Godot Engine includes third-party components, such as Mbed TLS and ENet. Their copyright notices and license texts are in GODOT_COPYRIGHT.txt, next to the game.
    ```
@@ -140,7 +142,7 @@ Uit `docs/business/knop-glyphs-check.md` §3 punt 4, aangevuld met de formulerin
 
 > Xbox is a trademark of the Microsoft group of companies. PlayStation is a registered trademark or trademark of Sony Interactive Entertainment Inc. Steam and Steam Deck are trademarks and/or registered trademarks of Valve Corporation in the U.S. and/or other countries. Polderlight is not affiliated with or endorsed by Microsoft, Sony Interactive Entertainment or Valve. All other trademarks are the property of their respective owners.
 
-- **Welke variant** volgt CEO-vraag [#157](https://github.com/cesarvangerwen-glitch/echoborn/issues/157) vraag 1: bij A–C de eerste, bij D de tweede.
+- **Besluit #157 (1A):** variant 1A–1C geldt, letterlijk in `CREDITS_TRADEMARKS_TEXT`; 1D vervalt.
 - **Toestemming van Anthropic is volgens het merkenrecht niet nodig** (Anthropics eigen voorwaarden zijn nog niet nagelezen, §6 punt 4): *Claude (AI, Anthropic)* is een feitelijke vermelding van het gereedschap waarmee het spel is gemaakt, alleen de naam, geen logo, zonder steun of samenwerking te suggereren (zelfde grond als bij de knopnamen, glyph-check S7: art. 14 lid 1 UMV). Een eigen regel in de merkenregel is juridisch niet verplicht, maar wel netjes en kost niets. Geen Anthropic- of Claude-logo gebruiken, ook niet op de Steam-pagina.
 - *Godot Engine* hoeft niet in de merkenregel: *Made with Godot Engine* (blok 4) is gewone, toegestane vermelding (B2). Geen Godot-logo zonder het na te lezen in de logo-regels van Godot.
 - *Polderlight* volgt de werktitel en gaat mee na de formele merkcheck (glyph-check §4 punt 6). De vraag aan de specialist (glyph-check §4 punt 1) blijft staan; die verandert de tekst naar verwachting niet.
@@ -174,21 +176,21 @@ Voor Polderlight: de art, audio en teksten worden door AI-rollen (Claude) gemaak
 | # | Wat | Wie | Wanneer |
 |---|---|---|---|
 | 1 | `GODOT_COPYRIGHT.txt` (§5.2 punt 2) in elke export en elk depot zetten, het FreeType-jaar invullen, en B1 nog eens nalezen tegen de Godot-docs, ook of Mbed TLS (net als FreeType) een vaste regel in de credits vraagt. (BLA-deel afgerond in v0.1.3.) | Engine & Platform Programmer (export), BLA (nalezen) | Vóór de eerste publieke build |
-| 2 | Blok 5 (*Lettertype*) behouden of schrappen: juridisch vrij (§5.5). (BLA-deel afgerond: eigen werk staat in `docs/licenties.md` §2.) | Producer | Bij de volgende versie van dit document; geen blokkade voor de bouw (punt 10) |
+| 2 | ~~Blok 5 (*Lettertype*) behouden of schrappen~~ **Afgerond (v0.1.6): behouden**, zonder licentietekst (§5.5): het eigen font is werk van de studio, het kost twee regels (± 2 s scrollen) en `CREDITS_FONT` staat al in `strings.csv`. | — | — |
 | 3 | ~~Taal van de licentie- en merkteksten~~ **Afgerond (v0.1.3):** alleen Engels, ook in NL (§5.4). | — | — |
 | 4 | ~~Variant van de merkenregel~~ **Afgerond (v0.1.6):** variant 1A–1C (besluit #157), letterlijk in `CREDITS_TRADEMARKS_TEXT`. Die tekst noemt *Polderlight* letterlijk: verandert de naam na de merkcheck, dan wijzigen `GAME_TITLE` én `CREDITS_TRADEMARKS_TEXT` (EN en NL) samen. **Nog open:** de BLA leest de eigen voorwaarden van Anthropic na (gebruik van de naam Claude/Anthropic; §5.3 steunt nu alleen op het merkenrecht). | BLA (voorwaarden); Narrative Designer (tekst bij naamwijziging) | Voorwaarden vóór de eerste publieke build; tekst bij een naamwijziging |
 | 5 | AI-melding op Steam (advies §5.6: ja, *pre-generated*): meldtekst schrijven en de Steamworks-tekst van de survey nalezen. | Marketing & Community Manager, met de BLA | Bij het maken van de Steam-pagina |
 | 6 | ~~CEO-vraag §4~~ **Afgerond (v0.1.6):** besluit #157 (1A, 2A). | — | — |
 | 7 | ~~`CREDITS_*`-sleutels in `strings.csv`~~ **Afgerond (v0.1.6):** 17 sleutels in `game/locale/strings.csv` (EN/NL, met context); §1 en §3 volgen ze. | — | — |
 | 8 | hud-menus §7 punt 18 sluiten met een verwijzing naar dit document; dit document wijzigt hud-menus niet. | UX Designer | Bij zijn volgende wijziging van hud-menus |
-| 9 | Placeholder in `genereer_menu_placeholder.py` (blok *Licenties*: *Tekst volgt*) vervangen door de echte inhoud, zodra punt 1 en §4 rond zijn. | UI Artist | Bij de eind-art van de credits |
+| 9 | Placeholder in `genereer_menu_placeholder.py` (blok *Licenties*: *Tekst volgt*) vervangen door de echte inhoud, zodra punt 1 rond is. | UI Artist | Bij de eind-art van de credits |
 | 10 | Credits bouwen uit dit document (de licentietekst bij voorkeur via `Engine.get_license_text()`, zodat hij altijd bij de gebruikte versie past). De bouw herbreekt de licentie-alinea's op de kolom van 320 px (± 71 tekens per regel), niet op de regels van `LICENSE.txt`. Onder de Godot-tekst de FreeType-regel en de verwijsregel van §5.2. De namen die niet in `strings.csv` staan (*CesarTheLittle*, de 26 roltitels, *Godot Engine*, *Polderletter*) krijgen een eigen bron (bv. een databestand) die `test_no_hard_text_in_code` niet als harde tekst ziet. | Gameplay Programmer | Met hud-menus §7 punt 19 (T8a) |
 
 ## 7. Wijzigingen
 
 | Versie | Datum | Wat |
 |---|---|---|
-| 0.1.6 | 2026-11-11 | Na besluit #157 (1A, 2A) en de reviews op de `CREDITS_*`-sleutels (#87): §1 en §3 naar de sleutels en koppen in `strings.csv` (*Programming / Programmeren*, *Quality assurance / Kwaliteitscontrole*; nieuw `CREDITS_TRADEMARKS_TEXT`, `CREDITS_LICENSE_FREETYPE`, `CREDITS_LICENSE_GODOT_FILE`); CesarTheLittle in blok 2; §6 punt 4 (variant), 6 en 7 afgerond; punt 4: naamwijziging raakt `GAME_TITLE` én `CREDITS_TRADEMARKS_TEXT`; punt 10: eigen bron voor namen buiten `strings.csv`. |
+| 0.1.6 | 2026-11-11 | Na besluit #157 (1A, 2A) en de reviews op de `CREDITS_*`-sleutels (#87): §1 en §3 naar de sleutels en koppen in `strings.csv` (*Programming / Programmeren*, *Quality assurance / Kwaliteitscontrole*; nieuw `CREDITS_TRADEMARKS_TEXT`, `CREDITS_LICENSE_FREETYPE`, `CREDITS_LICENSE_GODOT_FILE`); CesarTheLittle in blok 2; §6 punt 2 (blok 5 behouden), 4 (variant), 6 en 7 afgerond; §4 en §5.3 met besluit #157; §5.2 punt 1 en 3 naar `CREDITS_LICENSE_FREETYPE` en `CREDITS_LICENSE_GODOT_FILE`; punt 9 hangt alleen nog aan punt 1; punt 4: naamwijziging raakt `GAME_TITLE` én `CREDITS_TRADEMARKS_TEXT`; punt 10: eigen bron voor namen buiten `strings.csv`. |
 | 0.1.5 | 2026-11-10 | Na de SM-review (PR #159): toestemming Anthropic alleen op merkenrecht gegrond, voorwaarden nalezen in §6 punt 4; ENet- en Mbed TLS-beweringen gemarkeerd als "uit B1, nog na te lezen"; §6 punt 2 geen blokkade voor de bouw. |
 | 0.1.4 | 2026-11-10 | Na de Lead-review van de EP (PR #159): merkenregel in twee volledige varianten (1A–1C en 1D); werkaanname onder voorbehoud van B1; `get_copyright_info()`/`get_license_info()` als runtime-calls (Godot-script van dezelfde versie); §6 punt 1 ook Mbed TLS-regel nagaan. |
 | 0.1.3 | 2026-11-10 | BLA (#87, open punten 1–5): §5.2 componenten van derden (FreeType-regel, `GODOT_COPYRIGHT.txt`, verwijsregel); §5.3 merkenregel definitief, Anthropic-zin afhankelijk van #157; nieuw §5.4 taal (alleen Engels), §5.5 eigen werk (blok 5 mag vervallen), §5.6 advies AI-melding Steam, §5.7 bronnen; §6 punt 3 afgerond, 1, 2, 4 en 5 tot één restregel; `docs/licenties.md` aangevuld. |
