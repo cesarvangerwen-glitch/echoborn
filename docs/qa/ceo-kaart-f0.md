@@ -1,6 +1,6 @@
 # CEO-kaart F0: de flow-kamer spelen en scoren (T17)
 
-Versie 0.2.1 · 2026-11-11 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA (lees je pas na het spelen, zoals §5): het testplan in `docs/qa/`
+Versie 0.2.2 · 2026-11-11 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA (lees je pas na het spelen, zoals §5): het testplan in `docs/qa/`
 
 **Tijd: ± 15 min spelen + ± 5 min luisteren.** Je hoeft alleen te spelen, te scoren en het antwoordblok (§4) als comment in #80 te zetten. **Lees tot en met §4; lees §5 pas na het spelen** (anders kleurt het je antwoorden).
 
@@ -21,7 +21,7 @@ Je speelt **alleen solo**, zonder tweede speler (besluit [#124](https://github.c
 | | Toetsenbord | Controller |
 |---|---|---|
 | Jij | A/D lopen, spatie springen, linker Shift dash, E slaan/pompen | stick, A springen, X slaan/pompen, RB dash |
-| Debug | **F1 / F2 / F3** = staart 1,5 / 2 / 3 s (nieuwe run) · F6 = herstart | — |
+| Debug | **F1 / F2 / F3** = staart 1,5 / 2 / 3 s (nieuwe run; op een laptop vaak **Fn + F1/F2/F3**) · F6 = herstart. **Kijk na elke F-toets in de HUD of D klopt: D = 90 / 120 / 180** | — |
 | Na de run | Druk **drie cijfers 1–5**: de score voor K1, K2 en K3 (in die volgorde) | — |
 
 Druk tijdens een run **niet op Enter of Start** (Start op een controller waarmee je niet speelt): dan komt er een tweede speler bij en is het geen solo-run meer. Gebeurt het toch: F6 en opnieuw.
@@ -86,3 +86,4 @@ Bijlage: de meetlog-CSV's (zie hieronder)
 | 0.1 | 2026-11-09 | Eerste versie (#80): blokken 1–5 solo en co-op, antwoordblok, meetlogs |
 | 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: alleen solo; blok 4 (co-op) vervallen en weggelaten, luistercheck is nu blok 4; P2 uit de besturing en de co-op/P2-velden uit het antwoordblok; waarschuwing tegen Enter; tijd ± 20 → ± 15 min spelen; "Echo: hulp of last?" bij blok 3; M1 als zwak signaal met sterke check in F4b(c) als er zo'n P2 is, anders R-V9 open in F8; MP-7 en O4 uit §5; Start als meedoe-knop in de waarschuwing |
 | 0.2.1 | 2026-11-11 | Na F5 eerst A, D of spatie, want de eerste knop kiest de toetsenbordkant en F6 houdt die keuze (§1, noot onder §2; vraag bij *Open punten*). F5 in het spelvenster zet de meetlog uit; nog eens F5 zet hem weer aan (§1). |
+| 0.2.2 | 2026-11-11 | §2: op een laptop Fn + F-toets, en D in de HUD controleren na elke F-toets (in de sessie van 2026-11-11 kwam F3 waarschijnlijk niet aan; rapport §5.1) |
