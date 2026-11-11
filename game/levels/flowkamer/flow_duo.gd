@@ -54,24 +54,28 @@ const PATROL_PX := 30.0
 const RUNUP_PX := 66.0
 
 ## De route: [naam, soort, springer (1 of 2; 0 = geen), parameters].
-## "lift" = de drager wacht rond `spot` op niveau `level` (± `PATROL_PX`, overal
-## onder `next` en niet onder een trede); de springer bounct naar `next`; de
-## drager neemt daarna de trede op `tread` (midden-x, bovenkant) en springt in
-## richting `dir` naar `next`.
+## "lift" = de drager wacht rond `spot` op niveau `level` (± `PATROL_PX`, onder
+## het open (eenrichtings) deel van `next` en niet onder een trede); de
+## springer bounct naar `next`; de drager neemt daarna de langzame lijn vanaf
+## de trede op `tread` (midden-x, bovenkant): `steps` keer recht omhoog
+## springen (B3: 1, de trede; B1 en B2: 3, de treden op 45 en 90 en de richel op
+## 135, gdd §4.3 na F0), dan in richting `dir` naar `next`.
+## "omkeer" = de opstap aan het eind van de startgang (geen bouwsteen).
 const STEPS := [
 	["B4", "launch", 2, {}],
-	["B3", "lift", 1, {"level": Layout.FLOOR, "next": Layout.LEVEL_540, "spot": 330.0,
-		"tread": [Layout.B3_GALLERY_TIP - 20.0, Layout.FLOOR - 35.0], "dir": 1}],
-	["B1", "lift", 2, {"level": Layout.LEVEL_540, "next": Layout.LEVEL_450, "spot": 565.0,
-		"tread": [Layout.B1_WALL - 20.0, Layout.LEVEL_540 - 45.0], "dir": 1}],
-	["B2-0", "lift", 1, {"level": Layout.LEVEL_450, "next": 360.0, "spot": 1030.0,
-		"tread": [Layout.SHAFT_RIGHT - 20.0, Layout.LEVEL_450 - 45.0], "dir": -1}],
-	["B2-1", "lift", 2, {"level": 360.0, "next": 270.0, "spot": 750.0,
-		"tread": [Layout.SHAFT_LEFT + 20.0, 360.0 - 45.0], "dir": 1}],
-	["B2-2", "lift", 1, {"level": 270.0, "next": 180.0, "spot": 1030.0,
-		"tread": [Layout.SHAFT_RIGHT - 20.0, 270.0 - 45.0], "dir": -1}],
-	["B2-3", "lift", 2, {"level": 180.0, "next": 90.0, "spot": 750.0,
-		"tread": [Layout.SHAFT_LEFT + 20.0, 180.0 - 45.0], "dir": 1}],
+	["Omkeer", "omkeer", 0, {}],
+	["B3", "lift", 1, {"level": Layout.FLOOR, "next": Layout.LEVEL_540, "spot": 260.0,
+		"tread": [Layout.B3_GALLERY_TIP + 20.0, Layout.FLOOR - 35.0], "steps": 1, "dir": -1}],
+	["B1", "lift", 2, {"level": Layout.LEVEL_540, "next": Layout.LEVEL_450, "spot": 240.0,
+		"tread": [Layout.COLUMN_LEFT + 16.0, Layout.LEVEL_540 - 45.0], "steps": 3, "dir": 1}],
+	["B2-0", "lift", 1, {"level": Layout.LEVEL_450, "next": 360.0, "spot": 310.0,
+		"tread": [Layout.COLUMN_RIGHT - 16.0, Layout.LEVEL_450 - 45.0], "steps": 3, "dir": -1}],
+	["B2-1", "lift", 2, {"level": 360.0, "next": 270.0, "spot": 210.0,
+		"tread": [Layout.COLUMN_LEFT + 16.0, 360.0 - 45.0], "steps": 3, "dir": 1}],
+	["B2-2", "lift", 1, {"level": 270.0, "next": 180.0, "spot": 310.0,
+		"tread": [Layout.COLUMN_RIGHT - 16.0, 270.0 - 45.0], "steps": 3, "dir": -1}],
+	["B2-3", "lift", 2, {"level": 180.0, "next": 90.0, "spot": 210.0,
+		"tread": [Layout.COLUMN_LEFT + 16.0, 180.0 - 45.0], "steps": 3, "dir": 1}],
 	["Bovenroute", "top", 0, {}],
 	["K2", "arena", 0, {}],
 	["K3", "gemaal", 0, {}],
@@ -98,6 +102,7 @@ class Seat:
 	var last_x := INF
 	var stuck := 0
 	var from_tread := false
+	var off_ledge := false
 	var last_attack := -1000
 	var patrol_dir := 1
 	var pump_x := NAN
@@ -192,6 +197,7 @@ func _next_step(s: Seat) -> void:
 	s.stuck = 0
 	s.last_x = INF
 	s.from_tread = false
+	s.off_ledge = false
 
 
 # --- Beslissing per tick ---
@@ -209,6 +215,8 @@ func _decide(s: Seat, tick: int) -> int:
 	match spec[1]:
 		"launch":
 			return _launch(s, spec)
+		"omkeer":
+			return _omkeer(s)
 		"lift":
 			return _lift(s, spec)
 		"top":
@@ -226,7 +234,7 @@ func _decide(s: Seat, tick: int) -> int:
 func _launch(s: Seat, spec: Array) -> int:
 	var b := _body(s)
 	var springer: bool = s.index == spec[2]
-	if b.position.x < Layout.B4_FAR_EDGE - 20.0 and _on_level(s, Layout.FLOOR):
+	if b.position.x < Layout.B4_FAR_EDGE - 20.0 and (_on_level(s, Layout.FLOOR) or _on_level(s, Layout.STARTGANG)):
 		if springer:
 			lines[spec[0]] = s.sub == "launched"
 		_next_step(s)
@@ -286,6 +294,19 @@ func _slow_b4(s: Seat) -> int:
 	return L
 
 
+## Omkeren: de startgang naar links tot onder de opstap, er recht op springen.
+func _omkeer(s: Seat) -> int:
+	var b := _body(s)
+	if _on_level(s, Layout.FLOOR) and b.position.x < Layout.B3_ENTRANCE:
+		_next_step(s)
+		return R
+	if _on_level(s, Layout.STARTGANG):
+		if b.position.x > Layout.B3_ENTRANCE - 10.0:
+			return L
+		return _tap(s, J)
+	return L if b.motor.on_floor or (b.motor.velocity.y >= 0.0 and b.position.x > Layout.B3_ENTRANCE - 10.0) else 0
+
+
 ## Eén niveau omhoog met de ander als plank (C-10). De drager loopt heen en
 ## weer rond `spot`; de springer loopt naar hem toe en springt al lopend op hem
 ## (aanloop); de drager blijft staan zodra de springer afzet. Zo staat niemand
@@ -297,7 +318,9 @@ func _lift(s: Seat, spec: Array) -> int:
 	var spot: float = args["spot"]
 	var springer: bool = s.index == spec[2]
 	var b := _body(s)
-	if _on_level(s, next):
+	# Op het volgende niveau, niet op een trede die even hoog ligt (B1, B2).
+	var tread: Array = args["tread"]
+	if _on_level(s, next) and (int(args["steps"]) == 1 or absf(b.position.x - float(tread[0])) > Layout.KEERZONE):
 		if springer:
 			lines[spec[0]] = s.sub == "bounce"
 		_next_step(s)
@@ -332,7 +355,7 @@ func _lift(s: Seat, spec: Array) -> int:
 					s.sub = "slow"
 					return 0
 				return 0
-		return _slow_tread(s, level, args["tread"], args["dir"])
+		return _slow_tread(s, level, tread, int(args["steps"]), args["dir"])
 	# Springer.
 	match s.sub:
 		"":
@@ -366,21 +389,31 @@ func _lift(s: Seat, spec: Array) -> int:
 	return 0
 
 
-## Langzame lijn van de drager: naar de trede, erop springen, dan in richting
-## `dir` naar het volgende niveau.
-func _slow_tread(s: Seat, level: float, tread: Array, dir: int) -> int:
+## Langzame lijn van de drager: naar de trede, `steps` keer recht omhoog
+## springen (trede op trede), dan in richting `dir` naar het volgende niveau
+## (B3: van de trede af springen; B1, B2: van de richel op 135 aflopen).
+func _slow_tread(s: Seat, level: float, tread: Array, steps: int, dir: int) -> int:
 	var tx: float = tread[0]
 	var top: float = tread[1]
-	if _on_level(s, top):
-		s.from_tread = true
-		return _walk(dir) | _tap(s, J)
+	for i in steps:
+		if _on_level(s, top - 45.0 * i):
+			s.from_tread = true
+			if i < steps - 1:
+				return _tap(s, J)
+			if steps == 1:
+				return _walk(dir) | _tap(s, J)
+			s.off_ledge = true
+			return _walk(dir)
 	if _on_level(s, level):
 		s.from_tread = false
+		s.off_ledge = false
 		var go := _go_to(s, tx)
 		if go != 0:
 			return go
 		return _tap(s, J)
-	return _walk(dir) if s.from_tread else 0
+	if s.off_ledge or (steps == 1 and s.from_tread):
+		return _walk(dir)
+	return 0
 
 
 ## Bovenroute naar K2. Wie eerst in K2 is, wacht daar (heen en weer).

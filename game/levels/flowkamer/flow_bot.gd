@@ -47,6 +47,10 @@ const B4_GIVE_UP_TICKS := 300
 var recorded := PackedInt32Array()
 ## Welke bouwstenen de echolijn haalden (naam -> true) of de langzame lijn (false).
 var lines := {}
+## Per bouwsteen: de tick waarop hij klaar was (naam -> tick), voor het kamerdoc.
+var leg_done := {}
+## Per keerpunt (B1, B2-0 … B2-3): de tick waarop P1 tegen de keerwand keerde.
+var turned := {}
 ## Huidige stap, voor debug en tests.
 var leg := 0
 var sub := ""
@@ -62,6 +66,7 @@ var _pump_strokes := 0
 var _patrol_dir := 1
 var _tick := 0
 var _from_tread := false
+var _off_ledge := false
 var _needed := 0
 var _echo_now_x := NAN
 var _echo_last_x := NAN
@@ -69,10 +74,12 @@ var _echo_base := 0
 
 ## De route: [naam, soort, parameters]. "turn" = keren en op de echo bouncen
 ## (B1, B2): [niveau-y, richting heen, volgend niveau-y, richting langzame lijn].
+## "omkeer" = de opstap aan het eind van de startgang (geen bouwsteen).
 var _legs := [
 	["B4", "b4", []],
+	["Omkeer", "omkeer", []],
 	["B3", "b3", []],
-	["B1", "turn", [Layout.LEVEL_540, 1, Layout.LEVEL_450, 1]],
+	["B1", "turn", [Layout.LEVEL_540, -1, Layout.LEVEL_450, 1]],
 	["B2-0", "turn", [Layout.LEVEL_450, 1, Layout.LEDGES[0], -1]],
 	["B2-1", "turn", [Layout.LEDGES[0], -1, Layout.LEDGES[1], 1]],
 	["B2-2", "turn", [Layout.LEDGES[1], 1, Layout.LEDGES[2], -1]],
@@ -145,8 +152,10 @@ func _update_stuck() -> void:
 
 func _next_leg(echo_line: bool) -> void:
 	lines[_legs[leg][0]] = echo_line
+	leg_done[_legs[leg][0]] = _tick
 	leg += 1
 	sub = ""
+	_off_ledge = false
 	_since = 0
 	_stuck = 0
 	_last_x = INF
@@ -166,6 +175,8 @@ func _decide() -> int:
 	match spec[1]:
 		"b4":
 			return _leg_b4()
+		"omkeer":
+			return _leg_omkeer()
 		"b3":
 			return _leg_b3()
 		"turn":
@@ -186,7 +197,7 @@ func _decide() -> int:
 ## lijn (de kloof in, 160 px lopen, twee treden op).
 func _leg_b4() -> int:
 	var p := _p1()
-	if p.position.x < Layout.B4_FAR_EDGE - 20.0 and _on_level(Layout.FLOOR):
+	if p.position.x < Layout.B4_FAR_EDGE - 20.0 and (_on_level(Layout.FLOOR) or _on_level(Layout.STARTGANG)):
 		_next_leg(sub == "launched")
 		return L
 	match sub:
@@ -245,51 +256,71 @@ func _slow_b4() -> int:
 	return L
 
 
-## B3 lus: door de kom, op het blok, keren, terug op de echo en bouncen naar
-## de galerij. Mis je de echo: langzame lijn via de trede van 35 px.
+## Omkeren: de startgang naar links tot onder de opstap, er recht op springen.
+## De volgende stap (B3) loopt naar rechts.
+const OMKEER_X := Layout.B3_ENTRANCE - 10.0
+
+
+func _leg_omkeer() -> int:
+	var p := _p1()
+	if _on_level(Layout.FLOOR) and p.position.x < Layout.B3_ENTRANCE:
+		_next_leg(false)
+		return R
+	if _on_level(Layout.STARTGANG):
+		if p.position.x > OMKEER_X:
+			return L
+		return _tap(J)
+	# Nog op de overkant van B4, of in de lucht: naar links (springend: recht).
+	return L if p.motor.on_floor or p.motor.velocity.y >= 0.0 and p.position.x > OMKEER_X else 0
+
+
+## B3 lus: door de kom naar rechts, op het blok, keren tegen de wand, terug op
+## de echo en bouncen naar de galerij (naar links). Mis je de echo: langzame
+## lijn via de trede van 35 px.
 func _leg_b3() -> int:
 	var p := _p1()
 	if _on_level(Layout.LEVEL_540):
 		_next_leg(sub == "bounce")
-		return R
+		return L
 	match sub:
 		"":
-			if _on_level(Layout.FLOOR) and p.position.x <= 185.0:
+			if _on_level(Layout.FLOOR) and p.position.x >= Layout.B3_BLOCK_LEFT - 45.0:
 				sub = "to_block"
-				return L | _tap(J)
-			return L
+				return R | _tap(J)
+			return R
 		"to_block":
 			if _against_wall(Layout.FLOOR - 45.0):
 				sub = "back"
 				_since = 0
-				return R
+				return L
 			if _on_level(Layout.FLOOR) and _stuck >= 2:
 				sub = "slow"
-			return L
+			return R
 		"back":
 			# Op het blok terug naar de rand; daar afspringen zodra de echo
 			# zo ver de kom in is dat je op hem landt (gdd §4.3: 29–49 ticks
 			# na de rand, echo 99–146 px van de ingang).
-			if _on_level(Layout.FLOOR - 45.0) and p.position.x >= Layout.B3_BLOCK_RIGHT - 10.0:
+			if _on_level(Layout.FLOOR - 45.0) and p.position.x <= Layout.B3_BLOCK_LEFT + 10.0:
 				var e = _room.echo
-				if _echo_ready() and e.position.x <= Layout.B3_ENTRANCE + 60.0:
+				if _echo_ready() and absf(e.position.y - (Layout.FLOOR - Layout.HALF_H)) < 1.5 \
+						and e.position.x >= Layout.B3_ENTRANCE - 60.0 and e.position.x < Layout.B3_BLOCK_LEFT:
 					sub = "off_block"
-					return R | _tap(J)
+					return L | _tap(J)
 				if _since > 400 or not _room.echo_on:
 					sub = "off_block"
-					return R | _tap(J)
+					return L | _tap(J)
 				return 0
-			return R
+			return L
 		"off_block":
 			# Snel vallen op de echo is een vang (C-13): de zwiep gaat omhoog als een bounce.
 			if p.move_events & Motor.EV_CATCH:
 				sub = "bounce"
 				_since = 0
-				return R
+				return L
 			if _on_plank():
 				sub = "bounce"
 				_since = 0
-				return R | _tap(J)
+				return L | _tap(J)
 			if _on_level(Layout.FLOOR):
 				sub = "slow"
 				return 0
@@ -301,15 +332,15 @@ func _leg_b3() -> int:
 				if ex < p.position.x - 2.0:
 					return L
 				return 0
-			return R
+			return L
 		"bounce":
 			if _on_level(Layout.FLOOR):
 				sub = "slow"
 				return 0
 			# Met de teruggekregen dash haal je de galerij altijd (gdd §4.3).
-			if _since == 14 and p.position.x < Layout.B3_GALLERY_TIP - 4.0:
-				return R | _tap(DASH)
-			return R
+			if _since == 14 and p.position.x > Layout.B3_GALLERY_TIP + 4.0:
+				return L | _tap(DASH)
+			return L
 		"slow":
 			return _slow_b3()
 	return 0
@@ -320,14 +351,14 @@ func _slow_b3() -> int:
 	var tread_top := Layout.FLOOR - 35.0
 	if _on_level(tread_top):
 		_from_tread = true
-		return R | _tap(J)
+		return L | _tap(J)
 	if _on_level(Layout.FLOOR):
 		_from_tread = false
-		var target := Layout.B3_GALLERY_TIP - 20.0
+		var target := Layout.B3_GALLERY_TIP + 20.0
 		if absf(p.position.x - target) <= 2.0:
 			return _tap(J)
 		return R if p.position.x < target else L
-	return R if _from_tread else 0
+	return L if _from_tread else 0
 
 
 ## B1 en een verdieping van B2: heen naar de wand, keren, op de echo springen
@@ -339,13 +370,16 @@ func _leg_turn(args: Array) -> int:
 	var next_level: float = args[2]
 	var slow_dir: int = args[3]
 	var p := _p1()
-	if _on_level(next_level):
+	# Op het volgende niveau, en niet op de trede op 90 (die ligt even hoog,
+	# binnen de keerzone): pas dan is deze bouwsteen klaar.
+	if _on_level(next_level) and absf(p.position.x - _wall_x()) > Layout.KEERZONE:
 		_next_leg(sub == "bounce")
 		return 0
 	match sub:
 		"":
 			if _against_wall(level):
 				_turn_x = p.position.x
+				turned[_legs[leg][0]] = _tick
 				sub = "back" if _room.echo_on else "slow"
 				return _walk(-out_dir)
 			return _walk(out_dir)
@@ -380,6 +414,14 @@ func _leg_turn(args: Array) -> int:
 	return 0
 
 
+## Het wandvlak van het keerpunt van deze stap (Layout.turn_points).
+func _wall_x() -> float:
+	for tp: Dictionary in Layout.turn_points():
+		if tp["name"] == _legs[leg][0]:
+			return tp["wall"]
+	return INF
+
+
 ## In de lucht naar de echo sturen: hij komt je tegemoet (2 px/tick), dus
 ## soms even niets of terug. Zonder echo: `fallback`.
 func _steer_to_echo(fallback: int) -> int:
@@ -397,22 +439,36 @@ func _steer_to_echo(fallback: int) -> int:
 	return 0
 
 
-## Langzame lijn: onder de trede (40 px tegen de wand) recht omhoog springen,
-## dan vanaf de trede naar het volgende niveau.
+## Langzame lijn (gdd §4.3, na F0): onder de treden (40 px tegen de wand)
+## recht omhoog springen, op 45, 90 en de richel op 135; dan over de richel van
+## de wand af lopen tot je eraf valt, op het volgende niveau.
 func _slow_turn(level: float, out_dir: int, slow_dir: int) -> int:
 	var p := _p1()
-	if _on_level(level - 45.0):
+	# Op de treden: springen en al van de wand af sturen; de overhang houdt je
+	# tegen tot je erboven bent (zo is dit de snelste langzame lijn, FK-2).
+	for step in [45.0, 90.0]:
+		if _on_level(level - step):
+			_from_tread = true
+			return _walk(slow_dir) | _tap(J)
+	if _on_level(level - 135.0):
 		_from_tread = true
-		return _walk(slow_dir) | _tap(J)
+		if not _off_ledge:
+			_off_ledge = true
+			return _walk(slow_dir) | _tap(DASH)
+		return _walk(slow_dir)
 	if _on_level(level):
 		_from_tread = false
+		_off_ledge = false
 		if _turn_x == 0.0:
 			return _walk(out_dir)
 		var tread_x := _turn_x - out_dir * (Layout.TREAD_W * 0.5 - 8.0)
 		if absf(p.position.x - tread_x) <= 2.0:
 			return _tap(J)
 		return _walk(1 if tread_x > p.position.x else -1)
-	return _walk(slow_dir) if _from_tread else 0
+	if _off_ledge or _from_tread:
+		# Tussen de treden en van de richel op 135 af: van de wand af sturen.
+		return _walk(slow_dir)
+	return 0
 
 
 ## Bovenroute naar K2.
