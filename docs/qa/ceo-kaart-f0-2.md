@@ -1,12 +1,12 @@
 # CEO-kaart F0-2: de nieuwe flow-kamer spelen en scoren (tweede flow-test)
 
-Versie 0.1.1 · 2026-11-11 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA: `docs/qa/testplan-f0-2.md` (lees je pas na het spelen)
+Versie 0.1.2 · 2026-11-11 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA: `docs/qa/testplan-f0-2.md` (lees je pas na het spelen)
 
 **Tijd: ± 20–25 min.** Je speelt alleen solo (besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124)). Geen luistercheck deze keer. Je speelt 8 korte runs, geeft na elke run drie cijfers, beantwoordt een paar vragen en geeft alles in de Claude-chat.
 
 **Lees §1–§4. Lees §5 pas als je §4 tot en met O2 ingevuld hebt, en §6 pas nadat je het antwoordblok verstuurd hebt.**
 
-Build: commit `________` (QA vult in). Zip van precies die versie: `https://github.com/cesarvangerwen-glitch/echoborn/archive/________.zip` (QA vult in; speel niet met een andere zip).
+Build: commit `8be9910`. Zip van precies die versie: https://github.com/cesarvangerwen-glitch/echoborn/archive/8be99109adae47f16ebc10b10fd5b2a2d7616099.zip (speel niet met een andere zip).
 
 ## 1. Klaarzetten (Windows, ± 3 min)
 
@@ -99,3 +99,4 @@ Bijlage: alle meetlog-CSV's van vandaag
 |---|---|---|
 | 0.1 | 2026-11-11 | Eerste versie (#80, T17-2 deel 1): nieuwe build als zip, 2 oefenruns + 6 getelde runs (180, 90, 120, 90, 180, 120), D van het scorescherm per run, M1/M2/H, O1/O2 en daarna S1/S2, CSV's in de Claude-chat; geen luistercheck |
 | 0.1.1 | 2026-11-11 | Na Lead-review EP: HUD-check na elke F-toets op D, meetlog aan en echo aan (F4/F5 blijven staan); oude meetlogs eerst naar een submap of starttijd noteren; zip-link van de ingevulde commit; §6 pas na het versturen van het antwoordblok |
+| 0.1.2 | 2026-11-11 | Build `8be9910` en zip-link ingevuld |

@@ -1,6 +1,6 @@
 # Testplan F0-2: tweede flow-test op de herontworpen flow-kamer (T17-2)
 
-Versie 0.1.1 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
+Versie 0.1.2 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
 
 Basis: gdd v0.7.3 §4.5 (MP-1–MP-7, keuzeregel), §4.7.1–§4.7.3 en **§4.7.5** (wat het herontwerp nodig heeft), §5 (playtestvragen); `docs/design/kamers/flowkamer.md` (§3 keerpunten, §9 gemeten, §12 antwoord 1 van de LGD); rapport F0 v0.3.1 (`docs/qa/rapport-f0-flowtest.md`, §5–§8, open punten 8–11); het testplan van de eerste flow-test (`docs/qa/testplan-f0.md` v0.3.1, normen §1, W1–W10); fasekader §3 F0; besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B: de CEO speelt alleen solo) en #51 (staart bereik 1,5–3 s).
 
@@ -20,20 +20,20 @@ Co-op blijft buiten F0 (besluit #124): de gescripte duo-run (`test_flowtest_duo.
 
 De sessie vraagt de **hele** herontworpen kamer, ook K3 (W-4). Zonder W-4 meet de sessie K3 van F0 en is punt (b) van het herontwerp niet getoetst: dan **geen sessie**.
 
-| Wat | Waarde (in te vullen door QA vóór de sessie) |
+| Wat | Waarde (ingevuld door QA) |
 |---|---|
-| Build | `main` op commit `________`, na de merge van PR [#181](https://github.com/cesarvangerwen-glitch/echoborn/pull/181) van de World & Level Designer voor [#176](https://github.com/cesarvangerwen-glitch/echoborn/issues/176) (W-4–W-7; G-1–G-5 zitten erin via PR #178, W-1–W-3 via PR #179) |
-| D-toetsen | F1 = D `___`, F2 = D `___`, F3 = D `___` (verwacht 90 / 120 / 180, zoals `DEBUG_TAIL_KEYS` in `flow_room.gd` en `flowkamer.md` §8) |
-| Plek van de schoepen en de sluis in K3 (voor §4.3) | schoepen x `____ / ____ / ____ / ____`, vloer y `____`; sluisdoorgang x `____` (uit `flowkamer.md` §5 na W-7) |
+| Build | `main` op commit `8be99109adae47f16ebc10b10fd5b2a2d7616099` (`8be9910`), de merge van PR [#181](https://github.com/cesarvangerwen-glitch/echoborn/pull/181) van de World & Level Designer voor [#176](https://github.com/cesarvangerwen-glitch/echoborn/issues/176) (W-4–W-7; G-1–G-5 zitten erin via PR #178, W-1–W-3 via PR #179) |
+| D-toetsen | F1 = D 90, F2 = D 120, F3 = D 180 (`DEBUG_TAIL_KEYS` in `flow_room.gd`, `flowkamer.md` §8) |
+| Plek van de schoepen en de sluis in K3 (voor §4.3) | schoepen (middelpunt) x **1980 / 1900 / 1820 / 1740**, 38 px boven de vloer op y = 610 (`PUMP_VANES` in `flow_layout.gd`); kade x 1480–1720; sluisdoorgang x **1440–1460** (`SLUICE`); bovenste trede van de trap x 2000–2026 op y = 385 (`flowkamer.md` v0.6 §5) |
 
-Checklist van QA (alles ✅, anders meldt QA in #80 wat ontbreekt en wie aan zet is; de Producer geeft de CEO pas daarna de kaart):
+Checklist van QA (afgelopen op `8be9910`, 2026-11-11, headless op Linux met Godot 4.6.3; alles ✅, anders meldt QA in #80 wat ontbreekt en wie aan zet is; de Producer geeft de CEO pas daarna de kaart):
 
-- [ ] Volledige suite groen op die commit (`godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd`), met `test_flowkamer.gd`, `test_flowkamer_na_f0.gd`, `test_flowtest_t17.gd` en `test_flowtest_duo.gd`.
-- [ ] De gescripte geoefende run haalt per D MP-1, MP-2, MP-4 en MP-6 op de nieuwe K3 (W-5; `flowkamer.md` §9).
-- [ ] De tabel van de wachtbot staat in `flowkamer.md` §9 (W-6): per wachtplek of de weg omhoog gehaald wordt en na hoeveel stilstand. QA gebruikt die als referentie voor het restgat (§4.2).
-- [ ] De D-toetsen geven de D uit de tabel hierboven (de eerste `ECHO_LEEG_EIND` van een log ligt op tick D, rapport F0 §5.1).
-- [ ] Het scorescherm noemt de D na `RUN_EIND`, en F1–F4/F6 doen niets tot er drie scores zijn (G-5).
-- [ ] Het rekenscript van QA (`docs/qa/f0-2-meetlogs/rekenen.gd`, uitbreiding van het F0-script met §4.2–§4.3) geeft op de logs van de gescripte run per D 5 van 5 keerpunten "echolijn zonder stilstand" (zoals `test_flowkamer_na_f0.gd`), en op een log van de wachtbot de wachtplek die de bot koos.
+- [x] Volledige suite groen op die commit (`godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd`), met `test_flowkamer.gd`, `test_flowkamer_na_f0.gd`, `test_wachtbot.gd`, `test_flowtest_t17.gd` en `test_flowtest_duo.gd`: **239 geslaagd, 0 mislukt** (± 76 s).
+- [x] De gescripte geoefende run haalt per D MP-1, MP-2, MP-4 en MP-6 op de nieuwe K3 (W-5): D = 90 / 120 / 180 runtijd 63,5 / 65,5 / 70,3 s, MP-1 60 / 90 / 150 ticks, MP-2 14,2 / 12,8 / 11,9 per min, MP-4 2 / 3 / 4 %, MP-6 69 / 69 / 66 %; in K3 geen stilstand, `GEMAAL_VOL` 103 / 73 / **13** ticks vóór P1 bij de sluis.
+- [x] De tabel van de wachtbot staat in `flowkamer.md` §9 (W-6) en komt overeen met de uitvoer van `test_wachtbot.gd`: 0–40 px trede, 60 px vloer (overhang), 80–240 px omhoog (B1 tot 300), in B2 vanaf 260 px van het niveau af; stilstand steeds D ticks. QA gebruikt die als referentie voor het restgat (§4.2).
+- [~] De D-toetsen geven de D uit de tabel hierboven: in de code ja (`DEBUG_TAIL_KEYS`), maar een toetsdruk in een venster kan QA headless niet doen. Controle in de sessie: de CEO noteert de D van het scorescherm, en de eerste `ECHO_LEEG_EIND` van elk log ligt op tick D (rapport F0 §5.1).
+- [x] Het scorescherm noemt de D na `RUN_EIND`, en F6 doet niets tot er drie scores zijn (`test_g5_score_screen_shows_d`, per D). F1–F4 gaan door dezelfde blokkering in `flow_room.gd` (code gelezen; niet apart getest).
+- [ ] Het rekenscript van QA (`docs/qa/f0-2-meetlogs/rekenen.gd`, uitbreiding van het F0-script met §4.2–§4.3) geeft op de logs van de gescripte run per D 5 van 5 keerpunten "echolijn zonder stilstand" (zoals `test_flowkamer_na_f0.gd`), en op een log van de wachtbot de wachtplek die de bot koos. **Niet nodig vóór de sessie** (het rekent de CSV's achteraf): volgt vóór het rapport.
 
 ## 3. Normen en keuzeregel (ongewijzigd, solo)
 
@@ -74,13 +74,15 @@ Vijf keerpunten per run, dus bij 6 getelde runs 30, 10 per D. Per keerpunt één
 | Uitkomst | Hoe herkend in het log |
 |---|---|
 | **A. Echolijn zonder stilstand** | een `SPRINGPLANK` op dat niveau, ≥ 60 px van de keerwand, zonder stilstand van ≥ 20 ticks in de 120 ticks ervoor (de MP-3-regel) |
-| **B. Echolijn na wachten**, met de plek | idem, mét zo'n stilstand; plek = `x` van die stilstand: **onder de weg omhoog** (120–270 px van de keerwand: het restgat) of elders. Richting (**op weg naar binnen** of **na het keren**) alleen als het log dat laat zien (een eerdere stilstand of landing in de keerzone van hetzelfde niveau = na het keren); anders "richting onbekend" |
+| **B. Echolijn na wachten**, met de plek | idem, mét zo'n stilstand; plek = `x` van die stilstand, als **afstand tot de keerwand in px** per keerpunt genoteerd, en ingedeeld volgens de wachtbot (`flowkamer.md` v0.6 §9): **80–119 px** (in de keerzone, toch omhoog: het restgat begint op 80 px, niet op 120) of **120–240 px** (onder de weg omhoog, het restgat van gdd §4.3). Richting (**op weg naar binnen** of **na het keren**) alleen als het log dat laat zien (een eerdere stilstand of landing in de keerzone van hetzelfde niveau = na het keren); anders "richting onbekend" |
 | **C. Bij de wand gewacht** | een `SPRINGPLANK` op dat niveau < 60 px van de keerwand (de bounce komt op de trede, gdd §4.3): langzame lijn na wachten |
 | **D. Langzame lijn** | het volgende niveau gehaald zonder `SPRINGPLANK` op dit niveau |
 
 **MP-3 per keerpunt = A ÷ (A + B + C + D)**, per D en over alle getelde runs. Verwachting LGD: ≥ 60 % (gdd §4.7.2). De niveaus herkent QA aan `y` (vloer van B1 en de richels van B2, `flowkamer.md` §3), de keerwand aan `x` (links x = 20, rechts x = 500).
 
-Twee vervolgregels uit de bron:
+Vervolgregels uit de bron:
+
+- De **wachtafstand per keerpunt** (px van de keerwand, ook bij C) is de invoer voor de keuze tussen een bredere overhang (tot 120 px) of een keerzone van 160 px in [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (`flowkamer.md` §12, LGD). Wachten op 0–40 px eindigt op de treden (C), op 60 px tegen de overhang (val terug; zichtbaar als een tweede stilstand of een tweede poging op hetzelfde niveau).
 
 - Kiest de speler bij een bouwsteen in meer dan de helft van de getelde runs de langzame lijn (C + D), dan zet de WLD daar de trede verder van de wand (`flowkamer.md` §12, antwoord 1 van de LGD; via [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81)).
 - Haalt MP-3 de 75 % niet en is B (onder de weg omhoog) de grootste groep, dan is dat het restgat: grond voor de CEO-vraag over hoe de echo op de speler reageert (gdd §4.7.3, *Als het niet werkt*).
@@ -91,7 +93,7 @@ Twee vervolgregels uit de bron:
 |---|---|---|
 | K1 | langste stilstand per bouwsteen (B4 apart, W14) | ≤ 60 ticks als de speler keert |
 | K2 | per merk de langste stilstand van P1 tussen `MERK_GEZET` en de `MERKSPRONG` erna (zelfde merk-id; zonder merksprong: tot het eind van het merk, D + 30); daarnaast de langste stilstand in K2 | ≤ 60 ticks |
-| K3 | elke stilstand ≥ 30 ticks, met plek: **bij de schoepen** (`x` binnen 40 px van een schoep), **bij de sluis** (binnen 80 px van de sluisdoorgang) of elders | ≤ 30 ticks |
+| K3 | elke stilstand ≥ 30 ticks, met plek: **bij de schoepen** (`x` binnen 40 px van een schoep), **bij de sluis** (binnen 80 px van de sluisdoorgang) of elders. Daarnaast twee regels van de LGD (`flowkamer.md` §12): (1) landt de speler na de val door het gat op de **bovenste trede** (x 2000–2026, y ≈ 385) en hoe lang staat hij daar (stilstand met die `x, y`); (2) de **stilstand bij de sluis per D** (LM-04: ≤ 30 ticks). Bij D = 180 valt `GEMAAL_VOL` in de geoefende run maar 13 ticks vóór P1 bij de sluis is: wie op de kade dasht, kan voor een dichte sluis staan | ≤ 30 ticks |
 
 ### 4.4 Na de getelde runs (vragen, kaart §4–§5)
 
@@ -154,7 +156,7 @@ W1, W2, W7, W8, W9 en W10 uit `docs/qa/testplan-f0.md` §6 blijven gelden (W3–
 | W14 | De **solo-lancering in B4**: de stilstand van P1 in B4 en de aanloop (K1, x ≥ 1150, op de vloer van B4) tot de `LANCERING` telt niet voor MP-1; de `SPRINGPLANK` op de tick van de `LANCERING` telt niet voor MP-3. QA rapporteert beide apart. Lanceert de CEO niet, dan valt er niets weg | gdd §4.7.1 (open punt B4 solo); `flowkamer.md` §12, antwoord 6 van de LGD |
 | W15 | De uitkomst per keerpunt (§4.2) komt alleen uit events met `x, y`: het log heeft geen doorlopende positie. De richting van een wachtplek (op weg naar binnen of na het keren) is daarom niet altijd te bepalen; het rapport zegt dan "richting onbekend". De grens van 60 px voor C ligt tussen een bounce bij de wand (echo ≤ 40 px van de wand) en de vroegste keerlanding (90 px bij D = 90) | gdd §4.7.4: geen nieuwe events. Getoetst op de logs van de gescripte run en de wachtbot (§2) |
 | W16 | MP-3 ≥ 75 % per D telt over alle landingen van de getelde runs van die D samen; per run staat het ook in het rapport | Per run zijn het maar ± 4–7 landingen |
-| W17 | Plek in K3: "bij de schoepen" = `x` binnen 40 px van het middelpunt van een schoep; "bij de sluis" = binnen 80 px van de sluisdoorgang. De coördinaten komen uit `flowkamer.md` na W-4–W-7 (§2) | gdd §4.7.5 punt 3 noemt de plekken, geen maten |
+| W17 | Plek in K3: "bij de schoepen" = `x` binnen 40 px van het middelpunt van een schoep (1700–2020); "bij de sluis" = `x` 1440–1540 (binnen 80 px van de sluisdoorgang); "bovenste trede" = x 2000–2026 en y < 400. Coördinaten uit §2 | gdd §4.7.5 punt 3 noemt de plekken, geen maten |
 | W18 | De kaart zegt vóór het spelen niets over keren, het plank-signaal, de doelstreep of de bereikcirkel; de gerichte vragen S1–S2 staan in een apart blok dat de CEO pas na O2 leest | gdd §4.7.5 punt 5 vraagt of hij het **uit zichzelf** doet en ziet |
 | W19 | M2 heeft één antwoord: "≥ 80 % begrepen" is bij één speler ja of nee. Een uitleg via het bereik ("ze stonden allebei in de cirkel") telt niet als begrepen volgens de regel, maar staat als bevinding voor E-14j in het rapport | gdd §4.7.5 punt 4: dezelfde regel als F0 |
 | W20 | Volgorde **180, 90, 120, 90, 180, 120**: elke D één keer in elke helft, nooit twee keer dezelfde D na elkaar, 3 s eerst (in F0 ontbrak die). Oefenruns op D = 120, zoals F0 | gdd §5: wisselende volgorde; oefening en verwachting zo beter te scheiden dan in F0 (rapport F0 §5.1) |
@@ -164,8 +166,8 @@ W1, W2, W7, W8, W9 en W10 uit `docs/qa/testplan-f0.md` §6 blijven gelden (W3–
 
 | # | Wat | Wie |
 |---|---|---|
-| 1 | Build-commit (ook in de zip-link van de kaart), D-toetsen en de K3-coördinaten invullen (§2) zodra PR #181 van de WLD voor [#176](https://github.com/cesarvangerwen-glitch/echoborn/issues/176) gemerged is; daarna de checklist van §2 | qa-lead |
-| 2 | Rekenscript `docs/qa/f0-2-meetlogs/rekenen.gd` met §4.2–§4.3, getoetst op de gescripte run en de wachtbot | qa-lead |
+| 1 | ~~Build-commit, D-toetsen en K3-coördinaten invullen~~ gedaan (v0.1.2). Wat van de checklist van §2 niet headless kan (D-toetsen en scorescherm met de hand), staat in §2 (D-toetsen: controle in de sessie) | qa-lead |
+| 2 | Rekenscript `docs/qa/f0-2-meetlogs/rekenen.gd` met §4.2–§4.3, getoetst op de gescripte run en de wachtbot; na de sessie, vóór het rapport | qa-lead |
 | 3 | Eerste knop op de pijltjeskant maakt speler 1 (rapport F0 open punt 10): de kaart werkt eromheen | ux-designer, gameplay-programmer |
 
 ## Wijzigingen
@@ -174,3 +176,4 @@ W1, W2, W7, W8, W9 en W10 uit `docs/qa/testplan-f0.md` §6 blijven gelden (W3–
 |---|---|---|
 | 0.1 | 2026-11-11 | Eerste versie (#80, T17-2 deel 1): normen en keuzeregel per D, twee getelde runs per D, MP-3 per bouwsteen en per keerpunt, stilstand per kamer met plek, M2 en *Nine Sols*, observaties keren en plank-signaal/doelstreep, oordeel en gevolgen, W11–W21 |
 | 0.1.1 | 2026-11-11 | Na Lead-review EP: PR #181 bij naam (§2, §8); V1 alleen bevinding, niet in het oordeel (§6) |
+| 0.1.2 | 2026-11-11 | Build `8be9910` (na PR #181), D-toetsen en K3-coördinaten ingevuld (§2, W17); wachtafstand per keerpunt met de banden van de wachtbot (restgat vanaf 80 px), landing op de bovenste trede en stilstand bij de sluis per D (§4.2, §4.3; `flowkamer.md` §12) |
