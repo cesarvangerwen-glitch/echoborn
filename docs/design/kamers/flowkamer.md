@@ -63,9 +63,11 @@ Alle maten uit gdd §4.3 en §4.7.4; per bouwsteen alleen wat ik koos of moest k
 | Vlakke vloer vóór elke keerwand (nodig D + 24) | B1 320, B2 480 | gelijk | gelijk (nodig 204) |
 | Landing na keren zonder dash (rand weg omhoog op 120 + 8, ≥ 30 marge) | 158 px | 188 px | 248 px |
 | B2: landing (≤ D + 88) tot de volgende wand (nodig D + 24) | 302 px | 272 px | 212 px |
+| B2: marge van de bounce tot het dichte stuk van de volgende richel (begint op 480 − 215 = 265 px van de wand; de bounce passeert de richel op ± D + 76): zonder dash / met dash (+ 20 px) | ± 99 / ± 79 px | ± 69 / ± 49 px | **± 9 / ± −11 px**: zonder dash krap, met dash kan de bounce tegen het dichte stuk komen |
+| Afzet onder de overhang (40–70 px van de wand): speling tussen lichaam en overhang | **5 px** (afzet op ± 32 px van de wand) | afzet verder van de wand, niet onder de overhang | idem |
 | Gemeten: keren tot het volgende niveau / langzame lijn vanaf de wand | 80 / 142 ticks (1,8×) | 95 / 142 (1,5×) | 125–133 / 142 (1,1×) |
 
-Bij D = 180 is keren nog maar 9–17 ticks sneller dan de langzame lijn (gdd: 124 tegen 145). Dat is de prijs van een lange staart; de tweede flow-test meet welke lijn spelers kiezen.
+Bij D = 180 is keren nog maar 9–17 ticks sneller dan de langzame lijn (gdd: 124 tegen 145). Dat is de prijs van een lange staart; de tweede flow-test meet welke lijn spelers kiezen. De geometrie blijft zo (LGD, §12). De krappe marges (D = 180 met dash, D = 90 onder de overhang) test de late bot (W-6, open punt in §12).
 
 **Restgat** (gdd §4.3, bekend risico): wie onder de weg omhoog stilstaat (120–270 px van de wand, ook op weg naar binnen), krijgt na ≤ D ticks zijn echo onder zich en haalt de weg omhoog. De geometrie sluit dat niet uit; de wachtbot (W-6) en de tweede flow-test meten het.
 
@@ -102,7 +104,7 @@ Met 2 + 2 paren haalt de run de 100 LP niet. 3 + 2 haalt ze wel, maar dan duurt 
 
 Het gemaal is zonder echo dus vol na **1 terugkeer** (grens FK-2: ≤ 4). Gemeten: 1 bij elke D.
 
-**Hooguit 5 vijanden tegelijk (L-13 (f))** haalt K2 niet: een golf heeft 6 basisvijanden (golf 2 met het pantserdoel 7), en na G-3 staat golf 2 er al terwijl de gemerkte vijanden van golf 1 nog niet geknald zijn (tot 13). In F0 waren het er 6 (golf 2). Dat volgt uit het LP-doel met paren en de tijdgrens van de tests; voorstel aan de LGD in §12.
+**Hooguit 5 vijanden tegelijk (L-13 (f))** haalt K2 niet: een golf heeft 6 basisvijanden (golf 2 met het pantserdoel 7), en na G-3 staat golf 2 er al terwijl de gemerkte vijanden van golf 1 nog niet geknald zijn (tot 13). In F0 waren het er 6 (golf 2). Dat volgt uit het LP-doel met paren en de tijdgrens van de tests; de LGD laat (f) voor de flow-kamer vallen tot de tweede flow-test (§12); W-5 meet per D het maximum aantal vijanden tegelijk in K2 (§9).
 
 ## 5. K3 gemaal en lichtmeter
 
@@ -198,7 +200,7 @@ Wat dit zegt:
 | FK-6 maten | ja | Echolijnen 70–90 px; treden ≤ 45 px (B1, B2: 45, 90, 135; opstap 40); te overspringen gaten ≤ 64 px (trap K3). Het gat van 120 px aan de open kant van elke richel van B2 hoef je niet over te springen: je keert eronder (echolijn) of loopt er over de richel op 135 overheen (langzame lijn). De kloof van B4 (160) en het gat van B3 (150) idem |
 | Keerzone (gdd §4.3, W-1, W-2) | ja | Bij elk van de 5 keerpunten binnen 120 px van de wand niets landbaars lager dan 120 px behalve de treden; weg omhoog 120–480 px (B1) en 120–480 px (B2); test per D |
 | K2 in paren (W-3, L-13 (d)) | ja | Paren 28 px, paren ≥ 162 px uit elkaar, golf 2 aan de ingang; test op de maten en in de kamer |
-| L-13 (f) ≤ 5 vijanden tegelijk | nee | 6 per golf (golf 2 met pantserdoel 7); zie §4 en §12 |
+| L-13 (f) ≤ 5 vijanden tegelijk | uitzondering flow-kamer (LGD) tot T17-2 | 6 per golf (golf 2 met pantserdoel 7); W-5 meet het maximum tegelijk per D (§9); zie §4 en §12 |
 | C-15 optioneel samenwerken | ja | Geen object of poort vraagt een samenwerkingsactie; één kamer voor solo en co-op. Met een meeloper ≤ 2× de run met echo uit (`test_coop_deel2.gd`); de gescripte co-op-run haalt de normen (§9) |
 | L-02 | ja | Elke plek op de route is lopend te halen; geen plek alleen voor een live P2 |
 | L-03 | ja | De enige poort (sluis) gaat open door het gemaal |
@@ -245,19 +247,23 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 - QA Lead (T17 deel 2, [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80)): de co-op-cijfers van het duo (§9) en de nieuwe solo-cijfers met lancering. Omdat de bot nu in B4 lanceert, veranderen ook de solo-runs van T17 (64,4 / 66,8 / 78,9 s, was 63,5 / 65,4 / 76,6 s) en de co-op-ondergrenzen (de schaduwpartner lanceert P1 in B4).
 - QA Lead of Gameplay Programmer bij T17 deel 2 ([#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80)), of de LGD past gdd §4.6 aan: co-op-replay per speler (de `recorded` van beide stoelen van `flow_duo.gd` afspelen als twee `ScriptedInput`s, met hetzelfde log; gdd §4.5/§4.6). De duo-test draait nu de bots twee keer opnieuw.
 - Gameplay Programmer: de springplank-reeks `n` opnieuw laten beginnen bij aflopen van de echo kan van `flow_meetlog.gd` naar `meetlog.gd`.
-- LGD: gdd §4.2 en FK-2 naar 3 + 3 paren (§4): FK-2 zonder echo wordt 72 + 36 per terugkeer (1 terugkeer), in plaats van 36 + 18.
+- LGD: gdd §4.2/FK-2 naar 3 + 3 paren (72 + 36 per terugkeer, 1 terugkeer; was 36 + 18).
+- W-6: de late bot krijgt er een variant bij met een dash bij D = 180 (dichte stuk, §3) en een met een bounce die 8 ticks te laat komt bij D = 90 (overhang op 66–70 px).
+- W-5: meet per D het maximum aantal vijanden tegelijk in K2 en zet dat in §9 (L-13 (f), uitzondering tot T17-2).
 - LGD na T17: in B3 geeft de vang +3 tegen +5 voor landen plus bounce; met 3 + 3 paren haalt de gescripte run 119–121 LP na K1 + K2 (marge 19).
 
-**Na F0, deel 1 (W-1–W-3): afwijkingen van de startmaten (werkaanname LGD (5)) en vragen aan de LGD**
+**Na F0, deel 1 (W-1–W-3): afwijkingen van de startmaten (werkaanname LGD (5))**
+
+**Besluit LGD:** afwijkingen 1–5 akkoord, binnen werkaanname LGD (5).
 
 - **Opstap (omkeer zonder echo)** en de startgang 40 px lager (§2): niet in de gdd, nodig omdat K1 zes keerpunten met de echo heeft en naar de andere kant uit moet. Kost ± 0,5 s per run.
-- **Overhang** (§3): de langzame lijn uit §4.3 is zonder overhang via de trede op 45 (sprong + dash) of de trede op 90 (opzij springen) even snel als keren of sneller. Voorstel: in gdd §4.3 *Keerzone* opnemen dat van de treden alleen de richel op 135 te halen is.
-- **Dicht stuk van 215 px** aan de wandkant van de richels (§3): de richel op 135 ligt 45 px onder de richel twee hoger, zodat je anders een verdieping overslaat. Voorstel: in gdd §4.3 *B2* opnemen, of de richel op 135 korter maken dan de afzet die de richel twee hoger haalt (kan niet: hij moet tot boven het begin van de weg omhoog reiken).
+- **Overhang** (§3): de langzame lijn uit §4.3 is zonder overhang via de trede op 45 (sprong + dash) of de trede op 90 (opzij springen) even snel als keren of sneller. De LGD neemt de overhang over in gdd §4.3 (*Keerzone*).
+- **Dicht stuk van 215 px** aan de wandkant van de richels (§3): de richel op 135 ligt 45 px onder de richel twee hoger, zodat je anders een verdieping overslaat. De LGD neemt het dichte stuk over in gdd §4.3 (*B2*).
 - **B1: galerij van 120 tot 480 px**, en het is de vloer van B2 (gdd: "tot ≥ 270"). Achter de keerwand ligt niets (buitenwand), dus "de vloer van B2 hoger, of een overhang" was niet nodig.
 - **K2: 3 + 3 paren** in plaats van een open aantal (§4), en paren **28 px** uit elkaar.
-- **Bevinding: paren geven geen ketting** (§4). Eén slag merkt beide vijanden van een paar, de eerste ontploffing doodt ze allebei, het tweede merk knalt niet. MP-6 met echo: 69–70 % (F0: 83 %). Vraag: is dat goed zo (één merk raakt er twee, en dat leest), of wil de LGD paren op 33–48 px (buiten E, binnen K), zodat twee merken een ketting geven? Dan raakt één merk er maar één.
-- **L-13 (f)** (≤ 5 vijanden tegelijk) haalt K2 niet: 6 per golf, en na G-3 overlappen de golven (tot 13). Voorstel: K2 in drie golven van 2 paren (code van de Gameplay Programmer), of (f) voor de flow-kamer laten vallen tot T17-2.
-- **Keren bij D = 180 nog maar 9–17 ticks sneller** dan de langzame lijn (142 ticks). In lijn met gdd §4.3 (124 tegen 145); de tweede flow-test meet welke lijn spelers kiezen.
+- **Bevinding: paren geven geen ketting** (§4). Eén slag merkt beide vijanden van een paar, de eerste ontploffing doodt ze allebei, het tweede merk knalt niet. MP-6 met echo: 69–70 % (F0: 83 %). **Besluit LGD:** paren blijven op 28 px. "Eén knal, twee doden" was in F0 precies wat de speler niet zag (M2); MP-6 haalt 69–70 %. De LGD zet de gdd recht: in §4.2 en §4.7.1 (c) vervalt "twee merken geven een ketting", in §4.7.2 vervalt de MP-6-verwachting. Paren op 33–48 px gaan naar [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81).
+- **L-13 (f)** (≤ 5 vijanden tegelijk) haalt K2 niet: 6 per golf, en na G-3 overlappen de golven (tot 13). **Besluit LGD:** (f) geldt niet voor de flow-kamer tot de tweede flow-test (T17-2). F0 had er ook 6; drie golven breken G-3 open (scope T16e). W-5 meet per D het maximum aantal vijanden tegelijk in K2 en zet dat in §9; de QA Lead ziet het terug bij vraag 6.
+- **Keren bij D = 180 nog maar 9–17 ticks sneller** dan de langzame lijn (142 ticks). **Besluit LGD:** de geometrie blijft zoals hij is. Een langzamere langzame lijn komt bij D = 90 te dicht bij FK-2 (2 × 80 = 160). Weinig winst bij D = 180 is de prijs van een lange staart en invoer voor de keuzeregel (§4.5); de tweede flow-test meet welke lijn spelers kiezen.
 
 **Na F0: voor W-4–W-6 (volgende maak-taak)**
 
@@ -273,4 +279,4 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 | 0.3 | Lead-review: vijfde basisvijand in golf 2 (108 LP na K1 + K2), FK-2-grens en metingen bijgewerkt |
 | 0.2 | Merge met co-op 7A (#78): vang en lancering tellen in de lichtmeter (+3, +4), B3 landt met een vang; metingen bijgewerkt. Lead-review: FK-2-grens voor 4 + 4 vijanden voorgerekend (§4), FK-2-test per D, antwoorden van de LGD en open punten (§12) |
 | 0.4 | #125: de bot lanceert in B4 (solo); gescripte co-op-run `flow_duo.gd` met test per D; §9 solo bijgewerkt en co-op erbij; werkaannames 7, 9–11; Lead-review: antwoorden 6 en 7 van de LGD, open punten; SM-review: B4-check op de rolverdeling, open punt co-op-replay |
-| 0.5 | Na F0, deel 1 (T16d, W-1–W-3 en W-7 voor K1/K2): B1 en B2 met keerzone, overhang en dicht stuk in één kolom; B3 weer met de ingang links; opstap en lagere startgang; K2 in 3 + 3 paren; §2–§4, §9 (metingen), §10, §11 (werkaannames 2, 12–15) en §12 (afwijkingen, bevinding paren, vragen aan de LGD) bijgewerkt; nieuwe test `test_flowkamer_na_f0.gd` |
+| 0.5 | Na F0, deel 1 (T16d, W-1–W-3 en W-7 voor K1/K2): B1 en B2 met keerzone, overhang en dicht stuk in één kolom; B3 weer met de ingang links; opstap en lagere startgang; K2 in 3 + 3 paren; §2–§4, §9 (metingen), §10, §11 (werkaannames 2, 12–15) en §12 (afwijkingen, bevinding paren, vragen aan de LGD) bijgewerkt; nieuwe test `test_flowkamer_na_f0.gd`. Lead-review: marges bounce–dicht stuk en overhang per D (§3), besluiten van de LGD (§12), L-13 (f) uitzondering tot T17-2 (§10), open punten W-5 en W-6 |
