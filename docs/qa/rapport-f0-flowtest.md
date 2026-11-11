@@ -1,15 +1,15 @@
 # Rapport F0, deel 1: scripted runs in de grijze flow-kamer (T17)
 
-Versie 0.1 · 2026-11-09 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
+Versie 0.2 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
 
-Plan: `docs/qa/testplan-f0.md`. Deel 2 (de CEO-sessie, het eindoordeel F0) volgt in #80 met `docs/qa/ceo-kaart-f0.md`.
+Plan: `docs/qa/testplan-f0.md`. Deel 2 (de CEO-sessie solo, het eindoordeel F0) volgt in #80 met `docs/qa/ceo-kaart-f0.md`. F0 slaagt op de solo-normen; de co-op-metingen hieronder zijn meting, geen F0-voorwaarde (besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124): 1B; kader §3 F0 en F4b(c)).
 
 ## 1. Samenvatting
 
 - **Solo haalt alle objectieve normen bij elke staart** (D = 90 / 120 / 180): MP-1, MP-2, MP-3, MP-4 en MP-6 met ruime marge. Norm (3) (MP-5) en de *Nine Sols*-check kunnen alleen mensen geven: die wachten op de CEO.
 - **Co-op is met scripted runs nog niet te beoordelen.** Er is geen gescripte geoefende co-op-run (gdd §4.5 vraagt die van de WLD met de Gameplay Programmer). De twee partners die QA zelf schreef zijn ondergrenzen: ze halen MP-2 en MP-6 niet, wat iets zegt over die partners, niet over de kamer (§4, §6 punt 1).
-- **Staartkeuze**: solo laat alle drie de D toe; de keuze valt op MP-5 van de CEO en op co-op. Zonder verschil in MP-5 wordt het D = 120 (keuzeregel gdd §4.5), wat past bij besluit #51 (± 2 s).
-- **Advies nu: nog geen go of no-go voor F0.** Solo is klaar voor de CEO, co-op heeft eerst een tweede speler nodig ([#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124)) en de co-op-run van de WLD (§6).
+- **Staartkeuze**: solo laat alle drie de D toe; de keuze valt op MP-5 van de CEO (solo). Zonder verschil in MP-5 wordt het D = 120 (keuzeregel gdd §4.5), wat past bij besluit #51 (± 2 s).
+- **Advies nu: nog geen go of no-go voor F0.** Solo is klaar voor de CEO-sessie (deel 2); het oordeel volgt na zijn scores. Co-op telt in F0 niet mee: de co-op-normen toetst F4b(c).
 
 ## 2. Opzet
 
@@ -38,7 +38,7 @@ Wat opvalt:
 - **Landingen per bouwsteen** (vraag 4): B3, B1 en elke verdieping van B2 geven elk 1 landing; **B4 en K2 geven er 0**. K2 is de merk-arena (de echo werkt daar als merk-afmaker, dat is bedoeld). B4 is gemeten via de langzame lijn: de bot lanceert nog niet (§6 punt 2).
 - MP-3 is 100 % omdat de bot nooit op zijn echo wacht; bij mensen is dit de maat die R-V12 echt toetst.
 
-## 4. Co-op (ondergrenzen)
+## 4. Co-op (ondergrenzen; meting, geen F0-voorwaarde)
 
 In co-op is er geen echo: P2 is het tweede lichaam (gdd §2.7). P2 komt erin zodra de echo er is (tick D + 1) en neemt zijn plek over (C-01).
 
@@ -59,31 +59,38 @@ In co-op is er geen echo: P2 is het tweede lichaam (gdd §2.7). P2 komt erin zod
 Wat dit wel en niet zegt:
 
 - **Niet**: dat co-op de normen mist. Beide partners doen bijna niets samen. De schaduwpartner werkt tot B3 (P1 vangt zich op P2), maar dan staat P1 hoger en kan P2 niet volgen: anders dan de echo, die zijn opgenomen posities afspeelt, heeft een levend lichaam zelf een plank nodig om omhoog te komen, en P1 is al verder. Daarna loopt P2 alleen mee. Een echt duo wisselt van rol (P2 bounct ook op P1, gdd §2.7); die run bestaat nog niet.
-- **Wel**: (1) co-op zonder samenwerken is **trager** dan solo met echo (1,3–1,55×) en blijft binnen FK-2/C-15 (≤ 2× de run met echo uit): de route blijft open. (2) MP-7 (a) "niet meer dan 2× zo snel" kan pas mislukken met een duo dat écht samenwerkt; dat is precies de run die ontbreekt. (3) **Een P2 die niet meeklimt, staat 6–7,5 s stil zonder dat de leiband hem oplost** (meeloper, MP-7 b 358–448 ticks), want hij blijft in beeld onder P1. Bij een mens is dat een "ik wacht"-moment; observatie O4 op de kaart en een punt voor de LGD (C-07).
+- **Wel**: (1) co-op zonder samenwerken is **trager** dan solo met echo (1,3–1,55×) en blijft binnen FK-2/C-15 (≤ 2× de run met echo uit): de route blijft open. (2) MP-7 (a) "niet meer dan 2× zo snel" kan pas mislukken met een duo dat écht samenwerkt; dat is precies de run die ontbreekt. (3) **Een P2 die niet meeklimt, staat 6–7,5 s stil zonder dat de leiband hem oplost** (meeloper, MP-7 b 358–448 ticks), want hij blijft in beeld onder P1. Bij een mens is dat een "ik wacht"-moment; observatie voor F4b(c) en een punt voor de LGD (C-07).
 
 ## 5. Wat alleen de CEO kan geven
 
 | Vraag (gdd §5) | Waarom niet scripted |
 |---|---|
-| MP-5, norm (3): vloeiend/satisfying per kamer, solo en co-op | Een gevoelsscore |
+| MP-5, norm (3): vloeiend/satisfying per kamer, solo (co-op in F4b(c)) | Een gevoelsscore |
 | Vraag 1: "Wist je waar je echo zou zijn?" per D | Idem |
-| Vraag 5: *Nine Sols*-check (ideecheck §2, slotzin) | Moet spontaan komen, vóór we iets zeggen |
+| Vraag 5: *Nine Sols*-check (ideecheck §2, slotzin); bij de CEO een zwak signaal, sterk in F4b(c) | Moet spontaan komen, vóór we iets zeggen |
 | Vraag 6: is de merksprong leesbaar? | Uitleg van een speler |
-| Vraag 7 en 8: wachten (ja/nee), echo/partner als hulp of last | Idem |
+| Vraag 8 solo: echo als hulp of last (vraag 7 en 8 in co-op: F4b(c)) | Idem |
 | MP-1 en MP-3 bij een mens | De bot wacht nooit; een mens wel |
 
 ## 6. Open punten
 
 | # | Wat ontbreekt | Waarom het ertoe doet | Wie |
 |---|---|---|---|
-| 1 | **Gescripte geoefende co-op-run** per D (gdd §4.5): P1 en P2 als inputbron, met bounce in beide richtingen, lancering in B4, merk-combo in K2, pompslagen van P2 | Zonder die run weten we niet of de kamer in co-op MP-2, MP-6 en MP-7 (c) **kan** halen, en kan MP-7 (a) niet echt mislukken. Punt 1–3 komen samen in één issue voor de World & Level Designer (met de Gameplay Programmer): issue volgt (Producer). De proxy `_CoopView` en de MP-7-code in `test_flowtest_t17.gd` kunnen ze gebruiken | world-level-designer, gameplay-programmer |
+| 1 | **Gescripte geoefende co-op-run** per D (gdd §4.5): P1 en P2 als inputbron, met bounce in beide richtingen, lancering in B4, merk-combo in K2, pompslagen van P2 | Zonder die run weten we niet of de kamer in co-op MP-2, MP-6 en MP-7 (c) **kan** halen, en kan MP-7 (a) niet echt mislukken. Sinds besluit #124 een meting voor het rapport en een voorbereiding op F4b(c), geen F0-voorwaarde. Punt 1–3 staan samen in [#125](https://github.com/cesarvangerwen-glitch/echoborn/issues/125) (World & Level Designer, met de Gameplay Programmer). De proxy `_CoopView` en de MP-7-code in `test_flowtest_t17.gd` kunnen ze gebruiken | world-level-designer, gameplay-programmer |
 | 2 | **De bot lanceert niet in B4** (zelfde issue als punt 1) (comment in `flow_bot.gd`: "de lancering komt in T16c"; T16c is gemerged) | Vraag 8 vraagt lancering ≥ 1× per co-op-run in B4; nu is B4 alleen via de langzame lijn gemeten (0 landingen) | world-level-designer |
 | 3 | **Het meetlog meet MP-1 alleen voor P1** (`meetlog.gd`) | MP-7 (b) vraagt P2 ook. In de scripted runs rekent de testcode het uit; voor de CSV's van de CEO-sessie ontbreekt het, dus MP-7 (b) is bij mensen alleen te observeren (zelfde issue als punt 1) | gameplay-programmer |
-| 4 | **Een tweede speler voor co-op** met de CEO | Zonder P2 geen co-op-score voor norm (3), en F0 vraagt solo én co-op. Vraag aan de CEO: [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) | CEO |
-| 5 | MP-4 in co-op en MP-7 (b)/(c) hebben in de gdd geen uitgewerkte telling; QA rekent met W4–W6 (testplan §6) | **De LGD bevestigt W4–W6 vóór deel 2** | lead-game-designer |
-| 6 | **P2 krijgt geen oefenrun** vóór de getelde co-op-runs (de kaart geeft alleen de CEO twee oefenruns) | P2 is in co-op dus niet "geoefend" volgens gdd §4.5; QA weegt de co-op-scores daarop in deel 2 | qa-lead |
-| 7 | **MP-7 (a) is in de gdd de mediane runtijd**; de CEO-sessie geeft één co-op- en één solo-run per D | Eén waarde per D is geen mediaan: in deel 2 rapporteert QA het als enkele meting, niet als oordeel over MP-7 (a) | qa-lead, lead-game-designer |
+| 4 | ~~Een tweede speler voor co-op met de CEO~~ *Vervallen voor F0* (besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124): 1B) | F0 slaagt op solo; de vraag wie P2 speelt komt bij F4b(a) (kader §9) | — |
+| 5 | MP-4 in co-op en MP-7 (b)/(c) hebben in de gdd geen uitgewerkte telling; QA rekent met W4–W6 (testplan §6) | **De LGD bevestigt W4–W6** vóór de co-op-metingen in F4b(c) meetellen; voor F0 (solo) niet nodig | lead-game-designer |
+| 6 | **P2 krijgt geen oefenrun** vóór de getelde co-op-runs | Geen co-op in de F0-sessie (besluit #124); meenemen in de kaart voor F4b(a)/(c) (T11) | qa-lead |
+| 7 | **MP-7 (a) is in de gdd de mediane runtijd**; een sessie met mensen geeft één co-op- en één solo-run per D | Geen co-op in de F0-sessie (besluit #124); in F4b(c) rapporteert QA één waarde per D als enkele meting, niet als oordeel over MP-7 (a), tenzij er meer runs zijn | qa-lead, lead-game-designer |
 
 ## 7. Werkaannames
 
 W1–W8 uit `docs/qa/testplan-f0.md` §6. De belangrijkste voor dit rapport: de bot is de geoefende solo-speler (W2), de co-op-partners zijn ondergrenzen (W3), en MP-4, MP-7 (b) en (c) in co-op volgen W4–W6.
+
+## Wijzigingen
+
+| Versie | Datum | Wijziging |
+|---|---|---|
+| 0.1 | 2026-11-09 | Eerste versie (#80): scripted runs solo en co-op, open punten |
+| 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: alleen de verwijzingen naar co-op/P2 als F0-voorwaarde bijgewerkt (kop, §1, §4-titel en punt 3 van "Wel", §5, §6 punt 1 en 4–7); meetwaarden ongewijzigd |
