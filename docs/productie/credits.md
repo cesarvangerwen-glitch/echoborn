@@ -153,7 +153,7 @@ Uit `docs/business/knop-glyphs-check.md` §3 punt 4, aangevuld met de formulerin
 
 ### 5.5 Eigen werk: Polderletter en de knop-glyphs
 
-Beide staan nu als regel "eigen werk" in `docs/licenties.md` §2. Voor eigen werk is **geen vermelding verplicht**: blok 5 (*Lettertype*) **mag vervallen**. Laten staan mag ook (als dank aan het eigen font), dan zonder licentietekst. Dat is een keuze over de presentatie, niet juridisch (§6 punt 2).
+Beide staan nu als regel "eigen werk" in `docs/licenties.md` §2. Voor eigen werk is **geen vermelding verplicht**: blok 5 (*Lettertype*) **mag vervallen**. Laten staan mag ook (als dank aan het eigen font), dan zonder licentietekst. Dat is een keuze over de presentatie, niet juridisch (§6 punt 2). Gekozen: behouden (v0.1.6, §6 punt 2).
 
 ### 5.6 AI-melding op de Steam-pagina (advies, geen besluit)
 
@@ -176,7 +176,7 @@ Voor Polderlight: de art, audio en teksten worden door AI-rollen (Claude) gemaak
 | # | Wat | Wie | Wanneer |
 |---|---|---|---|
 | 1 | `GODOT_COPYRIGHT.txt` (§5.2 punt 2) in elke export en elk depot zetten, het FreeType-jaar invullen, en B1 nog eens nalezen tegen de Godot-docs, ook of Mbed TLS (net als FreeType) een vaste regel in de credits vraagt. (BLA-deel afgerond in v0.1.3.) | Engine & Platform Programmer (export), BLA (nalezen) | Vóór de eerste publieke build |
-| 2 | ~~Blok 5 (*Lettertype*) behouden of schrappen~~ **Afgerond (v0.1.6): behouden**, zonder licentietekst (§5.5): het eigen font is werk van de studio, het kost twee regels (± 2 s scrollen) en `CREDITS_FONT` staat al in `strings.csv`. | — | — |
+| 2 | ~~Blok 5 (*Lettertype*) behouden of schrappen~~ **Afgerond (v0.1.6): behouden**, zonder licentietekst (§5.5): het eigen font is werk van de studio, het kost twee regels (± 2 s scrollen) en `CREDITS_FONT` staat al in `strings.csv`. De context van `CREDITS_FONT` in `strings.csv` zegt nog *Blok mag vervallen*; de Narrative Designer past die aan naar *behouden (credits.md §6 punt 2)* bij de volgende wijziging van `strings.csv`. | Narrative Designer (context) | Bij de volgende wijziging van `strings.csv` |
 | 3 | ~~Taal van de licentie- en merkteksten~~ **Afgerond (v0.1.3):** alleen Engels, ook in NL (§5.4). | — | — |
 | 4 | ~~Variant van de merkenregel~~ **Afgerond (v0.1.6):** variant 1A–1C (besluit #157), letterlijk in `CREDITS_TRADEMARKS_TEXT`. Die tekst noemt *Polderlight* letterlijk: verandert de naam na de merkcheck, dan wijzigen `GAME_TITLE` én `CREDITS_TRADEMARKS_TEXT` (EN en NL) samen. **Nog open:** de BLA leest de eigen voorwaarden van Anthropic na (gebruik van de naam Claude/Anthropic; §5.3 steunt nu alleen op het merkenrecht). | BLA (voorwaarden); Narrative Designer (tekst bij naamwijziging) | Voorwaarden vóór de eerste publieke build; tekst bij een naamwijziging |
 | 5 | AI-melding op Steam (advies §5.6: ja, *pre-generated*): meldtekst schrijven en de Steamworks-tekst van de survey nalezen. | Marketing & Community Manager, met de BLA | Bij het maken van de Steam-pagina |
