@@ -17,6 +17,7 @@ extends RefCounted
 const InputBits = preload("res://scripts/input/input_bits.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
 const Layout = preload("res://levels/flowkamer/flow_layout.gd")
+const Gemaal = preload("res://scripts/light/gemaal.gd")
 
 const L := InputBits.LEFT
 const R := InputBits.RIGHT
@@ -566,7 +567,7 @@ func _pump_side() -> int:
 func _strokes_needed() -> int:
 	var g = _room.gemaal
 	var useful := mini(100 - int(g.fill), int(_room.meter.value))
-	var total := int(ceil(useful / 10.0))
+	var total := int(ceil(useful / float(Gemaal.per_stroke())))
 	if _room.echo_on:
 		return int(ceil(total / 2.0))
 	return total
@@ -580,7 +581,7 @@ func _will_fill() -> bool:
 	if not _room.echo_on:
 		return false
 	var pending := _pump_strokes - (int(g.strokes.get("echo", 0)) - _echo_base)
-	return int(g.fill) + mini(pending * 10, int(_room.meter.value)) >= 100
+	return int(g.fill) + mini(pending * Gemaal.per_stroke(), int(_room.meter.value)) >= 100
 
 
 ## De trap op naar het gat in K2 (K3 → K2).

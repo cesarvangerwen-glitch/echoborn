@@ -46,3 +46,8 @@ static func combat() -> Dictionary:
 ## De groep `coop` (C-03, C-09–C-13).
 static func coop() -> Dictionary:
 	return _section("coop")
+
+
+## De groep `light` (LM-03; lichtmeter en gemaal, gdd §2.12).
+static func light() -> Dictionary:
+	return _section("light")

@@ -38,6 +38,8 @@ const ROOM_C := Rect2(1640, TOP, 1360, HEIGHT)
 const POMPRAD_AT := Vector2(2500, Fx.STAND_Y)
 const CHECKPOINT_AT := Vector2(2200, Fx.STAND_Y)
 const STREET := Rect2(2600, 300, 300, 100)
+## LP per pompslag (LM-03, `data/echo_v04.json`).
+var P: int = Gemaal.per_stroke()
 
 
 func _clear() -> void:
@@ -166,12 +168,12 @@ func test_gemaal_in_streamed_room(t) -> void:
 		"stand of aanmelding: G %d" % gemaal.fill)
 	t.check(sim.combat.hit.get_connections().size() == hits_before + 1, "gemaal niet met Combat verbonden")
 	_strike(sim, "p2", Layers.SHADOW)
-	t.check(gemaal.fill == 40 and meter.value == 40, "pompslag: G %d, L %d" % [gemaal.fill, meter.value])
+	t.check(gemaal.fill == 30 + P and meter.value == 50 - P, "pompslag: G %d, L %d" % [gemaal.fill, meter.value])
 	# Ontladen: P1 terug in A, C is geen buur van A.
 	p1.position = IN_A
 	await t.run_ticks(sim, 1)
 	t.check(c.inhoud_node == null and not progress.has_gemaal(id), "C nog geladen of gemaal nog gebonden")
-	t.check(state.gemalen.get(id) == {"vulstand": 40, "vol": false}, "stand niet naar state: %s" % [state.gemalen])
+	t.check(state.gemalen.get(id) == {"vulstand": 30 + P, "vol": false}, "stand niet naar state: %s" % [state.gemalen])
 	t.check(sim.combat.hit.get_connections().size() == hits_before, "gemaal niet los van Combat")
 	state.set_gemaal(id, 70, false)
 	progress.store_world()
@@ -239,7 +241,7 @@ func test_pump_sets_checkpoint(t) -> void:
 	var cp_ticks: Array = []
 	checkpoint.reached.connect(func(tick: int) -> void: cp_ticks.append(tick))
 	_strike(sim, "echo", Layers.SHADOW)
-	t.check(gemaal.fill == 10 and reached.is_empty(), "echo zette een checkpoint: %s (G %d)" % [reached, gemaal.fill])
+	t.check(gemaal.fill == P and reached.is_empty(), "echo zette een checkpoint: %s (G %d)" % [reached, gemaal.fill])
 	await t.run_ticks(sim, 1)
 	await t.run_ticks(sim, 1)
 	_strike(sim, "p2", Layers.SHADOW)
@@ -249,15 +251,15 @@ func test_pump_sets_checkpoint(t) -> void:
 	var stored: GameState = SaveService.read(service.path_of(2))["state"]
 	t.check(saves.size() == 1 and saves[0] == [2, "checkpoint", OK] and stored != null
 		and stored.checkpoint_kamer == &"C" and stored.gebied == GEBIED
-		and stored.gemalen.get(id) == {"vulstand": 20, "vol": false},
+		and stored.gemalen.get(id) == {"vulstand": 2 * P, "vol": false},
 		"autosave na de pompslag: %s %s" % [saves, stored.to_dict() if stored else null])
 	await t.run_ticks(sim, 1)
 	_strike(sim, "p1", Layers.LIGHT)
-	t.check(reached.size() == 1 and saves.size() == 1 and gemaal.fill == 30,
+	t.check(reached.size() == 1 and saves.size() == 1 and gemaal.fill == 3 * P,
 		"tweede pompslag schreef opnieuw: %d saves" % saves.size())
 	await t.run_ticks(sim, 1)
 	_strike(sim, "p1", Layers.LIGHT)
-	t.check(reached.size() == 1 and saves.size() == 1 and gemaal.fill == 40,
+	t.check(reached.size() == 1 and saves.size() == 1 and gemaal.fill == 4 * P,
 		"derde pompslag schreef opnieuw: %d saves" % saves.size())
 	# Vol: nog één save, met het volle gemaal.
 	gemaal.fill = 90

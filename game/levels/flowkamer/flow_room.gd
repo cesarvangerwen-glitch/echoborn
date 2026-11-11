@@ -31,6 +31,7 @@ const LightMeter = preload("res://scripts/light/light_meter.gd")
 const Gemaal = preload("res://scripts/light/gemaal.gd")
 const Pomprad = preload("res://scripts/light/pomprad.gd")
 const Respawn = preload("res://scripts/save/respawn.gd")
+const EchoHints = preload("res://scripts/echo/echo_hints.gd")
 
 const P1_COLOR := Color(1.0, 0.85, 0.4)
 const P2_COLOR := Color(0.5, 0.85, 1.0)
@@ -64,7 +65,13 @@ var p2: PlayerActor
 var echo: TailEcho
 var meter: LightMeter
 var gemaal: Gemaal
+## De eerste pompschoep (LM-03); alle schoepen staan in `vanes`.
 var pomprad: Pomprad
+var vanes: Array[Pomprad] = []
+## Plank-signaal, doelstreep, bereikcirkel en kettinglijn (E-07d, E-02t, E-14j).
+var hints: EchoHints
+## Tick waarop golf 2 begon (L-13, G-3), of -1.
+var wave_2_tick := -1
 var meetlog: FlowMeetlog
 ## LM-05: bij 0 levenspunten respawn op het begin van de kamer. Geen
 ## `Progress`: de flow-kamer heeft geen checkpoint (C-08: P2 respawnt mee).
@@ -102,6 +109,8 @@ const CAMERA_EASE := 8.0
 ## beeld samen met de leiband (C-07, perf-doc §7 punt 14).
 const BASE_VIEW_PX := Vector2(640, 360)
 var _scores: Array = []
+var _score_panel: PanelContainer
+var _score_label: Label
 var _k3_tint: Polygon2D
 var _overlay: Node2D
 
@@ -133,12 +142,13 @@ func _ready() -> void:
 	meter.filled.connect(func(t: int, amount: int, _added: int, source: String, who: String) -> void:
 		meetlog.add_row(t, "LP", "+%d" % amount, "%s_%s" % [source, who], p1.position))
 	gemaal.pumped.connect(func(t: int, amount: int, who: String) -> void:
-		meetlog.add_row(t, "POMP", str(amount), who, pomprad.position))
+		meetlog.add_row(t, "POMP", str(amount), who, gemaal.last_vane.position))
 	gemaal.full.connect(func(t: int) -> void:
-		meetlog.add_row(t, "GEMAAL_VOL", "", "", pomprad.position)
+		meetlog.add_row(t, "GEMAAL_VOL", "", "", gemaal.last_vane.position)
 		if _k3_tint:
 			_k3_tint.color = Color(0.45, 0.35, 0.2, 0.35))
 	sim.tick_finished.connect(_on_tick)
+	hints = EchoHints.new(sim, p1, func() -> Node2D: return echo)
 	# C-06: werkaanname T16c: de onderrand is die van het hele gebied (K2 gaat
 	# open over in K3, dus een val van K2 naar K3 is geen val uit de kamer).
 	sim.room_bottom = Layout.K1.end.y
@@ -261,13 +271,30 @@ func _build_backdrop() -> void:
 			_level.add_child(_k3_tint)
 
 
+## Middelpunten van de pompschoepen (LM-03, FK-5). De geometrie is van de
+## World & Level Designer (W-4): staat `PUMP_VANES` in `flow_layout.gd`, dan
+## die; anders één schoep op `POMPRAD_AT` (het pomprad van v0.6).
+static func vane_positions() -> Array:
+	var layout_script: Script = Layout
+	var consts: Dictionary = layout_script.get_script_constant_map()
+	if consts.has("PUMP_VANES"):
+		return consts["PUMP_VANES"]
+	return [Layout.POMPRAD_AT]
+
+
 func _build_gemaal() -> void:
-	pomprad = Pomprad.new()
-	pomprad.setup_pomprad()
-	pomprad.position = Layout.POMPRAD_AT
-	sim.add_object(pomprad)
+	var positions := vane_positions()
+	for i in positions.size():
+		var vane := Pomprad.new()
+		vane.setup_pomprad()
+		if positions.size() > 1:
+			vane.name = "Pompschoep%d" % (i + 1)
+		vane.position = positions[i]
+		sim.add_object(vane)
+		vanes.append(vane)
+	pomprad = vanes[0]
 	gemaal = Gemaal.new()
-	gemaal.setup_gemaal(meter, pomprad, _sluice, Layout.STREET, Layout.WATER_HIGH, Layout.WATER_LOW)
+	gemaal.setup_gemaal(meter, vanes, _sluice, Layout.STREET, Layout.WATER_HIGH, Layout.WATER_LOW)
 	gemaal.connect_combat(sim.combat)
 	sim.add_object(gemaal)
 
@@ -311,7 +338,10 @@ func _on_tick(tick: int) -> void:
 			_on_enter_k2()
 		elif now == "K1" and came_from == "K3" and gemaal.full_tick >= 0 and not run_over:
 			_finish_run(tick)
-	if wave == 1 and _all_dead(_wave_basics):
+	# G-3 (gdd §4.2, L-13): golf 2 start op de eerste tick waarop elke
+	# basisvijand van golf 1 een merk heeft of op is (het pantserdoel telt niet).
+	if wave == 1 and _all_marked_or_dead(_wave_basics):
+		wave_2_tick = tick
 		_spawn_wave_2()
 
 
@@ -361,9 +391,20 @@ func _spawn(kind: CombatTarget.Kind, x: float) -> CombatTarget:
 	return enemy
 
 
-func _all_dead(list: Array[CombatTarget]) -> bool:
-	for e in list:
+## Is de golf van nu op (gdd §4.2)? Een golf is op als zijn basisvijanden op
+## zijn; een pantserdoel telt niet mee (L-13 (e)).
+func wave_done() -> bool:
+	if wave == 0:
+		return false
+	for e in _wave_basics:
 		if e.alive:
+			return false
+	return true
+
+
+func _all_marked_or_dead(list: Array[CombatTarget]) -> bool:
+	for e in list:
+		if e.alive and sim.combat.mark_on(e) == null:
 			return false
 	return not list.is_empty()
 
@@ -446,6 +487,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not (event is InputEventKey) or not event.pressed or event.echo:
 		return
 	var key: int = (event as InputEventKey).physical_keycode
+	# G-5 (rapport F0 §8 punt 8): na RUN_EIND eerst de scores; een nieuwe run
+	# (F1–F4, F6) kan pas als K1–K3 een score hebben.
+	if scores_pending() and (DEBUG_TAIL_KEYS.has(key) or key == KEY_F4 or key == KEY_F6):
+		return
 	if DEBUG_TAIL_KEYS.has(key):
 		chosen_tail = DEBUG_TAIL_KEYS[key]
 		_restart()
@@ -465,6 +510,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			save_log()
 
 
+## Wacht de run nog op scores (na RUN_EIND, niet alle drie de kamers)?
+func scores_pending() -> bool:
+	return run_over and _scores.size() < 3
+
+
 func _restart() -> void:
 	if meetlog and not meetlog.is_closed() and autosave:
 		# Een afgebroken run wordt ook bewaard (zonder GEMAAL_VOL), als bewijs.
@@ -476,19 +526,47 @@ func _restart() -> void:
 
 # --- Placeholder-HUD (§4.1; eindvorm T10) ---
 
-## Merk = lichtvonk met een ring die de laatste 60 ticks krimpt (E-14b, i);
-## naast het pomprad een balk met G.
+## Placeholder-beeld (eindvorm Art Director en UX Designer, T10):
+## - merk = lichtvonk boven het doel (E-14i) met een **bereikcirkel** van
+##   straal E om zijn middelpunt; de aftelling (laatste 60 ticks, E-14b) loopt
+##   als boog rond die cirkel (E-14j);
+## - een **rand** om elk doel binnen E van een merk, een **kettinglijn** tussen
+##   merken binnen K (E-14j);
+## - de **doelstreep** van de echo naar zijn doelmerk, feller naarmate de slag
+##   nadert (E-02t);
+## - het **plank-signaal**: de plank van de echo licht op (E-07d);
+## - naast de laatste pompschoep een balk met G.
 func _draw_overlay() -> void:
-	var countdown := int(Tuning.combat()["mark_countdown_ticks"])
+	var c: Dictionary = Tuning.combat()
+	var countdown := int(c["mark_countdown_ticks"])
+	var reach := float(c["explosion_radius_px"])
+	var glow := Color(1.0, 0.9, 0.5)
+	for link: Array in hints.chain_links:
+		_overlay.draw_line(link[0].center(), link[1].center(), Color(1.0, 0.85, 0.45, 0.8), 1.5)
 	for mark in sim.combat.marks:
 		if not mark.alive:
 			continue
-		var at: Vector2 = mark.center() + Vector2(0, -20)
-		var left := mark.expires - sim.tick
-		_overlay.draw_circle(at, 2.5, Color(1.0, 0.95, 0.7))
-		var r := 7.0 if left > countdown else 7.0 * maxf(left, 0) / countdown
-		_overlay.draw_arc(at, maxf(r, 1.0), 0.0, TAU, 20, Color(1.0, 0.9, 0.5), 1.0)
-	var base := Layout.POMPRAD_AT + Vector2(22, 24)
+		var center: Vector2 = mark.center()
+		var left: int = mark.expires - sim.tick
+		_overlay.draw_arc(center, reach, 0.0, TAU, 40, Color(glow, 0.35), 1.0)
+		if left <= countdown:
+			var part := TAU * clampf(float(left) / countdown, 0.0, 1.0)
+			_overlay.draw_arc(center, reach, -PI / 2.0, -PI / 2.0 + part, 40, glow, 2.0)
+		_overlay.draw_circle(center + Vector2(0, -20), 2.5, Color(1.0, 0.95, 0.7))
+	for target: Node2D in hints.in_bereik:
+		var size: Vector2 = (target.shape as RectangleShape2D).size + Vector2(4, 4)
+		_overlay.draw_rect(Rect2(target.global_position - size * 0.5, size), glow, false, 1.0)
+	if echo and is_instance_valid(echo):
+		if hints.doelstreep and hints.doelstreep_mark:
+			var a := lerpf(0.2, 1.0, hints.doelstreep_strength)
+			_overlay.draw_line(echo.global_position, hints.doelstreep_mark.center(),
+				Color(0.85, 0.8, 1.0, a), lerpf(1.0, 2.5, hints.doelstreep_strength))
+		if hints.plank_signaal:
+			var body := Tuning.body_size()
+			var top := echo.global_position + Vector2(-body.x * 0.5 - 2.0, -body.y * 0.5 - 3.0)
+			_overlay.draw_rect(Rect2(top, Vector2(body.x + 4.0, 4.0)), Color(0.9, 0.85, 1.0), false, 1.0)
+	var last: Node2D = vanes[vanes.size() - 1]
+	var base := last.position + Vector2(22, 24)
 	_overlay.draw_rect(Rect2(base + Vector2(0, -48), Vector2(4, 48)), Color(0.1, 0.1, 0.1))
 	var h := 48.0 * gemaal.fill / 100.0
 	_overlay.draw_rect(Rect2(base + Vector2(0, -h), Vector2(4, h)), Color(1.0, 0.85, 0.4))
@@ -510,6 +588,15 @@ func _build_hud() -> void:
 	_hud_label = Label.new()
 	_hud_label.position = Vector2(16, 36)
 	_hud.add_child(_hud_label)
+	# G-5: het scorescherm, midden in beeld zodra RUN_EIND valt.
+	_score_panel = PanelContainer.new()
+	_score_panel.name = "Scorescherm"
+	_score_panel.set_anchors_preset(Control.PRESET_CENTER)
+	_score_panel.visible = false
+	_score_label = Label.new()
+	_score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_score_panel.add_child(_score_label)
+	_hud.add_child(_score_panel)
 
 
 func _update_hud() -> void:
@@ -525,9 +612,21 @@ func _update_hud() -> void:
 		tr("HUD_ROOM") % [room, tail, echo_state, run_ticks() / 60.0],
 		tr("HUD_DEBUG_KEYS") % (tr("COMMON_ON") if autosave else tr("COMMON_OFF")),
 	])
-	if run_over:
-		if _scores.size() < 3:
-			lines.append(tr("HUD_RUN_DONE") % [run_ticks() / 60.0, ["K1", "K2", "K3"][_scores.size()]])
-		else:
-			lines.append(tr("HUD_THANKS") % csv_path)
 	_hud_label.text = "\n".join(lines)
+	var score := score_text()
+	_score_panel.visible = not score.is_empty()
+	if _score_panel.visible and _score_label.text != score:
+		_score_label.text = score
+		_score_panel.reset_size()
+		_score_panel.position = (get_viewport().get_visible_rect().size - _score_panel.size) * 0.5
+
+
+## G-5 (rapport F0 §8 punt 8): de tekst van het scorescherm na RUN_EIND, met
+## de D van de run (ticks en seconden), zodat een verkeerde D meteen opvalt.
+## Leeg tijdens de run.
+func score_text() -> String:
+	if not run_over:
+		return ""
+	if _scores.size() < 3:
+		return tr("HUD_RUN_DONE") % [run_ticks() / 60.0, tail, tail / 60.0, ["K1", "K2", "K3"][_scores.size()]]
+	return tr("HUD_THANKS") % csv_path

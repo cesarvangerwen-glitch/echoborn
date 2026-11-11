@@ -88,10 +88,13 @@ const ROOM_START := {
 ## scripted run 92 LP na K1 + K2 (doel ≥ 100). Daarom 4 basisvijanden in
 ## golf 1 en 5 in golf 2 (gdd §4.2: eerst de aantallen bijstellen, niet de
 ## LP-waarden; de vijfde geeft marge sinds de vang in B3, Lead-review PR #112).
+## Sinds golf 2 start zodra golf 1 gemerkt is (G-3, #177) knallen meer vijanden
+## samen; een zesde in golf 2, bij de ingang, houdt D = 180 op ≥ 100 LP.
+## Werkaanname tot de paren van W-3 (#176).
 ## Golf 2 heeft er ook het pantserdoel bij. Bij een terugkeer komen de
 ## basisvijanden van golf 2 terug.
 const WAVE_1 := [1600.0, 1720.0, 1840.0, 1940.0]
-const WAVE_2 := [1580.0, 1640.0, 1700.0, 1820.0, 1940.0]
+const WAVE_2 := [1500.0, 1580.0, 1640.0, 1700.0, 1820.0, 1940.0]
 const ARMORED_X := 1840.0
 
 

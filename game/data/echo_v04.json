@@ -30,7 +30,8 @@
 		"overlap_tolerance_px": 2.0,
 		"support_probe_px": 4.0,
 		"release_hold_ticks": 30,
-		"plank_thickness_px": 4.0
+		"plank_thickness_px": 4.0,
+		"plank_signal_px": 130.0
 	},
 	"combat": {
 		"attack_box": [
@@ -50,6 +51,7 @@
 		"merksprong_radius_px": 80.0,
 		"merksprong_out_ticks": 4,
 		"merksprong_back_ticks": 8,
+		"doelstreep_ticks": 30,
 		"enemy_size": [
 			16,
 			24
@@ -81,5 +83,9 @@
 			960,
 			540
 		]
+	},
+	"light": {
+		"_uitleg": "Gemaal (gdd LM-03, LM-04, §2.9; herzien na F0, §4.7). pump_per_stroke: LP per pompslag op een schoep, startwaarde 15 (testbereik 10–25).",
+		"pump_per_stroke": 15
 	}
 }
