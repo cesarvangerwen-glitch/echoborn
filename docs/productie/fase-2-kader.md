@@ -1,14 +1,14 @@
 # Fasekader fase 2: Preproductie
 
-Versie 0.2 · 2026-11-09 · Eigenaar: Executive Producer · Issue: #57 · Lead-review: Creative Director
+Versie 0.3 · 2026-11-11 · Eigenaar: Executive Producer · Issues: #57, [#161](https://github.com/cesarvangerwen-glitch/echoborn/issues/161) · Lead-review: Creative Director
 
-**Status: geldt sinds besluit #51** (deel 1 en 2: 1A, 2A, 7A, 8A). Basis: pitch v0.4 (`docs/concept/pitch.md`, §4, §10, §12). Werktitel *Wraithstep* (werktitel; besluit #24, naamvraag in #61); niet publiek vóór de formele merkcheck (besluit #24, 3A).
+**Status: geldt sinds besluit #51** (deel 1 en 2: 1A, 2A, 7A, 8A), bijgesteld na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (2026-11-11, 1B: de CEO speelt F0 alleen solo). Basis: pitch v0.4 (`docs/concept/pitch.md`, §4, §10, §12). Werktitel *Polderlight* (besluit #96); niet publiek vóór de formele merkcheck (besluit #24, 3A).
 
 ## 1. Doel
 
 Aan het eind van fase 2 weet de CEO **of de draai speelbaar en leuk is** en **wat de productie kost**. Fase 2 beantwoordt vier vragen, in deze volgorde:
 
-0. **Vloeit het?** Een **grijze flow-kamer** (sprongketen, merk-arena, één gemaal; placeholder-art) haalt de drie flownormen van pillar 1 (pitch §4), solo én co-op. Dit is de eerste mijlpaal (#51: 2A).
+0. **Vloeit het?** Een **grijze flow-kamer** (sprongketen, merk-arena, één gemaal; placeholder-art) haalt de drie flownormen van pillar 1 (pitch §4), **solo**. Dit is de eerste mijlpaal (#51: 2A). De co-op-normen toetst de slice (F4b; besluit #124: 1B).
 1. **Speelt het?** Een verticale slice (polderwijk met het eerste gemaal en de Gemaalmeester), solo en co-op, beantwoordt de playtestvragen (gdd §5, herzien in T3a): de staartduur 1,5 / 2 / 3 s (R9, R-V1), hoe vaak de echo Leeg is (R12, R-V3) en of co-op de balans scheeftrekt of iemand laat wachten (R10, R-V5).
 2. **Halen we eindkwaliteit?** Art en audio van de slice halen het niveau van een goede indie-release (R5, R22), eerst bewezen in één scène en één fragment.
 3. **Wat kost de rest?** Een productieraming per gebied en een voorstel voor een releasevenster (besluit #2, R20).
@@ -43,7 +43,7 @@ Elke regel is **één issue** voor de Producer (T1 bestaat al: #20). "Na" = moet
 | T16b | **Flow-kamer bouwen** (grijs, placeholder) | world-level-designer (met gameplay-programmer) | Sprongketen, merk-arena, één gemaal met de minimale lichtmeter uit T3a; meetpunten voor normen (1)–(3) en R-V12 gelogd | T3a, T16a | 2–3 | F0, R-V2, R-V12 |
 | T16c | **Co-op 7A in code** | gameplay-programmer | C-01–C-05 volgens T3b; bounce en lancering eerst; tests groen | T3b, T4, T5a, T16a | 1–2 | F0, R10 |
 | T7 | **Build op Steam Deck-specificaties** met het lichtbudget uit #21 | engine-platform-programmer (met technical-artist) | Flow-kamer draait op Deck-specificaties; herhaald op de slice (T8a) | #21, T16b | 1–2 | F5, R17 |
-| T17 | **Flow-test** | qa-lead (met lead-game-designer) | Plan + rapport: normen (1)–(3) solo en co-op; staart 1,5 / 2 / 3 s; echo ≤ 40 % Leeg; co-op ≤ 2× zo snel als solo; R-V12 (springplank per minuut, aandeel zonder stilstand); de *Nine Sols*-check (ideecheck §2, slotzin). Spelers: scripted runs + de CEO (± 20 min, score norm 3) | T16a–c | 2–3 | F0 |
+| T17 | **Flow-test** | qa-lead (met lead-game-designer) | Plan + rapport: normen (1)–(3) solo; staart 1,5 / 2 / 3 s; echo ≤ 40 % Leeg; R-V12 (springplank per minuut, aandeel zonder stilstand); de *Nine Sols*-check (ideecheck §2, slotzin) als zwak signaal (M1 van de CEO). Spelers: scripted runs (solo; de scripted co-op-runs blijven als meting, niet als slaagcriterium) + de CEO solo (± 15 min, score norm 3 solo). Co-op-normen: zie F4b(c) (besluit #124: 1B) | T16a–c | 2–3 | F0 |
 
 **C. Na de flow-test: GDD v1 en slice**
 
@@ -56,7 +56,7 @@ Elke regel is **één issue** voor de Producer (T1 bestaat al: #20). "Na" = moet
 | T8c | **Slice-art** | art-director (met environment-artist, concept-artist, animator, technical-artist) | Slice op eindkwaliteit: Kwaliteit ≥ 7 | **F0 én F1**, T8a (layout) | 7–9 | F1, F3 |
 | T8d | **Slice-audio** | composer-sound-designer | Kwaliteit ≥ 7 | **F0 én F2** | 2–4 | F2, F3 |
 | T10 | **UX + UI**: HUD (lichtmeter, merk-aftelling), menu's, drop-in/out | ux-designer, ui-artist | UX-spec + UI-assets; UI-art pas na F1 | T3c | 2–3 | F3 |
-| T11 | **QA-testplan en playtests slice** | qa-lead | Elke slice-kamer en de boss solo én co-op; F4-metingen; gedragsmaat F4b(b); CEO-kaart F4b(a) verwerkt | T8a–d | 2–3 | F4, F4b |
+| T11 | **QA-testplan en playtests slice** | qa-lead | Elke slice-kamer en de boss solo én co-op; F4-metingen; gedragsmaat F4b(b); CEO-kaart F4b(a) verwerkt, met de co-op-normen uit F0 (F4b(c)) en de sterke *Nine Sols*-check | T8a–d | 2–3 | F4, F4b |
 | T15 | **Raming per gebied, releasevenster, statusrapport en gate-voorstel** | executive-producer | F6 en F8 | T11 | 3 | F6, F8, R20 |
 
 **Totaal: ≈ 61–88 maak-taken** (som van de kolom Runs), € 0 extern; binnen besluit #51 (2A: ≈ 61–88 maak-taken). De v0.4-delta (pitch §12, ≈ 16–18 runs) zit in T1, T3a–c, T5b, T16a–c, T18 en de ideecheck.
@@ -80,12 +80,12 @@ Fase 2 sluit pas als **alle** criteria F0–F8 (inclusief F4b) gehaald zijn; "bi
 
 | # | Exit-criterium | Toets | Bewijs |
 |---|---|---|---|
-| F0 | **Flow-kamer geslaagd** (mijlpaal 1) | In de grijze flow-kamer (T16) haalt T17, solo én co-op, de normen van pillar 1: (1) geoefende speler nergens > ± 5 s stil; (2) echo als springplank of merk-afmaker ≥ ± 1× per 20 s; (3) score "vloeiend/satisfying" ≥ 4 op 5. Oppompen bij het gemaal haalt norm (1) (≤ ± 5 s stilstand), en de echo telt mee bij het vullen van de lichtmeter. Staartduur gekozen binnen 1,5–3 s. CD zet `Visie-review: past` op P1 en P3. Pas daarna start T8. **Mislukt**: herontwerp door de LGD en een tweede flow-test; haalt die norm (2) niet, dan een `ceo-beslissing` (pitch R-V12). | testrapport QA in een gemergde PR + visie-review |
+| F0 | **Flow-kamer geslaagd** (mijlpaal 1) | In de grijze flow-kamer (T16) haalt T17, **solo**, de normen van pillar 1: (1) geoefende speler nergens > ± 5 s stil; (2) echo als springplank of merk-afmaker ≥ ± 1× per 20 s; (3) score "vloeiend/satisfying" ≥ 4 op 5 (de CEO, solo). Oppompen bij het gemaal haalt norm (1) (≤ ± 5 s stilstand), en de echo telt mee bij het vullen van de lichtmeter. Staartduur gekozen binnen 1,5–3 s op de solo-normen. **Co-op hoort niet bij F0** (besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124): 1B): norm (3) co-op, C1–C2, MP-7 en M1 van P2 schuiven naar F4b(c). *Nine Sols*-check: M1 van de CEO telt als zwak signaal (hij koos *Nine Sols* zelf als referentie); noemt hij het merk toch spontaan "net als *Nine Sols*", dan gaat het merk terug naar afwijkpunt 2 (gdd §2.13); noemt hij het niet, dan is de check nog niet gehaald, maar uitgesteld naar F4b(c). CD zet `Visie-review: past` op P1 en P3 (P3 op de solo-echo als partner; P3 met twee mensen in F4b(c)). Pas daarna start T8. **Mislukt**: herontwerp door de LGD en een tweede flow-test; haalt die norm (2) niet, dan een `ceo-beslissing` (pitch R-V12). | testrapport QA in een gemergde PR + visie-review |
 | F1 | **Art op eindkwaliteit bewezen** | De scène uit T1 scoort Kwaliteit ≥ 7 én krijgt `Visie-review: past` van de CD op pillar 2: de laag is zichtbaar zonder icoon of uitleg, "vol = levend, hol = echo" (A9), met grijze beginstaat. Beide **vóór** slice-art (T8c, die ook F0 nodig heeft). Daarna haalt de slice-art zelf ook ≥ 7. | gemergde PR + SM-score + visie-review |
 | F2 | **Audio op eindkwaliteit bewezen** | Het fragment uit T2 scoort Kwaliteit ≥ 7 vóór slice-audio (T8d); daarna haalt de slice-audio ook ≥ 7. De eis is concept tot de AD hem bevestigt (A10). | gemergde PR + SM-score + akkoord AD |
 | F3 | **Verticale slice speelbaar** | Polderwijk met het eerste gemaal en de Gemaalmeester, van begin tot eind speelbaar solo én in lokale co-op met drop-in/drop-out, op de inhoud uit T3c. | gemergde PR in `game/` + SM-review |
 | F4 | **Playtestvragen beantwoord** | Gemeten in de slice: staartduur met 1,5, 2 en 3 s (R9, R-V1); echo ≤ 40 % van de tijd Leeg (R12); co-op ≤ 2× zo snel als solo en niemand wacht (R10, R-V5); normen (1)–(3) van P1 houden ook in de slice. **Elke slice-kamer en de boss** solo en co-op getest (T11). **Wie**: de QA Lead; spelers zijn de CEO (F4b) en scripted runs; een externe playtest is een apart CEO-besluit. Ligt de beste duur buiten 1,5–3 s: `ceo-beslissing`, voorbereid door de CD. | testrapport QA in een gemergde PR |
-| F4b | **De slice is leuk** | (a) De CEO speelt de slice solo én co-op (± 1 uur) en vult een kaart in: klikmoment van de kernfantasie (ja/nee, waar), wil doorspelen (ja/nee), de echo voelt als bondgenoot of als trucje. (b) Gedragsmaat R3/R-V2: de echo wordt ook **buiten verplichte boss-acties** gebruikt (aandeel springplank-sprongen en merk-ontploffingen op de route); de grens legt de LGD vast in T3c. Beide positief, anders geen gate maar een herzien voorstel. | kaart (comment CEO) + meting in het QA-rapport |
+| F4b | **De slice is leuk** | (a) De CEO speelt de slice solo én co-op (± 1 uur) en vult een kaart in: klikmoment van de kernfantasie (ja/nee, waar), wil doorspelen (ja/nee), de echo voelt als bondgenoot of als trucje. (b) Gedragsmaat R3/R-V2: de echo wordt ook **buiten verplichte boss-acties** gebruikt (aandeel springplank-sprongen en merk-ontploffingen op de route); de grens legt de LGD vast in T3c. (c) **Co-op-normen uit F0** (besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124): 1B), in de co-op-sessie van (a) met een tweede mens als P2, met de maten en grenzen van het F0-testplan (`docs/qa/testplan-f0.md` §1): norm (3) co-op (MP-5 ≥ 4,0, geen kamer < 3,0), C1–C2 (wachten; partner als hulp of last), MP-7 (a)–(d) (co-op ≥ ½ × solo, niemand wacht), en **M1 van P2 als sterke *Nine Sols*-check** (R-V9): P2 kent de referenties niet en antwoordt vóór uitleg over het merk. Leest het merk als *Nine Sols*: terug naar afwijkpunt 2 (gdd §2.13) vóór de gate. Alle drie positief, anders geen gate maar een herzien voorstel. | kaart (comment CEO) + meting in het QA-rapport |
 | F5 | **Techniek houdt** | Headless tests groen in CI, ook op Windows (T6); A2 beslist en getest (T4); flow-kamer en slice draaien op Deck-specificaties binnen het lichtbudget (T7). | gemergde PR's + CI-uitvoer |
 | F6 | **Raming en releasevenster** | Raming per gebied (runs, rollen, externe kosten), getoetst aan wat de slice kostte, met de kost per vijandtype en boss tegen het scopeplafond (R-V4), plus een voorstel releasevenster (besluit #2). | gemergde PR (EP) |
 | F7 | **Visie-review slice** | De CD zet op de slice-PR `Visie-review: past` op alle 3 pillars **en op de toon** (duister maar niet gruwelijk, melancholisch, PEGI 12). | visie-review |
@@ -94,7 +94,7 @@ Fase 2 sluit pas als **alle** criteria F0–F8 (inclusief F4b) gehaald zijn; "bi
 ## 4. Startvoorwaarden en volgorde
 
 - **Kritiek pad**: T3a → T16a/b (+ T3b → T16c) → T17 (**F0**) → T8a/T8b → T11 → T15 → F8.
-- **Ideecheck vóór T3a** (R-V9): T3a legt E-14 en de merksprong pas vast met de afwijkpunten uit `docs/business/ideecheck-v0-4.md` §2 (#58); de flow-test (T17) toetst of het merk als "net als *Nine Sols*" leest.
+- **Ideecheck vóór T3a** (R-V9): T3a legt E-14 en de merksprong pas vast met de afwijkpunten uit `docs/business/ideecheck-v0-4.md` §2 (#58); de flow-test (T17) geeft met M1 van de CEO alleen een zwak signaal of het merk als "net als *Nine Sols*" leest; de sterke check (M1 van een P2 die de referenties niet kent) gebeurt in F4b(c) (besluit #124: 1B). Gevolg: T8b bouwt het merk in de boss vóór de sterke check; leest het merk in F4b toch als *Nine Sols*, dan kost het herontwerp naar afwijkpunt 2 ≈ +3–5 maak-taken (gdd, code, boss-afstemming) vóór de gate.
 - **Flow eerst** (#51: 2A): geen slicewerk (T8a–d) vóór F0. T3c en T5b mogen eerder starten, maar T3c wordt na F0 bijgesteld.
 - **Eindkwaliteit eerst** (R5, R22): geen slice-art vóór F0 én F1, geen slice-audio vóór F0 én F2. Haalt de scène of het fragment geen 7, of twijfelt de AD of de Audio Director: geen slicewerk op die basis, maar een `brainstorm`-issue met de CEO (`WERKWIJZE.md` §9), en de EP herziet de raming (§9). T1 loopt parallel vanaf de start; de F1-eis staat als DoD-regel in #20.
 - **T4 en T5a vóór de flow-kamer-code** (T16a, T16c).
@@ -111,13 +111,13 @@ Bron: `docs/productie/risico.md` (Producer, bij te werken in T18) en pitch §10.
 | ID | Risico (kort) | Wat fase 2 doet | Eigenaar |
 |---|---|---|---|
 | R1 | Echo niet exact | CI + Windows-run (T6); tests herschreven (T16a) | technical-director |
-| R2 / R-V6 | Co-op, merk en finisher-echo onleesbaar | Leesbaarheidseisen in de art bible (T1), co-op vanaf de flow-kamer (T17) | art-director |
+| R2 / R-V6 | Co-op, merk en finisher-echo onleesbaar | Leesbaarheidseisen in de art bible (T1); co-op door mensen pas in de slice (F4b(c), besluit #124: 1B), in F0 alleen scripted | art-director |
 | R3 / R-V2 | Draai voelt als trucje; echo wordt passief zonder puzzels | Norm (2) in F0; gedragsmaat F4b(b); slice F3, F4, F7 | creative-director |
 | R5 | Art haalt eindkwaliteit niet | F1 vóór slice-art; anders `brainstorm` | art-director |
 | R9 / R-V1 | Staartduur klopt niet | Test 1,5 / 2 / 3 s in F0 en F4 | lead-game-designer |
-| R10 / R-V5 | Co-op wordt chaos, te makkelijk, of de een wacht | Co-op ≤ 2× solo; elke kamer en boss solo en co-op, vanaf de flow-kamer (F0, F4) | creative-director |
+| R10 / R-V5 | Co-op wordt chaos, te makkelijk, of de een wacht | Co-op ≤ 2× solo; elke kamer en boss solo en co-op in de slice (F4, F4b(c)); in F0 alleen scripted co-op-runs als meting (besluit #124: 1B) | creative-director |
 | R12 / R-V3 | Echo te vaak Leeg | Grens ≤ 40 % (F0, F4); echo volgt door deuren (E-04a, T5b) | lead-game-designer |
-| R-V9 | Schaduwmerk lijkt op *Nine Sols* | Afwijkpunten in T3a; check in T17; octrooiscan in de offerte van de merkcheck (§7) | business-legal-advisor |
+| R-V9 | Schaduwmerk lijkt op *Nine Sols* | Afwijkpunten in T3a; zwak signaal in T17 (M1 van de CEO), sterke check in F4b(c) (M1 van P2); octrooiscan in de offerte van de merkcheck (§7) | business-legal-advisor |
 | R-V12 | Springplank ligt achter je | Meetpunt in de flow-test; herontwerp vóór een CEO-vraag (F0) | lead-game-designer |
 | R20 / R-V4 | Raming fase 3 onzeker; combat duurder dan puzzels | Scopeplafond (T3c), kost per vijandtype en boss gemeten (F6) | executive-producer |
 | R22 | Audio haalt eindkwaliteit niet | F2 vóór slice-audio; anders `brainstorm` | audio-director |
@@ -163,12 +163,15 @@ Zelfde procedure als in fase 1 (`fase-1-kader.md` §6): een issue voor de EP met
 | VAF-dossier (T13), voorbereiden zonder indienen | #51 deel 1: 6B | ≈ 2 runs BLA + bijdragen; € 0 |
 | **v0.2: pitch v0.4** (#51: 1A, 7A, 8A): echo-regels, co-op 7A, GDD v1 zonder puzzels (T3a–c, T16a, T16c, T18) | Concept B in de vorm van pitch v0.4 | ≈ 16–18 runs (pitch §12), binnen het totaal |
 | **v0.2: grijze flow-kamer als mijlpaal 1** (F0, T16b, T17) | #51: 2A, slice-art pas na een geslaagde flow-test | ≈ 4–6 runs + ± 20 min CEO-tijd; doorlooptijd slice-art + ≈ 4–6 dagen later dan parallel |
+| **v0.3: F0 alleen solo, co-op-normen naar F4b(c)** (§1, T17, F0, F4b, T11, §4, R2, R10, R-V9) | Besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (2026-11-11, 1B): de CEO speelt F0 alleen solo | ≈ 0 runs voor dit kader + ≈ 1 run QA (kaart en testplan, #80); CEO-tijd F0 ± 20 → ± 15 min, F4b blijft ± 1 uur + ± 10 min van P2; risico: Nine Sols-herontwerp na T8b ≈ +3–5 maak-taken (§4) |
 | **v0.2: totaal** 45–70 → **61–88 maak-taken**; doorlooptijd 6–10 → **≈ 2–3,5 weken** | #51: 2A en ritme #52 | € 0 |
 
 **Open punten** (één regel per punt, de volgende versie neemt ze mee):
 - T1 en T9 werken de setting uit; de BLA toetst de formulering aan art. 4 in T13.
 - De VAF-deadlines 2027 (A16) volgen van de CEO; de Producer plant T13 daarop.
-- De co-op-balans met de korte staart (solo-echo ± 2 s naast een live partner, finisher van 10 s) toetst de LGD in de flow-kamer (T17), naast R-V12.
+- De co-op-balans met de korte staart (solo-echo ± 2 s naast een live partner, finisher van 10 s) toetst de LGD in de slice (T11, F4b(c)); in de flow-kamer (T17) alleen met de scripted co-op-runs, naast R-V12.
+- F4b(c) vraagt een tweede mens als P2 die de referenties niet kent; wie dat is, legt de QA Lead vóór T11 als `ceo-beslissing` aan de CEO voor. Is er geen, dan kan de sterke *Nine Sols*-check alleen in een externe playtest (apart CEO-besluit, F4).
+- `docs/productie/risico.md` (Producer): R2/R-V6, R10/R-V5 en R-V9 noemen nog co-op en de *Nine Sols*-check in de flow-kamer; bijwerken naar F4b(c) volgens dit kader (besluit #124: 1B).
 - Vóór F0 levert T10 alleen de UX-spec; de HUD wordt na F0 bijgesteld.
 - De tokens per maak-taak in fase 2 (vooral code) zijn nog niet gemeten; de EP stelt §8 bij na F0 met het tokenlog.
 
@@ -177,3 +180,4 @@ Zelfde procedure als in fase 1 (`fase-1-kader.md` §6): een issue voor de EP met
 |---|---|---|---|
 | 0.1 | 2026-11-08 | Concept, bijlage bij het gate-voorstel fase 1 (#10); Lead-review CD en SM-review op PR #50 | F4b: ± 1 uur CEO-tijd; merkcheck € 0 in fase 2 |
 | 0.2 | 2026-11-09 | Na besluit #51 (1A, 2A, 7A, 8A) en pitch v0.4 (#57): F0 grijze flow-kamer als mijlpaal 1; slice-art na F0 én F1; puzzels van de kritieke route (§1, T3, §4, T11/F4, F4b(b), R10); staart 1,5 / 2 / 3 s; co-op 7A; ideecheck (#58) vóór T3a; octrooiscan in de merkcheck-offerte; takenlijst per issue (T1–T18); raming volgens #52 | 61–88 maak-taken, ≈ 2–3,5 weken, € 0 |
+| 0.3 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B; [#161](https://github.com/cesarvangerwen-glitch/echoborn/issues/161)): F0 slaagt op de solo-normen; norm (3) co-op, C1–C2, MP-7 en M1 van P2 naar het nieuwe F4b(c); *Nine Sols*-check in F0 alleen zwak signaal, sterke check in F4b(c) (§1, T17, T11, F0, F4b, §4, §6 R2/R10/R-V9, §9); werktitel *Polderlight* in de kop (#96) | ≈ 0 runs; CEO-tijd F0 ± 15 min; risico ≈ +3–5 maak-taken bij een *Nine Sols*-lezing in F4b |
