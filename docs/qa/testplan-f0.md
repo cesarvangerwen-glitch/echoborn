@@ -1,6 +1,6 @@
 # Testplan F0: flow-test van de grijze flow-kamer (T17)
 
-Versie 0.3 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
+Versie 0.3.1 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
 
 Basis: fasekader fase 2 v0.3 (`docs/productie/fase-2-kader.md` §1, §2 rij T17, §3 F0 en F4b, §4, §5, §9), pitch v0.4 §4 (pillar 1), gdd §4.5 (MP-1–MP-7) en §5 (playtestvragen), ideecheck §2 (slotzin), audio bible §9.4, besluit #51 (1A, 7A: staart ± 2 s, bereik 1,5–3 s), besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B: de CEO speelt F0 alleen solo).
 

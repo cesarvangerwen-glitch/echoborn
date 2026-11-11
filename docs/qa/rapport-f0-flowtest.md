@@ -1,6 +1,6 @@
 # Rapport F0: flow-test van de grijze flow-kamer (T17)
 
-Versie 0.3 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
+Versie 0.3.1 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
 
 Plan: `docs/qa/testplan-f0.md`. Deel 1 (scripted runs) staat in §2–§4, deel 2 (de CEO-sessie solo, met `docs/qa/ceo-kaart-f0.md`) in §5, het QA-advies in §6. F0 slaagt op de solo-normen; de co-op-metingen zijn meting, geen F0-voorwaarde (besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124): 1B; kader §3 F0 en F4b(c)). De meetlogs van de CEO staan in `docs/qa/f0-meetlogs/`.
 
@@ -181,6 +181,7 @@ Eerlijk over de grond van dit advies:
 | 8 | **De D van een run is alleen in de HUD tijdens de run en in de bestandsnaam te zien**; het scorescherm noemt hem niet, en de scores mogen ook veel later (§5.1: ± 13 min) | Een F-toets die niet aankomt (laptop: Fn), of een late score, valt zo pas bij QA op. Voorstel: D op het scorescherm (`HUD_RUN_DONE`) | gameplay-programmer, ux-designer |
 | 9 | **Geen geldige meting op 3 s** (§5.1) | De DoD van T17 vraagt 1,5 / 2 / 3 s; 3 s volgt in de tweede flow-test en blijft tot dan open (§7) | qa-lead |
 | 10 | Eerste knop op de pijltjeskant maakt speler 1 | Staat als open punt in de kaart (*Open punten*) | ux-designer, gameplay-programmer |
+| 11 | **De tweede flow-test vraagt minstens twee getelde runs per D** (90 / 120 / 180) | In deze sessie had D = 90 twee runs met heel verschillende scores (1,0 en 2,0, §5.1) en D = 120 maar één; met één run per D zijn oefening en verwachting niet te scheiden | qa-lead |
 
 ## 9. Werkaannames
 
@@ -193,4 +194,4 @@ W1–W10 uit `docs/qa/testplan-f0.md` §6 (kader §5). De belangrijkste voor dit
 | 0.1 | 2026-11-09 | Eerste versie (#80): scripted runs solo en co-op, open punten |
 | 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: alleen de verwijzingen naar co-op/P2 als F0-voorwaarde bijgewerkt (kop, §1, §4-titel en punt 3 van "Wel", §5, §6 punt 1 en 4–7); meetwaarden ongewijzigd |
 | 0.3 | 2026-11-11 | Deel 2 (CEO solo) en QA-advies F0 (#80): titel en §1 nieuw; §5 (meetlogs van de CEO, welke run welke D is, normen per run, antwoorden), §6 (advies: herontwerp + tweede flow-test), §7 (wat nu; 3 s in de tweede flow-test); open punten 8–10; werkaannames W9–W10; oude §5 vervangen, §6–§7 hernummerd naar §8–§9; meetlogs in `docs/qa/f0-meetlogs/` |
-| 0.3.1 | 2026-11-11 | Na Lead-review EP: geen herhaling op 3 s; 3 s volgt in de tweede flow-test en dat deel van de DoD blijft open (§1, §6, §7, open punt 9); advies zonder voorwaarde; W10 = MP-5 per run |
+| 0.3.1 | 2026-11-11 | Na Lead-review EP: geen herhaling op 3 s; 3 s volgt in de tweede flow-test en dat deel van de DoD blijft open (§1, §6, §7, open punt 9); advies zonder voorwaarde; W10 = MP-5 per run; open punt 11 (minstens twee getelde runs per D in de tweede flow-test, na SM-review) |
