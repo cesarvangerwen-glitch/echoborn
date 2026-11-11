@@ -1,10 +1,10 @@
 # Credits *Polderlight*: inhoud
 
-Versie 0.1.7 · 2026-11-11 · eigenaar: Producer, met de Business/Legal Advisor (BLA) · issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10, "credits-inhoud")
+Versie 0.1.8 · 2026-11-11 · eigenaar: Producer, met de Business/Legal Advisor (BLA) · issue [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10, "credits-inhoud")
 
 Dit document geeft de **inhoud** van het credits-scherm (`docs/ux/hud-menus.md` MN-37, §7 punt 18). Indeling en bediening staan in hud-menus §4.9 (MN-35, MN-36); de mock-up is `menu_credits_x2_placeholder.png` (`docs/art/ui-stijlgids.md` §12.6, script `docs/art/ui/bron/genereer_menu_placeholder.py`).
 
-**Werkaanname (fase-2-kader §5):** hud-menus W7 (de spec is de versie vóór F0), stijlgids W7 (de credits-mock-up is een placeholder) en stijlgids §4 (het font is Polderletter, eigen werk). Verder: de namen en rollen in §3 volgen besluit #157 (1A, 2A); de licentie- en merkteksten in §5 zijn bevestigd door de BLA en nagelezen tegen B1, B5 en B6 (v0.1.7); de merkenregel is variant 1A–1C (§5.3, besluit #157), onder voorbehoud van de CEO-vraag in §5.8 (naam Claude/Anthropic zonder toestemming).
+**Werkaanname (fase-2-kader §5):** hud-menus W7 (de spec is de versie vóór F0), stijlgids W7 (de credits-mock-up is een placeholder) en stijlgids §4 (het font is Polderletter, eigen werk). Verder: de namen en rollen in §3 volgen besluit #157 (1A, 2A), gewijzigd door besluit [#173](https://github.com/cesarvangerwen-glitch/echoborn/issues/173) (1C: merkloos, geen naam Claude/Anthropic in de credits); de licentie- en merkteksten in §5 zijn bevestigd door de BLA en nagelezen tegen B1, B5 en B6 (v0.1.7); de merkenregel is variant 1D (§5.3, besluit #173).
 
 ## 1. Opbouw en volgorde
 
@@ -14,10 +14,10 @@ Blokken van een kop met de regels eronder (MN-35). Van boven naar beneden:
 |---|---|---|---|---|
 | 1 | Titel | — (`GAME_TITLE`, bestaat al) | *Polderlight* | besluit #96 |
 | 2 | Makers | `CREDITS_MADE_BY` | **CesarTheLittle**, zonder roltitel (§3) | besluit #157 (2A) |
-| 3 | Rollen | eerst de regel `CREDITS_TEAM_AI`, dan per vakgebied `CREDITS_TEAM_*` (§3) | De 26 AI-rollen per vakgebied | besluit #157 (1A), `studio/roles/` |
+| 3 | Rollen | eerst de regel `CREDITS_TEAM_AI` (*All roles: AI*), dan per vakgebied `CREDITS_TEAM_*` (§3) | De 26 AI-rollen per vakgebied, zonder merknaam | besluit #157 (1A), gewijzigd door #173 (1C); `studio/roles/` |
 | 4 | Gemaakt met | `CREDITS_MADE_WITH` | *Godot Engine* | MN-37 |
 | 5 | Lettertype | `CREDITS_FONT` | *Polderletter*, eigen werk van de studio (geen licentie van derden) | stijlgids §4, §10 punt 7 |
-| 6 | Merken | `CREDITS_TRADEMARKS`, tekst `CREDITS_TRADEMARKS_TEXT` | De merkenregel, variant 1A–1C (§5.3) | `docs/business/knop-glyphs-check.md` §3 punt 4 |
+| 6 | Merken | `CREDITS_TRADEMARKS`, tekst `CREDITS_TRADEMARKS_TEXT` | De merkenregel, variant 1D (§5.3) | `docs/business/knop-glyphs-check.md` §3 punt 4; besluit #173 |
 | 7 | Licenties | `CREDITS_LICENSES`, dan `CREDITS_LICENSE_FREETYPE` en `CREDITS_LICENSE_GODOT_FILE` | De Godot-licentietekst (§5.1, via `Engine.get_license_text()`, niet in `strings.csv`), de FreeType-regel en de verwijsregel naar `GODOT_COPYRIGHT.txt` (§5.2) | `docs/licenties.md` |
 | 8 | Slot | `CREDITS_THANKS` | *Bedankt voor het spelen* | — |
 
@@ -32,13 +32,13 @@ Waarom deze volgorde: eerst wie het maakte (wat spelers zoeken), dan het gereeds
 
 ## 3. Namen en rollen
 
-De studio is de CEO (een mens) en 26 AI-rollen (`studio/roles/`, Claude van Anthropic). Er is nog geen studionaam; de mock-up gebruikt *Een spel van de studio* als plaatshouder. De CEO koos in besluit #157 (CEO-vraag §4) optie **1A** (AI-rollen per vakgebied, met één regel *Claude (AI, Anthropic)* bovenaan blok 3) en **2A** (onder *Made by* / *Gemaakt door* alleen **CesarTheLittle**, zonder roltitel). Een studionaam (2C) kan later via een nieuw besluit.
+De studio is de CEO (een mens) en 26 AI-rollen (`studio/roles/`, Claude van Anthropic). Er is nog geen studionaam; de mock-up gebruikt *Een spel van de studio* als plaatshouder. De CEO koos in besluit #157 (CEO-vraag §4) optie **1A** (AI-rollen per vakgebied, met één regel bovenaan blok 3) en **2A** (onder *Made by* / *Gemaakt door* alleen **CesarTheLittle**, zonder roltitel). Besluit [#173](https://github.com/cesarvangerwen-glitch/echoborn/issues/173) (1C, CEO-vraag §5.8) maakt die regel **merkloos**: *All roles: AI* / *Alle rollen: AI*, zonder *Claude (AI, Anthropic)*; de credits noemen nergens Claude of Anthropic. De indeling per vakgebied en 2A blijven. Een studionaam (2C) kan later via een nieuw besluit.
 
 De rollen per vakgebied, in de volgorde van het organigram (koppen zoals in `strings.csv`):
 
 | Vakgebied (kop) | Sleutel | EN / NL | Rollen (namen, niet vertaald) |
 |---|---|---|---|
-| (bovenaan, één regel) | `CREDITS_TEAM_AI` | All roles: Claude (AI, Anthropic) / Alle rollen: Claude (AI, Anthropic) | — |
+| (bovenaan, één regel) | `CREDITS_TEAM_AI` | All roles: AI / Alle rollen: AI (besluit #173) | — |
 | Leiding en productie | `CREDITS_TEAM_PRODUCTION` | Leadership & production / Leiding en productie | Executive Producer, Producer, Studio Manager, Workflow & Process Optimization Lead |
 | Ontwerp | `CREDITS_TEAM_DESIGN` | Design / Ontwerp | Creative Director, Lead Game Designer, Systems Designer, Combat Designer, World & Level Designer, UX Designer, Narrative Designer |
 | Art | `CREDITS_TEAM_ART` | Art / Art | Art Director, Concept Artist, 2D Environment Artist, Animator, Technical Artist, UI Artist |
@@ -49,7 +49,7 @@ De rollen per vakgebied, in de volgorde van het organigram (koppen zoals in `str
 
 ## 4. CEO-vraag: namen en rollen in de credits
 
-**Beslist in #157: 1A, 2A = CesarTheLittle (2026-11-11).**
+**Beslist in #157: 1A, 2A = CesarTheLittle (2026-11-11).** 1A deels gewijzigd door [#173](https://github.com/cesarvangerwen-glitch/echoborn/issues/173) (1C): regel merkloos, zie §3.
 
 *In het format van `.github/ISSUE_TEMPLATE/ceo-beslissing.md`; geen apart issue, de regisseur bundelt.*
 
@@ -135,18 +135,18 @@ Waarom niet alles in de credits: ± 70 copyrightregels en licentieteksten zijn b
 
 Uit `docs/business/knop-glyphs-check.md` §3 punt 4, aangevuld met de formulering die Valve zelf gebruikt (*in the U.S. and/or other countries*) en een slotzin. Eén alinea, Engels, in twee varianten.
 
-**Variant 1A–1C** (de credits noemen Claude):
+**Variant 1A–1C** (de credits noemen Claude; vervallen door besluit #173, blijft staan als achtergrond):
 
 > Xbox is a trademark of the Microsoft group of companies. PlayStation is a registered trademark or trademark of Sony Interactive Entertainment Inc. Steam and Steam Deck are trademarks and/or registered trademarks of Valve Corporation in the U.S. and/or other countries. Claude and Anthropic are trademarks of Anthropic, PBC. Polderlight is not affiliated with or endorsed by Microsoft, Sony Interactive Entertainment, Valve or Anthropic. All other trademarks are the property of their respective owners.
 
-**Variant 1D** (geen AI in de credits):
+**Variant 1D** (geen merknaam van een AI in de credits; **geldt**, besluit #173):
 
 > Xbox is a trademark of the Microsoft group of companies. PlayStation is a registered trademark or trademark of Sony Interactive Entertainment Inc. Steam and Steam Deck are trademarks and/or registered trademarks of Valve Corporation in the U.S. and/or other countries. Polderlight is not affiliated with or endorsed by Microsoft, Sony Interactive Entertainment or Valve. All other trademarks are the property of their respective owners.
 
-- **Besluit #157 (1A):** variant 1A–1C geldt, letterlijk in `CREDITS_TRADEMARKS_TEXT`; 1D vervalt.
+- **Besluit [#173](https://github.com/cesarvangerwen-glitch/echoborn/issues/173) (1C, 2026-11-11):** variant 1D geldt, letterlijk in `CREDITS_TRADEMARKS_TEXT`; 1A–1C vervalt. Dit vervangt de keuze uit besluit #157 (1A), die variant 1A–1C liet gelden. De punten hieronder over Claude/Anthropic zijn de achtergrond van dat besluit (§5.8); ze gelden nog voor elke andere plek waar de naam zou kunnen staan, zoals de Steam-pagina (§5.6).
 - **Merkenrecht:** *Claude (AI, Anthropic)* is een feitelijke vermelding van het gereedschap waarmee het spel is gemaakt, alleen de naam, geen logo, zonder steun of samenwerking te suggereren (zelfde grond als bij de knopnamen, glyph-check S7: art. 14 lid 1 UMV). Daarvoor is volgens het merkenrecht geen toestemming nodig.
 - **Voorwaarden van Anthropic (nagelezen v0.1.7): die gaan verder dan het merkenrecht.** De Consumer Terms (gelden voor het Max-abonnement) zeggen: "You may not, without our prior written permission, use our name, logos, or other trademarks in connection with products or services other than the Services, or in any other way that implies our affiliation, endorsement, or sponsorship. To seek permission, please email us at marketing@anthropic.com." (B6). De Trademark Guidelines: "You may only use our trademarks as specifically permitted by us and only in materials we approve beforehand." (B7). Letterlijk gelezen vraagt de regel *Claude (AI, Anthropic)* in de credits van een commercieel spel dus **voorafgaande schriftelijke toestemming**. Een uitzondering voor een feitelijke vermelding ("gemaakt met") noemen de voorwaarden niet; of zo'n vermelding eronder valt, zeggen ze ook niet. Dit is een contractuele regel tussen de CEO (als gebruiker) en Anthropic, los van het merkenrecht. Daarom de CEO-vraag in §5.8.
-- **De zin in `CREDITS_TRADEMARKS_TEXT` past wel bij de richtlijnen:** een merkvermelding ("Claude and Anthropic are trademarks of Anthropic, PBC.") wordt niet gevraagd, maar ook niet verboden; de richtlijnen verbieden alleen een merksymbool ("Do not use a trademark symbol with the trademarks", B7), en de tekst gebruikt er geen. De zin "not affiliated with or endorsed by … Anthropic" sluit aan bij het verbod om steun of samenwerking te suggereren (B6, B7). Geen wijziging nodig, tenzij de CEO bij §5.8 voor C kiest.
+- **De Anthropic-zin van variant 1A–1C paste bij de richtlijnen:** een merkvermelding ("Claude and Anthropic are trademarks of Anthropic, PBC.") werd niet gevraagd, maar ook niet verboden; de richtlijnen verbieden alleen een merksymbool ("Do not use a trademark symbol with the trademarks", B7), en de tekst gebruikte er geen. De zin "not affiliated with or endorsed by … Anthropic" sloot aan bij het verbod om steun of samenwerking te suggereren (B6, B7). Na besluit #173 staat die zin niet meer in `CREDITS_TRADEMARKS_TEXT` (variant 1D).
 - **Geen Anthropic- of Claude-logo** gebruiken, ook niet op de Steam-pagina: logo's alleen met beeld en eisen die Anthropic zelf levert (B7).
 - **Eigendom van de output (B6):** "Subject to your compliance with our Terms, we assign to you all of our right, title, and interest—if any—in Outputs." Anthropic claimt de output dus niet en draagt wat het eventueel heeft over aan de gebruiker (de CEO), zolang die zich aan de voorwaarden houdt; of er auteursrecht op AI-output rust, regelen de voorwaarden niet ("if any"), dat bepaalt het recht. Voor `docs/licenties.md`: de AI-output is werk van de studio, zonder licentie van derden.
 - *Godot Engine* hoeft niet in de merkenregel: *Made with Godot Engine* (blok 4) is gewone, toegestane vermelding (B2). Geen Godot-logo zonder het na te lezen in de logo-regels van Godot.
@@ -166,7 +166,8 @@ Beide staan nu als regel "eigen werk" in `docs/licenties.md` §2. Voor eigen wer
 
 Voor Polderlight: de art, audio en teksten worden door AI-rollen (Claude) gemaakt, ook als dat via scripts gebeurt. Dat is *pre-generated* inhoud die spelers zien; melden is dus nodig. *Live-generated* is er niet (geen AI tijdens het spelen).
 
-- Dit staat **los van CEO-vraag [#157](https://github.com/cesarvangerwen-glitch/echoborn/issues/157)**: ook bij 1D (geen AI in de credits) blijft de Steam-melding nodig. 1D zou dan betekenen dat de Steam-pagina AI meldt en de credits niet; dat is een punt om mee te wegen, de keuze blijft bij de CEO.
+- Dit staat **los van de credits** (besluiten [#157](https://github.com/cesarvangerwen-glitch/echoborn/issues/157) en [#173](https://github.com/cesarvangerwen-glitch/echoborn/issues/173)): de Steam-melding blijft nodig (besluit #173). De credits melden AI merkloos (*All roles: AI*), de Steam-pagina meldt het ook; die twee sluiten op elkaar aan.
+- **Merknaam:** na besluit #173 is de Steam-melding de **enige plek** waar AI met naam (Claude/Anthropic) genoemd zou kunnen worden. Ook daar **geen** *Claude* of *Anthropic* zonder voorafgaande schriftelijke toestemming van Anthropic (Consumer Terms §12, B6; §5.3): de meldtekst zegt dus "AI" zonder merknaam. Een naam kan alleen via een nieuw CEO-besluit met toestemming (§6 punt 12).
 - De meldtekst (kort, eerlijk, in de lijn van §3) schrijft de Marketing & Community Manager met de BLA, bij het maken van de Steam-pagina (§6 punt 5). De officiële Steamworks-tekst van de survey leest de BLA dan na (deze run niet bereikbaar).
 
 ### 5.7 Bronnen (BLA, geraadpleegd 2026-11-10; B1, B1a en B5–B9 nagelezen 2026-11-11)
@@ -180,9 +181,13 @@ Voor Polderlight: de art, audio en teksten worden door AI-rollen (Claude) gemaak
 - **B6** Anthropic, *Consumer Terms of Service* (effective Oct 8, 2025; gelezen 2026-11-11): *Use of our brand* (§12 *General terms*) en eigendom van Outputs (§4 *Inputs, Outputs, Actions, and Materials*). https://www.anthropic.com/legal/consumer-terms. Volgens de inleiding gelden de Commercial Terms alleen voor API-sleutels en de Console, niet voor Claude.ai/Claude Pro van personen of bedrijven.
 - **B7** Anthropic, *Trademark Guidelines* (effective Aug 1, 2024; gelezen 2026-11-11). https://www.anthropic.com/legal/trademark-guidelines
 - **B8** Anthropic, *Commercial Terms of Service* (effective Jun 17, 2025; gelezen 2026-11-11), ter vergelijking: de klant "owns its Outputs"; gezocht op *trademark*, *logo* en *brand*: geen merkclausule voor de klant, alleen *Publicity* (Anthropic mag de klantnaam noemen). https://www.anthropic.com/legal/commercial-terms
-- **B9** Anthropic, *Usage Policy*, twee versies gelezen op 2026-11-11: de vandaag geldende (effective Sep 15, 2025; https://www.anthropic.com/legal/archive/22742366-2ef0-4c7a-a833-6523f10d3944) en de nieuwe op https://www.anthropic.com/legal/aup (effective Nov 12, 2026). Over dit punt zeggen ze hetzelfde: niets over het noemen van Claude in credits of over merken (gezocht op *credits* en *trademark*); in beide het verbod op "Plagiarize or submit AI-assisted work without proper permission or attribution" en op misleiden over de herkomst van inhoud (2025: "mislead others about its origin"; 2026: "mislead audiences about its origin"). De regel *Claude (AI, Anthropic)* en de Steam-melding (§5.6) passen daarbij.
+- **B9** Anthropic, *Usage Policy*, twee versies gelezen op 2026-11-11: de vandaag geldende (effective Sep 15, 2025; https://www.anthropic.com/legal/archive/22742366-2ef0-4c7a-a833-6523f10d3944) en de nieuwe op https://www.anthropic.com/legal/aup (effective Nov 12, 2026). Over dit punt zeggen ze hetzelfde: niets over het noemen van Claude in credits of over merken (gezocht op *credits* en *trademark*); in beide het verbod op "Plagiarize or submit AI-assisted work without proper permission or attribution" en op misleiden over de herkomst van inhoud (2025: "mislead others about its origin"; 2026: "mislead audiences about its origin"). De merkloze regel *All roles: AI* (besluit #173) en de Steam-melding (§5.6) passen daarbij.
 
 ### 5.8 CEO-vraag: de naam Claude/Anthropic in de credits
+
+**Beslist in [#173](https://github.com/cesarvangerwen-glitch/echoborn/issues/173): 1C (2026-11-11), credits merkloos.** Zie de regel van 2026-11-11 in `docs/beslissingen.md`. Verwerkt in §1, §3, §5.3 en §5.6 (v0.1.8); `strings.csv` verwerkt in #175 (§6 punt 4).
+
+*De tekst hieronder (opties A–C en "Wat wacht hierop") beschrijft de situatie vóór #173 en wordt niet meer uitgevoerd.*
 
 *In het format van `.github/ISSUE_TEMPLATE/ceo-beslissing.md`; geen apart issue, de regisseur bundelt (zoals §4).*
 
@@ -212,22 +217,23 @@ A houdt de eerlijke vermelding uit #157 en volgt de weg die de voorwaarden zelf 
 | # | Wat | Wie | Wanneer |
 |---|---|---|---|
 | 1 | `GODOT_COPYRIGHT.txt` (§5.2 punt 2) in elke export en elk depot zetten en het FreeType-jaar invullen. **BLA-deel afgerond (v0.1.7):** B1 nagelezen (B1, B1a, B5): FreeType-regel bevestigd; Mbed TLS vraagt geen eigen regel in de credits (het bestand dekt Apache 2.0 §4(a)); ENet gecorrigeerd: verplicht zolang het in de export-template zit, ook zonder multiplayer. **Rest:** B5 is gelezen op de tak `4.6`; bij de build `GODOT_COPYRIGHT.txt` en het FreeType-jaar nalezen tegen `COPYRIGHT.txt` van de gebruikte tag (4.6.x). | Engine & Platform Programmer (export, nalezen tegen de tag) | Vóór de eerste publieke build |
-| 2 | ~~Blok 5 (*Lettertype*) behouden of schrappen~~ **Afgerond (v0.1.6): behouden**, zonder licentietekst (§5.5): het eigen font is werk van de studio, het kost twee regels (± 2 s scrollen) en `CREDITS_FONT` staat al in `strings.csv`. De context van `CREDITS_FONT` in `strings.csv` zegt nog *Blok mag vervallen*; de Narrative Designer past die aan naar *behouden (credits.md §6 punt 2)* bij de volgende wijziging van `strings.csv`. | Narrative Designer (context) | Bij de volgende wijziging van `strings.csv` |
+| 2 | ~~Blok 5 (*Lettertype*) behouden of schrappen~~ **Afgerond (v0.1.6): behouden**, zonder licentietekst (§5.5): het eigen font is werk van de studio, het kost twee regels (± 2 s scrollen) en `CREDITS_FONT` staat al in `strings.csv`. De context van `CREDITS_FONT` in `strings.csv` zegt nog *Blok mag vervallen*; de Narrative Designer past die aan naar *behouden (credits.md §6 punt 2)* bij de volgende wijziging van `strings.csv`. Niet meegenomen in #175; volgende wijziging. | Narrative Designer (context) | Bij de volgende wijziging van `strings.csv` |
 | 3 | ~~Taal van de licentie- en merkteksten~~ **Afgerond (v0.1.3):** alleen Engels, ook in NL (§5.4). | — | — |
-| 4 | ~~Variant van de merkenregel~~ **Afgerond (v0.1.6):** variant 1A–1C (besluit #157), letterlijk in `CREDITS_TRADEMARKS_TEXT`. Die tekst noemt *Polderlight* letterlijk: verandert de naam na de merkcheck, dan wijzigen `GAME_TITLE` én `CREDITS_TRADEMARKS_TEXT` (EN en NL) samen. Voorwaarden van Anthropic **nagelezen (v0.1.7, §5.3, B6–B9)**: de merkzin past; de naam in de credits vraagt letterlijk schriftelijke toestemming. **Nog open:** CEO-vraag §5.8; bij A stuurt de CEO de mail (concept: BLA), bij C past de Narrative Designer `CREDITS_TEAM_AI` en `CREDITS_TRADEMARKS_TEXT` aan. | CEO (§5.8); BLA (concept mail bij A); Narrative Designer (tekst bij C of bij naamwijziging) | Vóór de eerste publieke build; tekst bij een naamwijziging |
+| 4 | ~~Variant van de merkenregel~~ **Afgerond (v0.1.8): variant 1D** (besluit [#173](https://github.com/cesarvangerwen-glitch/echoborn/issues/173), 1C, vervangt 1A–1C uit #157), letterlijk in `CREDITS_TRADEMARKS_TEXT`; `CREDITS_TEAM_AI` = *All roles: AI* / *Alle rollen: AI*. CEO-vraag §5.8 beslist; geen toestemmingsmail. Die tekst noemt *Polderlight* letterlijk: verandert de naam na de merkcheck, dan wijzigen `GAME_TITLE` én `CREDITS_TRADEMARKS_TEXT` (EN en NL) samen. `CREDITS_TEAM_AI` en `CREDITS_TRADEMARKS_TEXT` in `strings.csv` bijgewerkt in [#175](https://github.com/cesarvangerwen-glitch/echoborn/issues/175); bij verschil geldt `strings.csv` (§2). | Narrative Designer (`strings.csv`; tekst bij een naamwijziging) | Tekst bij een naamwijziging |
 | 5 | AI-melding op Steam (advies §5.6: ja, *pre-generated*): meldtekst schrijven en de Steamworks-tekst van de survey nalezen. | Marketing & Community Manager, met de BLA | Bij het maken van de Steam-pagina |
 | 6 | ~~CEO-vraag §4~~ **Afgerond (v0.1.6):** besluit #157 (1A, 2A). | — | — |
 | 7 | ~~`CREDITS_*`-sleutels in `strings.csv`~~ **Afgerond (v0.1.6):** 17 sleutels in `game/locale/strings.csv` (EN/NL, met context); §1 en §3 volgen ze. | — | — |
 | 8 | hud-menus §7 punt 18 sluiten met een verwijzing naar dit document; dit document wijzigt hud-menus niet. | UX Designer | Bij zijn volgende wijziging van hud-menus |
 | 9 | Placeholder in `genereer_menu_placeholder.py` (blok *Licenties*: *Tekst volgt*) vervangen door de echte inhoud, zodra punt 1 rond is. | UI Artist | Bij de eind-art van de credits |
 | 10 | Credits bouwen uit dit document (de licentietekst bij voorkeur via `Engine.get_license_text()`, zodat hij altijd bij de gebruikte versie past). De bouw herbreekt de licentie-alinea's op de kolom van 320 px (± 71 tekens per regel), niet op de regels van `LICENSE.txt`. Onder de Godot-tekst de FreeType-regel en de verwijsregel van §5.2. De namen die niet in `strings.csv` staan (*CesarTheLittle*, de 26 roltitels, *Godot Engine*, *Polderletter*) krijgen een eigen bron (bv. een databestand) die `test_no_hard_text_in_code` niet als harde tekst ziet. | Gameplay Programmer | Met hud-menus §7 punt 19 (T8a) |
-| 11 | Context van `CREDITS_LICENSE_FREETYPE` in `strings.csv` zegt *Letterlijk zoals FreeType het vraagt*; dat is de **aanbevolen** tekst van de FreeType License, niet een letterlijke eis (§5.2 punt 1). Context aanpassen naar *aanbevolen creditregel van de FreeType License (credits.md §5.2 punt 1)*. De tekst zelf hoeft niet te wijzigen; de FTL in Godot 4.6 schrijft de URL als *https://freetype.org* (B5), overnemen mag. | Narrative Designer | Bij de volgende wijziging van `strings.csv` |
-| 12 | Bij §5.8 A: de toestemmingsmail dekt ook de AI-meldtekst op de Steam-pagina (§5.6) als die *Claude*/*Anthropic* noemt (zelfde clausule, B6); anders noemt de meldtekst de naam niet. | BLA (concept mail), Marketing & Community Manager (meldtekst) | Bij het concept van de mail (§5.8 A) |
+| 11 | Context van `CREDITS_LICENSE_FREETYPE` in `strings.csv` zegt *Letterlijk zoals FreeType het vraagt*; dat is de **aanbevolen** tekst van de FreeType License, niet een letterlijke eis (§5.2 punt 1). Context aanpassen naar *aanbevolen creditregel van de FreeType License (credits.md §5.2 punt 1)*. De tekst zelf hoeft niet te wijzigen; de FTL in Godot 4.6 schrijft de URL als *https://freetype.org* (B5), overnemen mag. Niet meegenomen in #175; volgende wijziging. | Narrative Designer | Bij de volgende wijziging van `strings.csv` |
+| 12 | ~~Toestemmingsmail dekt ook de Steam-meldtekst~~ **Afgerond (v0.1.8):** door besluit #173 (1C) komt er geen toestemmingsmail. De AI-meldtekst op de Steam-pagina (§5.6, punt 5) noemt *Claude*/*Anthropic* daarom **niet**; alleen "AI". Wil de CEO daar later toch de naam, dan eerst schriftelijke toestemming (B6) via een nieuw besluit. | Marketing & Community Manager (meldtekst zonder merknaam, bij punt 5) | Bij het maken van de Steam-pagina |
 
 ## 7. Wijzigingen
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.1.8 | 2026-11-11 | Producer (#171, #87): besluit #173 (1C, credits merkloos) verwerkt: §5.3 variant 1D geldt (vervangt 1A–1C uit #157), Anthropic-zin vervalt; §1 en §3 `CREDITS_TEAM_AI` = *All roles: AI* / *Alle rollen: AI*, zonder *Claude (AI, Anthropic)*; werkaanname bijgewerkt; §5.8 gemarkeerd als beslist (vraag blijft staan); §5.6: de Steam-melding blijft en is de enige plek waar een AI-merknaam zou kunnen staan, ook daar niet zonder toestemming; §6 punt 4 en 12 afgerond (punt 4: `strings.csv` gedaan in #175). Na de EP-review (PR #174): §4 kopregel met #173, §5.3 Anthropic-zin in de verleden tijd, §6 punt 2 en 11 niet meegenomen in #175. |
 | 0.1.7 | 2026-11-11 | BLA (#171): B1 nagelezen via de bron op GitHub (B1, B1a, nieuw B5): FreeType-regel bevestigd (aanbevolen tekst van de FTL), Mbed TLS zonder eigen regel (bestand volstaat), ENet gecorrigeerd (niet alleen bij multiplayer); markeringen "uit B1, nog na te lezen" weg. Voorwaarden van Anthropic nagelezen (nieuw B6–B9): merkzin past, naam in de credits vraagt letterlijk schriftelijke toestemming; eigendom output in §5.3; nieuwe CEO-vraag §5.8; §6 punt 1 (BLA-deel) en 4 bijgewerkt, nieuw punt 11 (context FreeType-sleutel). Na de EP-review (PR #172): §5.8 B met het risico van schorsing/beëindiging van het account, C eenduidig (variant 1D), punt 12 (Steam-meldtekst in de toestemmingsmail); licenties.md §2 voorzichtiger. Na de SM-review (PR #172): B9 met de geldende versie (Sep 15, 2025), §5.8 C met wat de CEO inlevert, concept mail bij A in *Wat wacht hierop*, §6 punt 1 nalezen tegen de gebruikte tag. |
 | 0.1.6 | 2026-11-11 | Na besluit #157 (1A, 2A) en de reviews op de `CREDITS_*`-sleutels (#87): §1 en §3 naar de sleutels en koppen in `strings.csv` (*Programming / Programmeren*, *Quality assurance / Kwaliteitscontrole*; nieuw `CREDITS_TRADEMARKS_TEXT`, `CREDITS_LICENSE_FREETYPE`, `CREDITS_LICENSE_GODOT_FILE`); CesarTheLittle in blok 2; §6 punt 2 (blok 5 behouden), 4 (variant), 6 en 7 afgerond; §4 en §5.3 met besluit #157; §5.2 punt 1 en 3 naar `CREDITS_LICENSE_FREETYPE` en `CREDITS_LICENSE_GODOT_FILE`; punt 9 hangt alleen nog aan punt 1; punt 4: naamwijziging raakt `GAME_TITLE` én `CREDITS_TRADEMARKS_TEXT`; punt 10: eigen bron voor namen buiten `strings.csv`. |
 | 0.1.5 | 2026-11-10 | Na de SM-review (PR #159): toestemming Anthropic alleen op merkenrecht gegrond, voorwaarden nalezen in §6 punt 4; ENet- en Mbed TLS-beweringen gemarkeerd als "uit B1, nog na te lezen"; §6 punt 2 geen blokkade voor de bouw. |
