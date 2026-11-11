@@ -1,6 +1,8 @@
 # CEO-kaart F0: de flow-kamer spelen en scoren (T17)
 
-Versie 0.2.2 · 2026-11-11 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA (lees je pas na het spelen, zoals §5): het testplan in `docs/qa/`
+Versie 0.2.3 · 2026-11-11 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA (lees je pas na het spelen, zoals §5): het testplan in `docs/qa/`
+
+**Speel je de tweede flow-test? Gebruik dan `docs/qa/ceo-kaart-f0-2.md`, niet deze kaart.**
 
 **Tijd: ± 15 min spelen + ± 5 min luisteren.** Je hoeft alleen te spelen, te scoren en het antwoordblok (§4) als comment in #80 te zetten. **Lees tot en met §4; lees §5 pas na het spelen** (anders kleurt het je antwoorden).
 
@@ -87,3 +89,4 @@ Bijlage: de meetlog-CSV's (zie hieronder)
 | 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: alleen solo; blok 4 (co-op) vervallen en weggelaten, luistercheck is nu blok 4; P2 uit de besturing en de co-op/P2-velden uit het antwoordblok; waarschuwing tegen Enter; tijd ± 20 → ± 15 min spelen; "Echo: hulp of last?" bij blok 3; M1 als zwak signaal met sterke check in F4b(c) als er zo'n P2 is, anders R-V9 open in F8; MP-7 en O4 uit §5; Start als meedoe-knop in de waarschuwing |
 | 0.2.1 | 2026-11-11 | Na F5 eerst A, D of spatie, want de eerste knop kiest de toetsenbordkant en F6 houdt die keuze (§1, noot onder §2; vraag bij *Open punten*). F5 in het spelvenster zet de meetlog uit; nog eens F5 zet hem weer aan (§1). |
 | 0.2.2 | 2026-11-11 | §2: op een laptop Fn + F-toets, en D in de HUD controleren na elke F-toets (in de sessie van 2026-11-11 kwam F3 waarschijnlijk niet aan; rapport §5.1) |
+| 0.2.3 | 2026-11-11 | Verwijzing naar de kaart van de tweede flow-test (`ceo-kaart-f0-2.md`) |
