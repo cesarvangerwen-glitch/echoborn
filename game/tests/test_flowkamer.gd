@@ -1,12 +1,15 @@
 extends RefCounted
-## Tests voor de grijze flow-kamer (T16b, #77; gdd §4.2–§4.6).
+## Tests voor de grijze flow-kamer (T16b, #77; gdd §4.2–§4.6; na F0 T16d, #176).
 ##
 ## De kamer laadt, de gescripte geoefende run haalt per D het einde
 ## (`RUN_EIND`) en de normen MP-1, MP-2, MP-4 en MP-6, het meetlog schrijft de
 ## CSV en is deterministisch, en met echo uit is het gemaal vol te krijgen
-## (FK-2). Elke run duurt ± 3800–6900 ticks; de runner geeft een test 7200
-## frames, daarom is elke run een eigen test (ook FK-2 per D). De run van D = 90 wordt in een
-## volgende test afgespeeld met een ScriptedInput (zelfde bits, zelfde log).
+## (FK-2). De run haalt ook LM-04 in de pompgang van K3 (W-4): elke schoep één
+## slag, `GEMAAL_VOL` vóór P1 bij de sluis is, geen stilstand > 30 ticks in K3.
+## Elke run duurt ± 3800–5800 ticks; de runner geeft een test 7200 frames,
+## daarom is elke run een eigen test (ook FK-2 per D). De run van D = 90 wordt
+## in een volgende test afgespeeld met een ScriptedInput (zelfde bits, zelfde
+## log).
 
 const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
 const FlowBot = preload("res://levels/flowkamer/flow_bot.gd")
@@ -43,9 +46,23 @@ func _room(t, d: int, echo_on: bool, input: RefCounted = null) -> Array:
 	return [room, bot]
 
 
+## Speelt de run tot RUN_EIND. Zet als meta op de kamer de tick waarop P1 bij
+## de sluis is (`aankomst`, LM-04) en het grootste aantal levende vijanden
+## tegelijk in K2 (`max_vijanden`, L-13 (f), W-5).
 func _run(t, room) -> void:
+	var arrival := -1
+	var most := 0
 	while not room.run_over and room.sim.tick < TICK_CAP:
 		await t.tree.physics_frame
+		if arrival < 0 and room.room == "K3" and room.p1.position.x <= Layout.SLUICE.end.x + 10.0:
+			arrival = room.sim.tick
+		var alive := 0
+		for e in room.enemies:
+			if e.alive:
+				alive += 1
+		most = maxi(most, alive)
+	room.set_meta("aankomst", arrival)
+	room.set_meta("max_vijanden", most)
 
 
 func _free(t, room) -> void:
@@ -66,8 +83,11 @@ func test_room_loads(t) -> void:
 		t.check(is_equal_approx(size.x, d - 60.0), "D=%d: B3-blok %.0f px (verwacht %d)" % [d, size.x, d - 60])
 		var zones: Array = room.find_children("*", "Area2D", true, false)
 		t.check(zones.is_empty(), "D=%d: zones in de flow-kamer (FK-4): %s" % [d, zones])
-		var above: float = Layout.FLOOR - room.pomprad.position.y
-		t.check(above >= 15.0 and above <= 40.0, "pomprad %.0f px boven de vloer (FK-5: 15–40)" % above)
+		t.check(room.vanes.size() == Layout.PUMP_VANES.size() and room.gemaal.vanes.size() == room.vanes.size(),
+			"D=%d: %d schoepen in de kamer, %d in het gemaal (W-4: 4)" % [d, room.vanes.size(), room.gemaal.vanes.size()])
+		for vane in room.vanes:
+			var above: float = Layout.FLOOR - vane.position.y
+			t.check(above >= 15.0 and above <= 40.0, "%s %.0f px boven de vloer (FK-5: 15–40)" % [vane.name, above])
 		t.check(Layout.room_of(Layout.RUN_START) == "K1" and room.room == "K1", "run begint niet in K1")
 		await _free(t, room)
 	for key: String in Layout.NEIGHBOURS:
@@ -115,6 +135,26 @@ func _check_run(t, room, bot, d: int) -> FlowReport:
 	t.check(room.room_changes.size() >= 3, "D=%d: kamerwissels %s" % [d, room.room_changes])
 	for leg_name in ["B4", "B3", "B1", "B2-0", "B2-1", "B2-2", "B2-3"]:
 		t.check(bot.lines.get(leg_name, false), "D=%d: %s niet via de echolijn" % [d, leg_name])
+	# LM-04 (gdd §4.6, W-4): met ≥ 100 LP in K3 slaat P1 elke schoep één keer
+	# in het voorbijlopen; GEMAAL_VOL valt vóór P1 bij de sluis is, en P1 staat
+	# in K3 nergens langer dan 30 ticks stil (MP-1).
+	var arrival: int = room.get_meta("aankomst", -1)
+	t.check(arrival > 0 and rep.gemaal_full_tick >= 0 and rep.gemaal_full_tick < arrival,
+		"D=%d: GEMAAL_VOL op %d, P1 bij de sluis op %d (LM-04)" % [d, rep.gemaal_full_tick, arrival])
+	var k3_still := 0
+	var p1_pumps: Array = []
+	for row in room.meetlog.rows:
+		if row[2] == "STIL_EIND" and row[1] == "K3" and row[4] == "p1":
+			k3_still = maxi(k3_still, int(row[3]))
+		if row[2] == "POMP" and row[4] == "p1":
+			p1_pumps.append(int(float(row[5])))
+	t.check(k3_still <= 30, "D=%d: stilstand van %d ticks in K3 (LM-04: ≤ 30)" % [d, k3_still])
+	var vane_xs: Array = []
+	for v: Vector2 in Layout.PUMP_VANES:
+		vane_xs.append(int(v.x))
+	t.check(p1_pumps == vane_xs, "D=%d: pompslagen P1 op %s (elke schoep één keer: %s)" % [d, p1_pumps, vane_xs])
+	t.note("D=%d: K3 GEMAAL_VOL %d ticks vóór P1 bij de sluis, langste stilstand in K3 %d; max. %d vijanden tegelijk in K2" % [
+		d, arrival - rep.gemaal_full_tick, k3_still, room.get_meta("max_vijanden", 0)])
 	# Elk event van de kamer staat erin (gdd §4.6, meetlog).
 	for event in ["RUN_START", "RUN_EIND", "KAMER", "STIL_START", "STIL_EIND", "ECHO_LEEG_EIND",
 			"SPRINGPLANK", "BOUNCE", "LANCERING", "MERK_GEZET", "MERKSPRONG", "ONTPLOFFING", "LP", "POMP", "GEMAAL_VOL"]:

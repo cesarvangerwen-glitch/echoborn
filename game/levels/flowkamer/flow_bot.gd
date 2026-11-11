@@ -43,6 +43,18 @@ const B4_JUMP_AT_ECHO_PX := 24.0
 ## B4: zo lang wacht P1 op de echo; daarna de langzame lijn.
 const B4_GIVE_UP_TICKS := 300
 
+## **Late bot** (gdd §4.6 L-08 (b), W-6): bij elk keerpunt van B1 en B2 de
+## bounce `bounce_delay` ticks te laat (P1 blijft zolang zonder input op de
+## echo staan; de plank neemt hem mee naar de wand), en/of een dash
+## `dash_delay` ticks na de top van de bounce (-1 = geen dash, zoals de
+## geoefende run). Standaard 0 en -1: de gewone geoefende run.
+var bounce_delay := 0
+var dash_delay := -1
+## Per keerpunt (B1, B2-0 … B2-3): afstand tot de keerwand bij de bounce en
+## bij de landing op het volgende niveau (px), voor de marges in het kamerdoc.
+var bounce_from_wall := {}
+var landed_from_wall := {}
+
 ## De bits per tick van deze run, vanaf de eerste `sample`.
 var recorded := PackedInt32Array()
 ## Welke bouwstenen de echolijn haalden (naam -> true) of de langzame lijn (false).
@@ -62,12 +74,18 @@ var _stuck := 0
 var _turn_x := 0.0
 var _since := 0
 var _last_attack := -1000
-var _pump_strokes := 0
+## K3: slagen van P1 in deze keer K3 (-1 = nog niet in K3), de geslagen
+## schoepen in deze doorgang en de looprichting (-1 = naar de sluis).
+var _visit_strokes := -1
+var _struck := {}
+var _pass_dir := -1
+var _climb_up := false
+var _plank_ticks := 0
+var _apex_tick := -1
 var _patrol_dir := 1
 var _tick := 0
 var _from_tread := false
 var _off_ledge := false
-var _needed := 0
 var _echo_now_x := NAN
 var _echo_last_x := NAN
 var _echo_base := 0
@@ -373,6 +391,8 @@ func _leg_turn(args: Array) -> int:
 	# Op het volgende niveau, en niet op de trede op 90 (die ligt even hoog,
 	# binnen de keerzone): pas dan is deze bouwsteen klaar.
 	if _on_level(next_level) and absf(p.position.x - _wall_x()) > Layout.KEERZONE:
+		if sub == "bounce":
+			landed_from_wall[_legs[leg][0]] = absf(p.position.x - _wall_x())
 		_next_leg(sub == "bounce")
 		return 0
 	match sub:
@@ -399,15 +419,30 @@ func _leg_turn(args: Array) -> int:
 			return _walk(-out_dir)
 		"air":
 			if _on_plank():
+				if _plank_ticks < bounce_delay:
+					# Late bot: nog op de echo blijven staan, zonder input.
+					_plank_ticks += 1
+					return 0
+				_plank_ticks = 0
+				_apex_tick = -1
 				sub = "bounce"
+				bounce_from_wall[_legs[leg][0]] = absf(p.position.x - _wall_x())
 				return _walk(-out_dir) | _tap(J)
 			if _on_level(level):
 				sub = "slow"
 				return _walk(out_dir)
+			if _plank_ticks > 0:
+				# Van de echo af gegleden vóór de bounce.
+				_plank_ticks = 0
 			return _steer_to_echo(-out_dir)
 		"bounce":
 			if _on_level(level):
 				sub = "slow"
+			if dash_delay >= 0 and p.motor.velocity.y >= 0.0:
+				if _apex_tick < 0:
+					_apex_tick = _tick
+				if _tick - _apex_tick == dash_delay:
+					return _walk(-out_dir) | _tap(DASH)
 			return _walk(-out_dir)
 		"slow":
 			return _slow_turn(level, out_dir, slow_dir)
@@ -553,9 +588,13 @@ func _patrol() -> int:
 	return _walk(_patrol_dir)
 
 
-## K3: naar het pomprad, pompen (de helft van de slagen; de echo herhaalt
-## ze D ticks later), dan naar de sluis. Is het gemaal daarna niet vol, dan
-## de trap op terug naar K2 voor meer licht (met echo uit: FK-2).
+## K3 pompgang (gdd LM-04, FK-5, W-4): op de vloer naar links door de
+## pompgang en elke schoep één keer slaan in het voorbijlopen, dan door over
+## de kade naar de sluis; de echo slaat dezelfde schoepen D ticks later terwijl
+## P1 doorloopt. Maakt dat het gemaal niet vol (echo uit, of te weinig licht),
+## dan keert P1 en slaat de schoepen op de terugweg nog eens (FK-2), zolang er
+## licht in de meter is; is de meter leeg en het gemaal niet vol, dan de trap
+## op terug naar K2 voor meer licht.
 func _leg_gemaal() -> int:
 	var p := _p1()
 	var g = _room.gemaal
@@ -564,104 +603,129 @@ func _leg_gemaal() -> int:
 	if _room.room == "K2":
 		leg = _legs.size() - 2
 		sub = ""
+		_visit_strokes = -1
 		return 0
-	if g.full_tick >= 0 and sub != "pump":
-		# Naar de sluis; wachten aan de waterkant zolang het water hoog staat.
-		if p.motor.on_floor and g.in_deep_water(Vector2(p.position.x - 12.0, p.position.y), _tick):
-			return 0
-		return L
 	match sub:
 		"":
+			if not p.motor.on_floor:
+				# Door het gat: recht naar beneden vallen.
+				return 0
 			if not _on_level(Layout.FLOOR):
-				# Van de onderste trede aflopen en dan recht naar beneden vallen.
-				return L if p.motor.on_floor else 0
-			var dir := _pump_side()
-			if dir == 0:
-				return R if p.position.x < Layout.POMPRAD_AT.x else L
-			sub = "pump"
-			_pump_strokes = 0
-			_needed = _strokes_needed()
-			_echo_base = int(g.strokes.get("echo", 0))
-			return 0
-		"pump":
-			if _pump_strokes < _needed:
-				var side := _pump_side()
-				if side == 0:
-					return R if p.position.x < Layout.POMPRAD_AT.x else L
-				if p.motor.facing != side:
-					return _walk(side)
-				if _tick - _last_attack >= 21:
-					_last_attack = _tick
-					_pump_strokes += 1
-					return _tap(A)
-				return 0
-			sub = "wait" if _will_fill() else "climb"
-			return L if sub == "wait" else R
-		"wait":
-			# Niet het water in zolang het gemaal niet vol is (Diepwater zet je terug).
-			if p.motor.on_floor and g.in_deep_water(Vector2(p.position.x - 12.0, p.position.y), _tick):
-				return 0
+				# Op een trede beland: naar rechts eraf (links hangt de wand van het gemaalhuis).
+				return R
+			sub = "gang"
+			_pass_dir = -1
+			_struck = {}
+			if _visit_strokes < 0:
+				_visit_strokes = 0
+				_echo_base = int(g.strokes.get("echo", 0))
 			return L
+		"gang":
+			var bits := _walk(_pass_dir) | _pump_bits()
+			if g.full_tick >= 0 or _will_fill():
+				sub = "sluice"
+				return bits
+			if _past_gang():
+				if int(_room.meter.value) <= 0:
+					sub = "climb"
+					return R
+				_pass_dir = -_pass_dir
+				_struck = {}
+			return bits
+		"sluice":
+			# Over de kade naar de sluis (open op `t_v`, LM-06).
+			return L | _pump_bits()
 		"climb":
 			return _climb()
 	return 0
 
 
-## Kant waarnaar P1 moet kijken om het pomprad te raken (0 = buiten bereik).
-## Aanvalsvlak 8–28 px vóór het lichaam, pomprad 32 px breed.
-func _pump_side() -> int:
-	var dx := _p1().position.x - Layout.POMPRAD_AT.x
-	if dx >= -6.0 and dx <= 42.0:
-		return -1
-	if dx >= -42.0 and dx < -6.0:
-		return 1
+## Een slag als een schoep binnen bereik ligt in de looprichting en P1 hem in
+## deze doorgang nog niet sloeg (aanvalsvlak 8–28 px vóór het lichaam,
+## schoep 32 px breed: middelpunt 6–36 px vóór P1, met marge). Herhaaltijd
+## 21 ticks, zoals in K2.
+func _pump_bits() -> int:
+	var p := _p1()
+	if sub == "sluice" or _tick - _last_attack < 21:
+		return 0
+	var vanes: Array = Layout.PUMP_VANES
+	for i in vanes.size():
+		if _struck.has(i):
+			continue
+		var ahead: float = ((vanes[i] as Vector2).x - p.position.x) * float(p.motor.facing)
+		if ahead >= -6.0 and ahead <= 36.0 and p.motor.facing == _pass_dir:
+			_struck[i] = true
+			_last_attack = _tick
+			_visit_strokes += 1
+			return _tap(A)
 	return 0
 
 
-## Hoeveel slagen P1 zelf doet: met echo de helft van wat nodig is (de echo
-## herhaalt elke slag), met echo uit alles.
-func _strokes_needed() -> int:
-	var g = _room.gemaal
-	var useful := mini(100 - int(g.fill), int(_room.meter.value))
-	var total := int(ceil(useful / float(Gemaal.per_stroke())))
-	if _room.echo_on:
-		return int(ceil(total / 2.0))
-	return total
+func _first_vane_x() -> float:
+	return (Layout.PUMP_VANES[0] as Vector2).x
 
 
-## Maakt de echo het gemaal vol met de slagen die hij nog herhaalt?
+func _last_vane_x() -> float:
+	return (Layout.PUMP_VANES[Layout.PUMP_VANES.size() - 1] as Vector2).x
+
+
+## Is P1 in de looprichting voorbij de laatste schoep van deze doorgang?
+func _past_gang() -> bool:
+	var x := _p1().position.x
+	if _pass_dir < 0:
+		return x < _last_vane_x() - 10.0
+	return x > _first_vane_x() + 10.0
+
+
+## Maakt de echo het gemaal vol met de slagen die hij nog herhaalt (LM-03:
+## elke slag `min(15, L, G_max − G)`)?
 func _will_fill() -> bool:
 	var g = _room.gemaal
 	if g.full_tick >= 0:
 		return true
 	if not _room.echo_on:
 		return false
-	var pending := _pump_strokes - (int(g.strokes.get("echo", 0)) - _echo_base)
+	var pending := _visit_strokes - (int(g.strokes.get("echo", 0)) - _echo_base)
 	return int(g.fill) + mini(pending * Gemaal.per_stroke(), int(_room.meter.value)) >= 100
 
 
-## De trap op naar het gat in K2 (K3 → K2).
+## De trap op naar het gat in K2 (K3 → K2). De treden lopen op naar links;
+## van elke trede spring je vanaf de linkerkant met de knop naar links op de
+## volgende. Van de bovenste (onder het gat) recht omhoog, en pas naar links
+## als je boven de vloer van K2 bent.
 func _climb() -> int:
 	var p := _p1()
 	var stairs: Array = Layout.STAIRS
+	var top: Rect2 = stairs[stairs.size() - 1]
 	# Op welke trede staat P1 (index), of -1 = vloer.
 	var on := -1
 	for i in stairs.size():
-		if _on_level((stairs[i] as Rect2).position.y):
+		var st: Rect2 = stairs[i]
+		if _on_level(st.position.y) and p.position.x > st.position.x - 8.0 and p.position.x < st.end.x + 8.0:
 			on = i
 	if on == -1 and _on_level(Layout.FLOOR):
 		_from_tread = false
+		_climb_up = false
 		var first: Rect2 = stairs[0]
 		var x := first.get_center().x
 		if absf(p.position.x - x) <= 2.0:
 			return _tap(J)
 		return R if p.position.x < x else L
+	if on == stairs.size() - 1:
+		# Onder het gat: recht omhoog springen.
+		_climb_up = true
+		var spot := top.position.x + 12.0
+		if absf(p.position.x - spot) > 2.0:
+			return R if p.position.x < spot else L
+		return _tap(J)
 	if on >= 0:
-		# Eerst naar de linkerkant van de trede, dan springen (zo land je op de volgende).
 		_from_tread = true
 		var stair: Rect2 = stairs[on]
-		if p.position.x > stair.position.x + 20.0:
+		if p.position.x > stair.position.x + 4.0:
 			return L
 		return L | _tap(J)
-	# In de lucht: alleen naar links sturen na een sprong vanaf een trede.
+	if _climb_up:
+		# Boven de vloer van K2: naar links erop.
+		return L if p.position.y + Layout.HALF_H < Layout.K2_FLOOR - 1.0 else 0
+	# In de lucht na een sprong vanaf een trede: naar links sturen.
 	return L if _from_tread else 0

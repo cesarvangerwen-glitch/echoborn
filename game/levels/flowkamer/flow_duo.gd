@@ -15,7 +15,8 @@ extends RefCounted
 ## - **K2 merk-combo** (C-12): elk lichaam slaat eerst een vijand met een merk
 ##   van de ander (dat merk knalt), anders een vijand zonder merk (dat zet een
 ##   merk). De zetter laat zijn eigen merk staan.
-## - **K3 pompen** (LM-03): P1 pompt rechts van het pomprad, P2 links.
+## - **K3 pompen** (LM-03, LM-04): P1 en P2 lopen door de pompgang en slaan
+##   elk elke schoep één keer in het voorbijlopen.
 ##
 ## Net als `flow_bot.gd` gebruikt het duo alleen wat spelers zien (posities,
 ## houding, merken, de meter): dezelfde kamer en D geven dezelfde input en
@@ -81,14 +82,6 @@ const STEPS := [
 	["K3", "gemaal", 0, {}],
 ]
 
-## Waar je pompt: links van het pomprad (gezicht rechts) of rechts (gezicht
-## links). Aanvalsvlak 8–28 px vóór het lichaam, pomprad 32 px breed. Wie eerst
-## beneden is, neemt links: de ander valt rechts van de trap naar beneden en
-## landt dan niet op hem.
-const PUMP_LEFT_X := Layout.POMPRAD_AT.x - 30.0
-const PUMP_RIGHT_X := Layout.POMPRAD_AT.x + 30.0
-
-
 ## Eén speler: zijn bron, toestand en opgenomen bits.
 class Seat:
 	extends RefCounted
@@ -105,7 +98,10 @@ class Seat:
 	var off_ledge := false
 	var last_attack := -1000
 	var patrol_dir := 1
-	var pump_x := NAN
+	## K3: looprichting in de pompgang en de geslagen schoepen van deze doorgang.
+	var pass_dir := -1
+	var struck := {}
+	var climb_up := false
 	var recorded := PackedInt32Array()
 
 	func sample(tick: int) -> int:
@@ -529,49 +525,43 @@ func _follow(s: Seat) -> int:
 	return R if dx > 0.0 else L
 
 
-## K3 (LM-03): naar een kant van het pomprad, pompen tot het gemaal vol is of
-## de meter leeg; dan naar de sluis (P2 loopt achter P1 aan). Is de meter leeg
-## en het gemaal niet vol, dan de trap op naar K2 voor meer licht.
+## K3 pompgang (LM-03, LM-04, FK-5, W-4): op de vloer naar links door de
+## pompgang; elk lichaam slaat elke schoep één keer in het voorbijlopen. Is
+## het gemaal vol, dan naar de sluis (P2 loopt achter P1 aan). Niet vol en nog
+## licht in de meter: keren en de schoepen op de terugweg nog eens slaan; de
+## meter leeg: de trap op naar K2 voor meer licht.
 func _gemaal(s: Seat) -> int:
 	var b := _body(s)
 	var g = _room.gemaal
 	if Layout.room_of(b.position) == "K2" and s.sub == "climb":
 		s.step = STEPS.size() - 2
 		s.sub = ""
-		s.pump_x = NAN
 		return 0
-	if g.full_tick >= 0:
+	if g.full_tick >= 0 and s.sub != "climb":
 		if s.index == 2:
 			return _follow(s)
-		# Naar de sluis; wachten aan de waterkant zolang het water hoog staat.
-		if b.motor.on_floor and g.in_deep_water(Vector2(b.position.x - 12.0, b.position.y), _tick):
-			return 0
 		return L
 	match s.sub:
 		"":
+			if not b.motor.on_floor:
+				# Door het gat: recht naar beneden vallen.
+				return 0
 			if not _on_level(s, Layout.FLOOR):
-				# Van de onderste trede aflopen en dan recht naar beneden vallen.
-				return L if b.motor.on_floor else 0
-			if is_nan(s.pump_x):
-				var o := _other(s)
-				var left_taken: bool = o.step == s.step and o.pump_x == PUMP_LEFT_X
-				s.pump_x = PUMP_RIGHT_X if left_taken else PUMP_LEFT_X
-			var go := _go_to(s, s.pump_x)
-			if go != 0:
-				return go
-			s.sub = "pump"
-			return 0
-		"pump":
-			if int(_room.meter.value) <= 0:
-				s.sub = "climb"
+				# Op een trede beland: naar rechts eraf (links hangt de wand van het gemaalhuis).
 				return R
-			var face := 1 if s.pump_x < Layout.POMPRAD_AT.x else -1
-			if b.motor.facing != face:
-				return _walk(face)
-			if _tick - s.last_attack >= ATTACK_EVERY:
-				s.last_attack = _tick
-				return _tap(s, A)
-			return 0
+			s.sub = "gang"
+			s.pass_dir = -1
+			s.struck = {}
+			return L
+		"gang":
+			var bits := _walk(s.pass_dir) | _pump_bits(s)
+			if _past_gang(s):
+				if int(_room.meter.value) <= 0:
+					s.sub = "climb"
+					return R
+				s.pass_dir = -s.pass_dir
+				s.struck = {}
+			return bits
 		"climb":
 			if s.index == 2:
 				return _follow(s)
@@ -579,25 +569,61 @@ func _gemaal(s: Seat) -> int:
 	return 0
 
 
+## Een slag als een schoep in de looprichting binnen bereik ligt en dit lichaam
+## hem in deze doorgang nog niet sloeg (zoals `flow_bot.gd`).
+func _pump_bits(s: Seat) -> int:
+	var b := _body(s)
+	if _tick - s.last_attack < ATTACK_EVERY:
+		return 0
+	var vanes: Array = Layout.PUMP_VANES
+	for i in vanes.size():
+		if s.struck.has(i):
+			continue
+		var ahead: float = ((vanes[i] as Vector2).x - b.position.x) * float(b.motor.facing)
+		if ahead >= -6.0 and ahead <= 36.0 and b.motor.facing == s.pass_dir:
+			s.struck[i] = true
+			s.last_attack = _tick
+			return _tap(s, A)
+	return 0
+
+
+func _past_gang(s: Seat) -> bool:
+	var x := _body(s).position.x
+	var vanes: Array = Layout.PUMP_VANES
+	if s.pass_dir < 0:
+		return x < (vanes[vanes.size() - 1] as Vector2).x - 10.0
+	return x > (vanes[0] as Vector2).x + 10.0
+
+
 ## De trap op naar het gat in K2 (K3 → K2), zoals de solo-bot.
 func _climb(s: Seat) -> int:
 	var b := _body(s)
 	var stairs: Array = Layout.STAIRS
+	var top: Rect2 = stairs[stairs.size() - 1]
 	var on := -1
 	for i in stairs.size():
-		if _on_level(s, (stairs[i] as Rect2).position.y):
+		var st: Rect2 = stairs[i]
+		if _on_level(s, st.position.y) and b.position.x > st.position.x - 8.0 and b.position.x < st.end.x + 8.0:
 			on = i
 	if on == -1 and _on_level(s, Layout.FLOOR):
 		s.from_tread = false
-		var first: Rect2 = stairs[0]
-		var go := _go_to(s, first.get_center().x)
+		s.climb_up = false
+		var go := _go_to(s, (stairs[0] as Rect2).get_center().x)
+		if go != 0:
+			return go
+		return _tap(s, J)
+	if on == stairs.size() - 1:
+		s.climb_up = true
+		var go := _go_to(s, top.position.x + 12.0)
 		if go != 0:
 			return go
 		return _tap(s, J)
 	if on >= 0:
 		s.from_tread = true
 		var stair: Rect2 = stairs[on]
-		if b.position.x > stair.position.x + 20.0:
+		if b.position.x > stair.position.x + 4.0:
 			return L
 		return L | _tap(s, J)
+	if s.climb_up:
+		return L if b.position.y + Layout.HALF_H < Layout.K2_FLOOR - 1.0 else 0
 	return L if s.from_tread else 0

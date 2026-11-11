@@ -1,5 +1,5 @@
 extends RefCounted
-## Tests voor de flow-kamer na F0, deel 1 (T16d, #176; gdd §4.7.4 W-1–W-3).
+## Tests voor de flow-kamer na F0 (T16d, #176; gdd §4.7.4 W-1–W-4).
 ##
 ## - **Geometrie** (W-1, W-2; gdd §4.3 *Keerzone*, FK-6, L-08 voor zover de
 ##   geometrie): bij elk keerpunt van B1 en B2 de keerwand, D + 24 px vlakke
@@ -14,7 +14,12 @@ extends RefCounted
 ##   langer vóór de landing (MP-3 per keerpunt), en keren is sneller dan de
 ##   langzame lijn van dezelfde bot met echo uit (gdd §4.3), hooguit 2× (FK-2).
 ##
-## FK-2 met echo uit (≤ 4 terugkeren, ≤ 2× de run) staat in `test_flowkamer.gd`.
+## - **K3 pompgang** (W-4; gdd §4.2, FK-5): vier schoepen, 80 px, 15–40 px
+##   boven de vloer, ≥ 280 px droge vloer naar de sluis, de trap terug naar K2.
+##
+## FK-2 met echo uit (≤ 4 terugkeren, ≤ 2× de run) en de LM-04-run door K3
+## staan in `test_flowkamer.gd`; de wachtbot en de late bot (W-6) in
+## `test_wachtbot.gd`.
 
 const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
 const FlowBot = preload("res://levels/flowkamer/flow_bot.gd")
@@ -154,6 +159,70 @@ func test_ledge_above_ledge135_is_solid(t) -> void:
 			var r: Rect2 = spec[1]
 			if is_equal_approx(r.position.y, above_y) and r.position.x < ledge.end.x and r.end.x > ledge.position.x:
 				t.check(not spec[2], "%s: %s boven de richel op 135 is eenrichting" % [tp["name"], spec[0]])
+
+
+# --- K3 pompgang (W-4) -------------------------------------------------------
+
+## W-4 (gdd §4.2, FK-5, LM-04): vier schoepen van 32 × 48 op een vlak stuk
+## vloer, 80 px uit elkaar in de looprichting naar de sluis (naar links), het
+## middelpunt 15–40 px boven de vloer; van de laatste schoep naar de sluis
+## ≥ 280 px droge vloer (de kade boven de straat, niet door `Diepwater`); geen
+## vijand binnen 80 px; de trap terug naar K2 blijft; wie door het gat valt,
+## landt rechts van de eerste schoep.
+func test_k3_pompgang_geometry(t) -> void:
+	var blocks: Array = Layout.blocks(120)
+	var vanes: Array = Layout.PUMP_VANES
+	t.check(vanes.size() == 4, "K3: %d schoepen (4)" % vanes.size())
+	for i in vanes.size():
+		var v: Vector2 = vanes[i]
+		var up := Layout.FLOOR - v.y
+		t.check(up >= 15.0 and up <= 40.0, "schoep %d: %.0f px boven de vloer (FK-5: 15–40)" % [i + 1, up])
+		t.check(Layout.room_of(v) == "K3", "schoep %d niet in K3" % (i + 1))
+		if i > 0:
+			var prev: Vector2 = vanes[i - 1]
+			t.check(is_equal_approx(prev.x - v.x, 80.0) and is_equal_approx(prev.y, v.y),
+				"schoep %d: %.0f px na schoep %d (80, naar de sluis)" % [i + 1, prev.x - v.x, i])
+		# Geen vijand binnen 80 px (de vijanden blijven in K2, op de vloer van K2).
+		for x: float in Layout.WAVE_1 + Layout.WAVE_2 + [Layout.ARMORED_X]:
+			t.check(Vector2(x, Layout.K2_FLOOR - 12.0).distance_to(v) > 80.0, "vijand op %.0f binnen 80 px van schoep %d" % [x, i + 1])
+	var first: Vector2 = vanes[0]
+	var last: Vector2 = vanes[vanes.size() - 1]
+	var sluice_x := Layout.SLUICE.end.x
+	# Vlak stuk vloer onder de schoepen en ervoor (aanloop vanaf het gat).
+	var gang0 := last.x - 16.0
+	var gang1 := Layout.K2_HOLE.end.x
+	t.check(is_equal_approx(_covered(blocks, Layout.FLOOR, gang0, gang1), gang1 - gang0), "pompgang: geen vlakke vloer van %.0f tot %.0f" % [gang0, gang1])
+	# Niets dichts in de pompgang tussen vloer en schoeptop (lopen en springen).
+	for spec: Array in blocks:
+		var r: Rect2 = spec[1]
+		if spec[2]:
+			continue
+		var overlap := r.intersects(Rect2(gang0, Layout.FLOOR - 80.0, first.x + 16.0 - gang0, 80.0 - 0.5))
+		t.check(not overlap, "pompgang: %s hangt in de gang" % spec[0])
+	# ≥ 280 px van de laatste schoep tot de sluis, droog: vloer op FLOOR over de
+	# hele weg, en de straat met Diepwater ligt lager (onder de kade).
+	t.check(last.x - sluice_x >= 280.0, "laatste schoep %.0f px van de sluis (≥ 280)" % (last.x - sluice_x))
+	t.check(is_equal_approx(_covered(blocks, Layout.FLOOR, sluice_x, last.x), last.x - sluice_x), "geen droge vloer van de sluis tot de laatste schoep")
+	t.check(Layout.WATER_HIGH > Layout.FLOOR + Layout.HALF_H and Layout.STREET.position.y > Layout.FLOOR,
+		"Diepwater op de route: waterlijn %.0f, vloer %.0f" % [Layout.WATER_HIGH, Layout.FLOOR])
+	var quay := _block(blocks, "Kade")
+	t.check(not quay.is_empty() and not quay[2] and (quay[1] as Rect2).position.x <= Layout.STREET.position.x
+		and (quay[1] as Rect2).end.x >= Layout.STREET.end.x, "kade dekt de straat niet")
+	# De trap terug naar K2: de bovenste trede onder het gat, rechts van de
+	# wand van het gemaalhuis; van trede naar trede ≤ 45 px hoger (FK-6).
+	var top: Rect2 = Layout.STAIRS[Layout.STAIRS.size() - 1]
+	t.check(top.position.x >= Layout.K2_HOLE.position.x and top.end.x <= Layout.K2_HOLE.end.x,
+		"bovenste trede ligt niet onder het gat")
+	t.check(is_equal_approx(Layout.GEMAALHUIS_WALL.end.x, top.position.x), "wand van het gemaalhuis sluit niet aan op de bovenste trede")
+	for i in range(1, Layout.STAIRS.size()):
+		var a: Rect2 = Layout.STAIRS[i - 1]
+		var b: Rect2 = Layout.STAIRS[i]
+		t.check(a.position.y - b.position.y <= 45.0 and a.position.x - b.end.x <= 64.0, "trap: trede %d → %d te hoog of te ver" % [i, i + 1])
+	t.check(Layout.FLOOR - (Layout.STAIRS[0] as Rect2).position.y <= 45.0, "trap: eerste trede te hoog")
+	# Landing na het gat ligt rechts van de eerste schoep (zie de run in
+	# test_flowkamer.gd): de wand van het gemaalhuis hangt tot ≤ 110 px boven de vloer.
+	t.check(Layout.GEMAALHUIS_WALL.end.y >= Layout.FLOOR - 110.0 and Layout.GEMAALHUIS_WALL.end.y <= Layout.FLOOR - 31.0,
+		"wand van het gemaalhuis: onderkant %.0f" % Layout.GEMAALHUIS_WALL.end.y)
 
 
 # --- K2 in paren -------------------------------------------------------------
