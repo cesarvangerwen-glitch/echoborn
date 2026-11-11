@@ -89,11 +89,11 @@ Bij D = 180 is keren nog maar 9–17 ticks sneller dan de langzame lijn (gdd: 12
 |---|---|---|
 | 2 + 2 paren | 97 | 3 (niet gemeten: > 7000 ticks) |
 | 3 + 2 paren | 109 | 2, 6895 ticks |
-| **3 + 3 paren** | **119 / 119 / 121** (D = 90 / 120 / 180) | **1, 5822 ticks** |
+| **3 + 3 paren** | **119 / 119 / 121** (D = 90 / 120 / 180); na G-3 (golf 2 bij "alles gemerkt of op", #178): **121 / 121 / 111** | **1, 5822 ticks** (na G-3: 5696) |
 
-Met 2 + 2 paren haalt de run de 100 LP niet. 3 + 2 haalt ze wel, maar dan duurt de run zonder echo bij D = 180 6895 ticks (twee terugkeren), en de co-op-ondergrenzen van T17 (schaduwpartner, meeloper) halen `RUN_EIND` niet binnen 7000 ticks; de testrunner geeft een test 7200 frames. Met 3 + 3 paren is één terugkeer genoeg.
+De rijen 2 + 2 en 3 + 2 zijn gemeten vóór G-3. Met 2 + 2 paren haalt de run de 100 LP niet. 3 + 2 haalt ze wel, maar dan duurt de run zonder echo bij D = 180 6895 ticks (twee terugkeren), en de co-op-ondergrenzen van T17 (schaduwpartner, meeloper) halen `RUN_EIND` niet binnen 7000 ticks; de testrunner geeft een test 7200 frames. Met 3 + 3 paren is één terugkeer genoeg.
 
-**Een paar levert minder licht dan twee losse vijanden** (bevinding voor de LGD). P1 raakt met één slag allebei (aanvalsvlak 20 px, de vijanden 28 px uit elkaar): twee merken. De echo laat het eerste merk knallen; de ontploffing (20 SE, E = 32) doodt allebei, zodat het tweede merk niet meer knalt en er geen ketting komt. Een paar geeft met echo dus ± 2 + 2 + 2 + 6 = 12 LP, twee losse vijanden 16. De verwachting in gdd §4.7.2 ("de paren geven meer kettingschakels") komt in deze kamer niet uit; MP-6 blijft gehaald (69–70 % van de LP met de echo). Een ketting in K2 komt er alleen als de tweede vijand de eerste ontploffing overleeft (bv. een paar op 33–48 px: buiten E, binnen K).
+**Een paar levert minder licht dan twee losse vijanden** (bevinding voor de LGD). P1 raakt met één slag allebei (aanvalsvlak 20 px, de vijanden 28 px uit elkaar): twee merken. De echo laat het eerste merk knallen; de ontploffing (20 SE, E = 32) doodt allebei, zodat het tweede merk niet meer knalt en er geen ketting komt. Een paar geeft met echo dus ± 2 + 2 + 2 + 6 = 12 LP, twee losse vijanden 16. De verwachting in gdd §4.7.2 ("de paren geven meer kettingschakels") komt in deze kamer niet uit; MP-6 blijft gehaald (66–69 % van de LP met de echo). Een ketting in K2 komt er alleen als de tweede vijand de eerste ontploffing overleeft (bv. een paar op 33–48 px: buiten E, binnen K).
 
 **FK-2-grens met 3 + 3 paren** (gdd §4.4; zonder echo komt licht alleen uit P1-treffers: 3 treffers × 2 LP = 6 LP per basisvijand, en één slag raakt beide vijanden van een paar; het pantser breekt niet en geeft 0 LP):
 
@@ -138,45 +138,45 @@ Elke run schrijft `user://meetlog_<datum-tijd>_<solo|coop>_D<D>_p1.csv` (gdd §4
 
 - **Spelen**: open `game/` in Godot 4.6.3 en start het project (F5). P1: A/D lopen, spatie springen, linker Shift dash, E aanval/pompen, Q 0,5 s = Loslaten. P2: Enter doet mee, Backspace 1 s stopt (via de InputRouter; de echte drop-in/out is T16c).
 - **Debugmenu** (§4.1): F1/F2/F3 = D 90/120/180 (nieuwe run, met het B3-blok van die D), F4 = echo aan/uit (nieuwe run), F5 = meetlog aan/uit, F6 = herstart. Na de run: 1–5 per kamer.
-- **Headless**: `godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd`. `test_flowkamer.gd` bouwt de kamer per D, draait de gescripte run (moet `RUN_EIND` en de normen halen), speelt de run van D = 90 opnieuw af met een `ScriptedInput` (zelfde log), en draait per D de run met echo uit (FK-2). De run met echo uit bij D = 180 duurt 5822 ticks; de runner geeft een test 7200 frames. `test_flowkamer_na_f0.gd` controleert de keerzone en de maten van B1 en B2 per D, de paren van K2 (ook in de kamer), en per D dat de gescripte run bij elk keerpunt keert en via de echo omhoog gaat zonder stilstand van 20 ticks vóór de landing (L-08 (c), MP-3 per keerpunt), sneller dan de langzame lijn en die hooguit 2× zo lang (FK-2). `test_flowtest_duo.gd` draait per D de gescripte co-op-run (`flow_duo.gd`, §9) en die van D = 120 twee keer (zelfde log).
+- **Headless**: `godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd`. `test_flowkamer.gd` bouwt de kamer per D, draait de gescripte run (moet `RUN_EIND` en de normen halen), speelt de run van D = 90 opnieuw af met een `ScriptedInput` (zelfde log), en draait per D de run met echo uit (FK-2). De run met echo uit bij D = 180 duurt 5696 ticks; de runner geeft een test 7200 frames. `test_flowkamer_na_f0.gd` controleert de keerzone en de maten van B1 en B2 per D, de paren van K2 (ook in de kamer), en per D dat de gescripte run bij elk keerpunt keert en via de echo omhoog gaat zonder stilstand van 20 ticks vóór de landing (L-08 (c), MP-3 per keerpunt), sneller dan de langzame lijn en die hooguit 2× zo lang (FK-2). `test_flowtest_duo.gd` draait per D de gescripte co-op-run (`flow_duo.gd`, §9) en die van D = 120 twee keer (zelfde log).
 
 ## 9. Gemeten met de gescripte geoefende run
 
 Uit het meetlog berekend (`flow_report.gd`; co-op met de MP-7-code van `test_flowtest_t17.gd`). Dit zijn geen speltestresultaten: de runs laten zien dat de kamer de normen **kan** halen (gdd §4.5). Mensen meten in T17.
 
-**Solo** (`flow_bot.gd`; K1 en K2 na F0, K3 nog de F0-versie):
+**Solo** (`flow_bot.gd`; K1 en K2 na F0, K3 de F0-indeling met de regels van G-1–G-3 uit #178: sluis op `t_v`, golf 2 zodra golf 1 gemerkt of op is):
 
 | | D = 90 | D = 120 | D = 180 | Norm |
 |---|---|---|---|---|
-| Runtijd | 68,3 s | 70,0 s | 77,5 s | ≤ 120 s |
-| LP na K1 + één keer K2 | 119 | 119 | 121 | ≥ 100 |
-| MP-1 langste stilstand | 107 ticks | 137 | 197 | ≤ 300 |
-| MP-2 echo-acties/min (K1 / K2) | 13,2 (10,7 / 29,4) | 12,9 (10,5 / 28,9) | 12,4 (9,9 / 26,0) | ≥ 3,0, ook per kamer |
+| Runtijd | 66,2 s | 68,7 s | 74,6 s | ≤ 120 s |
+| LP na K1 + één keer K2 | 121 | 121 | 111 | ≥ 100 |
+| MP-1 langste stilstand | 86 ticks | 116 | 176 | ≤ 300 |
+| MP-2 echo-acties/min (K1 / K2) | 13,6 (10,7 / 32,4) | 12,2 (10,5 / 25,8) | 11,3 (9,9 / 22,2) | ≥ 3,0, ook per kamer |
 | MP-2 langste gat | 13,6 s | 13,9 s | 14,4 s | ≤ 40 s |
-| MP-3 landingen/min, zonder wachten | 5,3 / 83 % | 5,1 / 83 % | 4,6 / 83 % | ≥ 75 % |
+| MP-3 landingen/min, zonder wachten | 5,4 / 83 % | 5,2 / 83 % | 4,8 / 83 % | ≥ 75 % |
 | MP-3 per keerpunt (B1, B2-0 … B2-3): echolijn zonder stilstand | 5 van 5 | 5 van 5 | 5 van 5 | rapporteren |
 | Keren tot het volgende niveau / langzame lijn vanaf de wand | 80 / 142 ticks | 95 / 142 | 125–133 / 142 | keren sneller, ≤ 2× (FK-2) |
 | MP-4 echo Leeg | 2 % | 3 % | 4 % | ≤ 40 % |
-| MP-6 LP met de echo, pompslagen echo | 70 %, 5 | 70 %, 5 | 69 %, 5 | ≥ 40 %, ≥ 1 |
+| MP-6 LP met de echo, pompslagen echo | 69 %, 4 | 69 %, 4 | 66 %, 4 | ≥ 40 %, ≥ 1 |
 | Echo breekt | 0 | 0 | 0 | 0 (FK-4) |
-| **Echo uit** (FK-2): runtijd, terugkeren K2 | 95,5 s (1,40×), 1 | 96,0 s (1,37×), 1 | 97,0 s (1,25×), 1 | ≤ 2×, ≤ 4 |
+| **Echo uit** (FK-2): runtijd, terugkeren K2 | 93,4 s (1,41×), 1 | 93,9 s (1,37×), 1 | 94,9 s (1,27×), 1 | ≤ 2×, ≤ 4 |
 
-De langste stilstand zit nog telkens aan de waterkant in K3 (F0-versie): P1 wacht tot de echo zijn pompslagen herhaald heeft en het water zakt (± D + 40 ticks); dat lost W-4 op. De lancering in B4 kost een wachttijd aan de rand (P1 springt pas als de echo eraan komt, ± D − 12 ticks na zijn slag) en is daarom de enige landing met stilstand ervoor (MP-3 83 %, 6 van 7). Ten opzichte van F0 (64,4 / 66,8 / 78,9 s) is de run 3,9 / 3,2 s langer bij D = 90 / 120 en 1,4 s korter bij D = 180. MP-6 daalt van 83 naar 69–70 %: een paar geeft minder licht van de echo dan twee losse vijanden (§4). De wachtbot en de late bot (L-08 (a), (b)) komen hier met W-6.
+Na de rebase op #178 (G-1–G-3) is de langste stilstand gedaald van D + 17 naar D − 4 ticks (de sluis gaat open op `t_v`); de pompgang zelf volgt met W-4. Met de golf-2-regel van G-3 haalt D = 180 nog 111 LP na K1 + K2 (marge 11; D = 90 en 120: 121). De lancering in B4 kost een wachttijd aan de rand (P1 springt pas als de echo eraan komt, ± D − 12 ticks na zijn slag) en is daarom de enige landing met stilstand ervoor (MP-3 83 %, 6 van 7). Ten opzichte van F0 (64,4 / 66,8 / 78,9 s) is de run 1,8 / 1,9 s langer bij D = 90 / 120 en 4,3 s korter bij D = 180. MP-6 daalt van 83 naar 66–69 %: een paar geeft minder licht van de echo dan twee losse vijanden (§4). De wachtbot en de late bot (L-08 (a), (b)) komen hier met W-6.
 
 **Co-op** (`flow_duo.gd`, #125): een geoefend duo, P1 en P2 allebei gescript. B4: P1 in houding aan de rand, P2 vliegt over. B3, B1 en B2: op elk niveau loopt de drager heen en weer onder het volgende niveau, de springer springt al lopend op hem en bounct omhoog, de drager neemt de trede; de rollen wisselen elk niveau (springer P1 in B3, B2-0, B2-2; P2 in B4, B1, B2-1, B2-3). K2: wie een merk van de ander ziet, laat het knallen; anders zet hij een merk. K3: beiden pompen, aan elke kant van het pomprad één. P2 doet mee vóór de eerste tick.
 
 | | D = 90 | D = 120 | D = 180 | Norm |
 |---|---|---|---|---|
-| Runtijd | 69,2 s | 69,2 s | 69,2 s | — |
-| MP-1 langste stilstand P1 | 93 ticks | 93 | 93 | ≤ 300 |
-| MP-2 samenwerkingsacties/min (K1 / K2) | 13,9 (9,6 / 42,0) | gelijk | gelijk | ≥ 3,0, ook per kamer |
+| Runtijd | 68,9 s | 68,9 s | 68,9 s | — |
+| MP-1 langste stilstand P1 | 46 ticks | 46 | 46 | ≤ 300 |
+| MP-2 samenwerkingsacties/min (K1 / K2) | 13,9 (9,6 / 41,3) | gelijk | gelijk | ≥ 3,0, ook per kamer |
 | MP-2 langste gat | 940 ticks (15,7 s) | gelijk | gelijk | ≤ 2400 |
 | MP-3 landingen/min, zonder wachten | 6,1 / 86 % | gelijk | gelijk | ≥ 75 % |
 | Lancering (B4) · bounce P1 / P2 · merk-combo (K2) | 1 (1) · 3 / 3 · 8 (8) | gelijk | gelijk | vraag 8: lancering ≥ 1 |
 | MP-4 zonder tweede lichaam (W4) | 0 % | 0 % | 0 % | ≤ 40 % |
-| MP-6 LP met P2 of samen; pompslagen P2 | 98 % van 117; 4 | gelijk | gelijk | ≥ 40 %; ≥ 1 |
-| MP-7 (a) runtijd co-op ÷ solo | 1,01 | 0,99 | 0,89 | ≥ 0,5 |
-| MP-7 (b) langste stilstand P2 (W5) | 76 ticks | 76 | 76 | ≤ 300 |
+| MP-6 LP met P2 of samen; pompslagen P2 | 93 % van 117; 4 | gelijk | gelijk | ≥ 40 %; ≥ 1 |
+| MP-7 (a) runtijd co-op ÷ solo | 1,04 | 1,00 | 0,92 | ≥ 0,5 |
+| MP-7 (b) langste stilstand P2 (W5) | 60 ticks | 60 | 60 | ≤ 300 |
 | MP-7 (c) samenwerkingsacties/min per speler (W6) | 13,9 | 13,9 | 13,9 | ≥ 1,0 |
 | MP-7 (d) P2 opgelost | 0 % | 0 % | 0 % | ≤ 10 % |
 
@@ -184,7 +184,7 @@ Wat dit zegt:
 
 - **De kamer kan de normen in co-op halen**, bij elke D, met de lancering, bounce in beide richtingen, merk-combo's en pompslagen van P2. MP-1, MP-2, MP-4, MP-6 en MP-7 (b)–(d) zijn daarom checks in de test (zoals de solo-run in `test_flowkamer.gd`); MP-3 en MP-7 (a) staan alleen in de uitvoer.
 - **In co-op maakt D voor deze kamer niets uit**: er is geen echo (C-01), D zit alleen nog in de levensduur van een merk (D + 30), en het duo laat elk merk ruim binnen 120 ticks knallen. Het B3-blok gebruikt het duo niet: de drager gaat gewoon onder de galerij staan.
-- **Na F0 is een geoefend duo ongeveer even snel als solo** (0,89–1,01×; in F0 0,73–0,89×). In K1 en K2 is co-op niet ingekort: de drager wacht onder het open (eenrichtings)deel van de volgende richel en neemt daarna de langzame lijn met drie sprongen en de richel op 135, en dat is na F0 langer. De keerzone werkt voor de bounce op P2 net als voor de echo; het dichte stuk van de richels bepaalt waar de drager kan staan (§3).
+- **Na F0 is een geoefend duo ongeveer even snel als solo** (0,92–1,04×; in F0 0,73–0,89×). In K1 en K2 is co-op niet ingekort: de drager wacht onder het open (eenrichtings)deel van de volgende richel en neemt daarna de langzame lijn met drie sprongen en de richel op 135, en dat is na F0 langer. De keerzone werkt voor de bounce op P2 net als voor de echo; het dichte stuk van de richels bepaalt waar de drager kan staan (§3).
 - **Lancering en vang zijn één actie** (LGD, antwoord 6 in §12): MP-2 en MP-7 (c) in `test_flowtest_duo.gd` tellen een lancering nu nog twee keer (`SPRINGPLANK` en `LANCERING` op dezelfde tick); MP-3 telt haar al als één landing (`flow_report.gd` telt alleen `SPRINGPLANK`). Met één actie per contact blijven MP-2 en MP-7 (c) ruim gehaald (één actie minder per run).
 - **MP-3 in co-op meet de stilstand van de springer** (LGD, antwoord 7 in §12). De 88 % hierboven komt nog uit de stilstand van P1, ook als P1 de drager is: tot punt 3 van #125 klaar is, is het alleen indicatief.
 
@@ -250,7 +250,7 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 - LGD: gdd §4.2/FK-2 naar 3 + 3 paren (72 + 36 per terugkeer, 1 terugkeer; was 36 + 18).
 - W-6: de late bot krijgt er een variant bij met een dash bij D = 180 (dichte stuk, §3) en een met een bounce die 8 ticks te laat komt bij D = 90 (overhang op 66–70 px).
 - W-5: meet per D het maximum aantal vijanden tegelijk in K2 en zet dat in §9 (L-13 (f), uitzondering tot T17-2).
-- LGD na T17: in B3 geeft de vang +3 tegen +5 voor landen plus bounce; met 3 + 3 paren haalt de gescripte run 119–121 LP na K1 + K2 (marge 19).
+- LGD na T17: in B3 geeft de vang +3 tegen +5 voor landen plus bounce; met 3 + 3 paren en G-3 haalt de gescripte run 121 / 121 / 111 LP na K1 + K2 (marge 11 bij D = 180).
 
 **Na F0, deel 1 (W-1–W-3): afwijkingen van de startmaten (werkaanname LGD (5))**
 
@@ -261,7 +261,7 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 - **Dicht stuk van 215 px** aan de wandkant van de richels (§3): de richel op 135 ligt 45 px onder de richel twee hoger, zodat je anders een verdieping overslaat. De LGD neemt het dichte stuk over in gdd §4.3 (*B2*).
 - **B1: galerij van 120 tot 480 px**, en het is de vloer van B2 (gdd: "tot ≥ 270"). Achter de keerwand ligt niets (buitenwand), dus "de vloer van B2 hoger, of een overhang" was niet nodig.
 - **K2: 3 + 3 paren** in plaats van een open aantal (§4), en paren **28 px** uit elkaar.
-- **Bevinding: paren geven geen ketting** (§4). Eén slag merkt beide vijanden van een paar, de eerste ontploffing doodt ze allebei, het tweede merk knalt niet. MP-6 met echo: 69–70 % (F0: 83 %). **Besluit LGD:** paren blijven op 28 px. "Eén knal, twee doden" was in F0 precies wat de speler niet zag (M2); MP-6 haalt 69–70 %. De LGD zet de gdd recht: in §4.2 en §4.7.1 (c) vervalt "twee merken geven een ketting", in §4.7.2 vervalt de MP-6-verwachting. Paren op 33–48 px gaan naar [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81).
+- **Bevinding: paren geven geen ketting** (§4). Eén slag merkt beide vijanden van een paar, de eerste ontploffing doodt ze allebei, het tweede merk knalt niet. MP-6 met echo: 66–69 % (F0: 83 %). **Besluit LGD:** paren blijven op 28 px. "Eén knal, twee doden" was in F0 precies wat de speler niet zag (M2); MP-6 haalde 69–70 % (vóór G-3; nu 66–69 %). De LGD zet de gdd recht: in §4.2 en §4.7.1 (c) vervalt "twee merken geven een ketting", in §4.7.2 vervalt de MP-6-verwachting. Paren op 33–48 px gaan naar [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81).
 - **L-13 (f)** (≤ 5 vijanden tegelijk) haalt K2 niet: 6 per golf, en na G-3 overlappen de golven (tot 13). **Besluit LGD:** (f) geldt niet voor de flow-kamer tot de tweede flow-test (T17-2). F0 had er ook 6; drie golven breken G-3 open (scope T16e). W-5 meet per D het maximum aantal vijanden tegelijk in K2 en zet dat in §9; de QA Lead ziet het terug bij vraag 6.
 - **Keren bij D = 180 nog maar 9–17 ticks sneller** dan de langzame lijn (142 ticks). **Besluit LGD:** de geometrie blijft zoals hij is. Een langzamere langzame lijn komt bij D = 90 te dicht bij FK-2 (2 × 80 = 160). Weinig winst bij D = 180 is de prijs van een lange staart en invoer voor de keuzeregel (§4.5); de tweede flow-test meet welke lijn spelers kiezen.
 
@@ -279,4 +279,4 @@ Uit de gdd (van de LGD): beweging §2.5a, basisvijand en pantserdoel §4.3, D = 
 | 0.3 | Lead-review: vijfde basisvijand in golf 2 (108 LP na K1 + K2), FK-2-grens en metingen bijgewerkt |
 | 0.2 | Merge met co-op 7A (#78): vang en lancering tellen in de lichtmeter (+3, +4), B3 landt met een vang; metingen bijgewerkt. Lead-review: FK-2-grens voor 4 + 4 vijanden voorgerekend (§4), FK-2-test per D, antwoorden van de LGD en open punten (§12) |
 | 0.4 | #125: de bot lanceert in B4 (solo); gescripte co-op-run `flow_duo.gd` met test per D; §9 solo bijgewerkt en co-op erbij; werkaannames 7, 9–11; Lead-review: antwoorden 6 en 7 van de LGD, open punten; SM-review: B4-check op de rolverdeling, open punt co-op-replay |
-| 0.5 | Na F0, deel 1 (T16d, W-1–W-3 en W-7 voor K1/K2): B1 en B2 met keerzone, overhang en dicht stuk in één kolom; B3 weer met de ingang links; opstap en lagere startgang; K2 in 3 + 3 paren; §2–§4, §9 (metingen), §10, §11 (werkaannames 2, 12–15) en §12 (afwijkingen, bevinding paren, vragen aan de LGD) bijgewerkt; nieuwe test `test_flowkamer_na_f0.gd`. Lead-review: marges bounce–dicht stuk en overhang per D (§3), besluiten van de LGD (§12), L-13 (f) uitzondering tot T17-2 (§10), open punten W-5 en W-6 |
+| 0.5 | Na F0, deel 1 (T16d, W-1–W-3 en W-7 voor K1/K2): B1 en B2 met keerzone, overhang en dicht stuk in één kolom; B3 weer met de ingang links; opstap en lagere startgang; K2 in 3 + 3 paren; §2–§4, §9 (metingen), §10, §11 (werkaannames 2, 12–15) en §12 (afwijkingen, bevinding paren, vragen aan de LGD) bijgewerkt; nieuwe test `test_flowkamer_na_f0.gd`. Lead-review: marges bounce–dicht stuk en overhang per D (§3), besluiten van de LGD (§12), L-13 (f) uitzondering tot T17-2 (§10), open punten W-5 en W-6. Rebase op #178 (G-1–G-5): LP na K1 + K2 121 / 121 / 111, §4 en §9 opnieuw gemeten |
