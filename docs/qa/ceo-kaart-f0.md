@@ -1,6 +1,6 @@
 # CEO-kaart F0: de flow-kamer spelen en scoren (T17)
 
-Versie 0.2 · 2026-11-11 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA (lees je pas na het spelen, zoals §5): het testplan in `docs/qa/`
+Versie 0.2.1 · 2026-11-11 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA (lees je pas na het spelen, zoals §5): het testplan in `docs/qa/`
 
 **Tijd: ± 15 min spelen + ± 5 min luisteren.** Je hoeft alleen te spelen, te scoren en het antwoordblok (§4) als comment in #80 te zetten. **Lees tot en met §4; lees §5 pas na het spelen** (anders kleurt het je antwoorden).
 
@@ -12,6 +12,8 @@ Je speelt **alleen solo**, zonder tweede speler (besluit [#124](https://github.c
   - **Windows**: download `Godot_v4.6.3-stable_win64.exe.zip` van https://github.com/godotengine/godot/releases/tag/4.6.3-stable, pak uit en start `Godot_v4.6.3-stable_win64.exe`. Kies *Importeren*, wijs `game/project.godot` in je clone van de repo aan en open het project.
   - **Linux**: zie `docs/tech/setup.md` §2; daarna `godot --path game`.
 - Druk in de editor op **F5** (project starten): de flow-kamer start meteen.
+- Druk daarna **eerst A, D of spatie** (speel je met de controller: eerst een knop op de controller). De eerste knop bepaalt waarmee je speelt; druk je eerst een pijltje, dan speel je met de pijltjeskant en werkt spatie niet om te springen. Gebeurt het toch: sluit het spelvenster (of klik in de editor op de stopknop, F8) en druk in de editor opnieuw op F5. F6 herstart alleen de run en houdt je toetsenkeuze; voor een andere keuze moet je het spel helemaal stoppen en met F5 opnieuw starten.
+- Druk in het spelvenster **niet** op F5: dat zet de meetlog uit (de HUD toont dan *meetlog uit*). Gebeurd? Druk nog eens F5 tot de HUD *meetlog aan* toont.
 - Voor de luistercheck: een koptelefoon én de tv-luidsprekers.
 
 ## 2. Besturing
@@ -23,6 +25,8 @@ Je speelt **alleen solo**, zonder tweede speler (besluit [#124](https://github.c
 | Na de run | Druk **drie cijfers 1–5**: de score voor K1, K2 en K3 (in die volgorde) | — |
 
 Druk tijdens een run **niet op Enter of Start** (Start op een controller waarmee je niet speelt): dan komt er een tweede speler bij en is het geen solo-run meer. Gebeurt het toch: F6 en opnieuw.
+
+De toetsenbordkolom geldt alleen als je na F5 eerst A, D of spatie drukte (zie §1). Elke toets van de pijltjeskant als eerste (o.a. de pijltjes, Enter, rechter Shift en rechter Ctrl) maakt die kant van jou.
 
 Het doel van een run: door K1 (sprongen), K2 (vijanden), K3 (pomp het gemaal vol), dan door de sluis. De HUD toont kamer, staart (D) en tijd.
 
@@ -71,9 +75,14 @@ Bijlage: de meetlog-CSV's (zie hieronder)
 - **Uit de CSV's** rekent QA MP-1 t/m MP-4 en MP-6 per run. Observaties: O1 de stilstand aan de waterkant in K3 bij 3 s (de krapste plek in de scripted runs); O2 landingen met wachten ervoor (R-V12); O3 hoe vaak de echo Leeg is en waarom.
 - **Co-op** (score, wachten, partner als hulp of last, MP-7) toetst QA in de slice (fasekader §3, F4b(c)), niet in deze sessie.
 
+## Open punten
+
+- Moet de eerste knop op de pijltjeskant van het toetsenbord speler 1 blijven maken (`input_router.gd` `_claimable_slot`: plaats 1 neemt elke knop)? Eigenaar: UX Designer + Gameplay Programmer ([#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80)).
+
 ## Wijzigingen
 
 | Versie | Datum | Wijziging |
 |---|---|---|
 | 0.1 | 2026-11-09 | Eerste versie (#80): blokken 1–5 solo en co-op, antwoordblok, meetlogs |
 | 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: alleen solo; blok 4 (co-op) vervallen en weggelaten, luistercheck is nu blok 4; P2 uit de besturing en de co-op/P2-velden uit het antwoordblok; waarschuwing tegen Enter; tijd ± 20 → ± 15 min spelen; "Echo: hulp of last?" bij blok 3; M1 als zwak signaal met sterke check in F4b(c) als er zo'n P2 is, anders R-V9 open in F8; MP-7 en O4 uit §5; Start als meedoe-knop in de waarschuwing |
+| 0.2.1 | 2026-11-11 | Na F5 eerst A, D of spatie, want de eerste knop kiest de toetsenbordkant en F6 houdt die keuze (§1, noot onder §2; vraag bij *Open punten*). F5 in het spelvenster zet de meetlog uit; nog eens F5 zet hem weer aan (§1). |
