@@ -8,7 +8,9 @@ extends RefCounted
 ## - `plank_signaal` (E-07d): de echo is Actief, draagt zijn plank (E-07c),
 ##   is niet in een merksprong, en de horizontale afstand tussen zijn
 ##   middelpunt en dat van P1 is kleiner dan op `t − 1` en ≤ 130 px. Uit bij
-##   een landing op de plank of zodra de afstand niet meer kleiner wordt.
+##   een landing op de plank of zodra de afstand niet meer kleiner wordt. Op
+##   de eerste tick waarop de echo (weer) draagt is er geen `t − 1`: daar
+##   blijft het signaal uit.
 ## - `doelstreep` (E-02t): in een van de frames `p + 1 … p + 30` (al
 ##   opgenomen, want D ≥ 90) staat een AANVAL-event, en op tick `t` ligt een
 ##   merk binnen R van de positie van dat frame met vrije zichtlijn (dezelfde
@@ -86,7 +88,10 @@ func _update_plank_signal(tick: int, echo: Node2D) -> void:
 	var dx: float = absf(echo.global_position.x - _p1.global_position.x)
 	var on_plank: bool = _p1.motor.support == Motor.Support.SHADOW_BODY and _p1.motor.plank == echo.plank \
 		or _p1.move_events & Motor.EV_SPRINGPLANK != 0
-	plank_signaal = dx < _prev_dx and dx <= _signal_px and not on_plank
+	# Eerste tick waarop de echo (weer) draagt: er is geen afstand op `t − 1`,
+	# dus alleen `_prev_dx` zetten; het signaal kan pas vanaf de tick erna aan.
+	var first := is_inf(_prev_dx)
+	plank_signaal = not first and dx < _prev_dx and dx <= _signal_px and not on_plank
 	_prev_dx = dx
 	if plank_signaal and not was:
 		plank_signal_on.emit(tick)

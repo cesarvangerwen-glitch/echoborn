@@ -37,6 +37,9 @@ const IN_B := Vector2(1000, Fx.STAND_Y)
 const ROOM_C := Rect2(1640, TOP, 1360, HEIGHT)
 const POMPRAD_AT := Vector2(2500, Fx.STAND_Y)
 const CHECKPOINT_AT := Vector2(2200, Fx.STAND_Y)
+## De tweede schoep (`vane_paths`), ver genoeg van het pomprad voor een
+## aparte treffer.
+const VANE2_AT := Vector2(2380, Fx.STAND_Y)
 const STREET := Rect2(2600, 300, 300, 100)
 ## LP per pompslag (LM-03, `data/echo_v04.json`).
 var P: int = Gemaal.per_stroke()
@@ -53,8 +56,9 @@ func _clear() -> void:
 
 ## De inhoud van kamer C, zoals de World & Level Designer hem in de editor
 ## zou bouwen: pomprad, sluis, gemaal (met paden) en een checkpoint dat naar
-## het gemaal wijst. Posities ten opzichte van de kamer.
-func _gemaal_scene() -> PackedScene:
+## het gemaal wijst. Posities ten opzichte van de kamer. `two_vanes`: een
+## tweede schoep (`Schoep2`), beide via `vane_paths` (LM-03).
+func _gemaal_scene(two_vanes := false) -> PackedScene:
 	var origin := ROOM_C.get_center()
 	var root := Node2D.new()
 	root.name = "Inhoud"
@@ -74,7 +78,10 @@ func _gemaal_scene() -> PackedScene:
 	var gemaal := Gemaal.new()
 	gemaal.name = "Gemaal"
 	gemaal.position = Vector2(2700, Fx.STAND_Y) - origin
-	gemaal.pomprad_path = ^"../Pomprad"
+	if two_vanes:
+		gemaal.vane_paths = [^"../Pomprad", ^"../Schoep2"]
+	else:
+		gemaal.pomprad_path = ^"../Pomprad"
 	gemaal.sluice_path = ^"../Sluis"
 	gemaal.street = STREET
 	gemaal.y_high = 320.0
@@ -84,7 +91,13 @@ func _gemaal_scene() -> PackedScene:
 	checkpoint.setup(Layers.LIGHT, Vector2(40, 40))
 	checkpoint.position = CHECKPOINT_AT - origin
 	checkpoint.gemaal_path = ^"../Gemaal"
-	for node: Node in [pomprad, sluice, gemaal, checkpoint]:
+	var nodes: Array[Node] = [pomprad, sluice, gemaal, checkpoint]
+	if two_vanes:
+		var vane2 := Pomprad.new()
+		vane2.name = "Schoep2"
+		vane2.position = VANE2_AT - origin
+		nodes.insert(1, vane2)
+	for node: Node in nodes:
 		root.add_child(node)
 		node.owner = root
 	shape.owner = root
@@ -97,7 +110,7 @@ func _gemaal_scene() -> PackedScene:
 ## Kamers A – B – C (C alleen buur van B), het gemaal in de inhoud van C, een
 ## eigen Progress met lichtmeter. `state` wordt vóór het binden overgenomen.
 ## Geeft {sim, p1, loader, progress, meter, c, id}.
-func _world(t, state: GameState, progress: Progress = null, sim: Node = null) -> Dictionary:
+func _world(t, state: GameState, progress: Progress = null, sim: Node = null, two_vanes := false) -> Dictionary:
 	if sim == null:
 		sim = Fx.world(t)
 	var p1 := Fx.manual_player(sim, 1, IN_A)
@@ -109,7 +122,7 @@ func _world(t, state: GameState, progress: Progress = null, sim: Node = null) ->
 	var a: Kamer = Kamer.make(&"A", Rect2(-1000, TOP, 1640, HEIGHT), ["B"])
 	var b: Kamer = Kamer.make(&"B", Rect2(640, TOP, 1000, HEIGHT), ["A", "C"])
 	var c: Kamer = Kamer.make(&"C", ROOM_C, ["B"])
-	c.inhoud = _gemaal_scene()
+	c.inhoud = _gemaal_scene(two_vanes)
 	var loader := AreaLoader.new()
 	loader.name = "AreaLoader"
 	for room: Kamer in [a, b, c]:
@@ -128,8 +141,8 @@ func _world(t, state: GameState, progress: Progress = null, sim: Node = null) ->
 
 ## Een treffer van `attacker` op het pomprad, via de echte weg van stap (4)
 ## (`Combat.attack`): alleen een geladen, aangemeld pomprad wordt geraakt.
-func _strike(sim: Node, attacker: String, layer: int) -> void:
-	sim.combat.attack(sim.tick, attacker, layer, POMPRAD_AT - Vector2(16, 0), 1)
+func _strike(sim: Node, attacker: String, layer: int, at: Vector2 = POMPRAD_AT) -> void:
+	sim.combat.attack(sim.tick, attacker, layer, at - Vector2(16, 0), 1)
 
 
 ## Gemaal in gestreamde inhoud (deel 3b, punt 1): niet geladen = niet
@@ -194,6 +207,50 @@ func test_gemaal_in_streamed_room(t) -> void:
 	var sluice: StaticBody2D = c.inhoud_node.get_node("Sluis")
 	t.check(full.is_full() and full.sluice_open and sluice.collision_layer == 0 and full.waterline(sim.tick) == full.y_low,
 		"vol gemaal laadt niet in zijn eindstand")
+	await t.cleanup()
+
+
+## `vane_paths` in gestreamde inhoud (LM-03): een gemaal met twee schoepen.
+## Bij het laden krijgt het beide schoepen (opgezet als pomprad, namen
+## behouden, aangemeld bij Combat); een treffer op elk pompt hetzelfde ene
+## `G`; de save-id is die van het gemaal, zoals bij één schoep.
+func test_vane_paths_in_streamed_room(t) -> void:
+	var state := GameState.new()
+	state.lichtmeter = 50
+	var w := _world(t, state, null, null, true)
+	var sim = w["sim"]
+	var p1: Node2D = w["p1"]
+	var progress: Progress = w["progress"]
+	var meter: LightMeter = w["meter"]
+	var c: Kamer = w["c"]
+	var id: StringName = w["id"]
+	t.check(id == AreaLoader.object_flag(&"C", ^"Gemaal", GEBIED), "save-id: %s" % id)
+	p1.position = IN_B
+	await t.run_ticks(sim, 1)
+	if c.inhoud_node == null:
+		t.check(false, "C niet geladen met P1 in B")
+		await t.cleanup()
+		return
+	var gemaal: Gemaal = c.inhoud_node.get_node("Gemaal")
+	var first: CombatTarget = c.inhoud_node.get_node("Pomprad")
+	var second: CombatTarget = c.inhoud_node.get_node("Schoep2")
+	t.check(gemaal.vanes == [first, second] and gemaal.pomprad == first,
+		"schoepen niet uit vane_paths: %s" % [gemaal.vanes])
+	for vane: CombatTarget in [first, second]:
+		t.check(vane.kind == CombatTarget.Kind.DUMMY and (vane.shape as RectangleShape2D).size == Pomprad.HURTBOX
+			and sim.combat.targets.has(vane), "schoep %s niet opgezet of niet aangemeld" % vane.name)
+	t.check(progress.has_gemaal(id) and gemaal.meter == meter and gemaal.fill == 0, "gemaal niet gebonden")
+	_strike(sim, "p1", Layers.LIGHT, VANE2_AT)
+	t.check(gemaal.fill == P and gemaal.last_vane == second and meter.value == 50 - P,
+		"slag op Schoep2: G %d, schoep %s" % [gemaal.fill, gemaal.last_vane])
+	await t.run_ticks(sim, 1)
+	_strike(sim, "p2", Layers.SHADOW)
+	t.check(gemaal.fill == 2 * P and gemaal.last_vane == first and meter.value == 50 - 2 * P,
+		"slag op Pomprad: G %d, schoep %s" % [gemaal.fill, gemaal.last_vane])
+	# Ontladen: één stand onder dezelfde id.
+	p1.position = IN_A
+	await t.run_ticks(sim, 1)
+	t.check(state.gemalen == {id: {"vulstand": 2 * P, "vol": false}}, "stand in state: %s" % [state.gemalen])
 	await t.cleanup()
 
 

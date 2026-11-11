@@ -463,7 +463,9 @@ func test_e07d_plank_signal_all_d(t) -> void:
 
 ## E-07d: een zwevende echo (E-07c (2): P1 stond sinds zijn grondcontact op
 ## een plank) krijgt nooit een signaal, ook als hij nadert; dezelfde echo die
-## draagt wel. In een merksprong (E-02m) staat het signaal uit.
+## draagt wel. Draagt hij na het zweven weer (nieuw grondcontact) terwijl P1
+## binnen 130 px van hem af loopt: geen signaal, ook niet op de eerste
+## dragende tick. In een merksprong (E-02m) staat het signaal uit.
 func test_e07d_floating_and_merksprong(t) -> void:
 	for floating in [true, false]:
 		var sim = Fx.world(t)
@@ -481,6 +483,35 @@ func test_e07d_floating_and_merksprong(t) -> void:
 			seen = seen or hints.plank_signaal
 		t.check(seen != floating, "zwevend = %s: signaal gezien = %s" % [floating, seen])
 		await t.cleanup()
+	# Nieuw grondcontact na zweven: de echo zweeft 30 frames (E-07c (2)) en
+	# draagt daarna, 70 px van P1, die dan van hem af loopt. Op de eerste
+	# dragende tick is er geen afstand op `t − 1`: geen signaal en geen tik.
+	var sim3 = Fx.world(t)
+	var p1c := Fx.manual_player(sim3, 1, Vector2(150, Fx.STAND_Y))
+	await t.run_ticks(sim3, 2)
+	var ghost3 := Fx.ghost(t)
+	var s3: int = sim3.tick
+	Fx.ghost_path(ghost3, s3, 30, func(_k: int) -> Vector2: return Vector2(220, Fx.STAND_Y),
+		true, Motor.Support.WORLD, true)
+	Fx.ghost_path(ghost3, s3 + 30, 60, func(_k: int) -> Vector2: return Vector2(220, Fx.STAND_Y))
+	var echo3 := Fx.tail_echo(sim3, ghost3, 1)
+	var hints3 := EchoHints.new(sim3, p1c, func() -> Node2D: return echo3)
+	var taps: Array = []
+	hints3.plank_signal_on.connect(func(tick: int) -> void: taps.append(tick))
+	var floated := false
+	var dx_first := -1.0
+	var seen3 := false
+	for i in 70:
+		var carrying: bool = echo3.carrier_valid()
+		floated = floated or (echo3.is_present() and not carrying)
+		await _step(t, sim3, p1c, L if carrying else 0)
+		if echo3.carrier_valid() and dx_first < 0.0:
+			dx_first = absf(echo3.position.x - p1c.position.x)
+		seen3 = seen3 or hints3.plank_signaal
+	t.check(floated and dx_first >= 0.0 and dx_first <= 130.0,
+		"opzet nieuw grondcontact: zweefde %s, afstand bij dragen %.0f px" % [floated, dx_first])
+	t.check(not seen3 and taps.is_empty(), "nieuw grondcontact: signaal %s, tik op %s" % [seen3, taps])
+	await t.cleanup()
 	# Merksprong: P1 merkt een vijand; de echo nadert en springt naar het merk.
 	var sim2 = Fx.world(t)
 	var p1b := Fx.manual_player(sim2, 1, Vector2(100, Fx.STAND_Y))
