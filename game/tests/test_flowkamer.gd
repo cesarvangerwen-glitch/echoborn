@@ -75,7 +75,8 @@ func test_room_loads(t) -> void:
 			t.check(key in Layout.NEIGHBOURS[other], "buren niet symmetrisch: %s/%s (E-04a)" % [key, other])
 
 
-## Gemaal en lichtmeter (LM-01, LM-03, LM-06) zonder physics.
+## Gemaal en lichtmeter (LM-01, LM-03, LM-06) zonder physics. De regels per
+## schoep en per D staan in `test_regels_na_f0.gd`.
 func test_gemaal_and_meter(t) -> void:
 	var pair := _room(t, 120, true)
 	var room = pair[0]
@@ -84,21 +85,19 @@ func test_gemaal_and_meter(t) -> void:
 	var g: Gemaal = room.gemaal
 	meter.add(0, 110, "test", "p1")
 	t.check(meter.value == 100, "LM-01: 110 LP opgeteld geeft %d (verwacht 100)" % meter.value)
-	# LM-03: 5 slagen P1, dan 5 van de echo.
-	for i in 5:
+	# LM-03: 4 slagen P1 (15 per slag), dan 3 van de echo: 15, 15, 10.
+	for i in 4:
 		room.sim.combat.hit.emit(i * 20, "p1", room.pomprad, 10)
-	t.check(g.fill == 50 and meter.value == 50, "LM-03: na 5 slagen G=%d L=%d (50/50)" % [g.fill, meter.value])
-	for i in 5:
+	t.check(g.fill == 60 and meter.value == 40, "LM-03: na 4 slagen G=%d L=%d (60/40)" % [g.fill, meter.value])
+	for i in 2:
 		room.sim.combat.hit.emit(200 + i * 20, "echo", room.pomprad, 5)
-	t.check(g.fill == 100 and meter.value == 0 and g.full_tick == 280, "LM-03: G=%d L=%d t_v=%d" % [g.fill, meter.value, g.full_tick])
+	t.check(not g.sluice_open, "LM-06: sluis open vóór t_v")
+	room.sim.combat.hit.emit(240, "echo", room.pomprad, 5)
+	t.check(g.fill == 100 and meter.value == 0 and g.full_tick == 240, "LM-03: G=%d L=%d t_v=%d" % [g.fill, meter.value, g.full_tick])
 	var tv: int = g.full_tick
+	t.check(g.sluice_open and g.sluice.collision_layer == 0, "LM-06: sluis niet weg op t_v")
 	t.check(absf(g.waterline(tv + 90) - lerpf(Layout.WATER_HIGH, Layout.WATER_LOW, 0.5)) <= 1.0, "LM-06: waterlijn halverwege op t_v + 90")
 	t.check(is_equal_approx(g.waterline(tv + 180), Layout.WATER_LOW), "LM-06: waterlijn op y_laag op t_v + 180")
-	var none: Array[Node2D] = []
-	g.sim_update(tv + 179, none)
-	t.check(not g.sluice_open, "LM-06: sluis al open op t_v + 179")
-	g.sim_update(tv + 180, none)
-	t.check(g.sluice_open and g.sluice.collision_layer == 0, "LM-06: sluis niet weg op t_v + 180")
 	await _free(t, room)
 
 

@@ -1,13 +1,17 @@
 extends "res://scripts/objects/sim_object.gd"
-## Eén gemaal met pomprad, waterlijn, `Diepwater` en sluisdoorgang (gdd §2.12,
-## LM-03, LM-04, LM-06), minimaal voor de flow-kamer.
+## Eén gemaal met `n` pompschoepen, waterlijn, `Diepwater` en sluisdoorgang
+## (gdd §2.12, LM-03, LM-04, LM-06; herzien na F0, §4.7), minimaal voor de
+## flow-kamer.
 ##
-## - LM-03: elke treffer op het pomprad (P1, de echo of P2) pompt
-##   `min(10, L, 100 − G)` LP van de meter naar het gemaal; `G` daalt nooit.
+## - LM-03: één `Gemaal`, één vulstand `G`, `n` pompschoepen (`vanes`; elk een
+##   eigen hurtbox, `pomprad.gd`; `n = 1` is het pomprad van v0.6). Elke treffer
+##   op een schoep (P1, de echo of P2) pompt `min(15, L, G_max − G)` LP van de
+##   meter naar het gemaal; `G` daalt nooit. De 15 staat in
+##   `data/echo_v04.json` (`light.pump_per_stroke`).
 ## - LM-04: een pompslag is een gewone aanval (herhaaltijd 20 ticks), geen
-##   knop om vast te houden.
-## - LM-06: op `t_v` (G = 100) zakt de waterlijn lineair in 180 ticks van
-##   `y_high` naar `y_low`; op `t_v + 180` verdwijnt de sluis. `Diepwater`
+##   knop om vast te houden; elke schoep is lopend en springend te raken.
+## - LM-06: op `t_v` (G = 100) verdwijnt de sluis (zelfde tick, na F0) en zakt
+##   de waterlijn lineair in 180 ticks van `y_high` naar `y_low`. `Diepwater`
 ##   controleert alleen het middelpunt van P1: 30 ticks erin = terug op zijn
 ##   laatste vloerpositie buiten het water (telt als respawn, E-04b). De echo
 ##   en P2 negeren het water.
@@ -18,9 +22,11 @@ extends "res://scripts/objects/sim_object.gd"
 ## Twee manieren om het op te zetten (architectuur-aansluiting T5b deel 3b,
 ## #82; ontwerp.md §3a):
 ## - in code: `setup_gemaal(meter, pomprad, sluis, straat, y_hoog, y_laag)`,
-##   dan `connect_combat` (zoals de flow-kamer);
+##   dan `connect_combat` (zoals de flow-kamer); `pomprad` mag ook een lijst
+##   schoepen zijn;
 ## - in een scène (ook in de gestreamde `inhoud` van een kamer): vul
-##   `pomprad_path`, `sluice_path`, `street`, `y_high` en `y_low` in. De
+##   `vane_paths` (of voor één schoep `pomprad_path`), `sluice_path`, `street`,
+##   `y_high` en `y_low` in. De
 ##   AreaLoader geeft het gemaal bij het laden de lichtmeter (via `Progress`),
 ##   verbindt het met `Combat` en bindt zijn stand (`Progress.bind_gemaal`).
 
@@ -28,7 +34,11 @@ signal pumped(tick: int, amount: int, who: String)
 signal full(tick: int)
 signal sluice_opened(tick: int)
 
-const PER_STROKE := 10
+const Tuning = preload("res://scripts/echo/tuning.gd")
+
+## LM-03: LP per pompslag (startwaarde 15, testbereik 10–25, gdd §2.9).
+static func per_stroke() -> int:
+	return int(Tuning.light()["pump_per_stroke"])
 const MAX := 100
 const DRAIN_TICKS := 180
 const DROWN_TICKS := 30
@@ -39,10 +49,18 @@ var fill := 0
 var full_tick := -1
 var sluice_open := false
 var meter: RefCounted
-var pomprad: Node2D
+## De pompschoepen (LM-03), in de looprichting. `pomprad` is de eerste.
+var vanes: Array[Node2D] = []
+var pomprad: Node2D:
+	get:
+		return vanes[0] if not vanes.is_empty() else null
+## De schoep van de laatste pompslag (meetlog POMP), of null.
+var last_vane: Node2D = null
 ## De sluisdoorgang (wereldgeometrie, laag 1).
 var sluice: StaticBody2D
-## In een scène: het pomprad (een node met `pomprad.gd`) en de sluis.
+## In een scène: de schoepen (nodes met `pomprad.gd`) en de sluis. Is
+## `vane_paths` leeg, dan is `pomprad_path` de enige schoep.
+@export var vane_paths: Array[NodePath] = []
 @export var pomprad_path: NodePath
 @export var sluice_path: NodePath
 ## Straat met water, in wereldcoördinaten: x-bereik en de vloer (`end.y`);
@@ -61,11 +79,17 @@ var _has_dry := false
 var _drained := false
 
 
-func setup_gemaal(p_meter: RefCounted, p_pomprad: Node2D, p_sluice: StaticBody2D,
+## `p_vanes`: één schoep (Node2D) of een lijst schoepen (LM-03).
+func setup_gemaal(p_meter: RefCounted, p_vanes: Variant, p_sluice: StaticBody2D,
 		p_street: Rect2, p_y_high: float, p_y_low: float) -> void:
 	name = "Gemaal"
 	meter = p_meter
-	pomprad = p_pomprad
+	vanes.clear()
+	if p_vanes is Array:
+		for vane: Node2D in p_vanes:
+			vanes.append(vane)
+	elif p_vanes != null:
+		vanes.append(p_vanes as Node2D)
 	sluice = p_sluice
 	street = p_street
 	y_high = p_y_high
@@ -73,21 +97,29 @@ func setup_gemaal(p_meter: RefCounted, p_pomprad: Node2D, p_sluice: StaticBody2D
 	_setup_common()
 
 
-## In een scène: de verwijzingen uit de geëxporteerde paden. Het pomprad
+## In een scène: de verwijzingen uit de geëxporteerde paden. Elke schoep
 ## krijgt hier zijn soort en hurtbox (`setup_pomprad`; die worden niet in de
 ## scène bewaard); de namen blijven staan (ze zitten in de id van het gemaal
 ## in de save, §3a).
 func _ready() -> void:
-	if pomprad != null or pomprad_path.is_empty():
+	if not vanes.is_empty():
 		return
-	pomprad = get_node_or_null(pomprad_path)
+	var paths: Array[NodePath] = vane_paths.duplicate()
+	if paths.is_empty() and not pomprad_path.is_empty():
+		paths.append(pomprad_path)
+	if paths.is_empty():
+		return
 	sluice = get_node_or_null(sluice_path) as StaticBody2D
-	if pomprad == null:
-		push_error("Gemaal '%s': pomprad_path '%s' wijst nergens heen" % [name, pomprad_path])
-	elif pomprad.has_method("setup_pomprad"):
-		var own_name := pomprad.name
-		pomprad.setup_pomprad()
-		pomprad.name = own_name
+	for path in paths:
+		var vane := get_node_or_null(path) as Node2D
+		if vane == null:
+			push_error("Gemaal '%s': schoep '%s' wijst nergens heen" % [name, path])
+			continue
+		if vane.has_method("setup_pomprad"):
+			var own_name := vane.name
+			vane.setup_pomprad()
+			vane.name = own_name
+		vanes.append(vane)
 	_setup_common()
 
 
@@ -116,12 +148,7 @@ func restore_state(vulstand: int, vol: bool) -> void:
 		full_tick = -1
 		return
 	full_tick = 0
-	sluice_open = true
-	if sluice:
-		sluice.collision_layer = 0
-		sluice.visible = false
-		if sluice.is_inside_tree():
-			PhysicsServer2D.body_set_collision_layer(sluice.get_rid(), 0)
+	_set_sluice_open()
 	_update_water_visual(y_low)
 
 
@@ -153,31 +180,47 @@ func in_deep_water(at: Vector2, tick: int) -> bool:
 	return at.x >= street.position.x and at.x <= street.end.x and at.y > top and at.y < street.end.y
 
 
+## Een pompslag (stap 4): `min(15, L, G_max − G)` (LM-03). Slaan P1 en de
+## echo op dezelfde tick, dan komt P1 eerst (volgorde van `Combat.hit`,
+## E-07b). Wordt `G` hier 100, dan is dit `t_v`: de sluis gaat meteen open
+## (LM-06, na F0), het water begint te zakken.
 func _on_hit(tick: int, attacker: String, target: Node2D, _damage: int) -> void:
-	if target != pomprad:
+	if not vanes.has(target):
 		return
-	var amount := mini(PER_STROKE, MAX - fill)
+	var amount := mini(per_stroke(), MAX - fill)
 	amount = meter.take(amount)
 	fill += amount
+	last_vane = target
 	strokes[attacker] = int(strokes.get(attacker, 0)) + 1
 	pumped.emit(tick, amount, attacker)
 	if fill >= MAX and full_tick < 0:
 		full_tick = tick
 		full.emit(tick)
+		_open_sluice(tick)
 
 
-## Stap (5): water, sluis en Diepwater voor P1.
+## LM-06: de sluisdoorgang verdwijnt op `t_v`.
+func _open_sluice(tick: int) -> void:
+	if sluice_open:
+		return
+	_set_sluice_open()
+	sluice_opened.emit(tick)
+
+
+func _set_sluice_open() -> void:
+	sluice_open = true
+	if sluice:
+		sluice.collision_layer = 0
+		sluice.visible = false
+		# Meteen in de physics-ruimte, niet pas na deze physics-stap.
+		if sluice.is_inside_tree():
+			PhysicsServer2D.body_set_collision_layer(sluice.get_rid(), 0)
+
+
+## Stap (5): water en Diepwater voor P1 (de sluis gaat al open in `_on_hit`).
 func sim_update(tick: int, bodies: Array[Node2D]) -> void:
 	var line := waterline(tick)
 	_update_water_visual(line)
-	if full_tick >= 0 and not sluice_open and tick >= full_tick + DRAIN_TICKS:
-		sluice_open = true
-		if sluice:
-			sluice.collision_layer = 0
-			sluice.visible = false
-			# Meteen in de physics-ruimte, niet pas na deze physics-stap.
-			PhysicsServer2D.body_set_collision_layer(sluice.get_rid(), 0)
-		sluice_opened.emit(tick)
 	for body in bodies:
 		if not (body is CharacterBody2D) or (body as CollisionObject2D).collision_layer & Layers.LIGHT == 0:
 			continue
