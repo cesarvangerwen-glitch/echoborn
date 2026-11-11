@@ -12,7 +12,7 @@ Je speelt **alleen solo**, zonder tweede speler (besluit [#124](https://github.c
   - **Windows**: download `Godot_v4.6.3-stable_win64.exe.zip` van https://github.com/godotengine/godot/releases/tag/4.6.3-stable, pak uit en start `Godot_v4.6.3-stable_win64.exe`. Kies *Importeren*, wijs `game/project.godot` in je clone van de repo aan en open het project.
   - **Linux**: zie `docs/tech/setup.md` §2; daarna `godot --path game`.
 - Druk in de editor op **F5** (project starten): de flow-kamer start meteen.
-- Druk daarna **eerst A, D of spatie** (speel je met de controller: eerst een knop op de controller). De eerste knop bepaalt waarmee je speelt; druk je eerst een pijltje, dan speel je met de pijltjeskant en werkt spatie niet om te springen. Gebeurt het toch: sluit het spelvenster (of klik in de editor op de stopknop, F8) en druk in de editor opnieuw op F5. F6 helpt hier niet, en F5 ín het spelvenster zet de meetlog uit.
+- Druk daarna **eerst A, D of spatie** (speel je met de controller: eerst een knop op de controller). De eerste knop bepaalt waarmee je speelt; druk je eerst een pijltje, dan speel je met de pijltjeskant en werkt spatie niet om te springen. Gebeurt het toch: sluit het spelvenster (of klik in de editor op de stopknop, F8) en druk in de editor opnieuw op F5. F6 helpt hier niet, en F5 ín het spelvenster zet de meetlog uit (F5 is daar een schakelaar; de HUD toont *meetlog aan/uit*). Gebeurd? Druk nog eens F5 tot de HUD *meetlog aan* toont, of stop het spel en start opnieuw met F5 in de editor.
 - Voor de luistercheck: een koptelefoon én de tv-luidsprekers.
 
 ## 2. Besturing
@@ -84,4 +84,4 @@ Bijlage: de meetlog-CSV's (zie hieronder)
 |---|---|---|
 | 0.1 | 2026-11-09 | Eerste versie (#80): blokken 1–5 solo en co-op, antwoordblok, meetlogs |
 | 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: alleen solo; blok 4 (co-op) vervallen en weggelaten, luistercheck is nu blok 4; P2 uit de besturing en de co-op/P2-velden uit het antwoordblok; waarschuwing tegen Enter; tijd ± 20 → ± 15 min spelen; "Echo: hulp of last?" bij blok 3; M1 als zwak signaal met sterke check in F4b(c) als er zo'n P2 is, anders R-V9 open in F8; MP-7 en O4 uit §5; Start als meedoe-knop in de waarschuwing |
-| 0.2.1 | 2026-11-11 | Na F5 eerst A, D of spatie (§1, noot onder §2): de eerste knop claimt plaats 1, een pijltje maakt de pijltjeskant speler 1; herstel = spel stoppen en F5 in de editor (F6 houdt de plaats); vraag over dit gedrag bij *Open punten* |
+| 0.2.1 | 2026-11-11 | Na F5 eerst A, D of spatie (§1, noot onder §2): de eerste knop claimt plaats 1, een pijltje maakt de pijltjeskant speler 1; herstel = spel stoppen en F5 in de editor (F6 houdt de plaats); F5 in het spelvenster schakelt de meetlog, met herstel via de HUD (*meetlog aan*) of een nieuwe start; vraag over dit gedrag bij *Open punten* |
