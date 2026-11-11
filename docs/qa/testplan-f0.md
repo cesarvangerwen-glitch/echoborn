@@ -26,22 +26,22 @@ Plus de andere eisen uit de DoD van T17 (solo):
 | De echo telt mee bij het gemaal | MP-6 | ≥ 40 % van de LP met de echo; ≥ 1 pompslag van de echo |
 | *Nine Sols*-check (ideecheck §2, slotzin; R-V9) | gdd §5 vraag 5, M1 van de CEO | **zwak signaal** (de CEO koos *Nine Sols* zelf als referentie): noemt hij het merk spontaan "net als *Nine Sols*" (of talisman, of lading-en-ontploffing), dan terug naar afwijkpunt 2 (gdd §2.13); noemt hij het niet, dan is de check uitgesteld naar F4b(c), niet gehaald |
 
-**Co-op-maten: in F0 meting, slaagcriterium in F4b(c)** (kader §3 F4b(c)):
+**Co-op-maten: in F0 alleen meting** (kader §3 F4b(c)). De kolom "In F4b(c)" zegt of de maat daar een voorwaarde is.
 
-| Eis | Maat | Grens |
-|---|---|---|
-| Norm (3) co-op | MP-5 | gemiddeld ≥ 4,0 co-op, geen kamer < 3,0 |
-| Wachten; partner als hulp of last | C1–C2 (gdd §5 vraag 7–8) | niemand wacht; partner als hulp |
-| Co-op ≤ 2× zo snel als solo, niemand wacht | MP-7 (a)–(d) | runtijd co-op ≥ ½ × solo; MP-1 van P1 én P2 ≤ 300; ≥ 1,0 samenwerkingsactie/min per speler; P2 ≤ 10 % opgelost |
-| Echo Leeg / echo bij het gemaal, in co-op | MP-4 (W4), MP-6 | ≤ 40 % zonder tweede lichaam; ≥ 40 % van de LP met P2/samen, ≥ 1 pompslag van P2 |
-| Sterke *Nine Sols*-check | M1 van P2 | alleen als P2 de referenties niet kent en antwoordt vóór uitleg over het merk |
+| Eis | Maat | Grens | In F4b(c) |
+|---|---|---|---|
+| Norm (3) co-op | MP-5 | gemiddeld ≥ 4,0 co-op, geen kamer < 3,0 | voorwaarde |
+| Wachten; partner als hulp of last | C1–C2 (gdd §5 vraag 7–8) | niemand wacht; partner als hulp | voorwaarde |
+| Co-op ≤ 2× zo snel als solo, niemand wacht | MP-7 (a)–(d) | runtijd co-op ≥ ½ × solo; MP-1 van P1 én P2 ≤ 300; ≥ 1,0 samenwerkingsactie/min per speler; P2 ≤ 10 % opgelost | voorwaarde |
+| Echo Leeg / echo bij het gemaal, in co-op | MP-4 (W4), MP-6 | ≤ 40 % zonder tweede lichaam; ≥ 40 % van de LP met P2/samen, ≥ 1 pompslag van P2 | meting |
+| Sterke *Nine Sols*-check | M1 van P2 | alleen als P2 de referenties niet kent en antwoordt vóór uitleg over het merk; leest het merk als *Nine Sols*: terug naar afwijkpunt 2 vóór de gate | meting, geen gate-voorwaarde; is er zo'n P2 niet, dan blijft R-V9 open in F8 |
 
 ## 2. Spelers en wat ze bewijzen
 
 | Speler | Wat het bewijst | Wat het **niet** bewijst |
 |---|---|---|
 | **Scripted runs** (headless, deel 1) | Dat de kamer solo de objectieve normen MP-1–MP-4 en MP-6 **kan** halen, per D; herhaalbaar en deterministisch. De co-op-runs geven MP-7 en de co-op-maten als **meting** (geen slaagcriterium) | MP-5 (norm 3), de *Nine Sols*-check en voorspelbaarheid: die vragen een mens |
-| **De CEO** solo (± 15 min spelen + ± 5 min luisteren, deel 2) | MP-5 solo per D, de open vragen solo (gdd §5 vraag 1, 5, 6), het zwakke *Nine Sols*-signaal, en de objectieve normen bij een mens vanaf zijn derde run | Co-op bij mensen (norm 3 co-op, C1–C2, MP-7) en de sterke *Nine Sols*-check: F4b(c) |
+| **De CEO** solo (± 15 min spelen + ± 5 min luisteren, deel 2) | MP-5 solo per D, de open vragen solo (gdd §5 vraag 1, 5, 6 en 8 (solo)), het zwakke *Nine Sols*-signaal, en de objectieve normen bij een mens vanaf zijn derde run | Co-op bij mensen (norm 3 co-op, C1–C2, MP-7) en de sterke *Nine Sols*-check: F4b(c) |
 
 Een externe playtest valt buiten fase 2 zonder apart CEO-besluit (kader F4).
 
@@ -94,7 +94,7 @@ De CEO stuurt de meetlog-CSV's mee (de kamer schrijft ze zelf, `docs/design/kame
 | W5 | MP-1 voor P2: zelfde definitie als P1; opgeloste ticks tellen niet en na `P2_TERUG` gelden 60 ticks niet (zoals na een respawn) | gdd §4.5 MP-7 (b) noemt de opgeloste ticks; de 60 ticks zijn een QA-keuze |
 | W6 | MP-7 (c): een springplank, lancering of vang telt voor de drager én de springer; een merk-combo voor beide spelers | Elke samenwerkingsactie heeft twee lichamen (gdd §2.7) |
 | W7 | De CEO is "geoefend" vanaf zijn derde run; de eerste twee tellen niet mee | gdd §4.5 |
-| W8 | De *Nine Sols*-check bij de CEO is een zwak signaal: de CEO koos *Nine Sols* zelf als referentie (#51) | Een speler die de referentie niet kent, is een sterkere toets; die volgt in F4b(c) (kader §3) |
+| W8 | De *Nine Sols*-check bij de CEO is een zwak signaal: de CEO koos *Nine Sols* zelf als referentie (#51) | Een speler die de referentie niet kent, is een sterkere toets; die volgt in F4b(c) als er zo'n P2 is; anders blijft R-V9 open in F8 (kader §3, §4) |
 
 W3–W6 gelden in F0 alleen voor de co-op-metingen.
 
@@ -103,4 +103,4 @@ W3–W6 gelden in F0 alleen voor de co-op-metingen.
 | Versie | Datum | Wijziging |
 |---|---|---|
 | 0.1 | 2026-11-09 | Eerste versie (#80): normen solo én co-op, scripted runs, CEO-sessie met co-op-blok, W1–W8 |
-| 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: slaagcriterium F0 alleen solo (§1, §5); co-op-maten apart als meting met grenzen voor F4b(c) (§1, §3); *Nine Sols*-check in F0 als zwak signaal (§1, §5, W8); CEO-sessie ± 15 min, blok 4 vervallen (§2, §4); vraag over P2 eruit (die hoort bij F4b(a), kader §9) |
+| 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: slaagcriterium F0 alleen solo (§1, §5); co-op-maten apart als meting met grenzen voor F4b(c) (§1, §3); *Nine Sols*-check in F0 als zwak signaal (§1, §5, W8); CEO-sessie ± 15 min, blok 4 vervallen (§2, §4); vraag over P2 eruit (die hoort bij F4b(a), kader §9); na Lead-review EP: in de co-op-tabel alleen norm (3) co-op, C1–C2 en MP-7 als voorwaarde voor F4b(c), MP-4/MP-6 co-op en de sterke check als meting; R-V9 open in F8 zonder geschikte P2 |

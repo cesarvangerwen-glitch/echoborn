@@ -67,7 +67,7 @@ Bijlage: de meetlog-CSV's (zie hieronder)
 ## 5. Wat QA ermee doet (lees na het spelen)
 
 - **Norm (3), MP-5**: gemiddelde score solo ≥ 4,0 en geen kamer < 3,0, per staart; de staart met de hoogste MP-5 die ook de objectieve solo-normen haalt, wordt gekozen (gelijk = 2 s).
-- **M1 is de *Nine Sols*-check** (ideecheck §2, slotzin), hier alleen als **zwak signaal**: jij koos *Nine Sols* zelf als referentie. Daarom beschreef de kaart het merk vooraf alleen neutraal. Noem je spontaan *Nine Sols*, een talisman of "lading die ontploft", dan gaat het merk terug naar afwijkpunt 2 (gdd §2.13). Noem je het niet, dan is de check niet gehaald maar uitgesteld: de sterke check volgt in de slice, met een tweede speler die de referenties niet kent (fasekader §3, F4b(c)).
+- **M1 is de *Nine Sols*-check** (ideecheck §2, slotzin), hier alleen als **zwak signaal**: jij koos *Nine Sols* zelf als referentie. Daarom beschreef de kaart het merk vooraf alleen neutraal. Noem je spontaan *Nine Sols*, een talisman of "lading die ontploft", dan gaat het merk terug naar afwijkpunt 2 (gdd §2.13). Noem je het niet, dan is de check niet gehaald maar uitgesteld: de sterke check volgt in de slice, met een tweede speler die de referenties niet kent, als er zo'n speler is; anders blijft dit risico open bij het besluit over de fase (fasekader §3, F4b(c) en F8).
 - **M2** (de merksprong: ontplofte het merk wel of niet) telt als begrepen bij "de echo kwam (niet) langs" of "het merk was te ver of gedoofd".
 - **Uit de CSV's** rekent QA MP-1 t/m MP-4 en MP-6 per run. Observaties: O1 de stilstand aan de waterkant in K3 bij 3 s (de krapste plek in de scripted runs); O2 landingen met wachten ervoor (R-V12); O3 hoe vaak de echo Leeg is en waarom.
 - **Co-op** (score, wachten, partner als hulp of last, MP-7) toetst QA in de slice (fasekader §3, F4b(c)), niet in deze sessie.
@@ -77,4 +77,4 @@ Bijlage: de meetlog-CSV's (zie hieronder)
 | Versie | Datum | Wijziging |
 |---|---|---|
 | 0.1 | 2026-11-09 | Eerste versie (#80): blokken 1–5 solo en co-op, antwoordblok, meetlogs |
-| 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: alleen solo; blok 4 (co-op) vervallen, nummering 1–5 blijft; P2 uit de besturing en de co-op/P2-velden uit het antwoordblok; waarschuwing tegen Enter; tijd ± 20 → ± 15 min spelen; "Echo: hulp of last?" bij blok 3; M1 als zwak signaal met sterke check in F4b(c); MP-7 en O4 uit §5 |
+| 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: alleen solo; blok 4 (co-op) vervallen, nummering 1–5 blijft; P2 uit de besturing en de co-op/P2-velden uit het antwoordblok; waarschuwing tegen Enter; tijd ± 20 → ± 15 min spelen; "Echo: hulp of last?" bij blok 3; M1 als zwak signaal met sterke check in F4b(c) als er zo'n P2 is, anders R-V9 open in F8; MP-7 en O4 uit §5 |
