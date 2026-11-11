@@ -11,7 +11,7 @@ Plan: `docs/qa/testplan-f0.md`. Deel 1 (scripted runs) staat in §2–§4, deel 
 - **Bij een mens wacht de springplank op je (R-V12).** Vóór 12 van de 14 springplank-landingen in de drie geldige runs stond de CEO ≥ 20 ticks stil, meestal ± D ticks (MP-3: 0–25 % zonder stilstand, norm ≥ 75 %; de bot haalde 100 %). Dat past bij "het duurde te lang" en "sneller kon bewegen met de echo".
 - **Norm (1) bij het gemaal**: langste stilstand steeds in K3 aan de waterkant (175 / 366 / 212 ticks); één run (D = 90) haalt 300 niet.
 - **Gehaald**: norm (2) (MP-2 12,8–13,4 echo-acties/min, K1 en K2 elk ≥ 9,8), MP-4 (2–3 % Leeg) en MP-6 (80–82 % van de LP met de echo, 7–8 pompslagen van de echo).
-- **Er is geen geldige meting van 3 s.** Geen meetlog heeft D = 180; de "3 s"-scores van de CEO staan in-game bij een run op D = 90 (§5.1). QA stelt één korte herhaling op 3 s voor (§7); het advies hierboven steunt daar niet op.
+- **Er is geen geldige meting van 3 s.** Geen meetlog heeft D = 180; de "3 s"-scores van de CEO staan in-game bij een run op D = 90 (§5.1). 3 s volgt in de tweede flow-test; tot dan blijft dat deel van de DoD van T17 open. Het advies hierboven steunt er niet op.
 - ***Nine Sols***: niet spontaan genoemd (M1). Volgens kader §3 is de check niet gehaald maar uitgesteld naar F4b(c). De merksprong was niet leesbaar (M2).
 - **Staartkeuze**: nog geen. Tot de tweede flow-test blijft D = 120 de werkaanname (gdd, werkaanname LGD (3)).
 - **Co-op** telt in F0 niet mee (§4; normen in F4b(c)).
@@ -95,7 +95,7 @@ De D van een run staat in de bestandsnaam en is te controleren in het log zelf: 
 Twee kanttekeningen bij de run van 18:53:
 
 - De scores staan ± 46 000 ticks (± 13 min) na `RUN_EIND` in het log: ze zijn later gegeven, niet meteen na de run.
-- Dezelfde D gaf twee keer heel andere scores (1,0 en 2,0 gemiddeld). Dat kan oefening zijn (run 3 tegenover run 4) of verwachting (de CEO dacht dat het 3 s was). Met één run per D zijn die twee niet te scheiden.
+- Dezelfde D gaf twee keer heel andere scores (1,0 en 2,0 gemiddeld). Dat kan oefening zijn (run 3 tegenover run 4) of verwachting (de CEO dacht dat het 3 s was). Met deze runs zijn die twee niet te scheiden.
 
 De tijden in de bestandsnamen komen van de klok van de laptop; de runs van 19:07 en 19:08 eindigen later dan het tijdstip van het antwoordblok in #80 (19:03 Brusselse tijd; de antwoorden zijn in de chat verzameld en door de Producer geplaatst). Of de klok gelijk liep, is niet na te gaan; QA trekt er geen conclusie uit en koppelt alleen via de in-game scores, die exact overeenkomen.
 
@@ -156,7 +156,7 @@ Per regel van testplan §5 en de DoD van T17:
 Eerlijk over de grond van dit advies:
 
 - **Het steunt op twee runs op D = 90 en één op D = 120**, één speler, en scores die bij één run 13 min later gegeven zijn. Dat is weinig. Maar alle drie wijzen dezelfde kant op, met de objectieve maat MP-3 erbij die van de scores los staat.
-- **3 s is niet gemeten.** Formeel blijft de weg "go bij D = 180" dus open. QA verwacht die niet: bij 3 s wordt het wachten vóór elke springplank en aan de waterkant langer (deel 1: MP-1 groeit met D), en de CEO vond sneller beter. Haalt de herhaling op 3 s (§7) toch MP-1, -2, -4, -6 en een gemiddelde ≥ 4,0 zonder kamer < 3,0, dan herziet QA dit advies.
+- **3 s is nog niet gemeten.** Dat volgt in de tweede flow-test, op het herontwerp; tot dan blijft de eis "staart 1,5 / 2 / 3 s" van de DoD van T17 open. Het advies hangt er niet van af: norm (3) is bij de gemeten staarten ver onder de grens, het wachten vóór de springplank en aan de waterkant groeit met D (deel 1: MP-1 groeit met D), en de CEO vond sneller beter.
 - **De bot bewijst dat de kamer de normen kán halen; de CEO laat zien dat een mens dat niet zo speelt.** De bot loopt zo dat de echo onder hem is als hij springt; een mens wacht op de echo. Het herontwerp moet dus het wachten wegnemen, niet de maten.
 
 ## 7. Wat er nu moet gebeuren
@@ -164,8 +164,7 @@ Eerlijk over de grond van dit advies:
 | Wie | Wat | Waarom |
 |---|---|---|
 | **Lead Game Designer** (met de World & Level Designer) | **Herontwerp van de flow-kamer** vóór een tweede flow-test, op drie punten: (a) **K1**: de springplank mag niet achter de speler liggen; de speler wacht nu bij elk blok ± D ticks (MP-3 0–25 %). (b) **K3**: het gemaal vraagt wachten op de pompslagen van de echo (langste stilstand elke run, 366 ticks bij D = 90; score 1 in elke run). (c) **K2**: de merksprong en de ontploffing met bereik zijn niet leesbaar (M2); stilstanden tot 192 ticks. Hoe, kiest de LGD. Dit is ook de input voor het bijstellen van de startwaarden in [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (gdd, werkaanname LGD (2)–(4)): wat het herontwerp verandert aan E-02, de bouwstenen, LM-04 en D | Testplan §5; kader §6 R-V12: "herontwerp vóór een CEO-vraag (F0)", eigenaar LGD |
-| **CEO** (via de Executive Producer) | **Eén korte herhaling op 3 s**, nog op de huidige build (vóór het herontwerp de kamer verandert), ± 3 min: start het project (F5 in de editor), eerst A, D of spatie, druk **F3** (op een laptop **Fn + F3**) en controleer dat de HUD **D = 180** toont, speel één run, druk drie cijfers en noteer V1. Stuur de nieuwe `meetlog_…_D180_p1.csv` mee. Niet nodig voor het herontwerp om te starten | Maakt de meting "1,5 / 2 / 3 s" compleet, sluit de weg "go bij D = 180" (of opent hem) en geeft de LGD één menselijk punt voor de lange staart |
-| **QA Lead** | Herhaling op 3 s verwerken in dit rapport; daarna het testplan en de kaart voor de **tweede flow-test** op het herontwerp, met per D opnieuw MP-1–MP-6 en MP-5, en de D-controle in de HUD in de kaart (al toegevoegd, kaart §2) | Testplan §5 |
+| **QA Lead** | Het testplan en de kaart voor de **tweede flow-test** op het herontwerp, met per D (90 / 120 / 180) opnieuw MP-1–MP-6 en MP-5, en de D-controle in de HUD in de kaart (al toegevoegd, kaart §2). Daar komt ook de eerste meting op 3 s; tot dan blijft dat deel van de DoD van T17 open | Testplan §5; DoD T17 |
 | **Gameplay Programmer / UX Designer** | Overwegen: de D ook op het scorescherm tonen (`HUD_RUN_DONE`) en de scores meteen na `RUN_EIND` vragen, zodat een verkeerde D of een late score direct opvalt (§8 punt 8) | §5.1 |
 
 ## 8. Open punten
@@ -180,12 +179,12 @@ Eerlijk over de grond van dit advies:
 | 6 | **P2 krijgt geen oefenrun** vóór de getelde co-op-runs | Geen co-op in de F0-sessie (besluit #124); meenemen in de kaart voor F4b(a)/(c) (T11) | qa-lead |
 | 7 | **MP-7 (a) is in de gdd de mediane runtijd**; een sessie met mensen geeft één co-op- en één solo-run per D | Geen co-op in de F0-sessie (besluit #124); in F4b(c) rapporteert QA één waarde per D als enkele meting, niet als oordeel over MP-7 (a), tenzij er meer runs zijn | qa-lead, lead-game-designer |
 | 8 | **De D van een run is alleen in de HUD tijdens de run en in de bestandsnaam te zien**; het scorescherm noemt hem niet, en de scores mogen ook veel later (§5.1: ± 13 min) | Een F-toets die niet aankomt (laptop: Fn), of een late score, valt zo pas bij QA op. Voorstel: D op het scorescherm (`HUD_RUN_DONE`) | gameplay-programmer, ux-designer |
-| 9 | **Geen geldige meting op 3 s** (§5.1) | De DoD vraagt 1,5 / 2 / 3 s; één herhaling op de huidige build (§7) | ceo (via de executive-producer), qa-lead |
+| 9 | **Geen geldige meting op 3 s** (§5.1) | De DoD van T17 vraagt 1,5 / 2 / 3 s; 3 s volgt in de tweede flow-test en blijft tot dan open (§7) | qa-lead |
 | 10 | Eerste knop op de pijltjeskant maakt speler 1 | Staat als open punt in de kaart (*Open punten*) | ux-designer, gameplay-programmer |
 
 ## 9. Werkaannames
 
-W1–W10 uit `docs/qa/testplan-f0.md` §6 (kader §5). De belangrijkste voor dit rapport: de bot is de geoefende solo-speler (W2), de co-op-partners zijn ondergrenzen (W3), MP-4, MP-7 (b) en (c) in co-op volgen W4–W6, de CEO is geoefend vanaf zijn derde run (W7), M1 is een zwak signaal (W8), de D van een CEO-run komt uit het log en niet uit het label in het antwoordblok (W9), en MP-5 per D is het gemiddelde van K1–K3 van die ene run (W10). Daarnaast de werkaanname van de LGD: D = 120 tot T17 een staart kiest (gdd, werkaanname LGD (3)).
+W1–W10 uit `docs/qa/testplan-f0.md` §6 (kader §5). De belangrijkste voor dit rapport: de bot is de geoefende solo-speler (W2), de co-op-partners zijn ondergrenzen (W3), MP-4, MP-7 (b) en (c) in co-op volgen W4–W6, de CEO is geoefend vanaf zijn derde run (W7), M1 is een zwak signaal (W8), de D van een CEO-run komt uit het log en niet uit het label in het antwoordblok (W9), en MP-5 is per run het gemiddelde van K1–K3 (W10). Daarnaast de werkaanname van de LGD: D = 120 tot T17 een staart kiest (gdd, werkaanname LGD (3)).
 
 ## Wijzigingen
 
@@ -193,4 +192,5 @@ W1–W10 uit `docs/qa/testplan-f0.md` §6 (kader §5). De belangrijkste voor dit
 |---|---|---|
 | 0.1 | 2026-11-09 | Eerste versie (#80): scripted runs solo en co-op, open punten |
 | 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: alleen de verwijzingen naar co-op/P2 als F0-voorwaarde bijgewerkt (kop, §1, §4-titel en punt 3 van "Wel", §5, §6 punt 1 en 4–7); meetwaarden ongewijzigd |
-| 0.3 | 2026-11-11 | Deel 2 (CEO solo) en QA-advies F0 (#80): titel en §1 nieuw; §5 (meetlogs van de CEO, welke run welke D is, normen per run, antwoorden), §6 (advies: herontwerp + tweede flow-test), §7 (wat nu, met de herhaling op 3 s); open punten 8–10; werkaannames W9–W10; oude §5 vervangen, §6–§7 hernummerd naar §8–§9; meetlogs in `docs/qa/f0-meetlogs/` |
+| 0.3 | 2026-11-11 | Deel 2 (CEO solo) en QA-advies F0 (#80): titel en §1 nieuw; §5 (meetlogs van de CEO, welke run welke D is, normen per run, antwoorden), §6 (advies: herontwerp + tweede flow-test), §7 (wat nu; 3 s in de tweede flow-test); open punten 8–10; werkaannames W9–W10; oude §5 vervangen, §6–§7 hernummerd naar §8–§9; meetlogs in `docs/qa/f0-meetlogs/` |
+| 0.3.1 | 2026-11-11 | Na Lead-review EP: geen herhaling op 3 s; 3 s volgt in de tweede flow-test en dat deel van de DoD blijft open (§1, §6, §7, open punt 9); advies zonder voorwaarde; W10 = MP-5 per run |
