@@ -271,16 +271,10 @@ func _build_backdrop() -> void:
 			_level.add_child(_k3_tint)
 
 
-## Middelpunten van de pompschoepen (LM-03, FK-5). De geometrie is van de
-## World & Level Designer (W-4): staat `PUMP_VANES` in `flow_layout.gd`, dan
-## die; anders één schoep op `POMPRAD_AT` (het pomprad van v0.6).
-# TODO(W-4): vervang `get_script_constant_map` door de directe constante `Layout.PUMP_VANES` zodra W-4 landt.
+## Middelpunten van de pompschoepen (LM-03, FK-5): de pompgang van K3
+## (`Layout.PUMP_VANES`, W-4), in de looprichting naar de sluis.
 static func vane_positions() -> Array:
-	var layout_script: Script = Layout
-	var consts: Dictionary = layout_script.get_script_constant_map()
-	if consts.has("PUMP_VANES"):
-		return consts["PUMP_VANES"]
-	return [Layout.POMPRAD_AT]
+	return Layout.PUMP_VANES
 
 
 func _build_gemaal() -> void:

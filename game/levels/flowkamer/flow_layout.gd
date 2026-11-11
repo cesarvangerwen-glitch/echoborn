@@ -99,19 +99,48 @@ const SHAFT_BOTTOM := LEVEL_450 + ONE_WAY_T
 const K2_HOLE := Rect2(2000, 340, 60, 10)
 const K2_LEFT := 1450.0
 const K2_RIGHT := 2060.0
-## K3: sluis links, straat met Diepwater, oever met pomprad rechts.
+## K3 als **pompgang** (gdd §4.2, FK-5, LM-04, W-4; na F0). Van rechts naar
+## links, in de looprichting: P1 valt door het gat van K2 op de vloer
+## (x ± 2008–2120), loopt naar links door vier pompschoepen (80 px uit
+## elkaar, middelpunt `VANE_UP` boven de vloer) en dan 280 px over de kade
+## naar de sluis. De ondergelopen straat met `Diepwater` ligt lager, onder de
+## kade: de route loopt er niet doorheen, en na `GEMAAL_VOL` zie je het water
+## zakken (LM-06).
 const SLUICE := Rect2(1440, 360, 20, 250)
-const STREET := Rect2(1470, 570, 330, 40)   ## Diepwater bij hoog water: waterlijn 570
-const WATER_HIGH := 570.0
-const WATER_LOW := 610.0
-const POMPRAD_AT := Vector2(1960, FLOOR - 30.0)  ## middelpunt 30 px boven de vloer (FK-5: 15–40)
-## Trap terug naar K2 (K3 → K2 zonder sluis): vijf eenrichtingsrichels.
+## Kade: dicht, op vloerhoogte, boven de straat (x 1480–1720).
+const QUAY := Rect2(1480, FLOOR, 240, 8)
+## Straat met Diepwater onder de kade: waterlijn 640 (hoog) of 690 (laag),
+## bodem 690. P1 komt er niet (de kade is dicht); alleen beeld.
+const STREET := Rect2(1480, 640, 240, 50)
+const WATER_HIGH := 640.0
+const WATER_LOW := 690.0
+## Pompschoepen (LM-03, FK-5): middelpunt 38 px boven de vloer (FK-5: 15–40;
+## lopend én op de top van een volle sprong te raken vanaf ± 37 px), 80 px
+## uit elkaar; de laatste (links) 280 px van de sluis (x 1460).
+const VANE_UP := 38.0
+const VANE_STEP := 80.0
+const PUMP_VANES := [
+	Vector2(1980, FLOOR - VANE_UP),
+	Vector2(1900, FLOOR - VANE_UP),
+	Vector2(1820, FLOOR - VANE_UP),
+	Vector2(1740, FLOOR - VANE_UP),
+]
+## Wand van het gemaalhuis: hangt onder de rand van het gat (x 1990–2000,
+## y 350–500). Wie door het gat valt en naar links stuurt, of op de bovenste
+## trede staat en naar links loopt, komt pas onder de wand vandaan als hij
+## bijna op de vloer is; zo landt iedereen rechts van de eerste schoep.
+const GEMAALHUIS_WALL := Rect2(1990, 350, 10, 150)
+## Trap terug naar K2 (K3 → K2 zonder sluis): vijf eenrichtingsrichels,
+## oplopend naar links. De bovenste (x 2000–2026) ligt onder het linkerdeel
+## van het gat: van daar spring je recht omhoog K2 in. Wie door het gat valt,
+## landt er alleen op als hij meteen loslaat; met de knop naar rechts val je
+## langs alle treden op de vloer (± x 2120).
 const STAIRS := [
-	Rect2(2320, 565, 60, ONE_WAY_T),
-	Rect2(2250, 520, 60, ONE_WAY_T),
-	Rect2(2170, 475, 60, ONE_WAY_T),
-	Rect2(2090, 430, 60, ONE_WAY_T),
-	Rect2(2000, 385, 70, ONE_WAY_T),
+	Rect2(2316, 565, 60, ONE_WAY_T),
+	Rect2(2236, 520, 60, ONE_WAY_T),
+	Rect2(2156, 475, 60, ONE_WAY_T),
+	Rect2(2076, 430, 60, ONE_WAY_T),
+	Rect2(2000, 385, 26, ONE_WAY_T),
 ]
 
 ## Start van de run en van elke kamer (respawn, LM-05).
@@ -229,7 +258,11 @@ static func blocks(d: int) -> Array:
 	# Plafond van K3 rechts van K2.
 	out.append(["K3Plafond", Rect2(K2.end.x, K2_FLOOR, K3.end.x - K2.end.x, 10), false])
 	# --- K3 ---
-	out.append(["K3Vloer", Rect2(K1.end.x, FLOOR, K3.end.x - K1.end.x, 720 - FLOOR), false])
+	out.append(["K3VloerSluis", Rect2(K1.end.x, FLOOR, QUAY.position.x - K1.end.x, 720 - FLOOR), false])
+	out.append(["Kade", QUAY, false])
+	out.append(["Straatbodem", Rect2(STREET.position.x, STREET.end.y, STREET.size.x, 720 - STREET.end.y), false])
+	out.append(["K3Vloer", Rect2(QUAY.end.x, FLOOR, K3.end.x - QUAY.end.x, 720 - FLOOR), false])
+	out.append(["Gemaalhuiswand", GEMAALHUIS_WALL, false])
 	for i in STAIRS.size():
 		out.append(["Trap%d" % (i + 1), STAIRS[i], true])
 	return out
