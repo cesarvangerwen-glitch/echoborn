@@ -1,6 +1,6 @@
 # Testplan F0-2: tweede flow-test op de herontworpen flow-kamer (T17-2)
 
-Versie 0.1 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
+Versie 0.1.1 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
 
 Basis: gdd v0.7.3 §4.5 (MP-1–MP-7, keuzeregel), §4.7.1–§4.7.3 en **§4.7.5** (wat het herontwerp nodig heeft), §5 (playtestvragen); `docs/design/kamers/flowkamer.md` (§3 keerpunten, §9 gemeten, §12 antwoord 1 van de LGD); rapport F0 v0.3.1 (`docs/qa/rapport-f0-flowtest.md`, §5–§8, open punten 8–11); het testplan van de eerste flow-test (`docs/qa/testplan-f0.md` v0.3.1, normen §1, W1–W10); fasekader §3 F0; besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B: de CEO speelt alleen solo) en #51 (staart bereik 1,5–3 s).
 
@@ -22,7 +22,7 @@ De sessie vraagt de **hele** herontworpen kamer, ook K3 (W-4). Zonder W-4 meet d
 
 | Wat | Waarde (in te vullen door QA vóór de sessie) |
 |---|---|
-| Build | `main` op commit `________`, na de merge van de PR van de World & Level Designer voor [#176](https://github.com/cesarvangerwen-glitch/echoborn/issues/176) (W-4–W-7; G-1–G-5 zitten erin via PR #178, W-1–W-3 via PR #179) |
+| Build | `main` op commit `________`, na de merge van PR [#181](https://github.com/cesarvangerwen-glitch/echoborn/pull/181) van de World & Level Designer voor [#176](https://github.com/cesarvangerwen-glitch/echoborn/issues/176) (W-4–W-7; G-1–G-5 zitten erin via PR #178, W-1–W-3 via PR #179) |
 | D-toetsen | F1 = D `___`, F2 = D `___`, F3 = D `___` (verwacht 90 / 120 / 180, zoals `DEBUG_TAIL_KEYS` in `flow_room.gd` en `flowkamer.md` §8) |
 | Plek van de schoepen en de sluis in K3 (voor §4.3) | schoepen x `____ / ____ / ____ / ____`, vloer y `____`; sluisdoorgang x `____` (uit `flowkamer.md` §5 na W-7) |
 
@@ -138,6 +138,8 @@ Draaiboek: `docs/qa/ceo-kaart-f0-2.md`. ± 20–25 min, geen luistercheck (F2 is
 | M2 niet begrepen, of plank-signaal / doelstreep niet gezien | Geen F0-voorwaarde. Bevinding voor de LGD en de Gameplay Programmer (E-02t, E-07d, E-14j) en voor de UX Designer en Art Director in T10 |
 | De verwachting van de LGD (gdd §4.7.2) per kamer niet uitgekomen, maar de normen wel gehaald | Bevinding voor [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) |
 
+**V1** ("wist je waar je echo zou zijn?", grens gdd §5 vraag 1: gemiddeld ≥ 4) telt niet mee in het oordeel: de keuzeregel van gdd §4.5 en F0 noemen hem niet; QA rapporteert V1 per run en per D als bevinding.
+
 Het rapport noemt bij elk oordeel hoeveel runs het draagt (één speler, twee runs per D) en of oefening (eerste tegenover tweede helft van de getelde runs) het beeld kan verklaren.
 
 ## 7. Werkaannames (kader §5)
@@ -162,7 +164,7 @@ W1, W2, W7, W8, W9 en W10 uit `docs/qa/testplan-f0.md` §6 blijven gelden (W3–
 
 | # | Wat | Wie |
 |---|---|---|
-| 1 | Build-commit, D-toetsen en de K3-coördinaten invullen (§2) zodra de PR van de WLD voor [#176](https://github.com/cesarvangerwen-glitch/echoborn/issues/176) gemerged is; daarna de checklist van §2 | qa-lead |
+| 1 | Build-commit (ook in de zip-link van de kaart), D-toetsen en de K3-coördinaten invullen (§2) zodra PR #181 van de WLD voor [#176](https://github.com/cesarvangerwen-glitch/echoborn/issues/176) gemerged is; daarna de checklist van §2 | qa-lead |
 | 2 | Rekenscript `docs/qa/f0-2-meetlogs/rekenen.gd` met §4.2–§4.3, getoetst op de gescripte run en de wachtbot | qa-lead |
 | 3 | Eerste knop op de pijltjeskant maakt speler 1 (rapport F0 open punt 10): de kaart werkt eromheen | ux-designer, gameplay-programmer |
 
@@ -171,3 +173,4 @@ W1, W2, W7, W8, W9 en W10 uit `docs/qa/testplan-f0.md` §6 blijven gelden (W3–
 | Versie | Datum | Wijziging |
 |---|---|---|
 | 0.1 | 2026-11-11 | Eerste versie (#80, T17-2 deel 1): normen en keuzeregel per D, twee getelde runs per D, MP-3 per bouwsteen en per keerpunt, stilstand per kamer met plek, M2 en *Nine Sols*, observaties keren en plank-signaal/doelstreep, oordeel en gevolgen, W11–W21 |
+| 0.1.1 | 2026-11-11 | Na Lead-review EP: PR #181 bij naam (§2, §8); V1 alleen bevinding, niet in het oordeel (§6) |
