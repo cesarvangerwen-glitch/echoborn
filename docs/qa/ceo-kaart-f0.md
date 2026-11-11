@@ -22,7 +22,7 @@ Je speelt **alleen solo**, zonder tweede speler (besluit [#124](https://github.c
 | Debug | **F1 / F2 / F3** = staart 1,5 / 2 / 3 s (nieuwe run) · F6 = herstart | — |
 | Na de run | Druk **drie cijfers 1–5**: de score voor K1, K2 en K3 (in die volgorde) | — |
 
-Druk tijdens een run **niet op Enter** (of op Start van een tweede controller): dan komt er een tweede speler bij en is het geen solo-run meer. Gebeurt het toch: F6 en opnieuw.
+Druk tijdens een run **niet op Enter of Start** (Start op een controller waarmee je niet speelt): dan komt er een tweede speler bij en is het geen solo-run meer. Gebeurt het toch: F6 en opnieuw.
 
 Het doel van een run: door K1 (sprongen), K2 (vijanden), K3 (pomp het gemaal vol), dan door de sluis. De HUD toont kamer, staart (D) en tijd.
 
@@ -33,10 +33,9 @@ Het doel van een run: door K1 (sprongen), K2 (vijanden), K3 (pomp het gemaal vol
 | Blok | Wat je doet | Tijd |
 |---|---|---|
 | 1 | **F2**, speel 2 oefenruns. Druk na elke run drie willekeurige cijfers (oefenruns tellen niet). | ± 5 min |
-| 2 | **F3** (3 s), dan **F1** (1,5 s), dan **F2** (2 s): elk één run. Na elke run: drie cijfers in het spel, en noteer in §4 je score per kamer en V1. | ± 7 min |
+| 2 | **F3** (3 s), dan **F1** (1,5 s), dan **F2** (2 s): elk één run. Na elke run: drie cijfers in het spel, en noteer in §4 je score per kamer en V1 (wist je waar je echo zou zijn, 1–5). | ± 7 min |
 | 3 | Beantwoord M1, M2 en "Echo: hulp of last?" in §4 (meteen na blok 2). | ± 1–2 min |
-| 4 | *Vervallen* (besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124)): geen co-op in deze sessie. Ga door naar blok 5. | — |
-| 5 | Luistercheck F2 (audio bible §9.4) op `docs/audio/f2-fragment/f2_merk_aftelling_carillon_placeholder.wav`, eerst op de koptelefoon, dan op de tv. | ± 5 min |
+| 4 | Luistercheck F2 (audio bible §9.4) op `docs/audio/f2-fragment/f2_merk_aftelling_carillon_placeholder.wav`, eerst op de koptelefoon, dan op de tv. | ± 5 min |
 
 Lukt een run niet (vast, of je wilt opnieuw): F6. De afgebroken run wordt bewaard en telt niet mee.
 
@@ -77,4 +76,4 @@ Bijlage: de meetlog-CSV's (zie hieronder)
 | Versie | Datum | Wijziging |
 |---|---|---|
 | 0.1 | 2026-11-09 | Eerste versie (#80): blokken 1–5 solo en co-op, antwoordblok, meetlogs |
-| 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: alleen solo; blok 4 (co-op) vervallen, nummering 1–5 blijft; P2 uit de besturing en de co-op/P2-velden uit het antwoordblok; waarschuwing tegen Enter; tijd ± 20 → ± 15 min spelen; "Echo: hulp of last?" bij blok 3; M1 als zwak signaal met sterke check in F4b(c) als er zo'n P2 is, anders R-V9 open in F8; MP-7 en O4 uit §5 |
+| 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: alleen solo; blok 4 (co-op) vervallen en weggelaten, luistercheck is nu blok 4; P2 uit de besturing en de co-op/P2-velden uit het antwoordblok; waarschuwing tegen Enter; tijd ± 20 → ± 15 min spelen; "Echo: hulp of last?" bij blok 3; M1 als zwak signaal met sterke check in F4b(c) als er zo'n P2 is, anders R-V9 open in F8; MP-7 en O4 uit §5; Start als meedoe-knop in de waarschuwing |

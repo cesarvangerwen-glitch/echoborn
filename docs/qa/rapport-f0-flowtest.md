@@ -59,7 +59,7 @@ In co-op is er geen echo: P2 is het tweede lichaam (gdd §2.7). P2 komt erin zod
 Wat dit wel en niet zegt:
 
 - **Niet**: dat co-op de normen mist. Beide partners doen bijna niets samen. De schaduwpartner werkt tot B3 (P1 vangt zich op P2), maar dan staat P1 hoger en kan P2 niet volgen: anders dan de echo, die zijn opgenomen posities afspeelt, heeft een levend lichaam zelf een plank nodig om omhoog te komen, en P1 is al verder. Daarna loopt P2 alleen mee. Een echt duo wisselt van rol (P2 bounct ook op P1, gdd §2.7); die run bestaat nog niet.
-- **Wel**: (1) co-op zonder samenwerken is **trager** dan solo met echo (1,3–1,55×) en blijft binnen FK-2/C-15 (≤ 2× de run met echo uit): de route blijft open. (2) MP-7 (a) "niet meer dan 2× zo snel" kan pas mislukken met een duo dat écht samenwerkt; dat is precies de run die ontbreekt. (3) **Een P2 die niet meeklimt, staat 6–7,5 s stil zonder dat de leiband hem oplost** (meeloper, MP-7 b 358–448 ticks), want hij blijft in beeld onder P1. Bij een mens is dat een "ik wacht"-moment; observatie O4 op de kaart en een punt voor de LGD (C-07).
+- **Wel**: (1) co-op zonder samenwerken is **trager** dan solo met echo (1,3–1,55×) en blijft binnen FK-2/C-15 (≤ 2× de run met echo uit): de route blijft open. (2) MP-7 (a) "niet meer dan 2× zo snel" kan pas mislukken met een duo dat écht samenwerkt; dat is precies de run die ontbreekt. (3) **Een P2 die niet meeklimt, staat 6–7,5 s stil zonder dat de leiband hem oplost** (meeloper, MP-7 b 358–448 ticks), want hij blijft in beeld onder P1. Bij een mens is dat een "ik wacht"-moment; observatie voor F4b(c) en een punt voor de LGD (C-07).
 
 ## 5. Wat alleen de CEO kan geven
 
@@ -93,4 +93,4 @@ W1–W8 uit `docs/qa/testplan-f0.md` §6. De belangrijkste voor dit rapport: de 
 | Versie | Datum | Wijziging |
 |---|---|---|
 | 0.1 | 2026-11-09 | Eerste versie (#80): scripted runs solo en co-op, open punten |
-| 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: alleen de verwijzingen naar co-op/P2 als F0-voorwaarde bijgewerkt (kop, §1, §4-titel, §5, §6 punt 1 en 4–7); meetwaarden ongewijzigd |
+| 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: alleen de verwijzingen naar co-op/P2 als F0-voorwaarde bijgewerkt (kop, §1, §4-titel en punt 3 van "Wel", §5, §6 punt 1 en 4–7); meetwaarden ongewijzigd |

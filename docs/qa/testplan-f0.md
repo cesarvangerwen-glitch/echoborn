@@ -68,8 +68,7 @@ Draaiboek en scorekaart: `docs/qa/ceo-kaart-f0.md`. Opbouw (± 15 min spelen + �
 | 1 | Twee oefenruns solo, D = 120 (tellen niet mee: geoefend = vanaf de derde run, gdd §4.5) | ± 5 min |
 | 2 | Solo D = 180, D = 90, D = 120 (wisselende volgorde, gdd §5); na elke run score per kamer (toetsen 1–5) en "wist je waar je echo zou zijn?" | ± 7 min |
 | 3 | Open vraag over het merk, **vóór** we iets over het merk zeggen (zwak *Nine Sols*-signaal), de merksprong-vraag en "echo: hulp of last?" | ± 1–2 min |
-| 4 | *Vervallen* (besluit #124: 1B); co-op met de CEO volgt in F4b(a)/(c) | — |
-| 5 | Luistercheck F2 (audio bible §9.4): drie ja/nee-vragen | ± 5 min |
+| 4 | Luistercheck F2 (audio bible §9.4): drie ja/nee-vragen | ± 5 min |
 
 De CEO stuurt de meetlog-CSV's mee (de kamer schrijft ze zelf, `docs/design/kamers/flowkamer.md` §7). De QA Lead rekent ze uit met `flow_report.gd`.
 
@@ -103,4 +102,4 @@ W3–W6 gelden in F0 alleen voor de co-op-metingen.
 | Versie | Datum | Wijziging |
 |---|---|---|
 | 0.1 | 2026-11-09 | Eerste versie (#80): normen solo én co-op, scripted runs, CEO-sessie met co-op-blok, W1–W8 |
-| 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: slaagcriterium F0 alleen solo (§1, §5); co-op-maten apart als meting met grenzen voor F4b(c) (§1, §3); *Nine Sols*-check in F0 als zwak signaal (§1, §5, W8); CEO-sessie ± 15 min, blok 4 vervallen (§2, §4); vraag over P2 eruit (die hoort bij F4b(a), kader §9); na Lead-review EP: in de co-op-tabel alleen norm (3) co-op, C1–C2 en MP-7 als voorwaarde voor F4b(c), MP-4/MP-6 co-op en de sterke check als meting; R-V9 open in F8 zonder geschikte P2 |
+| 0.2 | 2026-11-11 | Na besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B) en fasekader v0.3: slaagcriterium F0 alleen solo (§1, §5); co-op-maten apart als meting met grenzen voor F4b(c) (§1, §3); *Nine Sols*-check in F0 als zwak signaal (§1, §5, W8); CEO-sessie ± 15 min, co-op-blok vervallen en de luistercheck hernummerd naar blok 4 (§2, §4); vraag over P2 eruit (die hoort bij F4b(a), kader §9); na Lead-review EP: in de co-op-tabel alleen norm (3) co-op, C1–C2 en MP-7 als voorwaarde voor F4b(c), MP-4/MP-6 co-op en de sterke check als meting; R-V9 open in F8 zonder geschikte P2 |
