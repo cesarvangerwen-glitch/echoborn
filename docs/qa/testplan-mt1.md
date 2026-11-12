@@ -1,6 +1,6 @@
 # Testplan MT1: mijlpaaltest flow-kamer op D = 60 (T17, F0 norm 3)
 
-Versie 0.1.2 · 2026-11-12 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
+Versie 0.1.3 · 2026-11-12 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
 
 Basis: fasekader v0.4 (`docs/productie/fase-2-kader.md`: §3 F0, §4 mijlpaaltest MT1, T17); besluiten van 2026-11-12 in `docs/beslissingen.md` (echo-staart **1 s, D = 60**, bereik 1–3 s, zonder aparte check; fase 2 parallel; **de CEO test alleen bij mijlpalen**, kaart ± 10–15 min, ± 3–4 runs); besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (F0 solo); gdd v0.8 §4.5 (MP-1–MP-6), **§4.8** (D = 60 doorgerekend, §4.8.3 punt 6 en 11, §4.8.4 W-8–W-11) en O-23; pitch v0.5 §10 R-V1; rapport F0-2 v0.1.2 (`docs/qa/rapport-f0-2-flowtest.md`, §7, **§8.3** de negen bot-punten, §11); testplan F0-2 v0.1.4 (W11–W21).
 
@@ -119,6 +119,7 @@ Vervolgregels (gdd §4.8.2, §4.8.3 punt 1, 11 en 13; `flowkamer.md` §12):
 | K1 | langste stilstand per bouwsteen, B4 inbegrepen (39 ticks wachten van slag tot sprong) | ≤ 60 ticks |
 | K2 | per merk de langste stilstand tussen `MERK_GEZET` en de `MERKSPRONG` erna (merk leeft D + 30 = 90 ticks); langste stilstand in K2, met afstand tot het pantserdoel (x 1579) | ≤ 60 ticks (wachten op de knal hooguit ± 60) |
 | K3 | elke stilstand ≥ 30 ticks met plek (schoepen, sluis, elders; W17); landing op de **bovenste trede** en K3 → K2 → K3 (rapport F0-2 §5.3; na de keuze van de WLD in W-11); stilstand bij de sluis (LM-04 ≤ 30) | ≤ 30 ticks |
+| K3 → K2 → K3 | **per keer de duur in ticks**, van het verlaten van K3 (`KAMER` K2 na K3) tot P1 K3 weer binnenkomt (`KAMER` K3), uit het meetlog; per run in het rapport, met het aantal keren, de LP die het opleverde en of hij op de bovenste trede landde. Komt hij niet terug in K3: de duur tot `RUN_EIND`. `rekenen.gd` geeft het per keer (`_k3_k2_k3`) | Voorwaarde voor de kandidaat-terugkeerregel van K2 (gdd v0.8.1 §4.2): die gaat in als het in MT1 opnieuw voorkomt **en > ± 600 ticks (10 s)** kost; QA meldt dat aan de LGD |
 
 ### 4.4 Uit het antwoordblok (open vragen, kaart §4)
 
@@ -201,3 +202,4 @@ Uit `testplan-f0.md` §6 blijven W1, W2, W7 (in de vorm van W25), W8, W9 en W10;
 | 0.1 | 2026-11-12 | Eerste versie (#80, T17 MT1): voorwaarden met de negen bot-punten (in te vullen), normen op D = 60, MP-3 per keerpunt met B3, open vragen (R voor R-V1, M1, O1, M2, H, V1, X), 1 oefenrun + 3 getelde runs, oordeel met O-23, W25–W30 |
 | 0.1.1 | 2026-11-12 | Na Lead-review EP: §4.2 en §6, bij MP-3 of MP-2 (K1) niet gehaald eerst een herontwerp door de LGD met de bots, zonder CEO; alleen een wijziging van hoe de echo reageert (O-23) is een `ceo-beslissing`; "kaderregel" geschrapt |
 | 0.1.2 | 2026-11-12 | Na de merge van #202 (en #201): build `d9f420c` en zip-link, keerwanden en niveaus van K1 (`flowkamer.md` v0.7), de negen bot-punten ingevuld en allemaal ✅, suite 274/0 (§2); `docs/qa/mt1-meetlogs/rekenen.gd` en `botlogs.gd` voor D = 60, getoetst; W26 definitief (de plek van de stilstand beslist A/B/C, grens 30 px); open punt 1 en 2 gedaan |
+| 0.1.3 | 2026-11-12 | §4.3: duur van K3 → K2 → K3 per keer in ticks, per run in het rapport (gdd v0.8.1 §4.2, kandidaat-terugkeerregel K2; PR #205); `rekenen.gd` met `_k3_k2_k3` |

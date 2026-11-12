@@ -378,5 +378,33 @@ func _k3(rows: Array, stills: Array, gemaal: int, run_end: int) -> void:
 				break
 	print("  K3: stilstand ≥ 30 of op de trede: %s" % (", ".join(parts) if not parts.is_empty() else "geen"))
 	print("  K3: kort in K3 en terug naar K2 (bovenste trede, sprong omhoog): %s" % (", ".join(top) if not top.is_empty() else "nee"))
+	_k3_k2_k3(rows)
 	print("  K3: stilstand bij de sluis %d ticks (LM-04 ≤ 30); GEMAAL_VOL op %d, RUN_EIND %d ticks later" % [
 		sluice, gemaal, run_end - gemaal if gemaal >= 0 else -1])
+
+
+## gdd v0.8.1 §4.2 (kandidaat-terugkeerregel K2): per keer K3 → K2 → K3 de duur
+## in ticks, van het verlaten van K3 (`KAMER` K2) tot P1 K3 weer binnenkomt
+## (`KAMER` K3). Komt P1 niet terug in K3, dan tot `RUN_EIND` of het eind van het log.
+func _k3_k2_k3(rows: Array) -> void:
+	var prev := ""
+	var left := -1
+	var parts := PackedStringArray()
+	var last_tick := 0
+	for r: Array in rows:
+		last_tick = int(r[0])
+		if r[2] != "KAMER":
+			continue
+		var now: String = r[4]
+		var t := int(r[0])
+		if prev == "K3" and now == "K2":
+			left = t
+		elif now == "K3" and left >= 0:
+			var n := t - left
+			parts.append("%d ticks (%.1f s, tick %d–%d)%s" % [n, n / 60.0, left, t, " > 600" if n > 600 else ""])
+			left = -1
+		prev = now
+	if left >= 0:
+		parts.append("niet terug in K3 (vanaf tick %d, %d ticks tot het eind)" % [left, last_tick - left])
+	print("  K3 → K2 → K3, duur per keer (gdd §4.2, grens ± 600 ticks): %s" % (
+		"; ".join(parts) if not parts.is_empty() else "geen"))
