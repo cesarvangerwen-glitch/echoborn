@@ -11,7 +11,8 @@ extends Node2D
 ## Backspace laat P2 stoppen (pijltjes + Enter + rechter Ctrl, `input.md`
 ## §2a); zolang P2 meedoet, is er geen echo
 ## (C-01). De echte drop-in en drop-out (C-03, C-05) komen in T16c; de
-## flow-kamer in T16b.
+## flow-kamer in T16b. Vijanden van de slice (T8b, placeholder): een Kadeloper en een
+## Schotdrager als E-paar en een Dwaallicht; Neerslag (V-01) = S + E in de lucht (P2: ↓).
 
 const Sim = preload("res://scripts/sim.gd")
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
@@ -21,10 +22,13 @@ const InputSetup = preload("res://scripts/input/input_setup.gd")
 const SpikeWorld = preload("res://scripts/world/spike_world.gd")
 const Tuning = preload("res://scripts/echo/tuning.gd")
 const CombatTarget = preload("res://scripts/combat/combat_target.gd")
+const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
+const EnemyData = preload("res://scripts/combat/enemy_data.gd")
+## De toets-naar-plek-tabel van het debugmenu staat op één plek: in de flow-kamer (SM-punt PR #194).
+const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
 
 const PLAYER_COLORS := [Color(1.0, 0.85, 0.4), Color(0.5, 0.85, 1.0)]
 const ECHO_COLOR := Color(0.2, 0.15, 0.35, 0.8)
-const DEBUG_TAIL_KEYS := {KEY_F1: 0, KEY_F2: 1, KEY_F3: 2, KEY_F7: 3}
 
 var _sim: Sim
 var _p1: PlayerActor
@@ -51,6 +55,18 @@ func _ready() -> void:
 		target.setup_target(spec[0])
 		target.position = Vector2(spec[1], SpikeWorld.FLOOR_Y - 12.0)
 		_sim.add_object(target)
+	# T8b (placeholder): een E-paar Kadeloper + Schotdrager en een Dwaallicht (slice.csv).
+	var floor_y := SpikeWorld.FLOOR_Y
+	var kadeloper := SliceEnemy.new()
+	kadeloper.setup_enemy(SliceEnemy.Type.KADELOPER, 720.0, floor_y)
+	var schotdrager := SliceEnemy.new()
+	var e_pair := EnemyData.value("gedeeld", "paar_e")
+	schotdrager.setup_enemy(SliceEnemy.Type.SCHOTDRAGER, 720.0 + e_pair, floor_y)
+	SliceEnemy.make_pair(kadeloper, schotdrager, e_pair)
+	var dwaallicht := SliceEnemy.new()
+	dwaallicht.setup_enemy(SliceEnemy.Type.DWAALLICHT, 860.0, floor_y, 840.0, 900.0)
+	for enemy: SliceEnemy in [kadeloper, schotdrager, dwaallicht]:
+		_sim.add_object(enemy)
 	var camera := Camera2D.new()
 	camera.position = Vector2(640, 260)
 	add_child(camera)
@@ -61,9 +77,8 @@ func _ready() -> void:
 # InputRouter (T16c deel 2).
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo \
-			and DEBUG_TAIL_KEYS.has(event.physical_keycode):
-		var options: Array = Tuning.echo()["tail_options"]
-		_tail = int(options[DEBUG_TAIL_KEYS[event.physical_keycode]])
+			and FlowRoom.DEBUG_TAIL_KEYS.has(event.physical_keycode):
+		_tail = FlowRoom.debug_tail(event.physical_keycode)
 		_sim.set_tail_ticks(_tail)
 	elif event.is_action_pressed("p2_join") and _p2 == null:
 		_p2 = PlayerActor.new()

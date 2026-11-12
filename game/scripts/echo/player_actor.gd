@@ -78,6 +78,9 @@ var _respawn_position := Vector2.ZERO
 var _respawn_death := false
 var _stance_event := -1000000   ## tick van het laatste AANVAL-event (C-11a)
 var _stance_held := false        ## AANVAL sindsdien aaneengesloten ingedrukt
+## VJ-02 (LM-05): schade per vijandelijke treffer en ticks onkwetsbaar daarna (uit data, in `setup`).
+var _hit_damage := 1
+var _invulnerable_ticks := 45
 
 
 func setup(p_player_index: int, p_input_source: RefCounted, color: Color,
@@ -85,6 +88,8 @@ func setup(p_player_index: int, p_input_source: RefCounted, color: Color,
 	player_index = p_player_index
 	input_source = p_input_source
 	health = int(Tuning.combat()["p1_health"])
+	_hit_damage = int(Tuning.combat()["p1_hit_damage"])
+	_invulnerable_ticks = int(Tuning.combat()["p1_invulnerable_ticks"])
 	# E-02: recorder-capaciteit uit de data, tenzij de aanroeper hem opgeeft.
 	recorder = EchoRecorder.new(capacity if capacity > 0 else int(Tuning.echo()["recorder_capacity"]))
 	name = "Player%d" % player_index
@@ -147,12 +152,25 @@ func respawn_at(at: Vector2, death := false) -> void:
 	_respawn_death = death
 
 
-## Een vijandelijk aanvalsvlak raakt dit lichaam (alleen laag 2, E-14h).
+## Een vijandelijk aanvalsvlak raakt dit lichaam (alleen laag 2, E-14h). Daarna is P1
+## 45 ticks onkwetsbaar (VJ-02, LM-05; `combat.p1_invulnerable_ticks`, gelezen in `setup`).
 func take_hit(tick: int) -> void:
 	if player_index != 1 or health <= 0 or tick < invulnerable_until:
 		return
-	health -= 1
+	health = maxi(health - _hit_damage, 0)
+	# Een treffer die P1 doodt, geeft geen onkwetsbaarheid: de respawn begint een nieuw leven.
+	if health > 0:
+		invulnerable_until = maxi(invulnerable_until, tick + _invulnerable_ticks)
 	health_changed.emit(tick, health)
+
+
+## V-01b: een neerslag raakte iets. `v.y = −5,0` (zoals een sprong), `v.x` blijft, dash terug;
+## geen sprong in de coyote-tijd erna. Werkt vanaf de volgende stap (de Sim roept dit in stap 4).
+func bounce_off(_tick: int) -> void:
+	motor.velocity.y = float(Tuning.combat()["neerslag_bounce_velocity"])
+	motor.dash_ready = true
+	motor.dash_ready_after_dash = false
+	motor.jumped_since_support = true
 
 
 ## Stap (2) voor P1, (1) voor P2: input lezen, events bepalen, bewegen.
@@ -170,6 +188,7 @@ func sim_step(tick: int, _delta: float) -> void:
 		# Na een dood (C-08, LM-05) zijn de levenspunten weer vol.
 		if died and player_index == 1:
 			health = int(Tuning.combat()["p1_health"])
+			invulnerable_until = -1
 			health_changed.emit(tick, health)
 	var bits: int = input_source.sample(tick)
 	last_input = bits

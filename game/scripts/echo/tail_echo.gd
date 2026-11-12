@@ -24,6 +24,7 @@ const Layers = preload("res://scripts/world/layers.gd")
 const Tuning = preload("res://scripts/echo/tuning.gd")
 const Zone = preload("res://scripts/objects/zone.gd")
 const Combat = preload("res://scripts/combat/combat.gd")
+const InputBits = preload("res://scripts/input/input_bits.gd")
 
 ## Echo-events die de echo uitvoert (E-10); bewegingsevents nooit.
 const REPLAYED_EVENTS := GameEvents.ATTACK | GameEvents.INTERACT
@@ -58,6 +59,9 @@ var last_valid_position := Vector2.ZERO
 var detonate_mark: Combat.Mark = null
 ## Loopt er een merksprong (E-02m)?
 var in_merksprong := false
+## V-01e: is het AANVAL-event van dit frame een neerslag (in de lucht, DOWN in de opname)?
+## De Sim zet het vlak dan onder de echo; de echo stuit niet.
+var neerslag := false
 ## De opgenomen positie van frame `p` (bij een merksprong wijkt `position` af).
 var recorded_position := Vector2.ZERO
 ## De AreaLoader van het gebied (gezet door de Sim), of null: dan is alles
@@ -187,6 +191,7 @@ func reset(tick: int) -> void:
 func sim_step(tick: int, _delta: float) -> void:
 	tick_events = 0
 	detonate_mark = null
+	neerslag = false
 	if finished:
 		return
 	var p := tick - tail_ticks
@@ -206,6 +211,7 @@ func sim_step(tick: int, _delta: float) -> void:
 	support = rec.support(index)
 	anim = rec.anim(index)
 	var events := rec.events(index) & REPLAYED_EVENTS
+	neerslag = not rec.post_on_floor(index) and rec.input(index) & InputBits.DOWN != 0
 	if not in_merksprong and events & GameEvents.ATTACK:
 		_try_start_merksprong(tick)
 	var detonate: Combat.Mark = null

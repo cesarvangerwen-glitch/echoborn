@@ -65,7 +65,14 @@
 		"enemy_attack_range_px": 16.0,
 		"enemy_windup_ticks": 30,
 		"enemy_attack_ticks": 6,
-		"p1_health": 5
+		"p1_health": 5,
+		"p1_hit_damage": 1,
+		"p1_invulnerable_ticks": 45,
+		"neerslag_box": [
+			16,
+			20
+		],
+		"neerslag_bounce_velocity": -5.0
 	},
 	"coop": {
 		"_uitleg": "Co-op 7A (gdd §2.7, C-03, C-06–C-13; §2.9). Startwaarden LGD voor de flow-kamer. leash_view_px is een werkaanname van de Gameplay Programmer (T16c): het beeld van de gedeelde camera op maximale zoom-uit, in wereldpixels (1,5 × 640 × 360); de echte waarde zetten de UX Designer en de Technical Director (C-07). leash_margin_px: zo ver blijft P1 minstens van de beeldrand; de leiband telt vanaf leash_view_px − marge.",

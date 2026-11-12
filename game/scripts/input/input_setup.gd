@@ -13,7 +13,9 @@ const ALL_DEVICES := -1
 const DEADZONE := 0.3
 
 ## Spelbesturing (worden bits). Meedoen en stoppen zijn géén bits (gdd §2.5).
-const CONTROLS: PackedStringArray = ["left", "right", "jump", "attack", "interact", "echo", "dash"]
+## `down` = de Neerslag (V-01, bit 7; TD-besluit PR #201).
+const CONTROLS: PackedStringArray = ["left", "right", "jump", "attack", "interact", "echo", "dash",
+	"down"]
 
 ## Knopbesturing -> inputbit (left en right komen ook van de stick, zie de InputRouter).
 const BUTTON_BITS := {
@@ -24,14 +26,15 @@ const BUTTON_BITS := {
 	"interact": InputBits.INTERACT,
 	"echo": InputBits.ECHO,
 	"dash": InputBits.DASH,
+	"down": InputBits.DOWN,
 }
 
 ## Fysieke toetsen (positie, niet het teken): op AZERTY en QWERTZ liggen ze op dezelfde plek.
 const KEYS := {
 	1: {"left": KEY_A, "right": KEY_D, "jump": KEY_SPACE, "attack": KEY_E,
-		"interact": KEY_F, "echo": KEY_Q, "dash": KEY_SHIFT},
+		"interact": KEY_F, "echo": KEY_Q, "dash": KEY_SHIFT, "down": KEY_S},
 	2: {"left": KEY_LEFT, "right": KEY_RIGHT, "jump": KEY_ENTER, "attack": KEY_CTRL,
-		"interact": KEY_SLASH, "echo": KEY_PERIOD, "dash": KEY_SHIFT,
+		"interact": KEY_SLASH, "echo": KEY_PERIOD, "dash": KEY_SHIFT, "down": KEY_DOWN,
 		"join": KEY_ENTER, "leave": KEY_BACKSPACE},
 }
 ## Toetsen waarvan alleen de linker- of rechtervariant telt. Zonder `location`
@@ -45,7 +48,7 @@ const KEY_LOCATIONS := {
 
 ## Joypadknoppen per besturing, voor elke pad gelijk (de InputRouter kiest de speler).
 ## Meedoen = Start/Menu, stoppen = Select/View, echo = linker en dash = rechter schouderknop
-## (gdd §2.5). D-pad omhoog/omlaag blijft vrij voor UP/DOWN (bit 6 en 7, Combat Designer).
+## (gdd §2.5). D-pad omlaag = DOWN (Neerslag, bit 7); d-pad omhoog blijft vrij voor UP (bit 6).
 const PAD_BUTTONS := {
 	JOY_BUTTON_DPAD_LEFT: "left",
 	JOY_BUTTON_DPAD_RIGHT: "right",
@@ -54,6 +57,7 @@ const PAD_BUTTONS := {
 	JOY_BUTTON_Y: "interact",
 	JOY_BUTTON_LEFT_SHOULDER: "echo",
 	JOY_BUTTON_RIGHT_SHOULDER: "dash",
+	JOY_BUTTON_DPAD_DOWN: "down",
 	JOY_BUTTON_START: "join",
 	JOY_BUTTON_BACK: "leave",
 }

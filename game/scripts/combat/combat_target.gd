@@ -19,6 +19,8 @@ signal armor_broken(tick: int)
 signal died(tick: int)
 ## Een aanvalsvlak van de vijand raakte P1 (kost P1 1 levenspunt, LM-05).
 signal hit_player(tick: int, player: Node2D)
+## Een treffer op een intact pantser: 0 SE, wel een merk; eigen geluid en vonk (VJ-07, T8b).
+signal armor_tinked(tick: int)
 
 const Tuning = preload("res://scripts/echo/tuning.gd")
 const BodyBuilder = preload("res://scripts/echo/body_builder.gd")
@@ -199,6 +201,11 @@ func apply_damage(tick: int, amount: int, source: String) -> int:
 		visible = false
 		died.emit(tick)
 	return done
+
+
+## VJ-07: een treffer op het intacte pantser (Combat, E-14g).
+func tink(tick: int) -> void:
+	armor_tinked.emit(tick)
 
 
 func break_armor(tick: int) -> void:

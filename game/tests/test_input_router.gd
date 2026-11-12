@@ -320,6 +320,7 @@ func test_attack_interact_echo_dash_bits_for_both_slots(t) -> void:
 		[[KEY_Q, KEY_LOCATION_UNSPECIFIED], [KEY_PERIOD, KEY_LOCATION_UNSPECIFIED],
 			InputBits.ECHO],
 		[[KEY_SHIFT, KEY_LOCATION_LEFT], [KEY_SHIFT, KEY_LOCATION_RIGHT], InputBits.DASH],
+		[[KEY_S, KEY_LOCATION_UNSPECIFIED], [KEY_DOWN, KEY_LOCATION_UNSPECIFIED], InputBits.DOWN],
 	]
 	var kb := _router({})
 	kb.handle_event(_key(KEY_SPACE, true))
@@ -343,7 +344,7 @@ func test_attack_interact_echo_dash_bits_for_both_slots(t) -> void:
 	for case: Array in kb_cases:
 		kb.handle_event(_key(case[0][0], true, 0, case[0][1]))
 	t.check(kb.slot_bits(1) == InputBits.ATTACK | InputBits.INTERACT | InputBits.ECHO
-		| InputBits.DASH, "samen ingedrukt: %s" % InputBits.describe(kb.slot_bits(1)))
+		| InputBits.DASH | InputBits.DOWN, "samen ingedrukt: %s" % InputBits.describe(kb.slot_bits(1)))
 	kb.free()
 
 	var pad_cases := [
@@ -351,6 +352,7 @@ func test_attack_interact_echo_dash_bits_for_both_slots(t) -> void:
 		[JOY_BUTTON_Y, InputBits.INTERACT],
 		[JOY_BUTTON_LEFT_SHOULDER, InputBits.ECHO],
 		[JOY_BUTTON_RIGHT_SHOULDER, InputBits.DASH],
+		[JOY_BUTTON_DPAD_DOWN, InputBits.DOWN],
 	]
 	var pads := _router({0: GUID_XBOX, 1: GUID_DS4})
 	_tap(pads, 0, JOY_BUTTON_A)
@@ -369,6 +371,7 @@ func test_attack_interact_echo_dash_bits_for_both_slots(t) -> void:
 
 ## #101: de knop die liet meedoen, doet niets tot hij los is (W5), ook als het een
 ## schouderknop is; en d-pad omhoog/omlaag geeft geen bit (bit 6/7 zijn gereserveerd).
+## D-pad omhoog geeft geen bit (UP blijft vrij, W7); d-pad omlaag is DOWN (Neerslag, PR #201).
 func test_join_press_is_swallowed_and_dpad_up_down_give_no_bits(t) -> void:
 	var router := _router({0: GUID_XBOX})
 	_pad(router, 0, JOY_BUTTON_RIGHT_SHOULDER, true)
@@ -379,7 +382,9 @@ func test_join_press_is_swallowed_and_dpad_up_down_give_no_bits(t) -> void:
 	t.check(router.slot_bits(1) == InputBits.DASH, "tweede druk dasht niet")
 	_pad(router, 0, JOY_BUTTON_RIGHT_SHOULDER, false)
 	_pad(router, 0, JOY_BUTTON_DPAD_UP, true)
+	t.check(router.slot_bits(1) == 0, "d-pad omhoog gaf %s"
+		% InputBits.describe(router.slot_bits(1)))
 	_pad(router, 0, JOY_BUTTON_DPAD_DOWN, true)
-	t.check(router.slot_bits(1) == 0, "d-pad omhoog/omlaag gaf %s"
+	t.check(router.slot_bits(1) == InputBits.DOWN, "d-pad omlaag gaf %s (DOWN)"
 		% InputBits.describe(router.slot_bits(1)))
 	router.free()
