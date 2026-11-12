@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
 [ext_resource type="Script" path="res://scripts/combat/slice_enemy.gd" id="2_enemy"]
-[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_luik.gd" id="3_luik"]
+[ext_resource type="Script" path="res://scripts/objects/luik.gd" id="3_luik"]
 
 [node name="S9Inhoud" type="Node2D"]
 position = Vector2(-2080, -540)

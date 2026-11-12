@@ -228,7 +228,7 @@ const S9_PIJLER := Rect2(2520, 455, 60, S9_KADE - 455.0)
 const S9_B2_LEFT := 2580.0
 const S9_B2_RIGHT := 3060.0
 const S9_B2_LEVELS := [S9_KADE, S9_KADE - 90.0, S9_KADE - 180.0]
-## Het luik in de kade (V-01, SL-04; `kadewijk_luik.gd`, zoals in S7), vlak
+## Het luik in de kade (V-01, SL-04; `scripts/objects/luik.gd`, zoals in S7), vlak
 ## vóór de kadewand: de lage kade loopt dood.
 const S9_LUIK := Rect2(560, S9_KADE, 40, 16)
 const S9_KADEWAND := Rect2(520, 360, 20, S9_KADE + 16.0 - 360.0)

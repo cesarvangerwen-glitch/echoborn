@@ -58,7 +58,7 @@ const EchoHints = preload("res://scripts/echo/echo_hints.gd")
 const Layout = preload("res://levels/kadewijk/kadewijk_layout.gd")
 const Inhoud = preload("res://levels/kadewijk/kadewijk_inhoud.gd")
 const Gemaal = preload("res://scripts/light/gemaal.gd")
-const Luik = preload("res://levels/kadewijk/kadewijk_luik.gd")
+const Luik = preload("res://scripts/objects/luik.gd")
 const Gemaalmeester = preload("res://scripts/combat/gemaalmeester.gd")
 ## Meetlog en camera van de flow-kamer, ongewijzigd hergebruikt (alleen gelezen).
 const FlowMeetlog = preload("res://levels/flowkamer/flow_meetlog.gd")
