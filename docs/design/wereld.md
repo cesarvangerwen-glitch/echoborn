@@ -1,10 +1,10 @@
 # Wereld en slice *Polderlight*
 
-Versie 0.1.4 (GDD v1, deel 2) · Eigenaar: Lead Game Designer (met World & Level Designer voor §1–§2, Systems Designer voor de lichtbalans, Combat Designer voor de vijandtypes) · Issue [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (T3c) en [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10, namen), `docs/productie/fase-2-kader.md` §2
-Hoort bij `docs/design/gdd.md` v0.6.2 (regels E-, C-, L-, LM-, V-) en `docs/design/kernloop.md` v0.5.1 (aantallen, rekensom, terugkeerregels K-01–K-05). De boss van de slice staat apart in `docs/design/gemaalmeester.md`.
+Versie 0.2 (GDD v1, op D = 60) · Eigenaar: Lead Game Designer (met World & Level Designer voor §1–§2, Systems Designer voor de lichtbalans, Combat Designer voor de vijandtypes) · Issue [#81](https://github.com/cesarvangerwen-glitch/echoborn/issues/81) (T3c) en [#87](https://github.com/cesarvangerwen-glitch/echoborn/issues/87) (T10, namen), `docs/productie/fase-2-kader.md` §2
+Hoort bij `docs/design/gdd.md` v0.8 (regels E-, C-, L-, LM-, V-) en `docs/design/kernloop.md` v0.5.1 (aantallen, rekensom, terugkeerregels K-01–K-05). De boss van de slice staat apart in `docs/design/gemaalmeester.md`.
 Bronnen: `docs/concept/pitch.md` v0.4 (P1–P3, §4 puzzeldefinitie en normen, §5 rondgangen, R-V4), `docs/narrative/verhaal-v2.md` (gebieden, bosses, bevroren echo's, logboeken), `docs/beslissingen.md`.
 
-**Werkaanname** (kader §5): CEO-besluiten #2 (5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12), #18 (2D, 640×360) en #51 deel 2 (1A: geen puzzels op de kritieke route, gating via vaardigheden en routes, water geen speellaag; 2A: slice-art pas na F0; 7A; 8A), fasekader fase 2 v0.2 (F3, F4b, R-V4, T8a–d). Daarnaast **werkaanname LGD**: alle tijden, aantallen en maten in dit document zijn **startwaarden van vóór de flow-test (F0, [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80))**; ze worden bijgesteld na F0 (gdd §8) en gemeten in de slice (T11). D = 120 ticks tot F0 een staart kiest; maten die van D afhangen, staan in de gdd als formule. Geen andere aannames.
+**Werkaanname** (kader §5): CEO-besluiten #2 (5–7 uur, 3–4 gebieden, 4–5 bosses, PEGI 12), #18 (2D, 640×360) en #51 deel 2 (1A: geen puzzels op de kritieke route, gating via vaardigheden en routes, water geen speellaag; 2A: slice-art pas na F0; 7A; 8A), fasekader fase 2 v0.2 (F3, F4b, R-V4, T8a–d). Daarnaast **werkaanname LGD**: alle tijden, aantallen en maten in dit document zijn **startwaarden van vóór de flow-test (F0, [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80))**; ze worden bijgesteld na F0 (gdd §8) en gemeten in de slice (T11). **Sinds v0.2: D = 60** (CEO-besluit 2026-11-12, bereik 60–180) en fase 2 parallel; maten die van D afhangen, staan in de gdd als formule en horen in data (fasekader v0.4 §4, regel 2). Wat T8a en T8b als vaste basis nemen: gdd §4.8.5. Geen andere aannames.
 
 **Wat dit document kiest** (binnen de besluiten, dus geen CEO-vraag): **4 gebieden** met elk **3 wijken**, een proloog en een finale; de volgorde van de gebieden ligt vast; de slice is wijk 1.3, *de Kadewijk*. Waarom geen CEO-vraag: 4 gebieden en 5 bosses liggen binnen besluit #2, de rekensom blijft binnen 5–7 uur (§1.6) en de kosten worden in F6 tegen het scopeplafond gemeten. Blijkt in F6 (T15) dat 4 gebieden niet te betalen zijn, dan legt de EP 3 gebieden voor in het gate-voorstel (F8); de terugvaloptie staat in §1.7.
 
@@ -134,22 +134,22 @@ De slice is **wijk 1.3, *de Kadewijk***, los speelbaar: van de ingang aan de kad
 
 **Duur** (startwaarden, WS-05): de scripted geoefende run haalt de route (S1 tot de arena en S9) in **10–12 min** en de boss in **3–4 min**. Een eerste speler: route ± 20 min, boss 8–12 min inclusief pogingen, samen **± 30 min per modus**, dus ± 1 uur voor solo plus co-op (F4b(a)).
 
-**Wat erin zit:** de echo (E-regels, D instelbaar 90 / 120 / 180 in het debugmenu), co-op 7A met drop-in en drop-out (C-01–C-16), de lichtmeter met genezen (LM-01–LM-04, LM-07), één gemaal met **2 trappen** en **3 waterstanden** (LM-08–LM-10, WS-03), checkpoint en opslaan (LM-08, LM-12), **één vaardigheid: V-01 Neerslag** (zonder `Doorns` en `Meerpaal`), **3 vijandtypes** (§2.4), de Gemaalmeester, 1 lampglas, 3 logbladzijden, 4 bevroren echo's, fragment 1 en het meetlog van gdd §4.5 met de events van §5.1.
+**Wat erin zit:** de echo (E-regels, D = 60, instelbaar 60 / 90 / 120 / 180 in het debugmenu), co-op 7A met drop-in en drop-out (C-01–C-16), de lichtmeter met genezen (LM-01–LM-04, LM-07), één gemaal met **2 trappen** en **3 waterstanden** (LM-08–LM-10, WS-03), checkpoint en opslaan (LM-08, LM-12), **één vaardigheid: V-01 Neerslag** (zonder `Doorns` en `Meerpaal`), **3 vijandtypes** (§2.4), de Gemaalmeester, 1 lampglas, 3 logbladzijden, 4 bevroren echo's, fragment 1 en het meetlog van gdd §4.5 met de events van §5.1.
 
 **Wat er níét in zit:** V-02–V-04, doorns en meerpalen, de persbuis (WS-07), minibazen, terugkeerpoorten die openen (de meerringgracht uit §1.4 is zichtbaar maar dicht), optionele echo-uitdagingen, Wards tien seconden (C-17) en het pareren (O-17).
 
 ### 2.2 Kamerlijst
 
-De kamers liggen in een lus (L-14f): S1 → S8 is de kritieke route, S9 brengt je via een luik terug naar S1. Waterstand `s`: 0 = hoog, 1 na trap 1, 2 na trap 2. Maten voor bouwstenen: gdd §4.3 (per D); vijandtypes: §2.4.
+De kamers liggen in een lus (L-14f): S1 → S8 is de kritieke route, S9 brengt je via een luik terug naar S1. Waterstand `s`: 0 = hoog, 1 na trap 1, 2 na trap 2. Maten voor bouwstenen: gdd §4.3 (op D = 60, formules in D); vijandtypes: §2.4.
 
 | Kamer | Wat | Bouwstenen en regels | Vijanden | Water |
 |---|---|---|---|---|
 | **S1 Kade-ingang** | Aankomst langs de gracht; het sluiswachtershuis aan de overkant in beeld, het gemaal in de verte. Uitleg zonder tekst: lopen, springen, dash, de echo verschijnt | **B1** keren-opstap onder een galerij (eerste bounce); eerste bevroren echo (de bakker) | — | `s = 0` |
-| **S2 Kadegang** | Een lange kade met een lus om een brugpijler | **B3** lus, daarna **B1**; L-11 (een echo-kans per ± 20 s) | 2 Kadelopers | `s = 0` |
-| **S3 Vismarkt** | Merk-arena (L-13) op het pleintje aan het water; sluit niet af | L-13 (a)–(g): vlak stuk ≥ D + 24 px, paren binnen 48 px, ≤ 5 tegelijk | 2 golven: 3 Kadelopers; 2 Kadelopers + 1 Schotdrager | `s = 0` |
+| **S2 Kadegang** | Een lange kade met een lus om een brugpijler | **B3** lus, daarna **B1**; L-11 (een echo-kans per ± 20 s). Bij D = 60 is B3 een keerpunt (gdd §4.3, `max(D − 60, 0)`); of S2 een korte lus krijgt, hangt af van O-22 (CD) | 2 Kadelopers | `s = 0` |
+| **S3 Vismarkt** | Merk-arena (L-13) op het pleintje aan het water; sluit niet af | L-13 (a)–(g): vlak stuk ≥ D + 24 px (84), paren binnen E (32 px) en ≥ 160 px uit elkaar, golf 2 als golf 1 gemerkt of op is, ≤ 5 tegelijk | 2 golven: 3 Kadelopers; 2 Kadelopers + 1 Schotdrager | `s = 0` |
 | **S4 Brugkloof** | Een opgehaalde brug over de gracht | **B4** lanceerkloof (solo met de houding, co-op met de partner); langzame lijn via de kademuur | 1 Kadeloper aan de overkant | `s = 0` |
-| **S5 Sluiswachtershuis** | Het huis van Ward: trappenhuis omhoog, één kamer, twee koppen, het logboek (logbladzijde 1). Geen gevecht | **B5** terugvalbocht in het trappenhuis (L-09), **B2** naar de zolder; het **lampglas** op een echolijn boven de zolder (L-12) | — | `s = 0` |
-| **S6 Gemaalplein** | Het gemaal met zijn pomprad aan de gevel; **checkpoint** (LM-08). Trap 1 vullen (L-14c: de run vanaf S1 vult ≥ 100 LP). Op `s = 1` zakt het water van de kelderingang | Pomprad in de route (FK-5); 2 bevroren echo's (twee kinderen bij de kademuur); logbladzijde 2 | 2 Kadelopers die terugkomen zolang het gemaal niet vol is (LM-09a) | `s = 0 → 1` |
+| **S5 Sluiswachtershuis** | Het huis van Ward: trappenhuis omhoog, één kamer, twee koppen, het logboek (logbladzijde 1). Geen gevecht | ~~**B5** terugvalbocht~~ (bij D = 60 niet te bouwen, gdd L-09; het trappenhuis is een B2 zonder B5), **B2** naar de zolder; het **lampglas** op een echolijn boven de zolder (L-12) | — | `s = 0` |
+| **S6 Gemaalplein** | Het gemaal met zijn pomprad aan de gevel; **checkpoint** (LM-08). Trap 1 vullen (L-14c: de run vanaf S1 vult ≥ 100 LP). Op `s = 1` zakt het water van de kelderingang | **Pompgang** in de route (FK-5, L-14b: 4 schoepen, 80 px uit elkaar, 15 LP per slag; de doorgang naar de kelder opent op de tick van de volle trap); 2 bevroren echo's (twee kinderen bij de kademuur); logbladzijde 2 | 2 Kadelopers die terugkomen zolang het gemaal niet vol is (LM-09a) | `s = 0 → 1` |
 | **S7 Sluiskelder** | De vaardigheid **Neerslag** op een sokkel; meteen erna de eerste luiken in de kelderbodem en twee Dwaallichten boven een kanaal: stuiten (V-01b) in plaats van overspringen | V-01 (a), (b), (d); een kanaal van 160 px breed met 2 Dwaallichten erboven (langzame lijn: kademuur en een trede); **≤ 10 s lopen** van S6 naar de arena-deur (boss opnieuw proberen) | 2 Dwaallichten | `s = 1` |
 | **S8 Machinehal** | Boss-arena: **de Gemaalmeester** (`gemaalmeester.md`). Sluit bij `BOSS_START` | GM-01–GM-11. Het gemaal van S6 en de Gemaalmeester zijn hetzelfde gebouw: het pomprad aan de gevel is de buitenkant, in de machinehal eronder staat de machine die levend werd (`verhaal-v2.md` §6) | Adds: Kadelopers | `s = 1` |
 | **S9 Lage kade** | Terug op het gemaalplein: trap 2 vullen (de meter is vol, GM-10), water naar `s = 2`, de wijk kleurt (WS-09a), de bevroren echo's spelen hun 10 s uit, fragment 1 bij het sluiswachtershuis. De lage kade die vrijkomt, loopt terug naar S1 met een **luik** (V-01, de poort van de lus) en een snelkoppeling | L-14d (de stand opent een route), L-14e (warm licht, geen `FelLicht`), L-14f (lus); logbladzijde 3 op een echolijn; de meerringgracht (dicht, §1.4) | 2 Kadelopers op de lage kade (de wijk is verlicht; O-18) | `s = 1 → 2` |
@@ -164,7 +164,7 @@ De kamers liggen in een lus (L-14f): S1 → S8 is de kritieke route, S9 brengt j
 | **SL-02** | **Trap 2 wacht op de boss** (WS-03). Tot `BOSS_VERSLAGEN` pompt het pomprad tot `G = 100`; daarna weer tot `G_max = 200` (LM-03). |
 | **SL-03** | **Respawn.** Vóór het gemaal is S1 de respawnplek, daarna het gemaal (LM-08). Bij 0 levenspunten in S8 begint de boss opnieuw op 100 % en zijn de adds weg; de meter blijft (LM-01). De weg van het gemaal tot de arena-deur is ≤ 10 s lopen (L-10 in de geest: opnieuw proberen kost weinig). |
 | **SL-04** | **Poort van de lus.** Het luik in S9 is de enige vaardigheidspoort van de slice (L-03: je ziet de scheur in de klep). Zonder V-01 is de lage kade een doodlopende kade. P1 breekt het luik zelf met een neerslag; de echo of P2 kan het ook breken (V-01d), maar is er nooit voor nodig (L-03). |
-| **SL-05** | **Debug voor T11.** Het debugmenu zet D (90 / 120 / 180), de echo uit (C-15-test) en een sprong naar elk checkpoint. De echo uit geldt niet in S8 (C-16: dan is de boss niet te verslaan). |
+| **SL-05** | **Debug voor T11.** Het debugmenu zet D (60 / 90 / 120 / 180; standaard 60), de echo uit (C-15-test) en een sprong naar elk checkpoint. De echo uit geldt niet in S8 (C-16: dan is de boss niet te verslaan). |
 | **SL-06** | **Toetsing.** Elke kamer en de boss solo én co-op (T11), met de flownormen MP-1–MP-7 per kamer, de grens van F4b(b) (gdd §5.1) en de playtestvraag V-01 (gdd §3.5). |
 
 ### 2.4 Vijandtypes van de slice (scopeplafond R-V4)
@@ -173,9 +173,9 @@ De kamers liggen in een lus (L-14f): S1 → S8 is de kritieke route, S9 brengt j
 
 | Type | Rol | Wat de echo of partner ermee doet | Grenzen |
 |---|---|---|---|
-| **Kadeloper** | De basisvijand van de flow-kamer (gdd §4.3) | Merken en laten knallen; ketting in paren (L-13d) | `36 + v × (D − 27) ≤ R` (L-13c); bij 0,25 px/tick ok voor alle D |
+| **Kadeloper** | De basisvijand van de flow-kamer (gdd §4.3) | Merken en laten knallen; één knal, twee doden in paren (L-13d) | `36 + v × (D_max − 27) ≤ R` (L-13c) met D_max = 90: v ≤ 0,70 px/tick (gdd §4.8.5); 0,25 px/tick werkt voor alle D |
 | **Schotdrager** | Een Kadeloper met een geroest schot voor zich: een **pantser** (E-14g) dat alleen een merk-ontploffing breekt | Leert in S3 wat de Gemaalmeester in fase 1 vraagt; laat zien dat de echo loont | Blokkeert de route nooit (L-13e: de golf is op zonder hem); zelfde snelheid als de Kadeloper |
-| **Dwaallicht** | Zweeft op een vaste baan van 40–80 px boven een vloer of kanaal, valt aan met een korte duik (30 ticks aanloop) | Stuitdoel voor de Neerslag (V-01b); de echo herhaalt de neerslag met een merksprong als het gemerkt is | Baan ≤ 0,25 px/tick, zodat de merksprong het haalt (L-13c); geen grind: komt niet terug als de wijk verlicht is |
+| **Dwaallicht** | Zweeft op een vaste baan van 40–80 px boven een vloer of kanaal, valt aan met een korte duik (30 ticks aanloop) | Stuitdoel voor de Neerslag (V-01b); de echo herhaalt de neerslag met een merksprong als het gemerkt is | Baan ≤ 0,70 px/tick (D_max = 90), zodat de merksprong het haalt (L-13c); geen grind: komt niet terug als de wijk verlicht is |
 
 Alle drie zijn `Merkbaar`. De kost per type (runs, animaties) meet de EP in F6 tegen het plafond van `kernloop.md` §5.
 
@@ -192,8 +192,8 @@ Alle drie zijn `Merkbaar`. De kost per type (runs, animaties) meet de EP in F6 t
 ### 2.6 Acceptatie van de slice-inhoud (checklist, review LGD)
 
 - [ ] S1–S9 liggen in een lus; elke kamer op de kritieke route is zonder echo te doen, hooguit 2× zo lang (C-15, FK-2), en heeft geen puzzel (FK-1).
-- [ ] Elke bouwsteen houdt de maten van gdd §4.3 voor D = 90, 120 en 180.
-- [ ] SL-01 gemeten per D, solo en co-op.
+- [ ] Elke bouwsteen houdt de maten van gdd §4.3 voor D = 60; wat van D afhangt, zit in data (keerzone, B3).
+- [ ] SL-01 gemeten bij D = 60, solo en co-op.
 - [ ] Elke waterstand opent een route (L-14d), en je ziet vooraf wat onder water ligt.
 - [ ] Max. 3 vijandtypes (4 met de reserve), ≤ 5 vijanden tegelijk in beeld (L-13f).
 - [ ] Het lampglas en logbladzijde 3 liggen op een echolijn met een langzame lijn (L-12).
@@ -205,7 +205,7 @@ Alle drie zijn `Merkbaar`. De kost per type (runs, animaties) meet de EP in F6 t
 
 | # | Punt | Wie | Wanneer |
 |---|---|---|---|
-| OW-1 | **Bijstellen na F0** ([#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80)): D vastzetten, de duur per wijk (WS-05) en de lichtbalans (SL-01) met de gemeten flow-kamerwaarden herrekenen | LGD, World & Level Designer, Systems Designer | Na F0, vóór T8a |
+| ~~OW-1~~ | *Gedaan voor D (gdd v0.8 §4.8); de duur per wijk en SL-01 meet de slice (T11, MT2).* **Bijstellen na F0** ([#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80)): D vastzetten, de duur per wijk (WS-05) en de lichtbalans (SL-01) met de gemeten flow-kamerwaarden herrekenen | LGD, World & Level Designer, Systems Designer | Na F0, vóór T8a |
 | OW-2 | ~~Namen van wijken zijn werknamen; afstemmen met het verhaal~~ **Afgestemd** in `docs/narrative/namen.md`; overgenomen in §1.3–§1.5 en §1.3a (v0.1.3) | — | — |
 | OW-3 | De waterstand in het belfort (torenbakken, §1.3) leest misschien niet als "water zakt, wijk gaat aan" | Art Director, World & Level Designer | Fase 3, bij gebied 4 |
 | OW-4 | Of de 4e vijandtype-plek in de slice nodig is | Combat Designer | T8b, na de eerste playtest |
@@ -223,6 +223,7 @@ Alle drie zijn `Merkbaar`. De kost per type (runs, animaties) meet de EP in F6 t
 
 | Versie | Wat |
 |---|---|
+| 0.2 | Op D = 60 gezet (#81, gdd v0.8 §4.8): werkaanname, D in het debugmenu (§2.1, SL-05), S2 (B3 is een keerpunt, O-22), S3 (paren binnen E), S5 (geen B5), S6 (pompgang), vijandgrens v ≤ 0,70 px/tick (§2.4), checklist §2.6 op D = 60, OW-1 gedaan voor D. |
 | 0.1.4 | OW-10 afgestreept (#87): `namen.md` v0.1.3 en `strings.csv` hebben 2.1 *De Poorttoren*; in §1.3a vervalt de uitzondering voor 2.1 op "bij verschil geldt `strings.csv`", en in de tabel verwijst 2.1 naar de keuze onder de tabel in plaats van naar OW-10. |
 | 0.1.3 | Namen uit `namen.md` (#87, NM-O2, NM-O2a, NM-O5): wijk 3.3 *Het Waagplein* en 2.1 *De Poorttoren* in §1.3–§1.5; nieuwe §1.3a met de vaste wijk-id's (gebied → wijk → id → sleutel → NL/EN) en de keuze voor *De Poorttoren*; OW-2 afgestemd; open punten OW-9 (wijk-id in de save) en OW-10 (naam 2.1 in `namen.md` en `strings.csv`). Na de Lead-review (PR #152): uitzondering 2.1 op "bij verschil geldt `strings.csv`", werkaanname over de indeling tot T8a, wijk-id uniek in het spel, OW-9 en OW-10 aangevuld, OW-11 (EN *Gatehouse*). |
 | 0.1.2 | Na de SM-review (PR #123): verwijzing naar `kernloop.md` v0.5.1 in §1.6; open punt OW-8. |
