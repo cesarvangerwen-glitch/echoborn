@@ -1,6 +1,6 @@
 # Vijanden en boss van de slice (T8b)
 
-Versie 0.1.1 · Eigenaar: **Combat Designer** · Issue [#84](https://github.com/cesarvangerwen-glitch/echoborn/issues/84) (T8b), `docs/productie/fase-2-kader.md` §2 (T8b), §3 (F3, R-V4)
+Versie 0.1.2 · Eigenaar: **Combat Designer** · Issue [#84](https://github.com/cesarvangerwen-glitch/echoborn/issues/84) (T8b), `docs/productie/fase-2-kader.md` §2 (T8b), §3 (F3, R-V4)
 Bouwt verder op: `docs/design/gemaalmeester.md` v0.2 (GM-01–GM-11, ontwerp LGD, [#187](https://github.com/cesarvangerwen-glitch/echoborn/issues/187)), `docs/design/wereld.md` v0.1.4 §2 (slice Kadewijk, §2.4 vijandtypes), `docs/design/gdd.md` v0.8 (#187; E-02, E-02m, E-02t, E-07a, E-07c, E-07d, E-14, E-14j, C-09–C-16, C-12e, L-13, LM-02, LM-05, LM-07, V-01, §2.5a, §4.3, §4.7, §4.8.5), `docs/concept/pitch.md` v0.4 §4 (P1–P3).
 Dit document is het **detailontwerp** dat `gemaalmeester.md` §7 en `wereld.md` §2.4 aan de Combat Designer laten: schade, levens, maten, patronen, vensters, telegraphs en de bouwopdracht. Waar het afwijkt van een LGD-document, staat dat in §8 (voor de Lead-review); de LGD-documenten zelf verandert dit document niet. Voor de slice vervult het de rol van `vijanden.md` en `bosses/gemaalmeester.md` uit het rolbestand.
 
@@ -38,12 +38,13 @@ Dit document is het **detailontwerp** dat `gemaalmeester.md` §7 en `wereld.md` 
 | ID | Regel |
 |---|---|
 | **VJ-01** | **Merkbaar en eerlijk.** Elk type is `Merkbaar` (E-14a). Elke aanval heeft een **aanloop van ≥ 30 ticks** met een tell in beeld én geluid (§9), en daarna een actief vlak van hooguit 8 ticks. Contactschade bestaat niet: alleen een actief aanvalsvlak raakt P1. |
-| **VJ-02** | **Schade aan P1.** Elke treffer van een vijand of de boss kost P1 **1 levenspunt** (P1: 5, plus 1 voor het lampglas in S5). Daarna is P1 **45 ticks onkwetsbaar** (knipperen); nieuw, de gdd heeft er nog geen waarde voor. De echo en P2 krijgen nooit iets (E-14h, C-02). |
+| **VJ-02** | **Schade aan P1.** Elke treffer van een vijand of de boss kost P1 **1 levenspunt** (P1: 5, plus 1 voor het lampglas in S5). Daarna is P1 **45 ticks onkwetsbaar** (knipperen); nieuw, de gdd heeft er nog geen waarde voor. Een treffer die P1 doodt, geeft geen onkwetsbaarheid; **na een respawn** is P1 wel **45 ticks onkwetsbaar** (zelfde knipperen, zelfde code), zodat een aanloop die al liep bij het respawnpunt hem niet raakt zonder volle tell (#190). De echo en P2 krijgen nooit iets (E-14h, C-02). |
 | **VJ-03** | **Snelheid in D.** Een vijand die loopt of zweeft, beweegt met `v(D) = min(v_max; 44 / (D − 27))` px/tick. Zo geldt L-13 (c) (`36 + v × (D − 27) ≤ R = 80`) bij elke D: de merksprong haalt hem altijd. Kadeloper en Schotdrager: `v_max = 0,5`. Dwaallicht: `v_max = 0,25`. Waarden per D: §7. **Bovengrens: `v ≤ 0,70 px/tick`** voor elke vijand (`44 / (D_max − 27)` met D_max = 90, gdd v0.8 §4.8.5). Bij D = 60 lopen ze dus **0,5 px/tick**, twee keer zo snel als in de flow-kamer en onder de grens: de korte staart laat dat toe, en een snellere vijand geeft minder reden om te wachten. |
 | **VJ-04** | **Stil na een treffer.** Na elke treffer (ook een merk zetten of een ontploffing die hem niet doodt) staat een vijand **30 ticks** stil en breekt zijn aanloop af (zoals gdd §4.3). |
 | **VJ-05** | **Paren en afstandsregel per paar.** L-13 (d) blijft: **elke golf heeft minstens één E-paar**, twee vijanden die **≤ 32 px** (E) uit elkaar beginnen: één merk raakt ze allebei, één knal doodt het paar. Daarnaast mogen er **K-paren** bij, als extra paar: **40–44 px** uit elkaar, buiten E en binnen K = 48, zodat twee merken ketenen met de kettinglijn van E-14j in beeld (20 + 25 SE; de les van F0-2: op 28 px komt er geen ketting). **De afstandsregel geldt per paar:** elk paar heeft een startafstand `a` **in data** (`slice.csv`; E-paar 28 px, K-paar 40–44 px), en de twee vijanden van een paar komen niet dichter bij elkaar dan `a` (een vijand loopt niet verder als hij daarmee binnen `a` van zijn paargenoot komt). Vijanden die geen paar zijn, houden ≥ 40 px, zodat paren niet samensmelten. |
 | **VJ-06** | **Donker en verlicht** (O-18, pitch P2). In een wijk die nog niet is opgepompt (waterstand `s < 2`, "donker") gelden de waarden hieronder. In een **verlichte** wijk (`s = 2`, in de slice alleen S9) zijn vijanden **zwakker, niet anders**: `v` × 0,5 en de aanloop +10 ticks. Geen apart type per lichtstand (kernloop §5). Beeld: in het donker gloeien hun ogen en randen feller (Art). |
 | **VJ-07** | **Leesbaarheid van het merk** (F0, F0-2). E-02t (doelstreep) en E-14j (bereikcirkel, rand, kettinglijn) gelden voor **elk** merk op een vijand en op de boss; ze zijn voor T8b geen polish maar een eis. Een treffer op een **intact pantser** geeft een eigen geluid en vonk ("tink", 0 SE), anders dan een treffer met schade. |
+| **VJ-08** | **Alleen aanlopen als het vlak kan raken** (#190). Een Kadeloper of Schotdrager begint zijn aanloop alleen als P1 horizontaal binnen 32 px is (middelpunten) **én de voeten van P1 tussen −20 en +20 px van zijn vloer** zijn: de slag ligt 4–20 px boven die vloer en P1 is 24 px hoog, dus daarbuiten raakt het vlak hem niet. Hangt P1 hoger (in de lucht, op de plank van je echo of partner op 30 px) of lager (op een lagere vloer, bv. 30 px eronder), dan loopt hij gewoon door naar P1 en slaat niet. Eenmaal begonnen loopt de aanloop door, ook als P1 dan springt: springen blijft een ontwijking. Het Dwaallicht heeft al zijn eigen hoogteregel ("P1 lager", §2.4). |
 
 ### 2.2 Kadeloper (basisvijand)
 
@@ -53,7 +54,7 @@ Dit document is het **detailontwerp** dat `gemaalmeester.md` §7 en `wereld.md` 
 | Lichaam en hurtbox | 16 × 24 px, op de vloer; springt niet, valt niet van randen (draait om bij een rand) |
 | Levens | **30 SE** (P1-treffer 10, ontploffing 20: één merk + één slag, of een merk dat de echo laat knallen + één slag) |
 | Beweging | Loopt naar P1 met `v(D)` (VJ-03; 0,5 bij D = 60, 0,25 verlicht); VJ-05 |
-| Aanval: **haakslag** | Als P1 binnen 16 px is (randen; middelpunten ≤ 32 px): aanloop **30 ticks** (haak omhoog, schraapgeluid), actief **6 ticks** een vlak van 20 × 16 px vóór hem, 4–20 px boven de vloer; herstel 20 ticks |
+| Aanval: **haakslag** | Als P1 binnen 16 px is (randen; middelpunten ≤ 32 px) en zijn voeten tussen −20 en +20 px van de vloer van de vijand (VJ-08): aanloop **30 ticks** (haak omhoog, schraapgeluid), actief **6 ticks** een vlak van 20 × 16 px vóór hem, 4–20 px boven de vloer; herstel 20 ticks |
 | Ontwijken | Weglopen (in 30 ticks 60 px), erover springen, of op je echo/partner staan (het vlak reikt tot 20 px, de plank ligt op 30) |
 | Merk | E-14a; in een E-paar (28 px) doodt één knal het paar, in een K-paar (40–44 px) ketent hij (VJ-05) |
 | Licht | LM-02 (+2 per treffer, +6 per schakel) |
@@ -66,7 +67,7 @@ Dit document is het **detailontwerp** dat `gemaalmeester.md` §7 en `wereld.md` 
 | Rol | Leert vóór de boss wat het schot van de Gemaalmeester vraagt: **alleen een merk-ontploffing breekt een pantser** (E-14g). Een Kadeloper met een geroest sluisschot voor zich |
 | Lichaam en hurtbox | 16 × 24 px (zelfde vorm als de Kadeloper, zodat de code één soort met een vlag is); beeld 22 × 26 px met het schot |
 | Pantser | Volgens E-14g voor het hele lichaam (geen "achterkant raken": de les is het merk, niet om hem heen springen). Treffer op het intacte pantser: 0 SE, 0 LP, **wel een merk**, "tink" (VJ-07). De eerste ontploffing die hem raakt (ook een schakel van een ketting of een ontploffing binnen E = 32 van een buurman), breekt het pantser en doet verder niets. Daarna: gewone Kadeloper, 30 SE |
-| Beweging en aanval | Als de Kadeloper; aanval **schotstoot**: aanloop 30, actief 6, vlak 24 × 16 px |
+| Beweging en aanval | Als de Kadeloper; aanval **schotstoot**: aanloop 30, actief 6, vlak 24 × 16 px vóór hem, **4–20 px boven de vloer** (zoals de haakslag); aanloop alleen volgens VJ-08 |
 | Plek | Altijd in een **E-paar** met een Kadeloper (VJ-05: 28 px): de ontploffing van het merk op de Kadeloper (E = 32) breekt ook zijn pantser. **Blokkeert de route nooit** (L-13 e): een golf is op zonder hem |
 | Terugkeer | Nee (zoals het pantserdoel) |
 
@@ -279,6 +280,7 @@ Code in `game/` (SM-review, `WERKWIJZE.md` §5). De arena S8 bouwt T8a ([#83](ht
 | **B-9** | **Scripted boss-runs** (`boss_bot.gd`, naar het voorbeeld van `flow_bot.gd`): solo en co-op, per D = 60 / 90 / 120 / 180; plus de C-16-runs (echo uit; P2 slaat nooit) en een run met drop-out van P2 in fase 1 en in Wankel | Elke run haalt MP-1 ≤ 300 ticks (verwacht ≤ 60 bij D = 60), de echo breekt nooit; de C-16-runs halen in 6000 ticks geen finisher; de scripted solo-run duurt bij D = 60 **90–150 s** (§3.9); de duur per deel komt in een tabel voor de Combat Designer |
 | **B-10** | **Meetlog**: nieuwe events `BOSS_FASE` (1, 2, wankel), `SCHOT_BREUK`, `KERN_DICHT` (reden: drempel/tijd), `RAD_TREFFER` (bron, actie: bounce/lancering/vang/stuit), `RAD_DRAAI`, `BOSS_AANVAL` (soort, helft, raak/mis) naast de bestaande `BOSS_START`, `FINISHER_START`, `FINISHERSLAG`, `BOSS_VERSLAGEN` | De events staan in het log van B-9; GM-a (tijd tot de eerste `SCHOT_BREUK`) en GM-b (`RAD_TREFFER` per minuut per actie) zijn eruit te rekenen |
 | **B-11** | **Leesbaarheid in placeholder-beeld**: E-02t en E-14j op de boss-merken; de "tink" bij 0 SE (VJ-07); tells (stofstrook pompslag, lichtstreep zwiep, gloeiende spuigaten, trillend rad); schermschok bij schotbreuk (6 ticks, 2 px), radtreffer (3 ticks, 1 px), finisherstart; elk met een vlag die een test kan lezen | Zichtbaar in de build; de vlaggen in de tests van B-6–B-8 |
+| **B-12** | **Antwoorden #190** (op PR #201): hoogtegrenzen van de aanloop (VJ-08: voeten P1 tussen −20 en +20 px van de vloer van de vijand, `aanloop_hoogte_min` = −20 en `aanloop_hoogte_max` = 20 in `slice.csv`) voor Kadeloper en Schotdrager; 45 ticks onkwetsbaar na een respawn (VJ-02, `onkwetsbaar_respawn` in `slice.csv`), niet na een dodelijke treffer | Tests: P1 recht boven een Kadeloper op 30 px (plank) of in de lucht: geen aanloop; P1 30 px lager dan de vloer van de vijand, binnen 32 px: geen aanloop; P1 op de vloer binnen 32 px: aanloop; P1 springt tijdens de aanloop: de aanloop loopt door; een vijand die op het respawnpunt al in zijn aanloop zit, raakt P1 niet in de eerste 45 ticks na de respawn |
 
 **Volgorde:** B-1 → B-2/B-3/B-4 (parallel aan T8a) → B-5 → B-6 → B-7 → B-8 → B-9/B-10, B-11 doorlopend. **Raming:** **4–5 maak-taken** Gameplay Programmer (B-1–B-4: 1–2; B-5–B-7: 1–2; B-8–B-11: 1–2), plus **1 maak-taak Combat Designer** om de waarden te zetten met de B-9-tabel (een nieuwe versie van dit document en `slice.csv`). Binnen de 3–5 van T8b; de Animator-taak komt erbij (§9).
 
@@ -304,7 +306,7 @@ D = 60 is de werkaanname; het debugmenu kan 60 / 90 / 120 / 180 zetten (bereik 1
 | Solo-lancering: wachten / venster | `D − 21` / 19 | 39 / 19 | 69 / 19 | 99 / 19 | 159 / 19 |
 | Langste verwachte stilstand (MP-1) | max(lancering, `D + 3` in Wankel) | ≤ 63 | ≤ 93 | ≤ 123 | ≤ 183 |
 
-**Niet van D afhankelijk:** de maat (120 / 90 ticks), de aanlopen, de kern-opening (300), het rad per kant (180), de drempels, de schade, de finisher (600 → 120 ticks).
+**Niet van D afhankelijk:** de maat (120 / 90 ticks), de aanlopen (pompslag fase 1: 40), de hoogtegrenzen van de aanloop (VJ-08, `slice.csv`: `aanloop_hoogte_min` = −20 px, `aanloop_hoogte_max` = +20 px), de hoogte van haakslag en schotstoot (4–20 px), onkwetsbaar na een treffer en na een respawn (VJ-02: 45 / 45 ticks), de kern-opening (300), het rad per kant (180), de drempels, de schade, de finisher (600 → 120 ticks).
 
 **Let op bij D = 60:** na het keren is de echo maar 120 px achter je, dus je springt **op het keerpunt** of vlak ervoor en stuurt in de lucht bij (in de lucht bepaal je `v.x` zelf, dus de ontmoeting is ruim te halen); het plank-signaal (E-07d, ≤ 130 px) staat dan al aan op het moment dat je keert. De late bot van B-8 toetst dit.
 
@@ -327,6 +329,7 @@ Geen CEO-vraag nodig: alles ligt binnen de besluiten (#2, #51, D = 60) en is bal
 | 9 | **Co-op te snel** (MP-7): verwacht co-op ± 0,95 × solo, maar onzeker (P2 is onkwetsbaar, O-13) | Eerst fase 2 ×1,25 in co-op (§3.8), pas na B-9 | Combat Designer na B-9; T11 |
 | 10 | **Vierde vijandtype** (OW-4): niet in de slice (§2.5) | **Besluit LGD:** de plek blijft leeg; OW-4 blijft open tot de mijlpaal-test | LGD, World & Level Designer |
 | 11 | **Verdeling over de kamers** (§2.6) is een voorstel binnen `wereld.md` §2.2 | De World & Level Designer neemt het over of meldt een afwijking | World & Level Designer |
+| 12 | **Hoogtegrenzen van de aanloop** (VJ-08, −20 … +20 px), detail bij gdd §4.3, en **45 ticks onkwetsbaar na een respawn** (VJ-02), naast punt 7 | Ter kennisname; de LGD neemt ze mee bij LM-05 en §4.3 | LGD |
 
 **Playtestvragen:** GM-a–GM-d uit `gemaalmeester.md` §8 blijven; meetbaar met B-10. Extra voor de mijlpaal-test (QA Lead): *ketting* (VJ-05): zag de speler in S6 een merk naar een tweede vijand overspringen? (kaartvraag naast M2).
 
@@ -357,7 +360,7 @@ Geen CEO-vraag nodig: alles ligt binnen de besluiten (#2, #51, D = 60) en is bal
 | Moment | Geluid |
 |---|---|
 | Maat | carillon-tel op het begin van elke maat (120 / 90 ticks): het ritme dat je leert (GM-04) |
-| Pompslag | sissende zuiger die stijgt gedurende de aanloop, dreun op de slag |
+| Pompslag | sissende zuiger die stijgt gedurende de aanloop, dreun op de slag. **Aanloop fase 1 blijft 40** (vraag PR #193): 30 is de fase-2-aanloop (het verschil is de escalatie) en 60 maakt fase 1 trager; leg de dreun als accent tussen de tellen |
 | Schoepenzwiep | aanzwellend water-gesuis, veeg |
 | Spuigaten | borrelen, 30 ticks |
 | Schot | "tink" bij 0 SE; breuk: krak + stoom (+ schermschok); dichtschuiven |
@@ -384,5 +387,6 @@ Geen CEO-vraag nodig: alles ligt binnen de besluiten (#2, #51, D = 60) en is bal
 
 | Versie | Wat |
 |---|---|
+| 0.1.2 | Antwoorden #190 (vragen GP uit PR #201) en PR #193: hoogtegrenzen van de aanloop (VJ-08, −20 … +20 px, §2.2), hoogte schotstoot 4–20 px (§2.3); 45 ticks onkwetsbaar na een respawn, niet na een dodelijke treffer (VJ-02); bouwregel B-12 (§6); waarden in §7; §8 punt 12; pompslag-aanloop fase 1 blijft 40 (§9.3). |
 | 0.1.1 | Lead-review PR #185 (klein): duur scripted 90–150 s via een 4e opening en meer kanten (1500 SE, 2 treffers per kant, §3.3, §3.5, §3.9); L-13 (d) blijft: E-paar per golf, K-paren als extra, afstandsregel per paar in data (VJ-05, §2.6), Schotdrager in een E-paar; grens `v` ≤ 0,70 (VJ-03, §7); merk in co-op 150 ticks (C-12e; §3.6, §3.7, §7); verwijzingen naar gdd v0.8 en gemaalmeester.md v0.2; O-17 terug naar fase 3; §8 met de besluiten van de LGD. |
 | 0.1 | Eerste versie (T8b, #84): drie vijandtypes met gedeelde regels (VJ-01–VJ-07) en plaatsing, de Gemaalmeester in detail (GMB-01–GMB-13, fasen, aanvallen, vensters, finisher, co-op), D-tabel voor D = 60 … 180, bouwopdracht B-1–B-11, afwijkingen voor de LGD, wat Animator, UI/UX en Audio nodig hebben. |
