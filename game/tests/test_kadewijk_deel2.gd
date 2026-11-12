@@ -383,6 +383,10 @@ func _check_slow_lines(t, d: int) -> void:
 		return
 	t.check(off["ticks"] <= 2 * on["ticks"], "D=%d: zonder echo %d ticks, met %d (C-15, LM-09c: ≤ 2×)" % [d, off["ticks"], on["ticks"]])
 	t.check(int(off["returns"]) <= 4, "D=%d: zonder echo %d keer terug naar S5 voor licht (FK-2: ≤ 4)" % [d, off["returns"]])
+	# SM-review #223: de run zonder echo zit op de grens (1,90× en 4 keer terug bij
+	# D = 60); de marge per D staat in de melding, zodat een kleine wijziging opvalt.
+	t.note("D=%d: marge zonder echo: %d ticks tot 2× (%.2f× van 2,00×), terugkeren %d van max. 4 (marge %d)" % [
+		d, 2 * int(on["ticks"]) - int(off["ticks"]), float(off["ticks"]) / maxf(on["ticks"], 1), off["returns"], 4 - int(off["returns"])])
 	var a5 := int(on["rooms"].get("S5", 0))
 	var b5 := int(off["rooms"].get("S5", 0))
 	t.check(a5 > 0 and b5 <= 2 * a5, "D=%d S5: zonder echo %d ticks, met %d (C-15: ≤ 2×)" % [d, b5, a5])
@@ -542,9 +546,12 @@ func test_deel2_s6_los(t) -> void:
 	var progress = parts[2]
 	t.check(progress.state.checkpoint_kamer == &"S6", "S6: het gemaal is geen checkpoint geworden (LM-08; checkpoint in %s)" % progress.state.checkpoint_kamer)
 	# C-15 voor de route van S6: zonder echo, met hetzelfde licht bij binnenkomst.
+	# Bewust met gelijk licht (LGD-besluit bij afwijking 10, Lead-review #223): C-15
+	# per kamer met gelijk licht; het tekort aan licht toetsen LM-09c en FK-2 op de run.
 	t.check(off_ticks > 0 and off_ticks <= 2 * wijk.run_ticks(),
-		"S6 met %d LP: zonder echo %d ticks, met %d (C-15: ≤ 2×)" % [LP_INTO_S6, off_ticks, wijk.run_ticks()])
-	t.note("S6 los (LP %d bij binnenkomst): %d ticks, POMP p1/echo %d/%d, GEMAAL_VOL tick %d, ontploffingen %d, checkpoint %s; zonder echo %d ticks (%.2f×, %d keer terug)" % [
+		"S6 met %d LP: zonder echo %d ticks, met %d (C-15: ≤ 2×, bewust met gelijk licht bij binnenkomst: LGD-besluit afwijking 10, #223)" % [
+		LP_INTO_S6, off_ticks, wijk.run_ticks()])
+	t.note("S6 los (LP %d bij binnenkomst, C-15 bewust met gelijk licht: LGD-besluit afwijking 10): %d ticks, POMP p1/echo %d/%d, GEMAAL_VOL tick %d, ontploffingen %d, checkpoint %s; zonder echo %d ticks (%.2f×, %d keer terug)" % [
 		LP_INTO_S6, wijk.run_ticks(), _count(rows, "POMP", "p1"), _count(rows, "POMP", "echo"), _first(rows, "GEMAAL_VOL"),
 		_count(rows, "ONTPLOFFING"), progress.state.checkpoint_positie, off_ticks, float(off_ticks) / maxf(wijk.run_ticks(), 1), off_returns])
 	await _free(t, parts)
