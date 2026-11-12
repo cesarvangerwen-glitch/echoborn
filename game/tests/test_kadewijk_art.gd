@@ -6,7 +6,8 @@ extends RefCounted
 ## Via de echte gebiedsscène en de AreaLoader, bij D = 60, 90, 120 en 180:
 ## - de lagen van S1 en S3 zijn geladen: per laag uit het manifest een
 ##   `Sprite2D` met texture, zo groot als de kamer, linksboven op de kamer, met
-##   de z-index van het manifest en filter Nearest;
+##   de z-index van het manifest en filter Nearest, en geen vlak dat de hele
+##   kamer bedekt (de `Achtergrond` van de wijk) ligt erboven;
 ## - **de art valt op de collision**: per kolom van de kamer ligt de eerste
 ##   dekkende pixel van `speelvlak` (grijs, half en kleur) precies op de
 ##   bovenkant van het hoogste vaste blok in die kolom (de blokken zoals de
@@ -54,6 +55,18 @@ func _image(bestand: String) -> Image:
 	return Image.load_from_file(ProjectSettings.globalize_path(KadewijkArt.DIR + bestand))
 
 
+## Z-index waarmee `item` getekend wordt (relatief opgeteld langs de ouders).
+func _z(item: CanvasItem) -> int:
+	var z := 0
+	var node: Node = item
+	while node is CanvasItem:
+		z += (node as CanvasItem).z_index
+		if not (node as CanvasItem).z_as_relative:
+			break
+		node = node.get_parent()
+	return z
+
+
 ## Wereldrechthoek van een blok zoals het gebouwd is (vorm × plek van het lichaam).
 func _body_rect(body: StaticBody2D) -> Rect2:
 	var shape := body.get_child(0) as CollisionShape2D
@@ -93,6 +106,19 @@ func _check_kamer(t, wijk, id: StringName, d: int) -> void:
 			"%s %s: linksboven op %s (centered %s), verwacht %s" % [tag, laag["naam"], sprite.global_position, sprite.centered, room.position])
 		t.check(sprite.z_index == int(laag["z_index"]) and sprite.is_visible_in_tree(),
 			"%s %s: z %d zichtbaar %s, manifest z %d" % [tag, laag["naam"], sprite.z_index, sprite.is_visible_in_tree(), int(laag["z_index"])])
+
+	# 1b. Niets dat de hele kamer bedekt (een achtergrondvlak), ligt boven `achter`: anders zie
+	# je alleen de lagen met een hogere z-index.
+	var z_achter := _z(art.get_node(^"Achter"))
+	for item in wijk.find_children("*", "Polygon2D", true, false):
+		var poly := item as Polygon2D
+		if art.is_ancestor_of(poly) or not poly.is_visible_in_tree() or poly.polygon.is_empty():
+			continue
+		var box := Rect2(poly.global_transform * poly.polygon[0], Vector2.ZERO)
+		for pt in poly.polygon:
+			box = box.expand(poly.global_transform * pt)
+		if box.encloses(room):
+			t.check(_z(poly) < z_achter, "%s: %s bedekt de kamer met z %d, boven achter (%d)" % [tag, poly.get_path(), _z(poly), z_achter])
 
 	# 2. De blokken zoals ze gebouwd zijn: vast (in `speelvlak`) of een eenrichtingsstuk.
 	var vast: Array[Rect2] = []

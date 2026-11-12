@@ -39,6 +39,7 @@ size = Vector2(640, 360)
 script = ExtResource("1_wijk")
 
 [node name="Achtergrond" type="Polygon2D" parent="."]
+z_index = -100
 color = Color(0.13, 0.13, 0.15, 1)
 polygon = PackedVector2Array(0, -220, 5760, -220, 5760, 740, 0, 740)
 
