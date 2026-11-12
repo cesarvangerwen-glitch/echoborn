@@ -1,7 +1,8 @@
 extends RefCounted
-## Geometrie van de Kadewijk, deel 1: S1–S4 als grijze blokken (T8a, #83;
-## `docs/design/wereld.md` §2.2, gdd v0.8.1 §4.3 en §4.8.5;
-## `docs/design/kamers/kadewijk.md`).
+## Geometrie van de Kadewijk: S1–S8 als grijze blokken (T8a, #83; deel 1
+## S1–S4 hieronder getekend, deel 2 S5–S8 vanaf "S5 Sluiswachtershuis";
+## `docs/design/wereld.md` §2.2, gdd v0.8.2 §4.3 en §4.8.5;
+## `docs/design/kamers/kadewijk.md`, §2 en §3b–§3e).
 ##
 ##   y=0    +----------+-------------------------+------------------+------------------+
 ##          | S1       | S2 Kadegang             | S3 Vismarkt      | S4 Brugkloof     |
@@ -26,7 +27,8 @@ extends RefCounted
 ## getallen.
 ##
 ## Geen schaduwgeometrie, geen FelLicht, geen Schaduwgevaar (L-06). Water:
-## alle vier op `s = 0`; de waterstand bestaat nog niet (GP, zie kamerdoc).
+## S1–S6 op `s = 0`, het water van de kelderingang (S6) zakt met het gemaal
+## (LM-06); de waterstand per wijk (`s` 0/1/2) bestaat nog niet (GP, kamerdoc).
 
 ## Lichaam 16 × 30: het middelpunt staat 15 px boven de vloer.
 const HALF_H := 15.0
@@ -41,16 +43,33 @@ const ROOMS := {
 	&"S2": Rect2(640, 0, 960, 360),
 	&"S3": Rect2(1600, 0, 960, 360),
 	&"S4": Rect2(2560, 0, 960, 360),
+	# Deel 2 (#83): het sluiswachtershuis en het gemaalplein liggen hoger
+	# (trappenhuis omhoog, loopbrug naar het plein), de kelder en de
+	# machinehal eronder.
+	&"S5": Rect2(3520, -200, 640, 560),
+	&"S6": Rect2(4160, -200, 960, 560),
+	&"S7": Rect2(4800, 360, 960, 360),
+	&"S8": Rect2(4160, 360, 640, 360),
 }
-## Buren (E-04a): op een rij. S4–S5 en S9–S1 (de lus, L-14f) komen met deel 2.
+## Buren (E-04a): de doorgangen. S4–S5 op de kade, S5–S6 over de zolder en de
+## loopbrug, S6–S7 door de kelderingang (de sluis), S7–S8 de deur van de
+## machinehal. S8–S9 en S9–S1 (de lage kade, de lus, L-14f) komen later (§9).
 const NEIGHBOURS := {
 	&"S1": [&"S2"],
 	&"S2": [&"S1", &"S3"],
 	&"S3": [&"S2", &"S4"],
-	&"S4": [&"S3"],
+	&"S4": [&"S3", &"S5"],
+	&"S5": [&"S4", &"S6"],
+	&"S6": [&"S5", &"S7"],
+	&"S7": [&"S6", &"S8"],
+	&"S8": [&"S7"],
 }
-const ORDER := [&"S1", &"S2", &"S3", &"S4"]
-const AREA_RIGHT := 3520.0
+const ORDER := [&"S1", &"S2", &"S3", &"S4", &"S5", &"S6", &"S7", &"S8"]
+## Deel 1 (S1–S4, PR #208/#220): de runs tot `END_X` en hun normen per kamer.
+const DEEL_1 := [&"S1", &"S2", &"S3", &"S4"]
+const AREA_RIGHT := 5760.0
+const AREA_TOP := -200.0
+const AREA_BOTTOM := 720.0
 
 ## --- S1 Kade-ingang: B1 tegen de linkerwand (gracht) ---
 const S1_WALL := 20.0
@@ -84,9 +103,95 @@ const KLOOF_BOTTOM := 350.0      ## 90 px lager
 ## overkant niet (gemeten: 8 → 3046, 16 → 3050, 20 → over; overkant vanaf 3052).
 const B4_BOLDER_W := 8.0
 const B4_BOLDER_H := 8.0
-const S4_END_WALL := 3500.0
-## Einde van deel 1: wie hier is, haalde S1–S4 (RUN_EIND in het meetlog).
+## Einde van de overkant: de kade loopt door naar S5 (deel 2).
+const S4_END_WALL := 3520.0
+## Einde van deel 1: wie hier is, haalde S1–S4 (RUN_EIND bij `run_end` = S4).
 const END_X := 3440.0
+
+## --- S5 Sluiswachtershuis: B2 zigzag omhoog naar de zolder (gdd §4.3, L-09) ---
+## Een schacht van 480 px met vier eenrichtingsrichels van `450 − D` px op
+## 90, 180, 270 en 360 px boven de vloer, om en om tegen de linker- en de
+## rechterwand; aan de open kant een gat van Z px boven de keerwand eronder.
+## De bovenste richel is de zolder en loopt door de rechterwand naar S6.
+const S5_FLOOR := 260.0
+const B2_LEFT := 3600.0
+const B2_RIGHT := 4080.0
+## Vloeren van onder naar boven: de kade, richel 1–3, de zolder.
+const B2_LEVELS := [260.0, 170.0, 80.0, -10.0, -100.0]
+const S5_ZOLDER := -100.0
+## Het lampglas (L-12, WS-08; placeholder, de GP maakt het object) op de
+## zolder, 105 px boven richel 3: alleen met de bounce in één beweging te
+## halen, of via de treden (langzame lijn).
+const LAMPGLAS := Vector2(3900, S5_ZOLDER - HALF_H)
+## Logbladzijde 1 (het logboek op de tafel in het huis, placeholder).
+const LOGBLAD_1 := Vector2(3700, S5_FLOOR - 12.0)
+
+## --- S6 Gemaalplein: loopbrug, plein, pompgang (FK-5, L-14 b), sluis ---
+const S6_FLOOR := 260.0
+const S6_BRUG_END := 4260.0
+## Pompschoepen: 80 px uit elkaar in de looprichting, middelpunt 38 px boven
+## de vloer (FK-5: 15–40), zoals de flow-kamer.
+const VANE_UP := 38.0
+const PUMP_VANES := [
+	Vector2(4480, S6_FLOOR - VANE_UP),
+	Vector2(4560, S6_FLOOR - VANE_UP),
+	Vector2(4640, S6_FLOOR - VANE_UP),
+	Vector2(4720, S6_FLOOR - VANE_UP),
+]
+## De kelderingang: de sluis is een klep over de schacht naar S7, die opengaat
+## op `t_v` (LM-06). 280 px na de laatste schoep (FK-5: ≥ `2 × (D − 40)`,
+## dus voor elke D tot 180).
+const SLUICE := Rect2(5000, 260, 60, 10)
+const S6_SHAFT_LEFT := 5000.0
+const S6_SHAFT_RIGHT := 5060.0
+## Water in de kelderingang (`Diepwater` van het gemaal): de schacht onder de
+## sluis, tot 40 px boven de bovenvloer van S7 (wie er doorheen valt, is er
+## korter dan 30 ticks in).
+const S6_STREET := Rect2(5000, 270, 60, 130)
+const S6_WATER_HIGH := 272.0
+const S6_WATER_LOW := 400.0
+## Trap terug naar de loopbrug (L-10, en de langzame lijn voor licht zonder
+## echo): eenrichtingstreden van 45 px (FK-6) recht boven elkaar.
+const S6_STAIR_X := 4200.0
+const S6_STAIR := [215.0, 170.0, 125.0, 80.0, 35.0, -10.0, -55.0]
+## Logbladzijde 2 en de bevroren echo's (placeholders).
+const LOGBLAD_2 := Vector2(4920, S6_FLOOR - 12.0)
+
+## --- S7 Sluiskelder: de sokkel, het luik, het kanaal met twee Dwaallichten ---
+const S7_UP := 440.0              ## bovenvloer (de schacht komt hier uit)
+const S7_LOW := 620.0             ## benedenvloer
+const S7_POCKET_LEFT := 4960.0
+const S7_POCKET_RIGHT := 5340.0
+## Het luik (V-01, SL-04: P1 breekt het met een neerslag), in de bovenvloer.
+const LUIK := Rect2(5260, 440, 40, 16)
+const SOKKEL := Vector2(5150, S7_UP)
+## Kanaal van 160 px (V-01b: stuiten op de Dwaallichten in plaats van
+## overspringen; langzame lijn: de kademuur en een trede).
+const KANAAL_LEFT := 4960.0
+const KANAAL_RIGHT := 5120.0
+const KANAAL_BOTTOM := 710.0
+## Dwaallichten op 1/3 en 2/3 van het kanaal, banen van 32 px
+## (`slice-vijanden-en-boss.md` §2.6).
+const DWAALLICHT_X := [5013.0, 5067.0]
+const DWAALLICHT_LANE := 16.0
+const S7_RIGHT_WALL := 5740.0
+
+## --- S8 Machinehal: de arena van de Gemaalmeester (GM-01, GMB-01–06) ---
+## Een scherm met een vlakke vloer van 600 px tussen twee muren; geen richels.
+## `ARENA_ORIGIN` = de linkermuur op de bovenkant van de vloer (de `origin`
+## van `gemaalmeester.gd`). De deur rechts (van S7) staat open tot
+## `BOSS_START`, de deur links (naar S9) is dicht tot `BOSS_VERSLAGEN`: dat
+## koppelt de Gameplay Programmer.
+const ARENA_WALL_L := 4180.0
+const ARENA_WALL_R := 4780.0
+const ARENA_FLOOR := 680.0
+const ARENA_W := 600.0
+const ARENA_ORIGIN := Vector2(ARENA_WALL_L, ARENA_FLOOR)
+const ARENA_DOOR_R := Rect2(4780, 360, 20, 260)
+const ARENA_DOOR_L := Rect2(4160, 360, 20, 360)
+## Blokken die bij het laden open staan (geen collision, niet in beeld); de
+## Gameplay Programmer sluit ze bij `BOSS_START` (`Kadewijk.set_door`).
+const START_OPEN := ["DeurRechts"]
 
 ## Begin van elke kamer (LM-05, LM-08: vaste, veilige plek; ook het debugmenu).
 const ROOM_START := {
@@ -94,6 +199,10 @@ const ROOM_START := {
 	&"S2": Vector2(660, S2_FLOOR - HALF_H),
 	&"S3": Vector2(1620, S2_TOP - HALF_H),
 	&"S4": Vector2(2580, S4_FLOOR - HALF_H),
+	&"S5": Vector2(3540, S5_FLOOR - HALF_H),
+	&"S6": Vector2(4180, S5_ZOLDER - HALF_H),
+	&"S7": Vector2(5030, S7_UP - HALF_H),
+	&"S8": Vector2(4790, S7_LOW - HALF_H),
 }
 const RUN_START := Vector2(440, S1_FLOOR - HALF_H)
 
@@ -151,14 +260,49 @@ static func b4_strike_x(d: int) -> float:
 	return B4_TURN_X - 28.0
 
 
-## De keerpunten van deel 1 (B1 en B3), voor de bot en de tests.
-## `wall` = x van het keervlak, `side` = kant van de wand (-1 = links van P1).
+## De keerpunten (B1, B3 en de verdiepingen van B2 in S5), voor de bot en de
+## tests. `wall` = x van het keervlak, `side` = kant van de wand (-1 = links
+## van P1). Index 0–2: deel 1; 3–6: S5 (B2, van onder naar boven).
 static func turn_points(d: int) -> Array:
 	return [
 		{"name": "S1-B1", "wall": S1_WALL, "floor": S1_FLOOR, "side": -1, "up": S1_UP},
 		{"name": "S2-B3", "wall": B3_BLOCK_LEFT + b3_width(d), "floor": S2_FLOOR, "side": 1, "up": S2_MID},
 		{"name": "S2-B1", "wall": S2_PIJLER, "floor": S2_MID, "side": -1, "up": S2_TOP},
+		{"name": "S5-B2a", "wall": B2_RIGHT, "floor": B2_LEVELS[0], "side": 1, "up": B2_LEVELS[1], "z": b2_keerzone(d)},
+		{"name": "S5-B2b", "wall": B2_LEFT, "floor": B2_LEVELS[1], "side": -1, "up": B2_LEVELS[2], "z": b2_keerzone(d)},
+		{"name": "S5-B2c", "wall": B2_RIGHT, "floor": B2_LEVELS[2], "side": 1, "up": B2_LEVELS[3], "z": b2_keerzone(d)},
+		{"name": "S5-B2d", "wall": B2_LEFT, "floor": B2_LEVELS[3], "side": -1, "up": B2_LEVELS[4], "z": b2_keerzone(d)},
+		# Index 7: keren tegen de linkermuur van de arena (GM-07: de bounce naar
+		# het rad). Geen weg omhoog (GM-01: geen richels), dus de stap rondt nooit
+		# af; alleen voor de arena-test.
+		{"name": "S8-rad", "wall": ARENA_WALL_L, "floor": ARENA_FLOOR, "side": -1, "up": ARENA_FLOOR - 400.0},
 	]
+
+
+## B2: de keerzone. `Z = D + 30` (gdd §4.3), behalve als de loop over de
+## richel (van de landing, ± `D + 70` van de vorige wand, tot de volgende
+## wand: `(480 − (D + 88)) / 2` ticks) korter is dan D: dan hangt je echo bij
+## het keren nog in zijn bounce, en keren duurt ± 8 ticks langer (gemeten bij
+## D = 180: 133 tegen 125). Dan `Z = D + 40`, de grens van gdd §4.3 ("Z mag
+## tot D + 40"), zodat ook de langzame lijn met dash ≥ 20 ticks trager blijft
+## (gdd §4.8.7). Werkaanname WLD (kamerdoc §3b): alleen bij D > 130.
+static func b2_keerzone(d: int) -> float:
+	if (480.0 - (d + 88.0)) * 0.5 < float(d):
+		return float(d + 40)
+	return keerzone(d)
+
+
+## B2: breedte van een richel, `480 − Z` (gdd §4.3: `450 − D`, 390 bij D = 60).
+static func b2_ledge(d: int) -> float:
+	return 480.0 - b2_keerzone(d)
+
+
+## Vlak waarin de camera mag kijken (de rechthoek om alle kamers).
+static func area_rect() -> Rect2:
+	var out: Rect2 = ROOMS[ORDER[0]]
+	for id: StringName in ORDER:
+		out = out.merge(ROOMS[id])
+	return out
 
 
 ## Kamer waarin `at` ligt (zelfde regel als `Kamer.contains`: halfopen).
@@ -173,7 +317,8 @@ static func room_of(at: Vector2) -> StringName:
 static func blocks(id: StringName, d: int) -> Array:
 	var out: Array = []
 	var r: Rect2 = ROOMS[id]
-	out.append(["Plafond", Rect2(r.position.x, -20, r.size.x, 20), false])
+	if id != &"S7":
+		out.append(["Plafond", Rect2(r.position.x, r.position.y - 20, r.size.x, 20), false])
 	match id:
 		&"S1":
 			var z := keerzone(d)
@@ -207,9 +352,49 @@ static func blocks(id: StringName, d: int) -> Array:
 			out.append(["KloofBodem", Rect2(B4_NEAR_EDGE, KLOOF_BOTTOM, B4_FAR_EDGE - B4_NEAR_EDGE, ROOM_H - KLOOF_BOTTOM + 20), false])
 			# Langzame lijn: twee treden van 45 tegen de overkant (gdd §4.3 B4; "via de kademuur").
 			out.append(["KloofTrede", Rect2(B4_FAR_EDGE - TREAD_W, KLOOF_BOTTOM - 45, TREAD_W, 45), false])
+			# De overkant loopt door naar S5 (deel 2; tot #83 deel 2 hier de `EindWand`).
 			out.append(["Overkant", Rect2(B4_FAR_EDGE, S4_FLOOR, S4_END_WALL - B4_FAR_EDGE, ROOM_H - S4_FLOOR), false])
-			# Einde van deel 1: dicht tot S5 er is (deel 2).
-			out.append(["EindWand", Rect2(S4_END_WALL, 0, r.end.x - S4_END_WALL, ROOM_H), false])
+		&"S5":
+			var w := b2_ledge(d)
+			out.append(["Vloer", Rect2(r.position.x, S5_FLOOR, B2_RIGHT - r.position.x, ROOM_H - S5_FLOOR), false])
+			# Linkerwand van de schacht; de gang van S4 loopt eronder door (84 px hoog).
+			out.append(["WandLinks", Rect2(r.position.x, r.position.y, B2_LEFT - r.position.x, B2_LEVELS[1] + ONE_WAY_T - r.position.y), false])
+			# Rechterwand; zijn bovenkant is de zolder, die doorloopt naar S6.
+			out.append(["WandRechts", Rect2(B2_RIGHT, S5_ZOLDER, r.end.x - B2_RIGHT, ROOM_H - S5_ZOLDER), false])
+			for i in range(1, B2_LEVELS.size()):
+				var y: float = B2_LEVELS[i]
+				var x0 := B2_LEFT if i % 2 == 1 else B2_RIGHT - w
+				out.append(["Richel%d" % i if i < 4 else "Zolder", Rect2(x0, y, w, ONE_WAY_T), true])
+			for tp: Dictionary in turn_points(d).slice(3, 7):
+				var prefix: String = String(tp["name"]).trim_prefix("S5-")
+				out.append_array(_treads(prefix, tp["wall"], -float(tp["side"]), tp["floor"], d))
+		&"S6":
+			out.append(["Loopbrug", Rect2(r.position.x, S5_ZOLDER, S6_BRUG_END - r.position.x, ONE_WAY_T), true])
+			out.append(["Plein", Rect2(r.position.x, S6_FLOOR, S6_SHAFT_LEFT - r.position.x, ROOM_H - S6_FLOOR), false])
+			out.append(["WandRechts", Rect2(S6_SHAFT_RIGHT, r.position.y, r.end.x - S6_SHAFT_RIGHT, ROOM_H - r.position.y), false])
+			for i in S6_STAIR.size():
+				out.append(["Trap%d" % (i + 1), Rect2(S6_STAIR_X - TREAD_W * 0.5, S6_STAIR[i], TREAD_W, ONE_WAY_T), true])
+		&"S7":
+			# Plafond met het gat van de schacht (de kelderingang van S6).
+			out.append(["Plafond", Rect2(r.position.x, r.position.y - 20, S6_SHAFT_LEFT - r.position.x, 20), false])
+			out.append(["Plafond2", Rect2(S6_SHAFT_RIGHT, r.position.y - 20, r.end.x - S6_SHAFT_RIGHT, 20), false])
+			# De bovenvloer (de kelder) met het luik; dicht aan beide kanten.
+			out.append(["KelderWandLinks", Rect2(S7_POCKET_LEFT - 20, r.position.y, 20, S7_UP + 16 - r.position.y), false])
+			out.append(["Bovenvloer", Rect2(S7_POCKET_LEFT, S7_UP, LUIK.position.x - S7_POCKET_LEFT, 16), false])
+			out.append(["Bovenvloer2", Rect2(LUIK.end.x, S7_UP, S7_POCKET_RIGHT - LUIK.end.x, 16), false])
+			out.append(["KelderWandRechts", Rect2(S7_POCKET_RIGHT, r.position.y, 20, S7_UP + 16 - r.position.y), false])
+			# Benedenvloer: west van het kanaal (naar de machinehal), het kanaal, oost.
+			out.append(["VloerWest", Rect2(r.position.x, S7_LOW, KANAAL_LEFT - r.position.x, r.end.y - S7_LOW), false])
+			out.append(["KanaalBodem", Rect2(KANAAL_LEFT, KANAAL_BOTTOM, KANAAL_RIGHT - KANAAL_LEFT, r.end.y - KANAAL_BOTTOM + 20), false])
+			# Langzame lijn: een trede van 45 tegen de westkant (de kademuur, FK-6).
+			out.append(["KanaalTrede", Rect2(KANAAL_LEFT, KANAAL_BOTTOM - 45, TREAD_W, 45), false])
+			out.append(["VloerOost", Rect2(KANAAL_RIGHT, S7_LOW, S7_RIGHT_WALL - KANAAL_RIGHT, r.end.y - S7_LOW), false])
+			out.append(["WandRechts", Rect2(S7_RIGHT_WALL, r.position.y, r.end.x - S7_RIGHT_WALL, ROOM_H), false])
+		&"S8":
+			out.append(["Vloer", Rect2(ARENA_WALL_L, ARENA_FLOOR, ARENA_W, r.end.y - ARENA_FLOOR), false])
+			out.append(["MuurRechts", Rect2(ARENA_WALL_R, S7_LOW, r.end.x - ARENA_WALL_R, r.end.y - S7_LOW), false])
+			out.append(["DeurLinks", ARENA_DOOR_L, false])
+			out.append(["DeurRechts", ARENA_DOOR_R, false])
 	return out
 
 
