@@ -54,6 +54,7 @@ const TEST_SCRIPTS := [
 	"res://tests/test_respawn.gd",
 	"res://tests/test_vijanden.gd",
 	"res://tests/test_boss.gd",
+	"res://tests/test_kadewijk.gd",
 ]
 
 ## 2 minuten speltijd bij 60 Hz. De langste test duurt ±3000 ticks (C-01).
