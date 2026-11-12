@@ -61,6 +61,7 @@ Doel: de flownormen van pillar 1 meten (sprongketen, merk-arena, één gemaal). 
 | Kleurscript en lichtovergang (studie) | `docs/art/slice/kleurscript_*`, `lichtovergang_*` | Placeholder (deel 1 van #85) |
 | S-04 tileset Kadewijk, eerste set (46 tegels) en props (pomprad 8f, straatlamp, halo, boograam, bolder, sluisbalk), 3 toestanden + index-atlas | `docs/art/slice/tiles/` | Placeholder (deel 1 van #85) |
 | S-03 / S-13 concept: 3 vijandtypes en de Gemaalmeester (stijlregels) | `docs/art/slice/concept_*` | Concept (deel 1 van #85) |
+| S-04/S-05/S-06/S-07 voor **S1 Kade-ingang en S3 Vismarkt**: kamerlagen (achter, midden, speelvlak, licht, voor) in grijs, half en kleur plus index, NinePatch-stukken voor de eenrichtingsblokken per D, manifest | `game/art/wereld/kadewijk/`, renders in `docs/art/slice/eindkwaliteit/`, `slice-kadewijk.md` §9 | **Eindkwaliteit** (deel 2 van #85); de koppeling aan de scènes volgt (TA) |
 
 ## 4. Open punten
 
