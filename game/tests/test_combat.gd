@@ -14,6 +14,7 @@ const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 const TailEcho = preload("res://scripts/echo/tail_echo.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
 const CombatTarget = preload("res://scripts/combat/combat_target.gd")
+const FlowEnemy = preload("res://levels/flowkamer/flow_enemy.gd")
 const Combat = preload("res://scripts/combat/combat.gd")
 const GameEvents = preload("res://scripts/events/game_events.gd")
 const Layers = preload("res://scripts/world/layers.gd")
@@ -484,35 +485,153 @@ func test_e02m_9_path_checks_paused_during_jump(t) -> void:
 		"breuk %s (alleen na de merksprong, op t + 14 = %d)" % [str(g["broke"]), g["t"] + 14])
 
 
-## (10) (alle D) Lopende basisvijand: P1 slaat met het verste deel van zijn
-## vlak, springt over hem heen en loopt weg; de vijand loopt na 30 ticks mee.
-## Op x + D ligt het merk binnen 36 + 0,25 × (D − 30) px: merksprong, en op
-## x + D + 3 krijgt de vijand 20 SE.
+## (10) (alle D) Lopende basisvijand (gdd v0.8.2 §4.6, G-10): P1 slaat op x
+## met het verste deel van zijn vlak, springt over hem heen en loopt weg; de
+## vijand loopt na zijn 30 ticks stil mee. Door de hoogtegrens (§4.3, G-9)
+## begint hij geen aanloop terwijl P1 over hem springt: geen aanloop van x tot
+## x + D + 3. De grens is `36 + 0,25 × (D − 27)` px (44 / 52 / 59 / 74 bij
+## D = 60 / 90 / 120 / 180). Bij elke D: op x + D ligt het merk verder dan
+## 36 px van de echo en binnen de grens; merksprong op x + D, 20 SE op x + D + 3.
 func test_e02m_10_walking_enemy_all_d(t) -> void:
 	for d: int in ALL_D:
 		var sim = Fx.world(t)
-		var enemy := Fx.target(sim, ENEMY, 235.0, true)
+		# 38,5 px vóór P1: in de 10 ticks vóór de slag loopt hij 2,5 px, dus op x = 10
+		# staat zijn middelpunt 36 px vóór P1 (het verste deel van het vlak).
+		var enemy := Fx.target(sim, ENEMY, 238.5, true)
 		var p1 := Fx.p1(sim, [[10, 0], [1, A], [5, 0], [1, R | J], [400, R]])
 		var echo := Fx.tail_echo(sim, p1, d)
-		var gap := {"at": -1.0}
+		var gap := {"at": -1.0, "slag": -1.0}
 		var jumps: Array = []
 		echo.merksprong_started.connect(func(tick: int, _id: int) -> void:
 			jumps.append(tick)
 			gap["at"] = echo.recorded_position.distance_to(enemy.global_position))
 		var damage: Array = []
-		enemy.damaged.connect(func(tick: int, amount: int, _s: String) -> void: damage.append([tick, amount]))
+		enemy.damaged.connect(func(tick: int, amount: int, _s: String) -> void:
+			damage.append([tick, amount])
+			if gap["slag"] < 0.0:
+				gap["slag"] = absf(enemy.global_position.x - p1.global_position.x))
+		var windups: Array = []
+		enemy.windup_started.connect(func(tick: int) -> void: windups.append(tick))
 		await t.run_ticks(sim, d + 20)
-		var limit := 36.0 + 0.25 * (d - 30) + 3.0
-		# Bij D ≥ 90 is de vijand op x + D al weggelopen (> 36 px). Bij D = 60
-		# staat hij dan nog op zijn plek (stil na de treffer en zijn aanloop duren
-		# langer dan 60 ticks): verwacht een merk op ≤ 36 px (gdd v0.8.1 §4.6, een
-		# verwachting, geen vrijstelling). De grens `limit` geldt bij elke D.
-		var expected: bool = gap["at"] > 36.0 if d >= 90 else (gap["at"] >= 0.0 and gap["at"] <= 36.0)
-		t.check(jumps == [10 + d] and gap["at"] <= limit and expected,
-			"D = %d: merksprong %s op %.1f px (≤ %.1f; %s 36 px)" % [d, str(jumps), gap["at"], limit,
-				"> " if d >= 90 else "≤ "])
-		t.check(damage.size() == 2 and damage[1] == [10 + d + 3, 20], "D = %d: schade %s" % [d, str(damage)])
+		var limit := 36.0 + 0.25 * (d - 27)
+		t.check(absf(float(gap["slag"]) - 36.0) < 0.01, "D = %d: slag op %.2f px van de vijand (36: het verste deel van het vlak)" % [
+			d, float(gap["slag"])])
+		t.check(jumps == [10 + d] and gap["at"] > 36.0 and gap["at"] <= limit,
+			"D = %d: merksprong %s (op %d) met het merk op %.2f px (> 36 en ≤ %.2f)" % [d, str(jumps), 10 + d,
+				gap["at"], limit])
+		t.check(damage.size() == 2 and damage[0] == [10, 10] and damage[1] == [10 + d + 3, 20],
+			"D = %d: schade %s ([10, 10], [%d, 20])" % [d, str(damage), 10 + d + 3])
+		t.note("E-02m (10) D = %d: merk op x + D op %.2f px van de echo (> 36, grens %.2f), merksprong %s, schade %s, eerste aanloop %s" % [
+			d, gap["at"], limit, str(jumps), str(damage), str(windups.slice(0, 1))])
+		var early := windups.filter(func(tick: int) -> bool: return tick <= 10 + d + 3)
+		t.check(early.is_empty(), "D = %d: aanloop op %s (geen van x = 10 tot x + D + 3 = %d)" % [d, str(early), 13 + d])
 		await t.cleanup()
+
+
+# --- Basisvijand: hoogtegrens van de aanloop (gdd v0.8.2 §4.3, §4.6; G-9) ---
+
+## Eén basisvijand (loopt) met zijn vloer op `enemy_floor` en zijn middelpunt op
+## x = 300; P1 met handmatige input op `p1_at`; `blocks` op laag 1. P1 springt
+## op `jump_at`. Geeft de aanlopen, de actieve ticks en de treffers terug.
+func _windup_case(t, p1_at: Vector2, n: int, blocks: Array = [], enemy_floor := Fx.FLOOR_TOP,
+		jump_at := -1, flow := false) -> Dictionary:
+	var sim = Fx.world(t)
+	for r: Rect2 in blocks:
+		Fx.block(t, "Blok%d" % blocks.find(r), r, Layers.WORLD)
+	var p1 := Fx.manual_player(sim, 1, p1_at)
+	var enemy: CombatTarget = FlowEnemy.new() if flow else CombatTarget.new()
+	enemy.setup_target(ENEMY)
+	enemy.walks = true
+	if flow:
+		enemy.is_awake = func() -> bool: return true
+	enemy.position = Vector2(300.0, enemy_floor - 12.0)
+	sim.add_object(enemy)
+	var seen := {"windups": [], "hits": [], "active": [], "gap": [], "feet": []}
+	enemy.windup_started.connect(func(tick: int) -> void:
+		seen["windups"].append(tick)
+		seen["gap"].append(snappedf(absf(p1.position.x - enemy.position.x), 0.01))
+		seen["feet"].append(snappedf(enemy_floor - (p1.position.y + 15.0), 0.01)))
+	enemy.hit_player.connect(func(tick: int, _p: Node2D) -> void: seen["hits"].append(tick))
+	sim.tick_finished.connect(func(tick: int) -> void:
+		if enemy._attack_left > 0:
+			seen["active"].append(tick)
+		if tick == jump_at:
+			p1.input_source.bits = J
+		elif tick == jump_at + 1:
+			p1.input_source.bits = 0)
+	await t.run_ticks(sim, n)
+	await t.cleanup()
+	return seen
+
+
+## Basisvijand (§4.6, v0.8.2), in een kale testscène met echo uit, voor de
+## basisvijand van de flow-kamer (`combat_target.gd`) en die van K2
+## (`flow_enemy.gd`). P1 met zijn middelpunt 30 px van de vijand: voeten op
+## +20 px (P1 op een richel): aanloop; op +21: geen; op −20: aanloop; op −21:
+## geen. P1 op 33 px met de voeten op de vloer: geen aanloop (pas als de
+## vijand binnen 32 px is gelopen). De grenzen staan in data
+## (`combat.enemy_windup_height_min` / `_max` in echo_v04.json, zoals VJ-08).
+func test_basisvijand_windup_only_in_height(t) -> void:
+	var c: Dictionary = Tuning.combat()
+	t.check(float(c["enemy_windup_height_min"]) == -20.0 and float(c["enemy_windup_height_max"]) == 20.0,
+		"hoogtegrenzen %s … %s (−20 … 20)" % [c["enemy_windup_height_min"], c["enemy_windup_height_max"]])
+	for flow: bool in [false, true]:
+		var who := "K2 (flow_enemy)" if flow else "basisvijand"
+		var floor_case := await _windup_case(t, Vector2(330, Fx.STAND_Y), 10, [], Fx.FLOOR_TOP, -1, flow)
+		t.check(floor_case["windups"] == [0] or floor_case["windups"] == [1],
+			"%s: op de vloer op 30 px: aanloop %s (op de eerste tick)" % [who, floor_case["windups"]])
+		# +20 / +21: P1 op een richel naast de vijand (rand op 322, 6 px van zijn rand).
+		var up20 := await _windup_case(t, Vector2(330, Fx.FLOOR_TOP - 20 - 15), 10,
+			[Rect2(322, Fx.FLOOR_TOP - 20, 40, 20)], Fx.FLOOR_TOP, -1, flow)
+		var up21 := await _windup_case(t, Vector2(330, Fx.FLOOR_TOP - 21 - 15), 120,
+			[Rect2(322, Fx.FLOOR_TOP - 21, 40, 21)], Fx.FLOOR_TOP, -1, flow)
+		t.check(not up20["windups"].is_empty() and up20["feet"][0] == 20.0,
+			"%s: voeten op +20: aanloop %s, voeten %s" % [who, up20["windups"], up20["feet"]])
+		t.check(up21["windups"].is_empty(), "%s: voeten op +21: aanloop %s %s (geen)" % [who, up21["windups"], up21["feet"]])
+		# −20 / −21: de vijand op een verhoging (rand op 308), P1 ernaast op de vloer.
+		var down20 := await _windup_case(t, Vector2(330, Fx.STAND_Y), 10,
+			[Rect2(200, Fx.FLOOR_TOP - 20, 108, 20)], Fx.FLOOR_TOP - 20, -1, flow)
+		var down21 := await _windup_case(t, Vector2(330, Fx.STAND_Y), 120,
+			[Rect2(200, Fx.FLOOR_TOP - 21, 108, 21)], Fx.FLOOR_TOP - 21, -1, flow)
+		t.check(not down20["windups"].is_empty() and down20["feet"][0] == -20.0,
+			"%s: voeten op −20: aanloop %s, voeten %s" % [who, down20["windups"], down20["feet"]])
+		t.check(down21["windups"].is_empty(), "%s: voeten op −21: aanloop %s %s (geen)" % [who, down21["windups"], down21["feet"]])
+		# 33 px op de vloer: geen aanloop zolang hij niet binnen 32 px is (0,25 px/tick: 4 ticks lopen).
+		var far := await _windup_case(t, Vector2(333, Fx.STAND_Y), 20, [], Fx.FLOOR_TOP, -1, flow)
+		t.check(not far["windups"].is_empty() and far["windups"][0] >= 4 and far["gap"][0] <= 32.0,
+			"%s: P1 op 33 px: aanloop %s op %s px (pas na ≥ 4 ticks lopen, binnen 32 px)" % [who, far["windups"], far["gap"]])
+
+
+## Basisvijand (§4.6): P1 op de plank van een echo die op de vloer van de
+## vijand loopt (voeten ± 30 px hoger): geen aanloop, geen treffer.
+func test_basisvijand_no_windup_on_echo_plank(t) -> void:
+	var sim = Fx.world(t)
+	var ghost := Fx.ghost(t)
+	Fx.ghost_path(ghost, -1, 500, func(_k: int) -> Vector2: return Vector2(330, Fx.STAND_Y))
+	var echo := Fx.tail_echo(sim, ghost, 1)
+	t.check(echo != null, "geen echo")
+	var p1 := Fx.manual_player(sim, 1, Vector2(330, Fx.ON_ECHO_Y - 2))
+	var enemy := Fx.target(sim, ENEMY, 300.0, true)
+	var windups: Array = []
+	enemy.windup_started.connect(func(tick: int) -> void: windups.append(tick))
+	await t.run_ticks(sim, 200)
+	t.check(p1.motor.on_floor and absf(p1.position.y - Fx.ON_ECHO_Y) < 0.6, "P1 staat niet op de echo: %s" % p1.position)
+	t.check(windups.is_empty() and p1.health == int(Tuning.combat()["p1_health"]),
+		"aanloop op P1 op de plank: %s, %d LP" % [windups, p1.health])
+	await t.cleanup()
+
+
+## Basisvijand (§4.6): een aanloop die op t begon, loopt door als P1 op t + 5
+## opspringt; het vlak is actief op t + 30 … t + 35, en de sprong ontwijkt het.
+func test_basisvijand_windup_continues_when_p1_jumps(t) -> void:
+	for flow: bool in [false, true]:
+		var seen := await _windup_case(t, Vector2(330, Fx.STAND_Y), 40, [], Fx.FLOOR_TOP, -2, flow)
+		var start: int = seen["windups"][0] if not seen["windups"].is_empty() else -1
+		var jumped := await _windup_case(t, Vector2(330, Fx.STAND_Y), 40, [], Fx.FLOOR_TOP, start + 5, flow)
+		var want: Array = range(start + 30, start + 36)
+		t.check(start >= 0 and jumped["windups"] == [start] and jumped["active"] == want,
+			"aanloop %s, actief %s (verwacht %s)" % [jumped["windups"], jumped["active"], want])
+		t.check(jumped["hits"].is_empty(), "P1 in de sprong geraakt op %s" % [jumped["hits"]])
 
 
 # --- C-12 (alleen waar het het merk raakt) --------------------------------

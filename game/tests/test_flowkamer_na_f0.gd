@@ -320,6 +320,40 @@ func test_k2_waves_in_pairs(t) -> void:
 	await t.tree.process_frame
 
 
+## Basisvijand (gdd v0.8.2 §4.3, §4.6; G-9) in de flow-kamer zelf: P1 staat in K2 op de vloer,
+## 30 px naast de eerste vijand van golf 1. Op dezelfde vloer: aanloop. Staat die vijand 21 px
+## hoger (de voeten van P1 op −21 van zijn vloer), dan geen aanloop; op 20 px hoger wel.
+## De grensgevallen +20 / +21, de plank en de sprong staan in `test_combat.gd` (ook voor
+## `flow_enemy.gd`).
+func test_k2_basisvijand_windup_height(t) -> void:
+	for lift: float in [0.0, 20.0, 21.0]:
+		var room = FlowRoom.new()
+		room.tail = 60
+		room.autosave = false
+		room.show_hud = false
+		room.input_override = preload("res://scripts/input/scripted_input.gd").new([[600, 0]])
+		t.tree.root.add_child(room)
+		await t.tree.physics_frame
+		room.p1.position = Layout.ROOM_START["K2"]
+		await t.tree.physics_frame
+		await t.tree.physics_frame
+		var enemy = room.enemies[0]
+		var windups: Array = []
+		enemy.windup_started.connect(func(tick: int) -> void: windups.append(tick))
+		enemy.position.y -= lift
+		room.p1.position = Vector2(enemy.position.x - 30.0, Layout.K2_FLOOR - Layout.HALF_H)
+		room.p1.velocity = Vector2.ZERO
+		for i in 20:
+			await t.tree.physics_frame
+		var feet := snappedf(enemy.position.y + 12.0 - (room.p1.position.y + Layout.HALF_H), 0.01)
+		if lift <= 20.0:
+			t.check(not windups.is_empty(), "K2, vijand %.0f px hoger (voeten P1 op %.2f): geen aanloop" % [lift, feet])
+		else:
+			t.check(windups.is_empty(), "K2, vijand %.0f px hoger (voeten P1 op %.2f): aanloop %s" % [lift, feet, windups])
+		room.queue_free()
+		await t.tree.process_frame
+
+
 ## Zelfde posities op ± 1 px (de vijanden lopen 0,25 px/tick naar P1).
 func _near(xs: Array, want: Array) -> bool:
 	if xs.size() != want.size():
