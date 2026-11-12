@@ -94,8 +94,15 @@ class Seat:
 		return bot.sample_for(index, tick)
 
 
-var p1_source: Seat
-var p2_source: Seat
+## Elke keer een nieuwe `Seat` (zonder eigen toestand): de bot bewaart zijn stoelen niet. Anders
+## houden bot en stoel elkaar vast (RefCounted-kring) en blijft `boss_bot.gd` na afloop in gebruik
+## ("1 resources still in use at exit", #233).
+var p1_source: Seat:
+	get:
+		return Seat.new(self, 1)
+var p2_source: Seat:
+	get:
+		return Seat.new(self, 2)
 ## B-8 (2), late bot: zo veel ticks blijft P1 op de echo of P2 staan vóór de bounce.
 var bounce_delay := 0
 ## Slagen per bounce. §3.5 rekent met 1; de geoefende run slaat er 2: de AANVAL-cooldown (20 ticks)
@@ -144,8 +151,6 @@ var _hesitate_left := -1
 func _init(sim: Node, boss: Gemaalmeester) -> void:
 	_sim = sim
 	_boss = boss
-	p1_source = Seat.new(self, 1)
-	p2_source = Seat.new(self, 2)
 
 
 func sample_for(index: int, tick: int) -> int:
