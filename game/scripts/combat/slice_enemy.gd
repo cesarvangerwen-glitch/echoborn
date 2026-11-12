@@ -36,10 +36,12 @@ var pair_partner: Node2D = null
 var pair_distance := 0.0
 ## Combat van de Sim (gezet door `Sim.add_object`): D en de andere vijanden.
 var combat: RefCounted = null
-## Dwaallicht: wereld-y van vloer of water onder de baan, en de baan (x van het middelpunt).
-var floor_top := 0.0
-var lane_from := 0.0
-var lane_to := 0.0
+## Dwaallicht: y van vloer of water onder de baan, en de baan (x van het middelpunt), in de
+## coördinaten van de ouder (zoals `position`). In een scène via de inspector (#83); in code via
+## `setup_enemy`. Een Dwaallicht zonder baan (`lane_from` = `lane_to` = 0) zweeft op zijn plek.
+@export var floor_top := 0.0
+@export var lane_from := 0.0
+@export var lane_to := 0.0
 var phase: Phase = Phase.IDLE
 ## Laatste tick van een tink (VJ-07), voor beeld en tests.
 var tink_tick := -1_000_000
@@ -76,6 +78,9 @@ func setup_enemy(p_type: Type, x: float, floor_y: float, from_x := NAN, to_x := 
 func _ready() -> void:
 	if not _set_up and shape == null:
 		setup(owner_layers, body_size())
+	if enemy_type == Type.DWAALLICHT and lane_from == 0.0 and lane_to == 0.0:
+		lane_from = position.x
+		lane_to = position.x
 	super._ready()
 
 

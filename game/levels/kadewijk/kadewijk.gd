@@ -1,8 +1,8 @@
 extends Node2D
 ## De Kadewijk (wijk 1.3): S1–S8 als grijze, speelbare kamers op placeholder
 ## (T8a, #83; deel 1 S1–S4, deel 2 S5–S8; `docs/design/wereld.md` §2.2,
-## kamerdoc `docs/design/kamers/kadewijk.md`). S8 is de lege arena van de
-## Gemaalmeester; de boss en de deuren koppelt de Gameplay Programmer.
+## kamerdoc `docs/design/kamers/kadewijk.md`). S8 is de arena van de
+## Gemaalmeester (`gemaalmeester.gd` op `Layout.ARENA_ORIGIN`).
 ##
 ## Een gebiedsscène met de systemen van T5b (ontwerp.md §3a, §7): elke kamer
 ## is een `Kamer` met meestreamende inhoud (`s*_*.tscn`), de `AreaLoader`
@@ -24,7 +24,19 @@ extends Node2D
 ##   placeholder), en `RUN_EIND`: bij `run_end` = S4 als P1 het einde van
 ##   deel 1 haalt (`Layout.END_X`), anders als P1 kamer `run_end` binnenkomt.
 ## - **S6**: het gemaal (`S6/Gemaal`, de `wijk_gemaal` van elke kamer), de
-##   pompgang en het K-paar; **S7**: de banen van de Dwaallichten en het luik.
+##   pompgang en het K-paar; **S7**: het luik (de banen van de Dwaallichten
+##   staan in de scène).
+## - **S8, de Gemaalmeester** (#83, gemaalmeester.md GM-01, GM-10, GM-11): als
+##   S8 laadt, staat de boss op `Layout.ARENA_ORIGIN` (breedte `ARENA_W`); als
+##   S8 ontlaadt, gaat hij weg (`Boss.detach`). `BOSS_START` (P1 en de echo of
+##   P2 helemaal in de arena, anders breekt de echo op de deur) sluit
+##   `DeurRechts`, `BOSS_VERSLAGEN` opent `DeurLinks` (naar S9), beide met
+##   `set_door`; een reset (P1 respawnt in een buurkamer) opent
+##   `DeurRechts` weer. Bij 0 levenspunten respawnt P1 op het checkpoint (na de
+##   eerste pompslag dat van het gemaal, S6); S8 ontlaadt dan en de boss begint
+##   opnieuw als P1 terugkomt. Verslagen blijft verslagen zolang de scène loopt
+##   (`boss_defeated_tick`; nog geen vlag in de save). Meetlog: de events van de
+##   boss (`watch_boss`); de lichtmeter gaat bij `BOSS_VERSLAGEN` naar 100 LP.
 ##
 ## Debugmenu (SL-05, placeholder): F1/F2/F3/F7 = D 60/90/120/180 (uit
 ## `echo.tail_options`; de kamers worden opnieuw gebouwd), F4 = echo aan/uit,
@@ -47,6 +59,7 @@ const Layout = preload("res://levels/kadewijk/kadewijk_layout.gd")
 const Inhoud = preload("res://levels/kadewijk/kadewijk_inhoud.gd")
 const Gemaal = preload("res://scripts/light/gemaal.gd")
 const Luik = preload("res://levels/kadewijk/kadewijk_luik.gd")
+const Gemaalmeester = preload("res://scripts/combat/gemaalmeester.gd")
 ## Meetlog en camera van de flow-kamer, ongewijzigd hergebruikt (alleen gelezen).
 const FlowMeetlog = preload("res://levels/flowkamer/flow_meetlog.gd")
 const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
@@ -61,6 +74,11 @@ const WAKE_DY := 40.0
 const WAKE_DX := 320.0
 ## L-13 (f): hooguit zoveel vijanden tegelijk in beeld.
 const MAX_AT_ONCE := 5
+## `run_end` voor een run tot en met de boss: `RUN_EIND` op `BOSS_VERSLAGEN`.
+const RUN_END_BOSS := &"Gemaalmeester"
+## BOSS_START als het middelpunt van P1 zo ver binnen de muren staat: het
+## lichaam (16 px) is dan helemaal binnen als `DeurRechts` dichtgaat.
+const BOSS_START_INSET := 24.0
 
 static var chosen_tail := int(Tuning.echo()["tail_ticks"])
 static var chosen_echo_on := true
@@ -112,6 +130,12 @@ var room_changes: Array = []
 var gemaal: Gemaal = null
 ## Tick waarop P1 het lampglas (S5) haalde, of -1 (placeholder, WS-08).
 var lampglas_tick := -1
+## De Gemaalmeester als S8 geladen is en hij nog niet verslagen is, anders null.
+var boss: Gemaalmeester = null
+## Tick van `BOSS_VERSLAGEN`, of -1. Daarna komt de boss niet meer terug.
+var boss_defeated_tick := -1
+## Hoe vaak de boss in S8 werd neergezet (elke keer dat S8 laadt, tot hij verslagen is).
+var boss_spawns := 0
 
 var _awake: Dictionary = {}
 var _wave_1: Array = []
@@ -157,6 +181,8 @@ func _ready() -> void:
 	room = loader.huidige
 	respawn = Respawn.new(p1, func() -> Vector2: return Layout.ROOM_START.get(loader.huidige, Layout.RUN_START), progress)
 	meetlog = FlowMeetlog.new(sim, p1, echo, String(room))
+	if boss != null:
+		meetlog.watch_boss(boss)
 	meter.filled.connect(func(t: int, amount: int, _added: int, source: String, who: String) -> void:
 		meetlog.add_row(t, "LP", "+%d" % amount, "%s_%s" % [source, who], p1.position))
 	sim.partner_dissolved.connect(func(t: int, at: Vector2, cause: String) -> void:
@@ -227,6 +253,8 @@ func _on_loaded_changed(_tick: int, id: StringName, geladen: bool) -> void:
 			wave = 0
 		elif id == &"S6":
 			gemaal = null
+		elif id == &"S8":
+			_remove_boss()
 		return
 	var inhoud: Node = kamer.inhoud_node
 	if inhoud == null:
@@ -267,18 +295,52 @@ func _on_loaded_changed(_tick: int, id: StringName, geladen: bool) -> void:
 				meetlog.add_row(t, "LUIK", "", by, luik_9.global_position))
 		&"S7":
 			# Dwaallichten: banen van 32 px op 1/3 en 2/3 van het kanaal, 40 px
-			# boven de vloer (§2.6; de `@export` voor de baan volgt van de GP).
-			for i in Layout.DWAALLICHT_X.size():
-				var e: SliceEnemy = inhoud.get_node("Dwaallicht%d" % (i + 1))
-				var x: float = Layout.DWAALLICHT_X[i]
-				if e.alive:
-					e.setup_enemy(SliceEnemy.Type.DWAALLICHT, x, Layout.S7_LOW,
-						x - Layout.DWAALLICHT_LANE, x + Layout.DWAALLICHT_LANE)
-					if not _awake.has(e):
-						e.hold_until(sim.tick + 2)
+			# boven de vloer (§2.6), in de scène (`lane_from`, `lane_to`,
+			# `floor_top` van `SliceEnemy`, #83).
 			var luik: Luik = inhoud.get_node(^"Luik")
 			luik.opened.connect(func(t: int, by: String) -> void:
 				meetlog.add_row(t, "LUIK", "", by, luik.global_position))
+		&"S8":
+			if boss_defeated_tick >= 0:
+				# GM-10: het gemaal staat er stil, de deur naar S9 is open.
+				set_door(&"S8", "DeurLinks", false)
+			else:
+				_spawn_boss(inhoud)
+
+
+## S8: de Gemaalmeester op `Layout.ARENA_ORIGIN`, met de deuren via `set_door`.
+func _spawn_boss(inhoud: Node) -> void:
+	boss = Gemaalmeester.new()
+	boss.name = "Gemaalmeester"
+	boss.setup_gemaalmeester(Layout.ARENA_ORIGIN)
+	inhoud.add_child(boss)
+	boss.global_position = Layout.ARENA_ORIGIN
+	boss.arena_width = Layout.ARENA_W
+	boss.start_inset = BOSS_START_INSET
+	boss.start_with_all_bodies = true
+	boss.arena_height = Layout.ARENA_FLOOR - Layout.ROOMS[&"S8"].position.y
+	boss.attach(sim)
+	boss_spawns += 1
+	boss.arena_changed.connect(func(_t: int, closed: bool) -> void:
+		set_door(&"S8", "DeurRechts", closed))
+	boss.boss_defeated.connect(_on_boss_defeated)
+	# In `_ready` laadt S8 vóór het meetlog er is; dan volgt het meetlog hem daar.
+	if meetlog != null:
+		meetlog.watch_boss(boss)
+	meter.watch_boss(boss)
+
+
+func _on_boss_defeated(tick: int) -> void:
+	boss_defeated_tick = tick
+	set_door(&"S8", "DeurLinks", false)
+
+
+## S8 ontlaadt (P1 respawnt buiten de buurkamers, F8): de boss weg bij de Sim.
+func _remove_boss() -> void:
+	if boss == null:
+		return
+	boss.detach()
+	boss = null
 
 
 ## VJ-05: een paar met de startafstand uit `slice.csv` (`paar_e` = 28, `paar_k` = 42).
@@ -342,13 +404,21 @@ func _on_tick(tick: int) -> void:
 		meetlog.add_row(tick, "LAMPGLAS", "", "p1", p1.position)
 	if run_over:
 		return
-	var done := room == &"S4" and p1.position.x >= Layout.END_X if run_end == &"S4" else room == run_end
+	var done := room == run_end
+	if run_end == &"S4":
+		done = room == &"S4" and p1.position.x >= Layout.END_X
+	elif run_end == RUN_END_BOSS:
+		done = boss_defeated_tick >= 0
 	if done:
-		run_over = true
-		end_tick = tick
-		meetlog.add_row(tick, "RUN_EIND", "", "", p1.position)
-		meetlog.finish()
-		run_finished.emit(tick)
+		_end_run(tick)
+
+
+func _end_run(tick: int) -> void:
+	run_over = true
+	end_tick = tick
+	meetlog.add_row(tick, "RUN_EIND", "", "", p1.position)
+	meetlog.finish()
+	run_finished.emit(tick)
 
 
 ## Wekken (kamerdoc §4): wakker als P1 in de kamer op de vloer van de vijand
@@ -385,11 +455,7 @@ func _pick_up(tick: int) -> void:
 	slice_end_tick = tick
 	meetlog.add_row(tick, "SLICE_EIND", "", "", p1.position)
 	if run_end == RUN_END_LUS and not run_over:
-		run_over = true
-		end_tick = tick
-		meetlog.add_row(tick, "RUN_EIND", "", "", p1.position)
-		meetlog.finish()
-		run_finished.emit(tick)
+		_end_run(tick)
 
 
 func _wave_1_marked_or_dead() -> bool:

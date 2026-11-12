@@ -31,7 +31,7 @@ Geldt voor alle code in `game/`. De Technical Director reviewt alle code van pro
 
 ## 3. `preload` in plaats van `class_name`
 
-We gebruiken voorlopig **geen `class_name`**. Scripts verwijzen naar elkaar met `const X = preload("res://...")`. Reden: `class_name` vereist de importcache (`.godot/`), die niet in git staat; een verse clone faalt dan headless tot iemand `--import` draait. Met `preload` werkt `godot --headless ... -s res://tests/run_tests.gd` direct. Heroverwegen zodra CI de import vast draait (ontwerp R4).
+We gebruiken voorlopig **geen `class_name`**. Scripts verwijzen naar elkaar met `const X = preload("res://...")`. Reden: `class_name` vereist de importcache (`.godot/`), die niet in git staat; een verse clone faalt dan headless tot iemand `--import` draait. Met `preload` werkt `godot --headless ... -s res://tests/run_tests.gd` direct. CI draait de import sinds #230; R4 blijft (besluit TD (c), `setup.md` §6).
 
 ## 4. Regels voor determinisme (verplicht voor gameplay-code)
 
@@ -69,7 +69,7 @@ game/
 
 - Een script dat bij één scène hoort, staat naast die scène. Herbruikbare code staat in `scripts/<systeem>/`.
 - Bestanden met `_placeholder` in de naam zijn geen eindkwaliteit (WERKWIJZE §9).
-- `.gd.uid`-bestanden (Godot 4.4+) **wel committen**; `.godot/` niet (staat in `.gitignore`).
+- `.gd.uid`- en `.import`-bestanden **wel committen**; `.godot/` niet (staat in `.gitignore`).
 - Godot-binaries en downloads nooit in de repo.
 
 ## 6. Testafspraken

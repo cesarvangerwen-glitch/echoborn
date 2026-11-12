@@ -94,6 +94,22 @@ jobs:
           echo "GODOT=$BIN/$EXE" >> "$GITHUB_ENV"
           "$BIN/$EXE" --headless --version
 
+      - name: Importeren (headless)
+        # #226 (TA): de kamerscènes van de Kadewijk verwijzen naar PNG's
+        # (`game/art/wereld/kadewijk/`). Die vragen de importcache (`.godot/`),
+        # en die staat niet in git; zonder deze stap faalt een verse clone.
+        # Ontwerp R4: "zodra `game/` importeerbare assets krijgt, komt er een
+        # `--import`-stap in CI". Een ERROR in de import, of een .import/.uid
+        # in game/ die niet in git staat, maakt de job rood (besluit TD (c)).
+        run: |
+          "$GODOT" --headless --path game --import 2>&1 | tee import.log
+          if grep -E '^(ERROR|SCRIPT ERROR):' import.log; then
+            echo "::error::fout bij de import (zie import.log)"
+            exit 1
+          fi
+          # Besluit TD (c): elk .import- en .uid-bestand staat in git.
+          NEW=$(git status --porcelain --untracked-files=all -- game | grep '^??' || true); [ -z "$NEW" ] || { echo "$NEW"; echo "::error::.import/.uid niet gecommit"; exit 1; }
+
       - name: Tests (headless)
         run: |
           "$GODOT" --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd 2>&1 | tee tests.log
@@ -133,6 +149,7 @@ jobs:
         with:
           name: testuitvoer-${{ matrix.os }}
           path: |
+            import.log
             tests.log
             meta.log
           if-no-files-found: ignore

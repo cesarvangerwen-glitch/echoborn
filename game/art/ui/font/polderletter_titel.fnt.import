@@ -1,0 +1,17 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://dc1h3mn66fgij"
+path="res://.godot/imported/polderletter_titel.fnt-0c27d2ab175c2ef6815584d731036667.fontdata"
+
+[deps]
+
+source_file="res://art/ui/font/polderletter_titel.fnt"
+dest_files=["res://.godot/imported/polderletter_titel.fnt-0c27d2ab175c2ef6815584d731036667.fontdata"]
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=2
