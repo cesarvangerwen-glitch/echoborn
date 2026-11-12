@@ -1,6 +1,6 @@
 # CEO-kaart MT1: de flow-kamer op 1 s spelen en scoren
 
-Versie 0.1.1 · 2026-11-12 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA: `docs/qa/testplan-mt1.md` (lees je pas na het spelen)
+Versie 0.1.2 · 2026-11-12 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA: `docs/qa/testplan-mt1.md` (lees je pas na het spelen)
 
 **Tijd: ± 12–15 min.** Solo. Je speelt **4 korte runs** (1 oefenrun + 3 die tellen), allemaal op de staart van **1 s (D = 60)**. Na elke run geef je in het spel drie cijfers. Daarna typ je zeven korte antwoorden in de Claude-chat en sleep je de meetlogs erbij. Geen kladje nodig.
 
@@ -8,7 +8,7 @@ Je speelt dit pas nu omdat de bots op 1 s groen zijn (testplan §2).
 
 **Lees §1–§3. Lees §5 pas nadat je het antwoordblok verstuurd hebt.**
 
-Build: commit `_______` (in te vullen door QA). Zip van precies die versie: `https://github.com/cesarvangerwen-glitch/echoborn/archive/_______.zip` (in te vullen; speel niet met een andere zip).
+Build: commit `d9f420c`. Zip van precies die versie: https://github.com/cesarvangerwen-glitch/echoborn/archive/d9f420ce8d68e1227e2703fbd41a9ca7d73d9dee.zip (speel niet met een andere zip).
 
 ## 1. Klaarzetten (Windows, ± 3 min)
 
@@ -81,3 +81,4 @@ Dat was het. De agent in de chat zet je antwoorden en de logs in de repo; QA sch
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie (#80, T17 MT1): D = 60 standaard bij het starten, F1 alleen als herstel (F1/F2/F3/F7 = 60/90/120/180); 1 oefenrun + 3 getelde runs, alle op D = 60, volgende run met F6; scores alleen in het spel; zeven korte open antwoorden (R van de CD vóór H) en de meetlogs via de Claude-chat; HUD-check en "na F5 eerst A, D of spatie" behouden |
 | 0.1.1 | 2026-11-12 | Na Lead-review EP: §5, bij springen met wachten eerst een herontwerp met de bots, een vraag aan de CEO alleen als de echo-regel moet veranderen (O-23) |
+| 0.1.2 | 2026-11-12 | Build `d9f420c` en zip-link ingevuld (na de merge van #202) |

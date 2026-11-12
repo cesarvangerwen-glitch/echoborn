@@ -1,10 +1,10 @@
 # Testplan MT1: mijlpaaltest flow-kamer op D = 60 (T17, F0 norm 3)
 
-Versie 0.1.1 · 2026-11-12 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
+Versie 0.1.2 · 2026-11-12 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
 
 Basis: fasekader v0.4 (`docs/productie/fase-2-kader.md`: §3 F0, §4 mijlpaaltest MT1, T17); besluiten van 2026-11-12 in `docs/beslissingen.md` (echo-staart **1 s, D = 60**, bereik 1–3 s, zonder aparte check; fase 2 parallel; **de CEO test alleen bij mijlpalen**, kaart ± 10–15 min, ± 3–4 runs); besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (F0 solo); gdd v0.8 §4.5 (MP-1–MP-6), **§4.8** (D = 60 doorgerekend, §4.8.3 punt 6 en 11, §4.8.4 W-8–W-11) en O-23; pitch v0.5 §10 R-V1; rapport F0-2 v0.1.2 (`docs/qa/rapport-f0-2-flowtest.md`, §7, **§8.3** de negen bot-punten, §11); testplan F0-2 v0.1.4 (W11–W21).
 
-Kaart voor de CEO: `docs/qa/ceo-kaart-mt1.md`. Rapport (na de sessie): `docs/qa/rapport-mt1.md`. Meetlogs van de sessie: `docs/qa/mt1-meetlogs/`.
+Kaart voor de CEO: `docs/qa/ceo-kaart-mt1.md`. Rapport (na de sessie): `docs/qa/rapport-mt1.md`. Meetlogs van de sessie en de scripts van QA: `docs/qa/mt1-meetlogs/` (`rekenen.gd`, `botlogs.gd`).
 
 ## 1. Wat MT1 toetst
 
@@ -25,36 +25,38 @@ De Producer geeft de CEO de kaart pas als alle regels hieronder ✅ zijn. Ontbre
 
 | Wat | Waarde |
 |---|---|
-| Build | `main` op commit `_______` (in te vullen door QA: de merge van de PR van de World & Level Designer voor [#189](https://github.com/cesarvangerwen-glitch/echoborn/issues/189), T16f W-8–W-11; G-6–G-8 zitten erin via PR [#194](https://github.com/cesarvangerwen-glitch/echoborn/pull/194)) |
-| Zip voor de CEO | `https://github.com/cesarvangerwen-glitch/echoborn/archive/<volledige commit>.zip` (in te vullen, ook in de kaart) |
+| Build | `main` op commit `d9f420ce8d68e1227e2703fbd41a9ca7d73d9dee` (`d9f420c`): de merge van PR [#201](https://github.com/cesarvangerwen-glitch/echoborn/pull/201), direct na PR [#202](https://github.com/cesarvangerwen-glitch/echoborn/pull/202) van de World & Level Designer voor [#189](https://github.com/cesarvangerwen-glitch/echoborn/issues/189) (T16f, W-8–W-11, `flowkamer.md` v0.7); G-6–G-8 zitten erin via PR [#194](https://github.com/cesarvangerwen-glitch/echoborn/pull/194). #201 (vijanden van de slice) raakt de flow-kamer niet; de suite is op deze commit gedraaid |
+| Zip voor de CEO | https://github.com/cesarvangerwen-glitch/echoborn/archive/d9f420ce8d68e1227e2703fbd41a9ca7d73d9dee.zip (ook in de kaart) |
 | Standaard-D | **D = 60** bij het starten, uit data (`game/data/echo_v04.json`, `echo.tail_ticks`), geen F-toets nodig (G-6) |
 | D-toetsen | F1 / F2 / F3 / F7 = D 60 / 90 / 120 / 180 (`DEBUG_TAIL_KEYS` in `flow_room.gd`); op een laptop met Fn. In MT1 alleen **F1** als herstel. Volgende run met **F6** (houdt de gekozen D; pas na drie scores, G-5) |
 | HUD | regel *Kamer K1   D = 60   echo Actief   tijd …* (`HUD_ROOM`); regel met de F-toetsen eindigt op *F5 meetlog aan · F6 herstart* (`HUD_DEBUG_KEYS`); meetlog staat standaard aan (`chosen_log_on`) |
 | Meetlog | `meetlog_<datum-tijd>_solo_D60_p1.csv` in `%APPDATA%\godot\app_userdata\Echoborn` |
-| Keerwanden en niveaus in K1 (voor §4.2) | in te vullen uit `flowkamer.md` §3 na W-8/W-9: x van de keerwand en y van het niveau voor **B3** (nieuw keerpunt bij D = 60), B1, B2-0, B2-1, B2-2, B2-3; keerzone Z = 90 px |
-| Plekken in K3 (voor §4.3) | schoepen x 1980 / 1900 / 1820 / 1740, sluis x 1440–1460, bovenste trede x 2000–2026 op y 385 (testplan F0-2 §2), tenzij W-11 de trede verplaatst: dan in te vullen |
+| Keerwanden en niveaus in K1 (voor §4.2; `flowkamer.md` v0.7 §3, `flow_layout.turn_points`) | **B3**: vloer y 610, kom x 300–490, keerwand x **490** (rechts; galerij op y 540) · **B1**: vloer y 540, keerwand x **20** · **B2-0**: vloer y 450, wand x **500** · **B2-1**: richel y 360, wand x **20** · **B2-2**: richel y 270, wand x **500** · **B2-3**: richel y 180, wand x **20** (richel 4 op y 90 = bovenroute). Keerzone Z = 90 px, geen overhang, treden op 30 / 60 / 90 px |
+| Plekken in K3 (voor §4.3) | schoepen x 1980 / 1900 / 1820 / 1740, sluis x 1440–1460, bovenste trede x 2000–2026 op y 385: ongewijzigd in `flowkamer.md` v0.7 §5 (W-11: nu met een wand van het gemaalhuis op x 1990–2000, zodat wie naar links stuurt bij ± 1982 landt) |
 
 ### 2.2 De negen bot-punten (rapport F0-2 §8.3), op de build van §2.1
 
-Draaien met `godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd`. De cijfers vult QA in uit de uitvoer van de suite en uit `flowkamer.md` §9 (W-10, W-11).
+Gedraaid door QA op `d9f420c`, 2026-11-12, Godot 4.6.3 headless op Linux: `godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd`. De cijfers komen uit de uitvoer van de suite, gelijk aan `flowkamer.md` v0.7 §9 en aan PR #202, en (punt 1, 7, 9) uit een eigen run van QA met `docs/qa/mt1-meetlogs/botlogs.gd`, die dezelfde cijfers gaf.
 
-| # | Wat (rapport F0-2 §8.3) | Grens | Uitkomst D = 60 (in te vullen) | ✅ |
+| # | Wat (rapport F0-2 §8.3) | Grens | Uitkomst D = 60 (QA, op `d9f420c`) | ✅ |
 |---|---|---|---|---|
-| 1 | Gescripte run vanaf `RUN_START`: `RUN_EIND` | MP-1 ≤ 300; MP-2 ≥ 3,0 (K1 en K2 apart), geen gat > 40 s; MP-4 ≤ 40 %; MP-6 ≥ 40 % met ≥ 1 pompslag van de echo; LP ≥ 100 na K1 + K2 | runtijd ___ s · MP-1 ___ · MP-2 ___ (K1 ___ / K2 ___), gat ___ s · MP-4 ___ % · MP-6 ___ %, ___ pompslagen · LP na K2 ___ | [ ] |
-| 2 | K1, keren bij elk keerpunt (`test_flowkamer_na_f0.gd`) | 6 van 6 via de echo zonder stilstand van 20 ticks (B3, B1, B2-0 … B2-3); per keerpunt snelste langzame lijn − keren ≥ 30 ticks, langzame lijn ≤ 2× keren; `test_keerzone_geometry` op Z = 90 | ___ van 6 · keren ___ ticks, langzame lijn ___ ticks (verschil ___, verhouding ___) | [ ] |
-| 3 | Late bot (bounce +4 / +8 ticks, dash 0 / 4 / 8 na de top) | marge tot de rand van de weg omhoog > 0 px in elke variant; geoefend zonder dash ≥ 9 px; afzetvenster ≥ 10 ticks; geen overhang | kleinste marge ___ px · zonder dash ___ px · venster ___ ticks | [ ] |
-| 4 | Wachtbot | tabel van `flowkamer.md` §9 voor D = 60: tegen de wand → trede; waar het restgat begint | trede tot ___ px · omhoog vanaf ___ px · stilstand ___ ticks | [ ] |
-| 5 | B3 en B4 | de echolijn van B3 bestaat en de bot haalt hem; solo-lancering in B4 | B3 ___ · B4 lancering op tick ___ | [ ] |
-| 6 | K3, LM-04 | elke schoep één slag; `GEMAAL_VOL` vóór P1 bij de sluis; geen stilstand > 30 in K3 | marge ___ ticks · langste stilstand K3 ___ | [ ] |
-| 7 | Echo uit (FK-2) | runtijd ≤ 2× de run met echo; ≤ 4 keer terug naar K2 | ___ × · ___ keer | [ ] |
-| 8 | D = 60 kiesbaar en standaard | D op HUD en scorescherm; CSV als `…_D60_….csv` | gezien in de suite / code ___ | [ ] |
-| 9 | QA: `rekenen.gd` op de bot-logs van punt 1 en 4 | punt 1: 6 van 6 uitkomst A; punt 4: de wachtplek van de bot klopt met §9; W15 (§7) aangepast op de nieuwe maten | punt 1 ___ · punt 4 ___ | [ ] |
+| 1 | Gescripte run vanaf `RUN_START`: `RUN_EIND` | MP-1 ≤ 300; MP-2 ≥ 3,0 (K1 en K2 apart), geen gat > 40 s; MP-4 ≤ 40 %; MP-6 ≥ 40 % met ≥ 1 pompslag van de echo; LP ≥ 100 na K1 + K2 | runtijd 62,5 s (3749 ticks) · MP-1 45 (K2) · MP-2 14,4 (K1 10,8 / K2 34,4), gat 13,4 s · MP-4 2 % · MP-6 69 % van 123 LP, 4 pompslagen · LP na K2 123 | ✅ |
+| 2 | K1, keren bij elk keerpunt (`test_flowkamer_na_f0.gd`) | 6 van 6 via de echo zonder stilstand van 20 ticks (B3, B1, B2-0 … B2-3); per keerpunt snelste langzame lijn − keren ≥ 30 ticks, langzame lijn ≤ 2× keren; `test_keerzone_geometry` op Z = 90 | 6 van 6 (B4-lancering, MP-3 7 van 7 = 100 %) · keren 68 ticks, langzame lijn 104–105 ticks (verschil 36–37, 1,53×) · `test_keerzone_geometry` op Z = 90 groen | ✅ |
+| 3 | Late bot (bounce +4 / +8 ticks, dash 0 / 4 / 8 na de top) | marge tot de rand van de weg omhoog > 0 px in elke variant; geoefend zonder dash ≥ 9 px; afzetvenster ≥ 10 ticks; geen overhang | kleinste marge 6 px (bounce 8 ticks te laat, landing 104 px, rand op 98) · geoefend zonder dash 22 px (landing 120) · afzetvenster 21 ticks (0–20) · overhang weg | ✅ |
+| 4 | Wachtbot | tabel van `flowkamer.md` §9 voor D = 60: tegen de wand → trede; waar het restgat begint | zonder dash: 0 px vloer, 20 px trede, vanaf 40 px omhoog · met dash: overal omhoog (B1 0–300, B2 0–240; B2 vanaf 260 "anders") · stilstand 60 ticks | ✅ |
+| 5 | B3 en B4 | de echolijn van B3 bestaat en de bot haalt hem; solo-lancering in B4 | B3: bounce 56 px van de wand, met dash 26 px voorbij de galerijrand (krapst 10 px, bounce 8 te laat; zonder dash mist hij, zo bedoeld) · B4: lancering op tick 113, 15 ticks stilstand ervoor | ✅ |
+| 6 | K3, LM-04 | elke schoep één slag; `GEMAAL_VOL` vóór P1 bij de sluis; geen stilstand > 30 in K3 | elke schoep één slag · `GEMAAL_VOL` 133 ticks vóór P1 bij de sluis · langste stilstand K3 0 | ✅ |
+| 7 | Echo uit (FK-2) | runtijd ≤ 2× de run met echo; ≤ 4 keer terug naar K2 | 5727 ticks = 1,53× · 1 keer terug naar K2 | ✅ |
+| 8 | D = 60 kiesbaar en standaard | D op HUD en scorescherm; CSV als `…_D60_….csv` | `test_g6_build_starts_on_d60_from_data`, `test_g6_debug_menu_and_b3_block`, `test_g5_score_screen_shows_d` groen; bestandsnaam `meetlog_<stamp>_solo_D60_p1.csv` (`flow_room.gd`) | ✅ |
+| 9 | QA: `rekenen.gd` op de bot-logs van punt 1 en 4 | punt 1: 6 van 6 uitkomst A; punt 4: de wachtplek van de bot klopt met §9; W15 (§7) aangepast op de nieuwe maten | punt 1: 6 van 6 A (B3 56 px, B1 en B2 54 px), ook de late bot (+8) 6 van 6 A · punt 4: wachtbot 0 en 20 px zonder dash → C, 40 px → B (< 90, keerzone), 160 px → B (≥ 90, restgat); W26 aangepast | ✅ |
 
 Daarnaast:
 
-- [ ] Volledige suite groen op die commit: ___ geslaagd, 0 mislukt (in te vullen). D = 90, 120 en 180 draaien mee als **regressie**; hun uitkomst staat in het rapport, maar is geen voorwaarde voor MT1, behalve dat de suite groen is.
-- [ ] `docs/qa/f0-2-meetlogs/rekenen.gd` is bijgewerkt voor D = 60 (B3 als zesde keerpunt, W15 en de banden van de wachtbot uit punt 4, geen uitzondering voor B4, W14 vervalt) en gekopieerd naar of verwezen vanuit `docs/qa/mt1-meetlogs/`.
-- [~] Wat headless niet kan (HUD bij het starten, F1 en het scorescherm met de hand): controle in de sessie via de HUD-check van de kaart en via het log (eerste `ECHO_LEEG_EIND` op tick 60, W9).
+- [x] Volledige suite groen op `d9f420c`: **274 geslaagd, 0 mislukt** (± 144 s). D = 90, 120 en 180 draaien mee als **regressie**; hun uitkomst staat in het rapport, maar is geen voorwaarde voor MT1, behalve dat de suite groen is.
+- [x] Rekenscript voor D = 60: `docs/qa/mt1-meetlogs/rekenen.gd` (kopie van het F0-2-script, dat ongewijzigd blijft voor het rapport F0-2): B3 als zesde keerpunt, A/B/C volgens W26, B4 telt mee (W14 vervalt), getelde runs volgens W25. Getoetst op de logs van `docs/qa/mt1-meetlogs/botlogs.gd` (punt 9). Bij D ≥ 90 geeft het voor B3 uitkomst D: daar is B3 een vang, geen `SPRINGPLANK` (alleen regressie).
+- [~] Wat headless niet kan (HUD bij het starten, F1 en het scorescherm met de hand): geen voorwaarde vooraf, maar een controle in de sessie via de HUD-check van de kaart en via het log (eerste `ECHO_LEEG_EIND` op tick 60, W9). In code en tests klopt het (punt 8).
+
+**Stand op `d9f420c`: alle voorwaarden ✅.** De bots zijn groen op D = 60; de kaart kan naar de CEO.
 
 ## 3. Normen (solo, D = 60)
 
@@ -76,7 +78,7 @@ Zoals F0 en F0-2 (gdd §4.5), nu over **één D**: de getelde runs van MT1 (W25)
 
 ## 4. Wat QA uit de logs rekent
 
-Alles uit de CSV's van de CEO met `flow_report.gd` en `rekenen.gd` (bijgewerkt, §2.2), per run; de oefenrun apart (leercurve). Geen nieuwe events (gdd §4.7.4): alles uit `SPRINGPLANK`, `LANCERING`, `BOUNCE`, `STIL_*`, `MERK_GEZET`, `MERKSPRONG`, `ONTPLOFFING`, `LP`, `POMP`, `GEMAAL_VOL`, `KAMER`, `SCORE`, `RUN_EIND` en `x, y`.
+Alles uit de CSV's van de CEO met `flow_report.gd` en `docs/qa/mt1-meetlogs/rekenen.gd` (§2.2), per run; de oefenrun apart (leercurve). Geen nieuwe events (gdd §4.7.4): alles uit `SPRINGPLANK`, `LANCERING`, `BOUNCE`, `STIL_*`, `MERK_GEZET`, `MERKSPRONG`, `ONTPLOFFING`, `LP`, `POMP`, `GEMAAL_VOL`, `KAMER`, `SCORE`, `RUN_EIND` en `x, y`.
 
 ### 4.1 Per run
 
@@ -97,9 +99,9 @@ Bij D = 60 heeft K1 **zes** keerpunten met de echo: B3 is een keerpunt geworden 
 
 | Uitkomst | Hoe herkend in het log |
 |---|---|
-| **A. Echolijn zonder stilstand** | een `SPRINGPLANK` op dat niveau, ≥ de grens voor C van de keerwand (W26), zonder stilstand van ≥ 20 ticks in de 120 ticks ervoor (de MP-3-regel) |
-| **B. Echolijn na wachten**, met de plek | idem, mét zo'n stilstand. Plek = `x` van die stilstand als **afstand tot de keerwand in px**, ingedeeld volgens de wachtbot op D = 60 (§2.2 punt 4): **in de keerzone (< Z = 90 px)** of **onder de weg omhoog (≥ 90 px, het restgat)**. Richting alleen als het log die toont, anders "richting onbekend" |
-| **C. Bij de wand gewacht** | een `SPRINGPLANK` op dat niveau dichter bij de keerwand dan de grens van W26: de bounce bracht hem op de treden (langzame lijn na wachten) |
+| **A. Echolijn zonder stilstand** | een `SPRINGPLANK` op dat niveau zonder stilstand van ≥ 20 ticks in de 120 ticks ervoor (de MP-3-regel), waar ook van de wand (W26) |
+| **B. Echolijn na wachten**, met de plek | idem, mét zo'n stilstand. Plek = `x` van die stilstand (≥ 30 px van de wand) als **afstand tot de keerwand in px**, ingedeeld volgens de wachtbot op D = 60 (§2.2 punt 4): **in de keerzone (30–89 px)** of **onder de weg omhoog (≥ 90 px, het restgat)**. Richting alleen als het log die toont, anders "richting onbekend" |
+| **C. Bij de wand gewacht** | een `SPRINGPLANK` op dat niveau na een stilstand van ≥ 20 ticks **< 30 px** van de keerwand (W26): zonder dash brengt de bounce hem op de vloer of de trede (wachtbot: 0 px vloer, 20 px trede), met dash toch omhoog |
 | **D. Langzame lijn** | het volgende niveau gehaald zonder `SPRINGPLANK` op dat niveau (W22) |
 
 **MP-3 per keerpunt = A ÷ (A + B + C + D)**, per run en over de getelde runs; ook per keerpunt over de runs (welk keerpunt valt uit?). De oefenrun apart: keert hij al in zijn eerste run?
@@ -177,7 +179,7 @@ Uit `testplan-f0.md` §6 blijven W1, W2, W7 (in de vorm van W25), W8, W9 en W10;
 | # | Aanname | Waarom |
 |---|---|---|
 | W25 | Een **getelde run** is een solo-run op D = 60 vanaf de **tweede** voltooide run, met `RUN_EIND`, drie `SCORE`-regels, echo aan en geen `DROP_IN`. De eerste voltooide run is de oefenrun. `_afgebroken` en runs met een andere D tellen niet. Een extra run aan het eind telt als hij aan die regels voldoet; dan gelden de eerste drie getelde | Besluit 2026-11-12 (2): ± 3–4 runs. De CEO speelde de kamer al in F0 en F0-2 (7 voltooide runs); één oefenrun voor de nieuwe K1 volstaat. W7 vroeg twee |
-| W26 | De grens tussen A/B en C (W15) en de banden van B komen uit de wachtbot en de gescripte run op D = 60 (§2.2 punt 2 en 4). Startwaarde **C < 40 px** van de keerwand (de bounce van de echolijn ligt bij D = 60 op 40–62 px, gdd §4.8.2), **B-band: < 90 px (keerzone) of ≥ 90 px (restgat)**. QA zet de definitieve waarden vóór de sessie in §2.2 punt 9 en in `rekenen.gd` | Bij D = 60 komt de vroegste keerlanding dicht bij de oude grens van 60 px (rapport F0-2 §8.2) |
+| W26 | Per keerpunt, op de eerste landing op dat niveau: **A** = `SPRINGPLANK` zonder stilstand van ≥ 20 ticks in de 120 ervoor, ook dicht bij de wand (het afzetvenster loopt tot een bounce op 18 px); met zo'n stilstand: **C** als de stilstand < **30 px** van de keerwand was, anders **B**, met de band **< 90 px (keerzone)** of **≥ 90 px (restgat)**. C geldt ook als hij met de dash toch omhoog kwam: C zegt *waar* hij wachtte | Bij D = 60 overlappen de bounce-afstanden van keren (18–62 px) en van wachten tegen de wand (8–20 px), dus de plek van de **stilstand** beslist, niet die van de landing. Getoetst op de wachtbot (0 / 20 px zonder dash → C, 40 / 160 px → B) en de gescripte run (6 van 6 A), §2.2 punt 9; gdd §4.8.2 "vanaf ± 30 px" | Bij D = 60 komt de vroegste keerlanding dicht bij de oude grens van 60 px (rapport F0-2 §8.2) |
 | W27 | Alle vragen zijn **open**: de CEO typt een korte zin in de Claude-chat. Geen meerkeuze, geen voorbeelden in de vraag. "Spontaan" (M1, O1) geldt daardoor sterker dan in F0-2 | Rapport F0-2 §6 en §10 (W18): M en O waren meerkeuze, zwakker |
 | W28 | De lezing van R deelt QA in als "meedeed", "spoor" of "anders/beide", met het letterlijke citaat. De CD bevestigt de indeling in de Lead-review van het rapport. R-V1 is een signaal, geen exit-norm | Pitch v0.5 §10 R-V1 |
 | W29 | De scores K1/K2/K3 komen alleen uit het log (`SCORE`), niet van een kladje; V1 wordt één keer na alle runs gevraagd. De kaart vraagt geen kladje per run | Licht houden (± 10–15 min); in F0-2 kwamen de scores 3–21 s na `RUN_EIND` in het log en klopten ze (rapport F0-2 §3.1) |
@@ -187,8 +189,8 @@ Uit `testplan-f0.md` §6 blijven W1, W2, W7 (in de vorm van W25), W8, W9 en W10;
 
 | # | Wat | Wie |
 |---|---|---|
-| 1 | Build-commit, zip-link, keerwanden/niveaus van K1 en de bot-cijfers van §2.2 invullen na de merge van de PR voor #189; in de kaart de zip-link | qa-lead (na world-level-designer) |
-| 2 | `rekenen.gd` bijwerken voor D = 60 (B3, W26, B4 telt mee) en toetsen op de bot-logs (§2.2 punt 9) | qa-lead |
+| 1 | ~~Build-commit, zip-link, keerwanden/niveaus van K1 en de bot-cijfers van §2.2 invullen~~ gedaan (v0.1.2), op `d9f420c` | qa-lead |
+| 2 | ~~`rekenen.gd` bijwerken voor D = 60 en toetsen op de bot-logs~~ gedaan (v0.1.2): `docs/qa/mt1-meetlogs/rekenen.gd` en `botlogs.gd` | qa-lead |
 | 3 | Eerste knop op de pijltjeskant maakt speler 1 (rapport F0 open punt 10): de kaart werkt eromheen ("na F5 eerst A, D of spatie") | ux-designer, gameplay-programmer |
 | 4 | Positie zonder events in K1 (rapport F0-2 open punt 4): uitkomst D blijft "zonder SPRINGPLANK" (W22) | lead-game-designer, gameplay-programmer |
 
@@ -198,3 +200,4 @@ Uit `testplan-f0.md` §6 blijven W1, W2, W7 (in de vorm van W25), W8, W9 en W10;
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie (#80, T17 MT1): voorwaarden met de negen bot-punten (in te vullen), normen op D = 60, MP-3 per keerpunt met B3, open vragen (R voor R-V1, M1, O1, M2, H, V1, X), 1 oefenrun + 3 getelde runs, oordeel met O-23, W25–W30 |
 | 0.1.1 | 2026-11-12 | Na Lead-review EP: §4.2 en §6, bij MP-3 of MP-2 (K1) niet gehaald eerst een herontwerp door de LGD met de bots, zonder CEO; alleen een wijziging van hoe de echo reageert (O-23) is een `ceo-beslissing`; "kaderregel" geschrapt |
+| 0.1.2 | 2026-11-12 | Na de merge van #202 (en #201): build `d9f420c` en zip-link, keerwanden en niveaus van K1 (`flowkamer.md` v0.7), de negen bot-punten ingevuld en allemaal ✅, suite 274/0 (§2); `docs/qa/mt1-meetlogs/rekenen.gd` en `botlogs.gd` voor D = 60, getoetst; W26 definitief (de plek van de stilstand beslist A/B/C, grens 30 px); open punt 1 en 2 gedaan |
