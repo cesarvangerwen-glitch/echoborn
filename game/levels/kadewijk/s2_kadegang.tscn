@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
+[ext_resource type="Script" path="res://scripts/combat/slice_enemy.gd" id="2_enemy"]
+
+[node name="S2Inhoud" type="Node2D"]
+position = Vector2(-1120, -180)
+script = ExtResource("1_inhoud")
+kamer_id = &"S2"
+
+[node name="Paar1A" type="Node2D" parent="."]
+position = Vector2(880, 148)
+script = ExtResource("2_enemy")
+
+[node name="Paar1B" type="Node2D" parent="."]
+position = Vector2(908, 148)
+script = ExtResource("2_enemy")

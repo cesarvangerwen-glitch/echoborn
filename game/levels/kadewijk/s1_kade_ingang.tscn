@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
+[ext_resource type="Script" path="res://scripts/save/checkpoint.gd" id="2_checkpoint"]
+
+[sub_resource type="RectangleShape2D" id="Rect_checkpoint"]
+size = Vector2(40, 40)
+
+[node name="S1Inhoud" type="Node2D"]
+position = Vector2(-320, -180)
+script = ExtResource("1_inhoud")
+kamer_id = &"S1"
+
+[node name="Proloogdeur" type="Polygon2D" parent="."]
+position = Vector2(470, 320)
+color = Color(0.22, 0.2, 0.18, 1)
+polygon = PackedVector2Array(-10, -40, 10, -40, 10, 0, -10, 0)
+
+[node name="Checkpoint" type="Node2D" parent="."]
+position = Vector2(440, 305)
+script = ExtResource("2_checkpoint")
+shape = SubResource("Rect_checkpoint")
+
+[node name="BevrorenEchoBakker" type="Polygon2D" parent="."]
+position = Vector2(580, 215)
+color = Color(0.62, 0.62, 0.68, 0.45)
+polygon = PackedVector2Array(-8, -15, 8, -15, 8, 15, -8, 15)
