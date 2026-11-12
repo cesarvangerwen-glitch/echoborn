@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
+
+[node name="S8Inhoud" type="Node2D"]
+position = Vector2(-4480, -540)
+script = ExtResource("1_inhoud")
+kamer_id = &"S8"
+
+[node name="PlekGemaalmeester" type="Polygon2D" parent="."]
+position = Vector2(4480, 680)
+color = Color(0.4, 0.38, 0.32, 0.25)
+polygon = PackedVector2Array(-48, -160, 48, -160, 48, 0, -48, 0)
+
+[node name="Spuigat1" type="Polygon2D" parent="."]
+position = Vector2(4416, 680)
+color = Color(0.2, 0.2, 0.22, 1)
+polygon = PackedVector2Array(-6, -8, 6, -8, 6, 0, -6, 0)
+
+[node name="Spuigat2" type="Polygon2D" parent="."]
+position = Vector2(4544, 680)
+color = Color(0.2, 0.2, 0.22, 1)
+polygon = PackedVector2Array(-6, -8, 6, -8, 6, 0, -6, 0)

@@ -1,5 +1,6 @@
 extends RefCounted
 ## Tests voor de Kadewijk, deel 1: S1–S4 als grijze kamers (T8a, #83;
+## deel 2, S5–S8: `test_kadewijk_deel2.gd`;
 ## `docs/design/wereld.md` §2.2–§2.6, gdd v0.8.1 §4.3, §4.5, §4.8.5;
 ## `docs/design/kamers/kadewijk.md`).
 ##
@@ -284,7 +285,7 @@ func _check_echo_run(t, d: int, parts: Array, rep) -> void:
 	for n: String in ["S1-B1", "S2-B3", "S2-B1", "S4-B4"]:
 		t.check(bot.lines.get(n, false), "D=%d %s: niet via de echolijn (L-08, gescripte geoefende run)" % [d, n])
 	t.check(rep.actions_per_min >= 3.0, "D=%d: %.2f echo-acties per minuut (MP-2 ≥ 3,0)" % [d, rep.actions_per_min])
-	for id: StringName in Layout.ORDER:
+	for id: StringName in Layout.DEEL_1:
 		var per: float = rep.actions_per_min_room.get(String(id), 0.0)
 		t.check(per >= 3.0, "D=%d %s: %.2f echo-acties per minuut (MP-2 per kamer, L-11)" % [d, id, per])
 	t.check(rep.longest_gap <= FlowReport.MP2_WINDOW, "D=%d: %d ticks zonder echo-actie (MP-2/L-11: ≤ 40 s)" % [d, rep.longest_gap])
@@ -319,7 +320,7 @@ func _check_slow_lines(t, d: int) -> void:
 	if on.is_empty() or off.is_empty():
 		return
 	t.check(off["ticks"] <= 2 * on["ticks"], "D=%d: zonder echo %d ticks, met %d (C-15: ≤ 2×)" % [d, off["ticks"], on["ticks"]])
-	for id: StringName in Layout.ORDER:
+	for id: StringName in Layout.DEEL_1:
 		var a := int(on["rooms"].get(String(id), 0))
 		var b := int(off["rooms"].get(String(id), 0))
 		t.check(a > 0 and b <= 2 * a, "D=%d %s: zonder echo %d ticks, met %d (C-15: ≤ 2×)" % [d, id, b, a])
@@ -364,7 +365,7 @@ func test_kadewijk_replay_d60(t) -> void:
 func test_kadewijk_per_kamer_d60(t) -> void:
 	var next := {&"S1": &"S2", &"S2": &"S3", &"S3": &"S4", &"S4": &""}
 	var lines := {&"S1": ["S1-B1"], &"S2": ["S2-B3", "S2-B1"], &"S3": [], &"S4": ["S4-B4"]}
-	for id: StringName in Layout.ORDER:
+	for id: StringName in Layout.DEEL_1:
 		var parts := _wijk(t, 60, true, id)
 		var wijk = parts[0]
 		await _run(t, wijk, next[id])

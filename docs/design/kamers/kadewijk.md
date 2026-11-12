@@ -1,10 +1,10 @@
-# Kamers: de Kadewijk (wijk 1.3, de slice), deel 1: S1–S4
+# Kamers: de Kadewijk (wijk 1.3, de slice): S1–S8
 
-Versie 0.2 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
+Versie 0.3.1 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
 
-Bronnen: `docs/design/wereld.md` v0.2 §2 (kamerlijst §2.2, SL-regels §2.3, vijandtypes §2.4, T8a §2.5, acceptatie §2.6), `docs/design/gdd.md` v0.8.2 (§4.3 bouwstenen met D in formules, L-08–L-14, §4.5 normen, §4.8.5 vaste basis), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.2 (§2.6 plaatsing, VJ-01–VJ-08), `docs/productie/fase-2-kader.md` v0.4 §4, `docs/tech/ontwerp.md` v0.3 (§3a, §7, §12 "naar T8a"), de visie-review van de CD ([comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), `docs/concept/visie-review/kadewijk/`).
+Bronnen: `docs/design/wereld.md` v0.2 §2 (kamerlijst §2.2, SL-regels §2.3, vijandtypes §2.4, T8a §2.5, acceptatie §2.6), `docs/design/gdd.md` v0.8.2 (§4.3 bouwstenen met D in formules, L-08–L-14, §4.5 normen, §4.8.5 vaste basis, §4.8.7 de langzame lijn met dash), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.3 (§2.6 plaatsing, VJ-01–VJ-08, §3.2 arena), `docs/design/gemaalmeester.md` v0.2.1 (GM-01, GM-07, GM-11), `docs/productie/fase-2-kader.md` v0.4 §4, `docs/tech/ontwerp.md` v0.3 (§3a, §7, §12 "naar T8a"), de visie-review van de CD ([comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), `docs/concept/visie-review/kadewijk/`).
 
-**Stand.** S1–S4 staan als grijze, speelbare kamers in `game/levels/kadewijk/`, op de systemen van T5b en T8b: `Kamer` + `AreaLoader` met meestreamende inhoud, `Progress` + `Checkpoint` + `Respawn`, `LightMeter`, de `SliceEnemy`s. Een gescripte bot loopt elke kamer en de hele route bij D = 60, met 120 en 180 als regressie, en haalt de normen (§6). **S4 is herontworpen na de visie-review (#217): B4 ligt nu achter een keerpunt, de bolder op de rand (§3a).** **S5–S9, het gemaal, de waterstand en de arena van S8 zijn nog niet gebouwd** (§9).
+**Stand.** S1–S8 staan als grijze, speelbare kamers in `game/levels/kadewijk/`, op de systemen van T5b en T8b: `Kamer` + `AreaLoader` met meestreamende inhoud, `Progress` + `Checkpoint` + `Respawn`, `LightMeter`, `Gemaal` met vier schoepen, de `SliceEnemy`s. Een gescripte bot loopt elke kamer en de route van S1 door het gemaal tot in S7 bij D = 60, met 120 en 180 als regressie, en haalt de normen (§6, §6b). **Deel 2 (#83): S5 (B2 naar de zolder, het lampglas), S6 (de pompgang, het gemaal = `wijk_gemaal` van elke kamer, het checkpoint), S7 (het luik, het kanaal met twee Dwaallichten) en S8 als lege arena op de maten van de Gemaalmeester (§3b–§3e).** **SL-01: 112 LP vóór de eerste pompslag bij D = 60** (§6b). **Nog niet gebouwd: S9 (de lage kade, de lus terug naar S1), de waterstand per wijk, en de boss en zijn deuren in S8** (GP, §9).
 
 ## 1. Doel
 
@@ -24,14 +24,37 @@ Deel 1 van T8a voor de WLD: de eerste vier kamers van de kritieke route maatvast
  x=     0         640                       1600               2560               3520
 ```
 
-`b` = de bolder op de rand van de kloof, het keerpunt van B4 (§3a). Elke kamer is 360 px hoog (één scherm op 640 × 360) en hangt aan de vorige; de buren staan op een rij (S1–S2–S3–S4). P1 begint in S1 bij de proloogdeur. De lus terug naar S1 (S9, L-14f) en S5 komen in deel 2; tot dan is S4 rechts dicht (`EindWand`), met de streep `EindeDeel1` op x = 3440 (`RUN_EIND`).
+`b` = de bolder op de rand van de kloof, het keerpunt van B4 (§3a). Elke kamer van deel 1 is 360 px hoog (één scherm op 640 × 360) en hangt aan de vorige; de buren staan op een rij (S1–S2–S3–S4). P1 begint in S1 bij de proloogdeur. Sinds deel 2 loopt de overkant van S4 door naar S5 (de `EindWand` is weg); de streep `EindeDeel1` op x = 3440 blijft het einde van de runs van deel 1 (`RUN_EIND` bij `run_end` = S4).
+
+**Deel 2** (S5–S8; S9 volgt, §9). Het sluiswachtershuis en het gemaalplein liggen hoger dan de kades (je klimt door het huis en ziet het gemaal van boven), de kelder en de machinehal liggen eronder:
+
+```
+ y=-200 +---- S5 ------+------------- S6 Gemaalplein ------------+
+ y=-100 |  ____zolder==|=loopbrug=+          gemaal (gevel)      |
+ y=-10  |=richel 3     |   |trap  |                              |
+ y=80   |     richel 2=|   |      v                              |
+ y=170  |=richel 1     |   |   paar   [s][s][s][s]   cp   sluis| |
+ y=260  =kade (S4)===>|   ==========plein==================[==]=|
+ y=360  +-------------+----- S8 Machinehal --+----- S7 Sluiskelder -----v-----------+
+ y=440                |                      |          |kelder sokkel [luik]|      |
+ y=620                |  arena 600 px        <=deur= vloer  kanaal (2 Dwaallichten)  |
+ y=680                |=======vloer=======|  |        |__trede__|                   |
+ y=720                +----------------------+----------------------------------------+
+ x=                 3520 4160               4800 4960 5120   5260          5760
+```
+
+`[s]` = pompschoep, `cp` = het checkpoint van het gemaal, `[==]` = de sluis (de klep over de kelderingang). Buren: S4–S5 (de kade), S5–S6 (de zolder en de loopbrug), S6–S7 (de kelderingang, open op `t_v`), S7–S8 (de deur van de machinehal).
 
 | Kamer | Rechthoek (x, y, b, h) | Begin (LM-08) | Wat |
 |---|---|---|---|
 | **S1 Kade-ingang** | 0, 0, 640, 360 | (440, 305) | Gang op 320 naar de linkerwand (de gracht); **B1**: keren en bouncen naar de galerij op 230 (90 hoog, Z → 480), die overgaat in de kade naar S2. Checkpoint en proloogdeur bij het begin; bevroren echo van de bakker (beeld, geen collision, WS-09) op de kade |
 | **S2 Kadegang** | 640, 0, 960, 360 | (660, 215) | Kade op 230 naar rechts, onder de brugpijler door, naar de kom van **B3** (bij D = 60 een keerpunt); bounce + dash naar de galerij op 160 (70 hoog), terug naar links: de lus om de pijler. Op de gang het **E-paar**; dan **B1** tegen de pijler (x 700) naar de bovenroute op 70, naar rechts naar S3 |
 | **S3 Vismarkt** | 1600, 0, 960, 360 | (1620, 55) | Je valt van de bovenroute (70) de markt op (260, 800 px vlak). **Merk-arena** (L-13), sluit niet af; twee kramen (eenrichting, 70 hoog) als extra springplank. Uitgang rechts op dezelfde vloer |
-| **S4 Brugkloof** | 2560, 0, 960, 360 | (2580, 245) | Aanloop 332 px op 260 tot de **bolder** (8 × 8 op de rand, de keerwand), **B4 achter een keerpunt** (§3a): AANVAL slaan en vasthouden op weg naar de bolder, keren, de echo komt je in houding tegemoet, erop springen = lancering over de kloof van 160 × 90. Langzame lijn: over de bolder de kloof in (trede van 45 tegen de overkant, "via de kademuur"); aan de overkant **één Kadeloper** |
+| **S4 Brugkloof** | 2560, 0, 960, 360 | (2580, 245) | Aanloop 332 px op 260 tot de **bolder** (8 × 8 op de rand, de keerwand), **B4 achter een keerpunt** (§3a): AANVAL slaan en vasthouden op weg naar de bolder, keren, de echo komt je in houding tegemoet, erop springen = lancering over de kloof van 160 × 90. Langzame lijn: over de bolder de kloof in (trede van 45 tegen de overkant, "via de kademuur"); aan de overkant **één Kadeloper**; de kade loopt door naar S5 |
+| **S5 Sluiswachtershuis** | 3520, −200, 640, 560 | (3540, 245) | Het trappenhuis: **B2** (zigzag omhoog, gdd §4.3) in een schacht van 480 px, vier verdiepingen van 90 px, elk een keerpunt; de bovenste richel is de **zolder**, met het **lampglas** (L-12) en de deur naar de loopbrug van S6. Beneden het logboek (logbladzijde 1) en de twee koppen. Geen gevecht (§3b) |
+| **S6 Gemaalplein** | 4160, −200, 960, 560 | (4180, −115) | Van de loopbrug het plein op (260); een **K-paar** Kadelopers; de **pompgang** (4 schoepen, 80 px, FK-5) in de looprichting naar de **sluis** over de kelderingang; het **checkpoint** van het gemaal; een trap van treden van 45 px terug naar de loopbrug. Twee bevroren echo's (de kinderen), logbladzijde 2 (§3c) |
+| **S7 Sluiskelder** | 4800, 360, 960, 360 | (5030, 425) | Door de kelderingang de kelder in (440): de **sokkel** (Neerslag), het **luik** in de kelderbodem (een neerslag opent het), de benedenvloer (620), het **kanaal van 160 px** met **twee Dwaallichten**: stuiten in plaats van overspringen (langzame lijn: de bodem, een trede, de kademuur); de deur van de machinehal (§3d) |
+| **S8 Machinehal** | 4160, 360, 640, 360 | (4790, 605) | **Lege arena** van de Gemaalmeester: 600 px vlakke vloer tussen twee muren, geen richels, 320 px vrij; deur rechts (van S7) open, deur links (naar S9) dicht (§3e) |
 
 ## 3. Bouwstenen en maten
 
@@ -68,6 +91,45 @@ Alle maten staan in `kadewijk_layout.gd`; wat van D afhangt is een formule daar,
 
 **Geen overhang, geen B5** (gdd §4.8.3, L-09): bij D = 60 niet. **Geen schaduwgeometrie, FelLicht of Schaduwgevaar** (L-06): de echo breekt in S1–S4 nergens (test).
 
+### 3b. S5: B2 naar de zolder (deel 2)
+
+**Opzet** (gdd §4.3 B2, `wereld.md` S5: "het trappenhuis is een B2 zonder B5"). Een schacht van **480 px** (x 3600–4080) met vier eenrichtingsrichels op **90, 180, 270 en 360 px** boven de kade (260): richel 1 (170) en 3 (−10) tegen de linkerwand, richel 2 (80) en de zolder (−100) tegen de rechterwand. Elke richel is **`480 − Z`** breed, met aan de open kant een gat van **Z** boven de keerwand van de verdieping eronder (de keerzone). Elke verdieping is een B1: je loopt naar de wand, keert, ontmoet je echo op ± D px van die wand en bounct door het gat naar de volgende richel; je landt op ± `D + 70` px en loopt naar de andere wand. Langzame lijn per verdieping: de treden 30, 60, 90 tegen de keerwand (de trede op 90 per D zoals in deel 1, `tread_90_width`). De gang van S4 loopt onder de linkerwand door (84 px hoog) tot de rechterwand: ≥ 480 px vlak vóór het eerste keerpunt.
+
+| Maat | Formule | D = 60 | 90 | 120 | 180 |
+|---|---|---|---|---|---|
+| Keerzone B2 (`b2_keerzone`) | `D + 30`; `D + 40` als `(480 − (D + 88)) / 2 < D` | **90** | 120 | 150 | **220** |
+| Richel (`b2_ledge`) | `480 − Z` (gdd: `450 − D`) | **390** | 360 | 330 | 260 |
+| Van de landing tot de volgende wand | `480 − (D + 88)`, nodig ≥ `D + 24` | 332 (84) | 302 (114) | 272 (144) | 212 (204) |
+
+**Waarom `D + 40` bij D = 180** (afwijking 9, §8). Bij D = 180 duurt de loop over de richel (± 106 ticks) korter dan D: als je keert, hangt je echo nog in zijn bounce naar jouw richel. Keren duurt dan bij de verdiepingen tegen de linkerwand 133 ticks in plaats van 124, en de snelste langzame lijn met dash was nog maar 18 ticks trager (gdd §4.8.7: ≥ 20). Met de rand van de richel 10 px verder (Z = D + 40, de grens van gdd §4.3) is het +22. Bij D ≤ 120 verandert er niets.
+
+**Het lampglas** (L-12, WS-08; placeholder `Lampglas`, het object is van de GP) hangt op de zolder op x 3900, **105 px boven richel 3**: met een sprong van richel 3 kom je er niet bij (je lichaam komt tot 80 px), met de bounce van de laatste verdieping wel; de langzame lijn is de treden. Elke run neemt het mee (het ligt op de route). **Logbladzijde 1** ligt beneden in het huis op de vloer (placeholder).
+
+### 3c. S6: het gemaalplein, de pompgang en het gemaal (deel 2)
+
+- **Loopbrug** van de zolder (−100) tot x 4260; je valt het plein op (260) en ziet het gemaal en de pompgang van boven.
+- **Pompgang** (FK-5, L-14 b): vier schoepen op x 4480, 4560, 4640, 4720, **80 px** uit elkaar, middelpunt **38 px** boven de vloer, in de looprichting naar de **sluis** (x 5000–5060, een klep van 10 px over de kelderingang). Van de laatste schoep tot de sluis **280 px** (≥ `2 × (D − 40)` tot D = 180).
+- **Het gemaal** (`S6/Gemaal`, `gemaal.gd` met `vane_paths`) is de **`wijk_gemaal` van elke kamer S1–S8** (L-14 a, LM-13: de Kadelopers komen terug tot het gemaal vol is). De sluis gaat open op `t_v` (LM-06); het water van de kelderingang (`Diepwater`, de schacht onder de sluis, 272 → 400) zakt in 180 ticks. Wie er vlak na `t_v` doorheen valt, is er korter dan 30 ticks in (de straat eindigt 40 px boven de kelderbodem).
+- **Checkpoint** (`Checkpoint` met `gemaal_path`) op x 4760 achter de laatste schoep: een pompslag van P1 zet het (LM-08), en daarna is het gemaal de respawnplek (SL-03, test).
+- **Trap terug** naar de loopbrug: zeven eenrichtingstreden van 45 px recht boven elkaar op x 4200 (FK-6). Voor wie te weinig licht heeft (zonder echo): even S5 in en terug, dan staat het paar er weer (LM-13), zoals de trap van K3 naar K2 in de flow-kamer (FK-2). Ook L-10: van het plein kom je altijd terug naar boven.
+- **Bevroren echo's** (twee kinderen, WS-09, beeld zonder collision) aan de voet van de loopbrug; **logbladzijde 2** bij de sluis (placeholders).
+
+### 3d. S7: de sluiskelder, het luik en het kanaal (deel 2)
+
+- **Kelder** (bovenvloer 440, x 4960–5340), dicht aan beide kanten: je valt er door de kelderingang in, loopt langs de **sokkel** (V-01, placeholder) naar het **luik** (x 5260–5300). Het luik is een stuk vloer dat alleen een **neerslag** raakt (`kadewijk_luik.gd`, §9: placeholder van de WLD): springen en in de lucht AANVAL met omlaag, de klep verdwijnt, P1 stuit en valt door naar de benedenvloer (620). De klep heeft een scheur (L-03). Open blijft open (`verslagen` in de save).
+- **Kanaal** van **160 px** (x 4960–5120), 90 diep, met **twee Dwaallichten** op 1/3 en 2/3 (x 5013 en 5067), banen van 32 px, onderkant 40 px boven de vloer (§2.6). **Stuitlijn** (V-01b): naar links tot de rand, springen (met coyote), boven het eerste Dwaallicht een neerslag, stuiten, boven het tweede weer, en de overkant op. De neerslag zet een merk; de echo herhaalt hem D + 3 ticks later als merksprong en laat het knallen (V-01e): **2 ontploffingen** bij D = 60. **Langzame lijn**: het kanaal in, over de bodem, een trede van 45, de kademuur van 45 (FK-6). Een Dwaallicht duikt tot 16 px boven de vloer, dus niet het kanaal in (test: geen treffer).
+- **De deur** van de machinehal: de benedenvloer loopt west tot x 4800, de deur rechts van S8; je valt 60 px de arena in.
+- **Van het gemaal tot de arena-deur**: **555 ticks (9,2 s)** (SL-03, GM-11: ≤ 10 s), met het gemaal vol, het luik open en de stuitlijn (test). Krap: een langzamere speler of de langzame lijn door het kanaal (+19 ticks) haalt het net.
+
+### 3e. S8: de lege arena van de Gemaalmeester (deel 2)
+
+Op de maten van GM-01 en `slice-vijanden-en-boss.md` §3.2, als layout-data (`kadewijk_layout.gd`): één scherm (4160–4800 × 360–720), **vloer van 600 px** (x 4180–4780, bovenkant y 680), muren van 20 px, plafond op 360: **320 px vrij** boven de vloer (het rad hangt op 100–140, de lancering komt tot ± 142 + 30). Geen eenrichtingsvloer, geen richels, geen zones (GM-01, GMB-06). Aan elke kant van het lichaam (arena-x 252–348) 252 px vlak: ≥ D + 24 tot D = 180.
+
+- **`Layout.ARENA_ORIGIN` = (4180, 680)**: de linkermuur op de bovenkant van de vloer, de `origin` van `gemaalmeester.gd`; `ARENA_W` = 600.
+- **Deuren** (blokken `DeurRechts` en `DeurLinks`): rechts (van S7, x 4780–4800, y 360–620) staat bij het laden open; links (naar S9) is dicht. `Kadewijk.set_door(&"S8", "DeurRechts", true)` sluit hem (bij `BOSS_START`); de koppeling met de boss is van de GP.
+- **Getest**: keren tegen de linkermuur en op de echo springen brengt het aanvalsvlak in de hurtbox van het rad (x `D − 14 … D + 82` van de muur, y 100–140), bij D = 60, 90, 120 en 180 (bounce op 54 / 92 / 122 / 182 px van de muur).
+- De boss zelf staat er niet in (opdracht: de GP koppelt boss en arena). Placeholders: de plek van het lichaam en de twee spuigaten (GMB-03), alleen beeld.
+
 ## 4. Encounters (`slice-vijanden-en-boss.md` §2.6)
 
 | Kamer | Vijanden (scène) | Hoe | Afwijking |
@@ -75,6 +137,8 @@ Alle maten staan in `kadewijk_layout.gd`; wat van D afhangt is een formule daar,
 | S2 | `Paar1A`, `Paar1B`: 2 Kadelopers op de gang (y 160), x 880 / 908 | **E-paar**, 28 px (`paar_e`), op het vlakke stuk na B3 | — |
 | S3 | Golf 1: `Paar1A/B` (2140 / 2168) + `Los` (2360). Golf 2: `Paar1A` = **Schotdrager** (1770) + `Paar1B` Kadeloper (1798), `Los` (1990) | Golf 1 een E-paar + een losse 192 px verder; golf 2 aan de kant van de ingang, de Schotdrager in een E-paar | Golf 2 wacht ook op ≤ 5 tegelijk (hieronder) |
 | S4 | `Overkant`: 1 Kadeloper op x 3260 | ≥ 80 px van de landing van de lancering (± 3090) | — |
+| S6 | `Paar1A`, `Paar1B`: 2 Kadelopers op het plein, x 4340 / 4382 | **K-paar**, 42 px (`paar_k`): twee merken, de ketting; ≥ 98 px van de eerste schoep (FK-5: ≥ 80). Komen terug zolang het gemaal niet vol is | — |
+| S7 | `Dwaallicht1`, `Dwaallicht2` boven het kanaal, x 5013 / 5067 | Banen van 32 px (de level-regel zet ze bij het laden met `setup_enemy`; de `@export` volgt van de GP), onderkant 40 px boven de vloer | — |
 
 De **paren** (VJ-05) zet het gebiedsscript bij het laden met `SliceEnemy.make_pair` en de afstand uit `slice.csv`. Een `@export` voor de paargenoot (zodat het paar in de scène staat) volgt van de Gameplay Programmer (ontwerp.md §12).
 
@@ -83,14 +147,14 @@ Twee regels van het level-script (`kadewijk.gd`), keuze WLD:
 1. **Wekken.** Een vijand doet pas mee als P1 in zijn kamer op zijn vloer staat (voeten ± 40 px) en binnen een half scherm (320 px); daarna tot P1 de kamer verlaat. Daarvóór doet hij niets (`hold_until`), raakbaar blijft hij. Zonder die regel loopt een `SliceEnemy` overal naar P1 toe, ook vanuit een andere kamer of verdieping: het paar van S2 stond dan onder de landing van B3 of aan de keerwand van B1, en de Kadeloper van S4 aan de rand van de kloof, op de landing van de lancering. Hetzelfde als `is_awake` in K2 van de flow-kamer.
 2. **Golf 2 in S3** start op de eerste tick waarop elke Kadeloper van golf 1 een merk heeft of op is (§2.6, gdd §4.7.1 c) **én** golf 2 erbij hooguit 5 vijanden tegelijk geeft (L-13 f, strikt in de slice). Met alleen de eerste voorwaarde zouden er 6 tegelijk kunnen staan (3 gemerkt + 3 nieuw). Tot de start is golf 2 niet bij de Sim aangemeld en niet in beeld. De Schotdrager blokkeert niet: de golf is op zonder hem (L-13 e).
 
-LM-13: de Kadelopers komen terug (`slice.csv`), de Schotdrager niet; zolang er geen gemaal is, telt de wijk als "niet vol" (`wijk_gemaal` leeg, §9).
+LM-13: de Kadelopers komen terug (`slice.csv`), de Schotdrager niet, tot het gemaal van S6 vol is: elke kamer heeft `wijk_gemaal` = `S6/Gemaal` (deel 2). De Dwaallichten komen terug zolang de wijk donker is.
 
 ## 5. Checkpoint, respawn, streamen en water
 
-- **Checkpoint** (`Checkpoint` in S1, bij de proloogdeur): P1 begint erop. Tot het gemaal van S6 er is, is dat de enige respawnplek (SL-03); `Respawn` met `Progress` in de gebiedsscène (ontwerp.md §12 punt 1c). Test: P1 sterft in S3 en verschijnt op S1, één `RESPAWN`.
+- **Checkpoint** (`Checkpoint` in S1, bij de proloogdeur): P1 begint erop. Tot het gemaal van S6 is dat de respawnplek (SL-03); `Respawn` met `Progress` in de gebiedsscène (ontwerp.md §12 punt 1c). Test: P1 sterft in S3 en verschijnt op S1, één `RESPAWN`. **Het checkpoint van het gemaal** (S6, §3c) neemt het over bij de eerste pompslag van P1 (test: `checkpoint_kamer` = S6).
 - **Begin van elke kamer** (LM-08): `Layout.ROOM_START`, een vaste, veilige plek bij de ingang; voor het debugmenu (F8) en zonder checkpoint.
 - **Streamen**: geladen zijn de kamer van P1 en zijn buren; S3 laadt pas als P1 in S2 is. Kamerwissels naar een buur resetten de echo niet (E-04a).
-- **Water**: alle vier op `s = 0` (wereld.md §2.2). De waterstand, `Diepwater` en de `Sluis`-objecten zijn er nog niet (GP, §9). In S1–S4 ligt niets onder water dat een route opent; dat begint in S6/S9 (L-14 d).
+- **Water**: S1–S6 op `s = 0` (wereld.md §2.2). Het gemaal van S6 heeft zijn eigen water (de kelderingang, LM-06): dat zakt op `t_v` en opent de route naar S7 (L-14 d, "je ziet vooraf wat onder water ligt": de schacht onder de sluis). De waterstand per wijk (`s` 0/1/2) en de `Sluis`-objecten voor S9 zijn er nog niet (GP, §9).
 
 ## 6. Gemeten met de gescripte geoefende run (`kadewijk_bot.gd`, `test_kadewijk.gd`)
 
@@ -151,17 +215,50 @@ De run is deterministisch: dezelfde bits als `ScriptedInput` geven hetzelfde mee
 
 Dat is het beeld van v0.1.1 (toen met de hand gemeten: +27 bij 60, ± +22 bij 90 en 120), nu als test en ook bij 180. Bij een langere D is de snelste dash later (12, 24 of 16 ticks): dan haal je met de dash de galerij rechtstreeks, over de trede op 90 heen.
 
+## 6b. Deel 2 gemeten (`test_kadewijk_deel2.gd`)
+
+Solo. De run loopt van S1 tot P1 door de kelderingang S7 binnenkomt (`run_end` = S7), dus door het gemaal. Per kamer los vanaf het begin van de kamer.
+
+| | **D = 60** | D = 120 | D = 180 | Norm |
+|---|---|---|---|---|
+| Run S1 → S7 met echo | **4810 ticks (80 s)** | 5022 | 5438 | — |
+| S4 / S5 / S6 (kamertijd) | 499 / **1304** / **503** | 571 / 1271 / 503 | 631 / 1303 / 503 | — |
+| **SL-01: LP vóór de eerste pompslag** (S1 tot het gemaal) | **112** (88 na S4, +24 het K-paar) | 114 | 114 | ≥ 100 (L-14 c): ✓ |
+| Gemaal vol op de eerste doorgang (POMP P1 / echo) | ✓ (4 / 4), `GEMAAL_VOL` op tick 4637 | ✓ (4 / 4) | ✓ (4 / 4) | geen terugweg met echo |
+| Zonder echo: run, terug naar S5 voor licht | 9141 ticks (**1,90×**), 4× terug, LP vóór het gemaal 60 | 9152 (1,82×), 4× | 9204 (1,69×), 4× | ≤ 2× (LM-09c, C-15), ≤ 4 terugkeren (FK-2): ✓ |
+| S5 zonder echo | 1483 (1,14×) | 1483 (1,17×) | 1483 (1,14×) | ≤ 2×: ✓ |
+| S6 zonder echo, zelfde licht bij binnenkomst (88 LP) | 713 tegen 492 (**1,45×**), 0× terug | — | — | ≤ 2× (C-15): ✓ |
+| S6 zonder echo in de run (48 LP bij binnenkomst) | 4294 tegen 503 (8,5×) | 4298 | 4296 | zie afwijking 10 |
+| S6 met 0 LP en zonder echo | 8003 ticks, 8× terug | — | — | geen slot (FK-2) |
+| B2 (S5-B2a … d) keren / langzame lijn zonder dash | **68 / 104 (+36, 1,53×)** elke verdieping | 95 / 145 (+50) | 124–133 / 186 (+53 … +62) | ≥ 30, ≤ 2×: ✓ |
+| B2 snelste langzame lijn met dash (n = 4 … 24) | **94 (+26, 1,38×)** (dash 8) | 118 (+23) (dash 24); bij 90: 103 (+23) | 155 (+22 … +31) (dash 20) | ≥ 20, ≤ 2×: ✓ |
+| B2 bounce / landing (van de wand) | 54 / 120 | — | — | landing ≥ Z + 8 |
+| MP-1 langste stilstand S5 / S6 | 0 / 5 | 4 / 5 | 4 / 5 | ≤ 300: ✓ |
+| MP-2 per kamer S5 / S6 / S7 (los) | **11,0 / 7,2 / 16,7** per min | ≥ 3 | ≥ 3 | ≥ 3,0: ✓ |
+| MP-2 langste gat (S1 → S7) | 715 ticks (S2 → S3, zoals deel 1) | — | — | ≤ 40 s: ✓ |
+| MP-3 / MP-4 / MP-6 (S1 → S7) | 100 % van 8 / 1 % / 79 % | — | — | ≥ 75 / ≤ 40 / ≥ 40 %: ✓ |
+| Lampglas (S5) | gehaald (S5 los: tick 1157 van 1293) | ✓ | ✓ | op de route |
+| S7 los: luik, stuitlijn, deur | **430 ticks**, 3 stuits (luik + 2), 2 ontploffingen (de echo) | — | — | — |
+| S7 langzame lijn (het kanaal door) | 449 ticks (1,04×), geen treffer | — | — | ≤ 2×: ✓ (afwijking 12) |
+| Van het checkpoint van het gemaal tot de arena-deur | **555 ticks (9,2 s)**, met en zonder echo | — | — | ≤ 10 s (SL-03, GM-11): ✓ |
+| S8: bounce na keren tegen de muur haalt het rad | ✓ (54 px van de muur) | ✓ (122) | ✓ (182); bij 90: 92 | GM-07 |
+| Treffers op P1, vijanden tegelijk | 0, ≤ 5 | 0, ≤ 5 | 0, ≤ 5 | L-13 f |
+
+De runs van deel 1 (§6, tot `END_X`) zijn met deel 2 niet veranderd (zelfde ticks; S4 duurt in de run van deel 2 41 ticks langer, omdat hij nu doorloopt tot x 3520).
+
+**De lege loop na golf 2 in S3** (punt van de CD, #212). Gemeten bij D = 60: de laatste ontploffing in S3 is op tick 2161 (x 1862), de volgende echo-actie de lancering in S4 op tick 2701: **540 ticks (9,0 s)**, waarvan ± 5 s in S3 (van x 1954 tot de uitgang) en ± 4 s de aanloop van S4. MP-2 en L-11 houdt het (≤ 40 s; het langste gat blijft 715 ticks, S2 → S3). **Niet opgelost in deze run**: in de overgang S3 → S4 is er geen plek voor een echo-actie zonder (a) een vijand meer of een verplaatste vijand (de plaatsing van §2.6 is van de Combat Designer; bv. de Kadeloper van S4 aan het begin van de aanloop in plaats van aan de overkant), (b) een bouwsteen in het oostelijke deel van de markt (S3 is maatvast, geen herontwerp), of (c) een kortere aanloop in S4 (de bolder kan ± 110 px naar links, aanloop ≥ D + 24 tot D = 180: ± 55 ticks minder, het gat blijft ± 8 s). Voorstel aan de LGD en de CD in §9.
+
 ## 7. Checklist (wereld.md §2.6, voor S1–S4)
 
 | Punt | Stand |
 |---|---|
-| Lus S1–S9, zonder echo te doen ≤ 2×, geen puzzel | S1–S4: zonder echo 1,12× (per kamer ≤ 1,16×); elke bouwsteen is lopen, keren, springen (FK-1); B4: slaan en vasthouden op weg naar de bolder, keren, springen. De lus zelf: deel 2 |
+| Lus S1–S9, zonder echo te doen ≤ 2×, geen puzzel | S1–S4: zonder echo 1,12× (per kamer ≤ 1,16×); elke bouwsteen is lopen, keren, springen (FK-1); B4: slaan en vasthouden op weg naar de bolder, keren, springen. S1 → S7 zonder echo 1,90× (S5 1,14×; S6 met gelijk licht 1,45×). De lus (S9): open (§9) |
 | Bouwstenen op de maten van §4.3 bij D = 60; wat van D afhangt in data | ✓ (§3; test `test_kadewijk_maten_per_d`) |
-| SL-01 gemeten bij D = 60, solo en co-op | Solo tot S4: 88 LP. S5/S6 en co-op: open (§9) |
-| Elke waterstand opent een route | Niet in S1–S4 (`s = 0`); deel 2 |
-| ≤ 3 vijandtypes, ≤ 5 tegelijk | 2 types in S1–S4 (Kadeloper, Schotdrager); max. 4 tegelijk |
-| Lampglas en logbladzijde 3 op een echolijn | S5 / S9: deel 2 |
-| MP-1 in elke kamer, solo en co-op | Solo ✓ bij 60, 120, 180. Co-op: open (§9) |
+| SL-01 gemeten bij D = 60, solo en co-op | **Solo: 112 LP vóór de eerste pompslag** (114 bij 120 en 180). Co-op: open (§9) |
+| Elke waterstand opent een route | `s = 0 → 1`: het gemaal opent de kelderingang (S6 → S7). `s = 2` (S9): open |
+| ≤ 3 vijandtypes, ≤ 5 tegelijk | 3 types in S1–S8 (Kadeloper, Schotdrager, Dwaallicht); max. 4 tegelijk |
+| Lampglas en logbladzijde 3 op een echolijn | Lampglas: op de zolder, 105 px boven richel 3 (echolijn: de bounce van B2; langzame lijn: de treden). Logbladzijde 3 (S9): open |
+| MP-1 in elke kamer, solo en co-op | Solo ✓ bij 60, 120, 180 (S1–S7). De arena met de boss: de GP (B-9). Co-op: open (§9) |
 
 ## 8. Afwijkingen, besluiten en visie-review
 
@@ -175,24 +272,36 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 | 4 | ~~B4 is met de echo niet sneller dan de langzame lijn (305 tegen 283)~~ | Was "mag blijven"; **vervangen door 7** (visie-review CD: past niet) |
 | 5 | **S3 alleen vooruit**: van de markt niet terug naar de bovenroute; terug via de lus (S9) | **Akkoord**: geen vastlopen (L-10 gaat over missen) |
 | 6 | **Geen tegels** van de AD: grijze blokken | — (opdracht) |
-| 7 | **B4 achter een keerpunt** (#217, §3a): een bolder van 8 × 8 op de rand als keerwand; de echo komt je in houding tegemoet. Wijkt af van de solo-werkwijze in gdd §4.3 B4 (aan de rand slaan, `T + D − 21 … T + D − 3` springen): bij **D = 60** spring je op de echo 62 px van de rand en heb je **na de lancering een dash nodig** (gdd: drager ≤ 8 px van de rand, 14 px marge zonder dash); zonder dash de kloof in en de langzame lijn. Bij D ≥ 90 draagt de echo je naar de bolder (16 px van de rand, zonder dash), maar is de echolijn trager dan de langzame lijn (309–399 tegen 287) | **Open** (Lead-review #217) |
+| 7 | **B4 achter een keerpunt** (#217, §3a): een bolder van 8 × 8 op de rand als keerwand; de echo komt je in houding tegemoet. Wijkt af van de solo-werkwijze in gdd §4.3 B4 (aan de rand slaan, `T + D − 21 … T + D − 3` springen): bij **D = 60** spring je op de echo 62 px van de rand en heb je **na de lancering een dash nodig** (gdd: drager ≤ 8 px van de rand, 14 px marge zonder dash); zonder dash de kloof in en de langzame lijn. Bij D ≥ 90 draagt de echo je naar de bolder (16 px van de rand, zonder dash), maar is de echolijn trager dan de langzame lijn (309–399 tegen 287) | **Akkoord** ([Lead-review #220](https://github.com/cesarvangerwen-glitch/echoborn/pull/220)) |
 | 8 | **Besluit B3-galerij S2** (SM-review #208, besluit WLD): **de galerij blijft zoals ze is.** De 2 px bij D ≥ 90 kwam van de bot: hij dashte 14 ticks na de bounce, het vroegste moment waarop de dash de galerij nog haalt. Het venster loopt van 14 tot ± 38 ticks (2 … 42 px); op de top dashen, zoals bij D = 60, geeft **30 px**. De bot dasht nu op de top, en de test eist ≥ 9 px bij elke D. De randen van het venster (dash 14 en 38 ticks na de bounce) draaien bij D ≥ 90 als late bot (`test_kadewijk_b3_late_bot`, rapport), zodat de krapste marge zichtbaar blijft: dash + 14 → 2 px, + 38 → 40 px, bij 90, 120 en 180 gelijk. Verder de kom in laten steken kan niet zonder het gat onder 150 px te brengen (FK-6, test) | WLD (binnen de maten); ter info |
+
+**Nieuw in deel 2** (Lead-review van de PR van #83 deel 2):
+
+| # | Afwijking | Besluit LGD |
+|---|---|---|
+| 9 | **B2: `Z = D + 40` als de loop over de richel korter is dan D** (alleen D > 130, dus D = 180; §3b). De richel wordt dan `480 − Z` = 260 in plaats van `450 − D` = 270. Zonder: bij de verdiepingen tegen de linkerwand keren 133 en de langzame lijn met dash 151 (+18, < 20). Gdd §4.3 staat Z tot D + 40 toe | **Akkoord** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): Z tot D + 40 mag (gdd §4.3), alleen bij D > 130; de LGD zet `480 − Z` in gdd §4.3 B2 |
+| 10 | **S6 zonder echo per kamer 8,5×** (4294 tegen 503 ticks bij D = 60): zonder echo komt P1 er met 48 LP aan in plaats van 88 en moet hij 4× terug voor licht (de trap, S5 in en uit, het paar staat er weer). De run houdt LM-09c en FK-2 (1,90×, 4 terugkeren); met hetzelfde licht bij binnenkomst is S6 zonder echo 1,45× (C-15). Ik toets C-15 voor S6 dus met gelijk licht, en het tekort aan licht met FK-2/LM-09c. Klopt dat met de bedoeling van C-15 per kamer? Zo niet: meer licht in S6 zonder echo (een tweede paar) | **Bedoeld** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): C-15 per kamer met gelijk licht bij binnenkomst; het tekort aan licht toetsen LM-09c en FK-2 op de run. De run zit op de grens (1,90×, 4 terugkeren), de tests bewaken dat; valt hij erover, dan meer licht in S6 (een tweede paar), geen ruimere norm |
+| 11 | **Trap terug van het plein naar de loopbrug** (S6, §3c): nieuw, niet in de kamerlijst; nodig voor FK-2 (licht halen zonder echo) en L-10 | **Akkoord** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): eenrichting, buiten de val van de loopbrug |
+| 12 | **S7: de langzame lijn door het kanaal is maar 19 ticks trager dan de stuitlijn** (449 tegen 430, 1,04×). Dat mag (FK-2: ≤ 2×; de stuitlijn is een V-01-lijn, geen echolijn), maar het stuiten loont in tijd weinig; de beloning is de ketting van merken (2 ontploffingen) en dat je boven blijft. Een dieper kanaal (twee treden) maakt de langzame lijn ± 35 ticks trager. Keuze LGD/CD | **Mag blijven** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): geen dieper kanaal (marge SL-03); MT2 meet of spelers stuiten |
+| 13 | **Placeholders van de WLD**: het luik (`kadewijk_luik.gd`, een `CombatTarget` met een klep; alleen een neerslag raakt het), het lampglas, de sokkel en de logbladzijden zijn markeringen zonder spelregel (behalve het luik). Het eindobject (WS-08, de pick-up van V-01, L-03-beeld) is van de GP | — (ter info) |
 
 **Visie-review per kamer** (CD, [comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212#issuecomment-6831045448) op D = 60; één regel per kamer):
 
 - **S1 Kade-ingang: Visie-review: past** (CD, #212): keren tegen de grachtwand, de echo loopt je tegemoet, bounce naar de galerij (68 tegen 104 ticks).
-- **S2 Kadegang: nog geen visie-review** (niet in de doorloop van #212).
+- **S2 Kadegang: Visie-review: past** (CD, [#212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), doorloop PR #221): drie echo-momenten in ± 5 s zonder stilstand (B3, het E-paar, B1 tegen de pijler). Punt van de CD, geen blokkade: ± 5 s kade aan het begin en ± 6,5 s bovenroute aan het eind, de echo alleen als spoor (langste gat 11,9 s, ≤ 40); mee naar deel 2 en de art.
 - **S3 Vismarkt: Visie-review: past** (CD, #212): de echo is je tweede slag (46 van 88 LP). Punt van de CD, geen blokkade: na golf 2 ± 5 s leeg lopen naar de uitgang (§9).
-- **S4 Brugkloof: Visie-review: past niet** (CD, #212: wachten aan de rand, trager dan de langzame lijn) → **herontworpen in #217** (B4 achter een keerpunt, §3a); **opnieuw naar de CD**.
+- **S4 Brugkloof: Visie-review: past** (CD, [#212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), na het herontwerp van #217, doorloop PR #221; eerst "past niet"): keren tegen de bolder, de echo tegemoet, lancering en dash over de kloof, 19 ticks sneller dan de langzame lijn. Kanttekeningen van de CD: ± 10 ticks in de lucht boven de naderende echo (MT1: leest het als wachten?), en bij D ≥ 90 is de echolijn trager (stijgt D, dan terug naar de CD).
 
 **Maatvast per kamer** (fasekader §4 regel 3: bots groen op D = 60 + `Visie-review: past` van de CD + geen open herontwerp):
 
 | Kamer | Stand |
 |---|---|
 | S1 | **Maatvast** na de merge van #217 (LGD bevestigt): bots groen, `past`, en het dash-punt dat de CD noemde is besloten (gdd v0.8.2 §4.8.7) en getest (W-12) |
-| S2 | **Kandidaat**: het B3-punt is besloten (8); de visie-review van de CD ontbreekt |
+| S2 | **Maatvast** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): bots groen, `Visie-review: past` (#212), het B3-punt besloten (8) |
 | S3 | **Maatvast** na de merge van #217 (LGD bevestigt): bots groen, `past`; het lege stuk na golf 2 is een punt, geen herontwerp |
-| S4 | **Niet maatvast**: herontworpen (#217). Pas **maatvast na een nieuwe `Visie-review: past` van de CD** (en de Lead-review van afwijking 7); tot dan geen eindkwaliteit-art |
+| S4 | **Maatvast** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): bots groen, `Visie-review: past` (#212), afwijking 7 akkoord (#220) |
+| S5, S6, S7 | **Kandidaat**: bots groen op D = 60 (§6b), afwijking 9–12 besloten (#223); de visie-review van de CD ontbreekt |
+| S8 | **Kandidaat voor de maten**: de arena volgt GM-01 en §3.2; maatvast pas met de boss erin (GP, B-9 in de arena) |
 
 ## 9. Open punten
 
@@ -205,18 +314,26 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 - `Meetlog` en de camera van de flow-kamer (`flow_meetlog.gd`, `flow_room.gd` `camera_view`) worden hier alleen gelezen; naar `scripts/` verplaatsen mag.
 - Co-op-bot (duo) voor de Kadewijk, zoals `flow_duo.gd`, voor MP-7 en SL-01 co-op (ook B4 in co-op met de bolder: de drager staat dan tegen de bolder, 16 px van de rand).
 
-**Volgende WLD-run (deel 2):**
-- **S5–S9** met de lus terug naar S1 (S9, het luik, SL-04), het lampglas (S5) en de logbladzijden, S6 met de pompgang (4 schoepen, 80 px, FK-5, L-14 b) en het checkpoint, S7 (Neerslag, kanaal van 160 met 2 Dwaallichten), de layout van S8 (arena), en de bot erdoor.
-- **SL-01**: na S4 staat de meter op 88 LP (met echo) en 48 zonder. S5 heeft geen gevecht en S6 2 Kadelopers (± +12–15 LP met merk): dat haalt 100 waarschijnlijk net. Zo niet, dan een golf of een bouwsteen erbij (SL-01, review LGD).
-- **S3, punt van de CD**: na golf 2 ± 5 s leeg naar de uitgang, de echo als spoor achter je. Kandidaat voor S4/S5 in deel 2 (bv. een keerpunt of richel vlak na de markt), geen herontwerp van S3.
-- Co-op door alle kamers (C-15 d, MP-7).
+**Gameplay Programmer (deel 2, S5–S8):**
+- **De boss in de arena**: `gemaalmeester.gd` op `Layout.ARENA_ORIGIN` (4180, 680), breedte `ARENA_W` = 600; `BOSS_START` sluit `DeurRechts` (`Kadewijk.set_door`), `BOSS_VERSLAGEN` opent `DeurLinks` (naar S9); respawn bij 0 levenspunten in S8 op het checkpoint van het gemaal (SL-03, GM-11: 555 ticks tot de deur, gemeten). De boss-bot (B-9) in de Kadewijk-arena.
+- **Het luik als systeemobject** (V-01, SL-04, L-03): `kadewijk_luik.gd` is een placeholder van de WLD (open = `verslagen`); verplaatsen naar `scripts/` en het beeld van de scheur mag.
+- **Lampglas, logbladzijden 1–2 en de sokkel** als objecten (WS-08; nu markeringen `Lampglas`, `Logbladzijde1/2`, `Sokkel` op de juiste plek in de inhoud).
+- `@export` voor de baan van het Dwaallicht: nu zet `kadewijk.gd` de banen bij het laden van S7.
+- Trap 2 en `s = 2` (SL-02) voor S9.
+
+**Volgende WLD-run (deel 3):**
+- **S9 de lage kade** met de lus terug naar S1 (L-14 f): door `DeurLinks` van de arena, de trap terug naar het plein voor trap 2, de lage kade die bij `s = 2` vrijkomt (onder S1–S5, y 360–720), het E-paar (verlicht), het luik (SL-04) in de kade, logbladzijde 3 op een echolijn en de snelkoppeling naar de gang van S1 bij de proloogdeur (`SLICE_EIND`). Voorstel: de lage kade op 620, een B1 tegen de grachtwand onder S1 voor logbladzijde 3, en een schacht met treden van 45 naar een eenrichtingsluik in de gang van S1 (x 460–500, achter het begin, buiten de aanloop van B1).
+- Co-op door alle kamers (C-15 d, MP-7, SL-01 co-op).
+- **S3, punt van de CD**: zie §6b (gemeten 9,0 s tussen de laatste ontploffing en de lancering). Voorstel: de Kadeloper van S4 naar het begin van de aanloop (Combat Designer), of de aanloop van S4 korter (± 55 ticks).
 
 **Lead Game Designer:**
-- **Afwijking 7 (B4 achter een keerpunt)**: akkoord met de bolder en met de dash na de lancering bij D = 60? En bij D ≥ 90 een echolijn die trager is dan de langzame lijn (de echo draagt je naar de rand; de prijs van een lange staart, binnen MP-1)?
+- ~~**Afwijking 7 (B4 achter een keerpunt)**~~ **Akkoord** (Lead-review #220; §8).
 - **Bevinding B4 (geldt al zonder bolder)**: gdd §4.3 zegt "bounce + dash haalt tot op de vloer ± 145 px", dus niet over de kloof. Dat klopt met de dash op de top. Wie aan de rand op zijn echo wacht, bounct en pas laat in de val dasht (de dash zet `v.y` op 0), komt wél over: middelpunt tot x 3076 (de overkant begint op 3052), met of zonder bolder. Het blijft een echolijn (een bounce op de echo), maar geen lancering. Zonder echo kom je niet over (test, ook van de bolder af: 3046).
 - **Flow-kamer B4** heeft nog de oude werkwijze (stap terug, 15 ticks stilstand bij D = 60, `flowkamer.md` §9). Geen nieuwe geometrie in de flow-kamer zolang MT1 erop speelt; de bolder kan daar na MT1, als de LGD dat wil.
 
-**Creative Director:** nieuwe visie-review van S4 (§3a; in de bot-doorloop op D = 60 is S4 tick ± 2505–2963, de lancering ± 185 ticks na het begin van S4) en een eerste van S2.
+**Creative Director:** visie-review van S5–S7 (§3b–§3d; in de run van deel 2 bij D = 60: S5 tick ± 3005–4310, S6 ± 4310–4810). S2 en S4: "past" (#212, gedaan).
+
+**Lead Game Designer (deel 2):** ~~afwijking 9–12~~ besloten (Lead-review #223, §8). De lege loop na golf 2 (§6b): binnen MP-2 en L-11, geen ombouw nu; de Kadeloper van S4 verplaatsen is een punt voor de CD na MT2.
 
 **W-13** (`flowkamer.md` §9, K2-cijfers na de hoogtegrens) wacht op G-11 van de Gameplay Programmer (#218).
 
@@ -227,11 +344,11 @@ godot --path game res://levels/kadewijk/kadewijk.tscn      # spelen (F1/F2/F3/F7
 godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd   # alle tests, waaronder test_kadewijk.gd
 ```
 
-Bestanden: `game/levels/kadewijk/kadewijk.tscn` (gebiedsscène, kamers S1–S4), `kadewijk.gd` (systemen en level-regels), `kadewijk_layout.gd` (maten en formules), `kadewijk_inhoud.gd` (bouwt de blokken van een kamer), `s1_kade_ingang.tscn` … `s4_brugkloof.tscn` (inhoud per kamer: vijanden, checkpoint, beeld), `kadewijk_bot.gd` (gescripte run, met `b4_jump_delay`/`b4_dash_delay` voor de late bot), `game/tests/test_kadewijk.gd` (met de B4-tests en W-12) en `game/tests/slow_dash_input.gd` (W-12: de langzame lijn van een bot met een dash `n` ticks na de afzet; ook voor de flow-kamer).
+Bestanden: `game/levels/kadewijk/kadewijk.tscn` (gebiedsscène, kamers S1–S8), `kadewijk.gd` (systemen en level-regels; `run_end`, `set_door`), `kadewijk_layout.gd` (maten en formules), `kadewijk_inhoud.gd` (bouwt de blokken van een kamer), `s1_kade_ingang.tscn` … `s8_machinehal.tscn` (inhoud per kamer: vijanden, gemaal, checkpoint, luik, beeld), `kadewijk_luik.gd` (het luik, placeholder), `kadewijk_bot.gd` (gescripte run S1–S8, met `b4_jump_delay`/`b4_dash_delay` en `kanaal_no_stuit`), `game/tests/test_kadewijk.gd` (deel 1, met de B4-tests en W-12), `game/tests/test_kadewijk_deel2.gd` (deel 2) en `game/tests/slow_dash_input.gd` (W-12).
 
 ## 11. Werkaannames (kader §5)
 
-Besluiten: D = 60 als werkaanname, bereik 1–3 s, en fase 2 parallel, ook bouwen (CEO, 2026-11-12); #51 deel 2 (1A geen puzzels op de kritieke route, 7A), #18 (2D, 640 × 360). Van de LGD: de maten van gdd v0.8.1 §4.3 en §4.8.5 als startwaarden; de kamerlijst van wereld.md §2.2. Van de Combat Designer: de plaatsing van §2.6 en de waarden in `slice.csv`. Van mij (WLD): de coördinaten van §2, de trede op 90 per D (§3), de bolder van 8 × 8 en de werkwijze van B4 per D (springen + dash als `b4_meet + 16 ≤ 80`, anders dragen; §3a), wekken en de 5-grens voor golf 2 (§4), en de bot als "scripted geoefende run". gdd v0.8.2 voor de eis met dash (§4.8.7).
+Besluiten: D = 60 als werkaanname, bereik 1–3 s, en fase 2 parallel, ook bouwen (CEO, 2026-11-12); #51 deel 2 (1A geen puzzels op de kritieke route, 7A), #18 (2D, 640 × 360). Van de LGD: de maten van gdd v0.8.1 §4.3 en §4.8.5 als startwaarden; de kamerlijst van wereld.md §2.2. Van de Combat Designer: de plaatsing van §2.6 en de waarden in `slice.csv`. Van mij (WLD): de coördinaten van §2, de trede op 90 per D (§3), de bolder van 8 × 8 en de werkwijze van B4 per D (springen + dash als `b4_meet + 16 ≤ 80`, anders dragen; §3a), wekken en de 5-grens voor golf 2 (§4), en de bot als "scripted geoefende run". gdd v0.8.2 voor de eis met dash (§4.8.7). Deel 2, van mij (WLD): de ligging van S5–S8 (§2: huis en plein hoger, kelder en hal eronder), B2 met `Z = D + 40` bij D > 130 (§3b), de trap terug in S6, het luik als placeholder en de deuren van S8 (open/dicht bij het laden), de banen van de Dwaallichten als level-regel, en `LP_INTO_S6` = 88 (gemeten) voor de test van S6 los.
 
 ## 12. Wijzigingen
 
@@ -239,4 +356,6 @@ Besluiten: D = 60 als werkaanname, bereik 1–3 s, en fase 2 parallel, ook bouwe
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie: S1–S4 als grijze kamers, bot en tests bij D = 60 (120/180 regressie) |
 | 0.1.1 | 2026-11-12 | Lead-review #208: langzame lijn met dash gemeten bij 60/90/120 (§6), besluiten van de LGD per afwijking en maatvast-stand per kamer (§8), open punten bijgewerkt (§9) |
+| 0.3.1 | 2026-11-12 | Lead-review #223: besluiten bij afwijking 7 en 9–12 (§8), visie-review per kamer (S2 en S4 "past", #212), S2 en S4 maatvast |
+| 0.3 | 2026-11-12 | [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) deel 2: **S5–S8** grijs en speelbaar (§2, §3b–§3e): S5 B2 naar de zolder met het lampglas, S6 de pompgang, het gemaal (`wijk_gemaal` = `S6/Gemaal` voor elke kamer), het checkpoint en de trap terug, S7 het luik en het kanaal met twee Dwaallichten, S8 de lege arena (GM-01). Bot en `test_kadewijk_deel2.gd` (§6b): **SL-01 112 LP** bij D = 60, B2 bij elke D met en zonder dash, gemaal → arena-deur 9,2 s, de bounce haalt het rad. Afwijkingen 9–13 (§8), de lege loop na golf 2 gemeten (§6b), open punten (§9) |
 | 0.2 | 2026-11-12 | [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217): **S4 herontworpen**, B4 achter een keerpunt (bolder 8 × 8 op de rand; §2, §3, §3a); bot en tests (geen stilstand vóór de lancering, bij D = 60 sneller dan de langzame lijn, late bot, zonder lancering niet over). **W-12**: de langzame lijn met dash als test bij elke D (§6). SM-punten #208: noot MP-3 bij 120/180, besluit B3-galerij (galerij blijft, bot dasht op de top: 30 px; §8 punt 8). Visie-review per kamer en maatvast-stand (§8), open punten (§9); §6 opnieuw gemeten |

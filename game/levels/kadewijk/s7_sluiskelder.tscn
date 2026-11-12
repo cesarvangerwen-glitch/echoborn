@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
+[ext_resource type="Script" path="res://scripts/combat/slice_enemy.gd" id="2_enemy"]
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_luik.gd" id="3_luik"]
+
+[node name="S7Inhoud" type="Node2D"]
+position = Vector2(-5280, -540)
+script = ExtResource("1_inhoud")
+kamer_id = &"S7"
+
+[node name="Sokkel" type="Polygon2D" parent="."]
+position = Vector2(5150, 440)
+color = Color(0.7, 0.62, 0.4, 0.9)
+polygon = PackedVector2Array(-8, -14, 8, -14, 8, 0, -8, 0)
+
+[node name="Luik" type="Node2D" parent="."]
+position = Vector2(5280, 444)
+script = ExtResource("3_luik")
+
+[node name="Dwaallicht1" type="Node2D" parent="."]
+position = Vector2(5013, 572)
+script = ExtResource("2_enemy")
+enemy_type = 2
+
+[node name="Dwaallicht2" type="Node2D" parent="."]
+position = Vector2(5067, 572)
+script = ExtResource("2_enemy")
+enemy_type = 2

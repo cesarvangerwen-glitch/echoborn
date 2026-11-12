@@ -39,3 +39,6 @@ func _ready() -> void:
 		for child in body.get_children():
 			if child is Polygon2D:
 				(child as Polygon2D).color = color
+		if Layout.START_OPEN.has(spec[0]):
+			body.collision_layer = 0
+			body.visible = false

@@ -1,7 +1,8 @@
 extends Node2D
-## De Kadewijk (wijk 1.3), deel 1: S1–S4 als grijze, speelbare kamers op
-## placeholder (T8a, #83; `docs/design/wereld.md` §2.2, kamerdoc
-## `docs/design/kamers/kadewijk.md`).
+## De Kadewijk (wijk 1.3): S1–S8 als grijze, speelbare kamers op placeholder
+## (T8a, #83; deel 1 S1–S4, deel 2 S5–S8; `docs/design/wereld.md` §2.2,
+## kamerdoc `docs/design/kamers/kadewijk.md`). S8 is de lege arena van de
+## Gemaalmeester; de boss en de deuren koppelt de Gameplay Programmer.
 ##
 ## Een gebiedsscène met de systemen van T5b (ontwerp.md §3a, §7): elke kamer
 ## is een `Kamer` met meestreamende inhoud (`s*_*.tscn`), de `AreaLoader`
@@ -18,8 +19,12 @@ extends Node2D
 ##   Zo loopt hij niet door een andere kamer of over een andere verdieping mee.
 ## - **Golven in S3** (L-13): golf 2 doet pas mee als elke Kadeloper van golf 1
 ##   een merk heeft of op is, en er dan hooguit 5 vijanden tegelijk zijn (L-13 f).
-## - **Meetlog** (gdd §4.5): `RUN_START` in S1, `KAMER`, `LP`, `P2_*`,
-##   `RUN_EIND` als P1 het einde van deel 1 haalt (S4, `Layout.END_X`).
+## - **Meetlog** (gdd §4.5): `RUN_START` in S1, `KAMER`, `LP`, `P2_*`, `POMP`
+##   en `GEMAAL_VOL` (S6), `LUIK` (S7, placeholder), `LAMPGLAS` (S5,
+##   placeholder), en `RUN_EIND`: bij `run_end` = S4 als P1 het einde van
+##   deel 1 haalt (`Layout.END_X`), anders als P1 kamer `run_end` binnenkomt.
+## - **S6**: het gemaal (`S6/Gemaal`, de `wijk_gemaal` van elke kamer), de
+##   pompgang en het K-paar; **S7**: de banen van de Dwaallichten en het luik.
 ##
 ## Debugmenu (SL-05, placeholder): F1/F2/F3/F7 = D 60/90/120/180 (uit
 ## `echo.tail_options`; de kamers worden opnieuw gebouwd), F4 = echo aan/uit,
@@ -40,6 +45,8 @@ const Checkpoint = preload("res://scripts/save/checkpoint.gd")
 const EchoHints = preload("res://scripts/echo/echo_hints.gd")
 const Layout = preload("res://levels/kadewijk/kadewijk_layout.gd")
 const Inhoud = preload("res://levels/kadewijk/kadewijk_inhoud.gd")
+const Gemaal = preload("res://scripts/light/gemaal.gd")
+const Luik = preload("res://levels/kadewijk/kadewijk_luik.gd")
 ## Meetlog en camera van de flow-kamer, ongewijzigd hergebruikt (alleen gelezen).
 const FlowMeetlog = preload("res://levels/flowkamer/flow_meetlog.gd")
 const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
@@ -67,6 +74,10 @@ var show_hud := true
 var start_at := Layout.RUN_START
 ## `Progress` voor deze scène; null = de autoload. Een test geeft een eigen node.
 var progress: Node = null
+## Waar de run eindigt (`RUN_EIND`): &"S4" = het einde van deel 1 (`END_X`),
+## anders de kamer waar P1 binnenkomt (bv. &"S7": door de kelderingang, dus
+## na het gemaal; &"S8": de arena).
+var run_end: StringName = &"S4"
 
 ## --- Toestand ---
 var sim: Sim
@@ -90,6 +101,10 @@ var wave_2_tick := -1
 var most_at_once := 0
 ## Kamerwissels van P1 als [tick, van, naar].
 var room_changes: Array = []
+## Het gemaal van S6 als zijn kamer geladen is, anders null.
+var gemaal: Gemaal = null
+## Tick waarop P1 het lampglas (S5) haalde, of -1 (placeholder, WS-08).
+var lampglas_tick := -1
 
 var _awake: Dictionary = {}
 var _wave_1: Array = []
@@ -130,7 +145,7 @@ func _ready() -> void:
 	if progress != null:
 		start_errors.append_array(progress.bind_area_loader(loader, GEBIED))
 		progress.bind_meter(meter)
-	sim.room_bottom = Layout.ROOM_H + 40.0
+	sim.room_bottom = Layout.AREA_BOTTOM + 40.0
 	start_errors.append_array(loader.start(sim.tick, p1.position))
 	room = loader.huidige
 	respawn = Respawn.new(p1, func() -> Vector2: return Layout.ROOM_START.get(loader.huidige, Layout.RUN_START), progress)
@@ -152,10 +167,11 @@ func _ready() -> void:
 			if slot == 2 and p2 != null:
 				leave_partner("apparaat" if reason.begins_with("apparaat") else reason))
 	_camera = Camera2D.new()
-	_camera.limit_left = 0
-	_camera.limit_top = -20
-	_camera.limit_right = int(Layout.AREA_RIGHT)
-	_camera.limit_bottom = int(Layout.ROOM_H)
+	var area := Layout.area_rect()
+	_camera.limit_left = int(area.position.x)
+	_camera.limit_top = int(area.position.y) - 20
+	_camera.limit_right = int(area.end.x)
+	_camera.limit_bottom = int(area.end.y)
 	_camera.position = p1.position
 	add_child(_camera)
 	if show_hud:
@@ -184,7 +200,7 @@ func _process(delta: float) -> void:
 			echo_state = tr("HUD_ECHO_P2")
 		elif echo:
 			echo_state = tr("HUD_ECHO_ACTIVE") if echo.is_present() else tr("HUD_ECHO_EMPTY")
-		_hud_label.text = "\n".join(PackedStringArray([tr("HUD_STATUS") % [meter.value, 0, p1.health],
+		_hud_label.text = "\n".join(PackedStringArray([tr("HUD_STATUS") % [meter.value, gemaal.fill if gemaal else 0, p1.health],
 			tr("HUD_ROOM") % [room, tail, echo_state, run_ticks() / 60.0]]))
 
 
@@ -202,6 +218,8 @@ func _on_loaded_changed(_tick: int, id: StringName, geladen: bool) -> void:
 			_wave_1 = []
 			_wave_2 = []
 			wave = 0
+		elif id == &"S6":
+			gemaal = null
 		return
 	var inhoud: Node = kamer.inhoud_node
 	if inhoud == null:
@@ -225,6 +243,28 @@ func _on_loaded_changed(_tick: int, id: StringName, geladen: bool) -> void:
 			for e in _wave_2:
 				sim.remove_object(e)
 				e.visible = false
+		&"S6":
+			# K-paar (VJ-05: 42 px, de ketting), ≥ 80 px van elke schoep (FK-5).
+			_pair(inhoud, ^"Paar1A", ^"Paar1B", "paar_k")
+			gemaal = inhoud.get_node(^"Gemaal")
+			gemaal.pumped.connect(func(t: int, amount: int, who: String) -> void:
+				meetlog.add_row(t, "POMP", str(amount), who, gemaal.last_vane.position))
+			gemaal.full.connect(func(t: int) -> void:
+				meetlog.add_row(t, "GEMAAL_VOL", "", "", gemaal.last_vane.position))
+		&"S7":
+			# Dwaallichten: banen van 32 px op 1/3 en 2/3 van het kanaal, 40 px
+			# boven de vloer (§2.6; de `@export` voor de baan volgt van de GP).
+			for i in Layout.DWAALLICHT_X.size():
+				var e: SliceEnemy = inhoud.get_node("Dwaallicht%d" % (i + 1))
+				var x: float = Layout.DWAALLICHT_X[i]
+				if e.alive:
+					e.setup_enemy(SliceEnemy.Type.DWAALLICHT, x, Layout.S7_LOW,
+						x - Layout.DWAALLICHT_LANE, x + Layout.DWAALLICHT_LANE)
+					if not _awake.has(e):
+						e.hold_until(sim.tick + 2)
+			var luik: Luik = inhoud.get_node(^"Luik")
+			luik.opened.connect(func(t: int, by: String) -> void:
+				meetlog.add_row(t, "LUIK", "", by, luik.global_position))
 
 
 ## VJ-05: een paar met de startafstand uit `slice.csv` (`paar_e` = 28, `paar_k` = 42).
@@ -252,6 +292,22 @@ func is_awake(enemy: Node2D) -> bool:
 	return _awake.has(enemy)
 
 
+## Een blok van een kamer (`Layout.blocks`), bv. de deuren van de arena:
+## `set_door(&"S8", "DeurRechts", true)` sluit hem (bij `BOSS_START`, GP).
+## Geeft false als de kamer niet geladen is of het blok niet bestaat.
+func set_door(id: StringName, block_name: String, closed: bool) -> bool:
+	var kamer = loader.kamers.get(id)
+	if kamer == null or kamer.inhoud_node == null:
+		return false
+	var body := kamer.inhoud_node.get_node_or_null("Blokken/" + block_name) as StaticBody2D
+	if body == null:
+		return false
+	body.collision_layer = 1 if closed else 0
+	body.visible = closed
+	PhysicsServer2D.body_set_collision_layer(body.get_rid(), body.collision_layer)
+	return true
+
+
 # --- Per tick ---
 
 func _on_tick(tick: int) -> void:
@@ -266,7 +322,13 @@ func _on_tick(tick: int) -> void:
 				e.visible = true
 				sim.add_object(e)
 	most_at_once = maxi(most_at_once, _alive_count(room))
-	if not run_over and room == &"S4" and p1.position.x >= Layout.END_X:
+	if lampglas_tick < 0 and room == &"S5" and p1.position.distance_to(Layout.LAMPGLAS) <= 12.0:
+		lampglas_tick = tick
+		meetlog.add_row(tick, "LAMPGLAS", "", "p1", p1.position)
+	if run_over:
+		return
+	var done := room == &"S4" and p1.position.x >= Layout.END_X if run_end == &"S4" else room == run_end
+	if done:
 		run_over = true
 		end_tick = tick
 		meetlog.add_row(tick, "RUN_EIND", "", "", p1.position)

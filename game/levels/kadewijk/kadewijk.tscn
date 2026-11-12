@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk.gd" id="1_wijk"]
 [ext_resource type="Script" path="res://scripts/world/kamer.gd" id="2_kamer"]
@@ -6,6 +6,10 @@
 [ext_resource type="PackedScene" path="res://levels/kadewijk/s2_kadegang.tscn" id="4_s2"]
 [ext_resource type="PackedScene" path="res://levels/kadewijk/s3_vismarkt.tscn" id="5_s3"]
 [ext_resource type="PackedScene" path="res://levels/kadewijk/s4_brugkloof.tscn" id="6_s4"]
+[ext_resource type="PackedScene" path="res://levels/kadewijk/s5_sluiswachtershuis.tscn" id="7_s5"]
+[ext_resource type="PackedScene" path="res://levels/kadewijk/s6_gemaalplein.tscn" id="8_s6"]
+[ext_resource type="PackedScene" path="res://levels/kadewijk/s7_sluiskelder.tscn" id="9_s7"]
+[ext_resource type="PackedScene" path="res://levels/kadewijk/s8_machinehal.tscn" id="10_s8"]
 
 [sub_resource type="RectangleShape2D" id="Rect_s1"]
 size = Vector2(640, 360)
@@ -19,12 +23,24 @@ size = Vector2(960, 360)
 [sub_resource type="RectangleShape2D" id="Rect_s4"]
 size = Vector2(960, 360)
 
+[sub_resource type="RectangleShape2D" id="Rect_s5"]
+size = Vector2(640, 560)
+
+[sub_resource type="RectangleShape2D" id="Rect_s6"]
+size = Vector2(960, 560)
+
+[sub_resource type="RectangleShape2D" id="Rect_s7"]
+size = Vector2(960, 360)
+
+[sub_resource type="RectangleShape2D" id="Rect_s8"]
+size = Vector2(640, 360)
+
 [node name="Kadewijk" type="Node2D"]
 script = ExtResource("1_wijk")
 
 [node name="Achtergrond" type="Polygon2D" parent="."]
 color = Color(0.13, 0.13, 0.15, 1)
-polygon = PackedVector2Array(0, -20, 3520, -20, 3520, 380, 0, 380)
+polygon = PackedVector2Array(0, -220, 5760, -220, 5760, 740, 0, 740)
 
 [node name="S1" type="Area2D" parent="."]
 position = Vector2(320, 180)
@@ -32,6 +48,7 @@ script = ExtResource("2_kamer")
 kamer_id = &"S1"
 buren = PackedStringArray("S2")
 inhoud = ExtResource("3_s1")
+wijk_gemaal = &"S6/Gemaal"
 
 [node name="Vlak" type="CollisionShape2D" parent="S1"]
 shape = SubResource("Rect_s1")
@@ -42,6 +59,7 @@ script = ExtResource("2_kamer")
 kamer_id = &"S2"
 buren = PackedStringArray("S1", "S3")
 inhoud = ExtResource("4_s2")
+wijk_gemaal = &"S6/Gemaal"
 
 [node name="Vlak" type="CollisionShape2D" parent="S2"]
 shape = SubResource("Rect_s2")
@@ -52,6 +70,7 @@ script = ExtResource("2_kamer")
 kamer_id = &"S3"
 buren = PackedStringArray("S2", "S4")
 inhoud = ExtResource("5_s3")
+wijk_gemaal = &"S6/Gemaal"
 
 [node name="Vlak" type="CollisionShape2D" parent="S3"]
 shape = SubResource("Rect_s3")
@@ -60,8 +79,53 @@ shape = SubResource("Rect_s3")
 position = Vector2(3040, 180)
 script = ExtResource("2_kamer")
 kamer_id = &"S4"
-buren = PackedStringArray("S3")
+buren = PackedStringArray("S3", "S5")
 inhoud = ExtResource("6_s4")
+wijk_gemaal = &"S6/Gemaal"
 
 [node name="Vlak" type="CollisionShape2D" parent="S4"]
 shape = SubResource("Rect_s4")
+
+[node name="S5" type="Area2D" parent="."]
+position = Vector2(3840, 80)
+script = ExtResource("2_kamer")
+kamer_id = &"S5"
+buren = PackedStringArray("S4", "S6")
+inhoud = ExtResource("7_s5")
+wijk_gemaal = &"S6/Gemaal"
+
+[node name="Vlak" type="CollisionShape2D" parent="S5"]
+shape = SubResource("Rect_s5")
+
+[node name="S6" type="Area2D" parent="."]
+position = Vector2(4640, 80)
+script = ExtResource("2_kamer")
+kamer_id = &"S6"
+buren = PackedStringArray("S5", "S7")
+inhoud = ExtResource("8_s6")
+wijk_gemaal = &"S6/Gemaal"
+
+[node name="Vlak" type="CollisionShape2D" parent="S6"]
+shape = SubResource("Rect_s6")
+
+[node name="S7" type="Area2D" parent="."]
+position = Vector2(5280, 540)
+script = ExtResource("2_kamer")
+kamer_id = &"S7"
+buren = PackedStringArray("S6", "S8")
+inhoud = ExtResource("9_s7")
+wijk_gemaal = &"S6/Gemaal"
+
+[node name="Vlak" type="CollisionShape2D" parent="S7"]
+shape = SubResource("Rect_s7")
+
+[node name="S8" type="Area2D" parent="."]
+position = Vector2(4480, 540)
+script = ExtResource("2_kamer")
+kamer_id = &"S8"
+buren = PackedStringArray("S7")
+inhoud = ExtResource("10_s8")
+wijk_gemaal = &"S6/Gemaal"
+
+[node name="Vlak" type="CollisionShape2D" parent="S8"]
+shape = SubResource("Rect_s8")

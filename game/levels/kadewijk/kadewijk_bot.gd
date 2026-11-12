@@ -1,6 +1,6 @@
 extends RefCounted
-## De gescripte geoefende run door de Kadewijk, deel 1 (S1–S4; gdd §4.5,
-## L-08, FK-2, C-15; T8a #83).
+## De gescripte geoefende run door de Kadewijk (S1–S8; gdd §4.5, L-08,
+## FK-2, C-15; T8a #83; deel 2: S5 B2, S6 pompgang, S7 luik en kanaal).
 ##
 ## Een inputbron (`sample(tick) -> int`) die per tick kijkt waar P1, zijn echo
 ## en de vijanden staan en daarop de knoppen kiest, zoals `flow_bot.gd` van de
@@ -17,6 +17,8 @@ const InputBits = preload("res://scripts/input/input_bits.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
 const Layout = preload("res://levels/kadewijk/kadewijk_layout.gd")
 const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
+const Gemaal = preload("res://scripts/light/gemaal.gd")
+const DOWN := InputBits.DOWN
 
 const L := InputBits.LEFT
 const R := InputBits.RIGHT
@@ -71,6 +73,18 @@ var _off_ledge := false
 var _echo_now_x := NAN
 var _echo_last_x := NAN
 var _b4_waited := 0
+## S6 pompgang (zoals `flow_bot.gd`): looprichting, geslagen schoepen in deze
+## doorgang, slagen van P1 sinds het begin, en de echo-slagen op dat moment.
+var _pass_dir := 1
+var _struck := {}
+var _visit_strokes := -1
+var _echo_base := 0
+## S6 zonder genoeg licht: zo vaak terug naar S5 voor de Kadelopers (LM-13).
+var s6_returns := 0
+## S7: stuit-treffers op de Dwaallichten (V-01b), in volgorde.
+var stuits := 0
+## S7, test van de langzame lijn: geen neerslag boven het kanaal (het kanaal in).
+var kanaal_no_stuit := false
 
 ## De route: [naam, soort, parameter].
 var _legs := [
@@ -83,7 +97,21 @@ var _legs := [
 	["S3-markt", "arena", null],
 	["S4-B4", "b4", null],
 	["S4-overkant", "fight", null],
-	["S4-eind", "end", null],
+	["S4-eind", "walk", &"S5"],
+	["S5-B2a", "turn", 3],
+	["S5-B2b", "turn", 4],
+	["S5-B2c", "turn", 5],
+	["S5-B2d", "turn", 6],
+	["S5-zolder", "walk", &"S6"],
+	["S6-brug", "land", null],
+	["S6-paar", "fight", null],
+	["S6-gemaal", "gemaal", null],
+	["S7-luik", "luik", null],
+	["S7-kanaal", "kanaal", null],
+	["S7-deur", "west", &"S8"],
+	["S8-eind", "end", null],
+	# Niet in de run (S8-eind wacht op het einde): de arena-test zet `leg` hierop.
+	["S8-rad", "turn", 7],
 ]
 
 
@@ -186,6 +214,23 @@ func _decide() -> int:
 				_next_leg(false)
 				return R
 			return R
+		"west":
+			if _room.room == spec[2]:
+				_next_leg(false)
+				return L
+			return L
+		"land":
+			# Van de loopbrug het plein op (S6).
+			if _room.room == &"S6" and _on_level(Layout.S6_FLOOR):
+				_next_leg(false)
+				return R
+			return R
+		"gemaal":
+			return _leg_gemaal()
+		"luik":
+			return _leg_luik()
+		"kanaal":
+			return _leg_kanaal()
 		"b3":
 			return _leg_b3()
 		"fight":
@@ -213,7 +258,8 @@ func _leg_turn(tp: Dictionary) -> int:
 	var wall: float = tp["wall"]
 	var name: String = tp["name"]
 	var p := _p1()
-	if _on_level(next_level) and absf(p.position.x - wall) > Layout.keerzone(_d):
+	var z: float = tp.get("z", Layout.keerzone(_d))
+	if _on_level(next_level) and absf(p.position.x - wall) > z:
 		if sub == "bounce":
 			landed_from_wall[name] = absf(p.position.x - wall)
 		_next_leg(sub == "bounce")
@@ -550,6 +596,8 @@ func _bounds(here: StringName) -> Vector2:
 			return Vector2(Layout.S3_LEFT + 10.0, Layout.ROOMS[&"S3"].end.x - 10.0)
 		&"S4":
 			return Vector2(Layout.B4_FAR_EDGE + 10.0, Layout.S4_END_WALL - 10.0)
+		&"S6":
+			return Vector2(Layout.ROOMS[&"S6"].position.x + 10.0, (Layout.PUMP_VANES[0] as Vector2).x - 20.0)
 	return Vector2(-INF, INF)
 
 
@@ -663,3 +711,211 @@ func _slow_b4() -> int:
 		if absf(p.motor.velocity.y) < 0.3:
 			return 0
 	return R
+
+
+# --- Deel 2 (#83) ---------------------------------------------------------------
+
+## S6 pompgang (gdd LM-04, FK-5; zoals K3 van de flow-kamer): naar rechts door
+## de vier schoepen, elke schoep één keer slaan in het voorbijlopen, en door
+## naar de sluis; de echo slaat dezelfde schoepen D ticks later. Gaat de sluis
+## niet open met wat de echo nog slaat (echo uit, of te weinig licht), dan
+## keert P1 en slaat hij ze op de terugweg nog eens, zolang er licht in de meter
+## is; is de meter leeg, dan de trap op naar de loopbrug, even S5 in en terug
+## (de Kadelopers staan er dan weer, LM-13) voor meer licht. Klaar in S7.
+func _leg_gemaal() -> int:
+	var p := _p1()
+	var g: Gemaal = _room.gemaal
+	if _room.room == &"S7":
+		_next_leg(g != null and int(g.strokes.get("echo", 0)) > 0)
+		return 0
+	if g == null:
+		return R
+	match sub:
+		"":
+			if not _on_level(Layout.S6_FLOOR):
+				return R
+			sub = "gang"
+			_pass_dir = 1
+			_struck = {}
+			if _visit_strokes < 0:
+				_visit_strokes = 0
+				_echo_base = int(g.strokes.get("echo", 0))
+			return R
+		"gang":
+			var bits := _walk(_pass_dir) | _pump_bits()
+			if g.full_tick >= 0 or _will_fill():
+				sub = "sluice"
+				return bits
+			if _past_gang():
+				if int(_room.meter.value) <= 0:
+					sub = "climb"
+					return L
+				_pass_dir = -_pass_dir
+				_struck = {}
+			return bits
+		"sluice":
+			if g.full_tick >= 0:
+				return R
+			# De echo slaat nog: heen en weer vóór de sluis, niet stilstaan (MP-1).
+			if p.position.x >= Layout.S6_SHAFT_LEFT - 12.0:
+				_patrol_dir = -1
+			elif p.position.x <= Layout.S6_SHAFT_LEFT - 72.0:
+				_patrol_dir = 1
+			return _walk(_patrol_dir)
+		"climb":
+			return _climb_s6()
+		"back":
+			# Even in S5 geweest: terug naar het plein, dan het paar en de pompgang.
+			if _room.room == &"S6" and _on_level(Layout.S6_FLOOR):
+				s6_returns += 1
+				leg = _legs.find(_legs.filter(func(l: Array) -> bool: return l[0] == "S6-paar")[0])
+				sub = ""
+				_visit_strokes = -1
+				return R
+			return R
+	return 0
+
+
+func _pump_bits() -> int:
+	var p := _p1()
+	if _tick - _last_attack < ATTACK_EVERY:
+		return 0
+	var vanes: Array = Layout.PUMP_VANES
+	for i in vanes.size():
+		if _struck.has(i):
+			continue
+		var ahead: float = ((vanes[i] as Vector2).x - p.position.x) * float(p.motor.facing)
+		if ahead >= -6.0 and ahead <= 36.0 and p.motor.facing == _pass_dir:
+			_struck[i] = true
+			_last_attack = _tick
+			_visit_strokes += 1
+			return _tap(A)
+	return 0
+
+
+func _past_gang() -> bool:
+	var x := _p1().position.x
+	if _pass_dir > 0:
+		return x > (Layout.PUMP_VANES[Layout.PUMP_VANES.size() - 1] as Vector2).x + 10.0
+	return x < (Layout.PUMP_VANES[0] as Vector2).x - 10.0
+
+
+## Maakt de echo het gemaal vol met de slagen die hij nog herhaalt (LM-03)?
+func _will_fill() -> bool:
+	var g: Gemaal = _room.gemaal
+	if g.full_tick >= 0:
+		return true
+	if not _room.echo_on or _room.echo == null:
+		return false
+	var pending := _visit_strokes - (int(g.strokes.get("echo", 0)) - _echo_base)
+	return int(g.fill) + mini(pending * Gemaal.per_stroke(), int(_room.meter.value)) >= Gemaal.MAX
+
+
+## De trap naar de loopbrug: recht omhoog over de treden, dan de brug af naar
+## links tot in S5 (de kamer verlaten, LM-13), en terug.
+func _climb_s6() -> int:
+	var p := _p1()
+	if _room.room == &"S5":
+		sub = "back"
+		return R
+	if _on_level(Layout.S5_ZOLDER):
+		return L
+	if not p.motor.on_floor:
+		return 0
+	if _on_level(Layout.S6_FLOOR):
+		if absf(p.position.x - Layout.S6_STAIR_X) <= 2.0:
+			return _tap(J)
+		return _walk(1 if Layout.S6_STAIR_X > p.position.x else -1)
+	return _tap(J)
+
+
+## S7, het luik (V-01, SL-04): door de kelder naar het luik (langs de sokkel),
+## springen en meteen een neerslag (in de lucht AANVAL met omlaag): het luik
+## gaat open, P1 stuit en valt erdoor naar de benedenvloer.
+func _leg_luik() -> int:
+	var p := _p1()
+	if _on_level(Layout.S7_LOW):
+		_next_leg(true)
+		return L
+	var cx := Layout.LUIK.get_center().x
+	if p.motor.on_floor and _on_level(Layout.S7_UP):
+		if absf(p.position.x - cx) <= 3.0:
+			sub = "jump"
+			return _tap(J)
+		return _walk(1 if cx > p.position.x else -1)
+	if sub == "jump" and not p.motor.on_floor:
+		sub = "slam"
+		return DOWN | A
+	return 0
+
+
+## S7, het kanaal (V-01b, `slice-vijanden-en-boss.md` §2.6): naar links tot de
+## rand (met coyote), springen, boven het eerste Dwaallicht een neerslag,
+## stuiten, boven het tweede weer, en de overkant op. Gemist: het kanaal in en
+## de langzame lijn (de trede en de kademuur).
+func _leg_kanaal() -> int:
+	var p := _p1()
+	if _on_level(Layout.S7_LOW) and p.position.x < Layout.KANAAL_LEFT - 4.0:
+		_next_leg(sub != "slow")
+		return L
+	if p.motor.on_floor and p.position.y > Layout.S7_LOW - Layout.HALF_H + 1.5:
+		sub = "slow"
+	match sub:
+		"":
+			if _on_level(Layout.S7_LOW) and p.position.x <= Layout.KANAAL_RIGHT + 6.0:
+				sub = "air"
+				_since = 0
+				return L | _tap(J)
+			if not p.motor.on_floor and p.position.x < Layout.KANAAL_RIGHT:
+				# Over de rand gelopen: coyote-sprong.
+				sub = "air"
+				_since = 0
+				return L | _tap(J)
+			return L
+		"air":
+			var target := _next_wisp()
+			if target == null or kanaal_no_stuit:
+				return L
+			var dx: float = target.position.x - p.position.x
+			var feet := p.position.y + Layout.HALF_H
+			var top: float = target.position.y - 8.0
+			if absf(dx) <= 10.0 and feet > top - 20.0 and feet < top + 14.0 and _tick - _last_attack >= 4:
+				_last_attack = _tick
+				stuits += 1
+				return DOWN | _tap(A)
+			if dx < -2.0:
+				return L
+			if dx > 2.0:
+				return R
+			return 0
+		"slow":
+			return _slow_kanaal()
+	return L
+
+
+## Het volgende Dwaallicht in de looprichting (naar links) dat nog leeft en
+## dat P1 nog niet raakte met een neerslag (gestund = net geraakt).
+func _next_wisp() -> Node2D:
+	var p := _p1()
+	var best: Node2D = null
+	for e in _room.enemies_in(&"S7"):
+		if e.enemy_type != SliceEnemy.Type.DWAALLICHT:
+			continue
+		if e.is_stunned(_tick) or (_room.sim.combat.mark_on(e) != null):
+			continue
+		if e.position.x > p.position.x + 12.0:
+			continue
+		if best == null or e.position.x > best.position.x:
+			best = e
+	return best
+
+
+func _slow_kanaal() -> int:
+	var p := _p1()
+	if _on_level(Layout.KANAAL_BOTTOM - 45.0):
+		return L | _tap(J)
+	if _on_level(Layout.KANAAL_BOTTOM):
+		if p.position.x <= Layout.KANAAL_LEFT + Layout.TREAD_W + 8.0 + 2.0:
+			return L | _tap(J)
+		return L
+	return L
