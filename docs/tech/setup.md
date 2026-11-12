@@ -59,6 +59,7 @@ godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd
   - Een test die na 7200 frames niet klaar is, wordt als FAIL gemeld, maar zijn coroutine blijft bestaan tot de runner stopt. Geeft die vastgelopen test later nog een fout, dan kan die op naam van een volgende test komen. Los bij een time-out dus eerst de hangende test op en draai de suite dan opnieuw.
   - Waarschuwingen (`push_warning`) maken een test niet rood, alleen fouten.
   - `Logger` bestaat pas sinds Godot 4.5; binnen het besluit "Godot 4.6" geen probleem.
+- Een testscript mag per test een eigen framegrens zetten met `const MAX_FRAMES := {"test_naam": frames}`, hooguit 36000 (`MAX_FRAMES_CAP`, 10 min speltijd; voor de scripted boss-runs, #190); een naam die niet klopt, valt terug op 7200. De hele suite duurt met `--fixed-fps 60` ± 3 min.
 - `--fixed-fps 60` laat elke frame precies 1/60 s duren, los van de echte tijd. Daardoor draaien 10 s spel in minder dan een seconde, en is er per frame precies één physics-tick. Zonder deze vlag slagen de tests ook, maar duren ze ongeveer twee minuten (echte tijd).
 - Een verse clone heeft geen `game/.godot/`-cache nodig: de code gebruikt `preload()` in plaats van `class_name` (zie `standaarden.md`). Wil je de cache toch opbouwen (bv. na het toevoegen van assets): `godot --headless --path game --import`.
 

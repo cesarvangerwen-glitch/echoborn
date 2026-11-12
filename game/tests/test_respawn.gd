@@ -42,6 +42,8 @@ const IN_B := Vector2(1000, Fx.STAND_Y)
 const ROOM_C := Rect2(1640, TOP, 1360, HEIGHT)
 ## Het checkpoint in de inhoud van C (vlak 40 × 40 op de vloer).
 const CHECKPOINT_AT := Vector2(2200, Fx.STAND_Y)
+## VJ-02 (B-12): zo lang is P1 na een respawn onkwetsbaar (`echo_v04.json`).
+var _respawn_safe := int(Tuning.combat()["p1_respawn_invulnerable_ticks"])
 ## Begin van elke kamer (de terugval, LM-05).
 const STARTS := {
 	&"A": Vector2(100, Fx.STAND_Y),
@@ -199,7 +201,8 @@ func test_respawn_on_checkpoint_in_unloaded_room(t) -> void:
 		"extra autosave op de respawntick: %s %s" % [saves, stored.to_dict() if stored else null])
 	# Dood in de kamer van het checkpoint zelf: weer daar, nog een autosave.
 	p1.position = CHECKPOINT_AT + Vector2(300, 0)
-	await t.run_ticks(sim, 2)
+	# VJ-02 (B-12): na de respawn is P1 eerst `p1_respawn_invulnerable_ticks` ticks onkwetsbaar.
+	await t.run_ticks(sim, 2 + _respawn_safe)
 	_kill(p1, sim)
 	await t.run_ticks(sim, 1)
 	t.check(p1.position.distance_to(CHECKPOINT_AT) < 1.0 and saves.size() == 3,
@@ -291,7 +294,8 @@ func test_c08_coop_both_on_checkpoint(t) -> void:
 	p1.position = IN_A
 	await t.run_ticks(sim, 1)
 	sim.dissolve_partner("val")
-	await t.run_ticks(sim, 3)
+	# VJ-02 (B-12): eerst voorbij de onkwetsbaarheid na de respawn (P2 komt pas na 120 ticks terug).
+	await t.run_ticks(sim, 3 + _respawn_safe)
 	t0 = _kill(p1, sim)
 	await t.run_ticks(sim, 1)
 	t.check(not p2.dissolved and p1.position.distance_to(CHECKPOINT_AT) < 1.0

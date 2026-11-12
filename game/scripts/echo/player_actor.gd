@@ -81,6 +81,8 @@ var _stance_held := false        ## AANVAL sindsdien aaneengesloten ingedrukt
 ## VJ-02 (LM-05): schade per vijandelijke treffer en ticks onkwetsbaar daarna (uit data, in `setup`).
 var _hit_damage := 1
 var _invulnerable_ticks := 45
+## VJ-02 (B-12): ticks onkwetsbaar na een respawn (`combat.p1_respawn_invulnerable_ticks`).
+var _respawn_invulnerable_ticks := 45
 
 
 func setup(p_player_index: int, p_input_source: RefCounted, color: Color,
@@ -90,6 +92,7 @@ func setup(p_player_index: int, p_input_source: RefCounted, color: Color,
 	health = int(Tuning.combat()["p1_health"])
 	_hit_damage = int(Tuning.combat()["p1_hit_damage"])
 	_invulnerable_ticks = int(Tuning.combat()["p1_invulnerable_ticks"])
+	_respawn_invulnerable_ticks = int(Tuning.combat()["p1_respawn_invulnerable_ticks"])
 	# E-02: recorder-capaciteit uit de data, tenzij de aanroeper hem opgeeft.
 	recorder = EchoRecorder.new(capacity if capacity > 0 else int(Tuning.echo()["recorder_capacity"]))
 	name = "Player%d" % player_index
@@ -185,10 +188,12 @@ func sim_step(tick: int, _delta: float) -> void:
 		motor = Motor.State.new()
 		velocity = Vector2.ZERO
 		echo_reset = EchoReset.RESPAWN
-		# Na een dood (C-08, LM-05) zijn de levenspunten weer vol.
+		# Na een dood (C-08, LM-05) zijn de levenspunten weer vol, en is P1 45 ticks onkwetsbaar
+		# vanaf de respawntick (`r … r + 44`; VJ-02, gdd v0.8.1), zodat een aanloop die bij het
+		# respawnpunt al liep hem niet raakt. De dodelijke treffer zelf gaf geen onkwetsbaarheid.
 		if died and player_index == 1:
 			health = int(Tuning.combat()["p1_health"])
-			invulnerable_until = -1
+			invulnerable_until = tick + _respawn_invulnerable_ticks
 			health_changed.emit(tick, health)
 	var bits: int = input_source.sample(tick)
 	last_input = bits

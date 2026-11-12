@@ -1,11 +1,11 @@
 groep,sleutel,waarde,eenheid,bron
-# Vijanden en boss van de slice (T8b). Bron: docs/design/combat/slice-vijanden-en-boss.md v0.1.1. Startwaarden van de Combat Designer op D = 60; aanpassen mag zonder code. Regels met # zijn uitleg. Tests: game/tests/test_vijanden.gd.
+# Vijanden en boss van de slice (T8b). Bron: docs/design/combat/slice-vijanden-en-boss.md v0.1.2. Startwaarden van de Combat Designer op D = 60; aanpassen mag zonder code. Regels met # zijn uitleg. Tests: game/tests/test_vijanden.gd.
 # --- Gedeelde regels (VJ-01 - VJ-07) ---
 gedeeld,v_teller,44,px,"VJ-03: v(D) = min(v_max; v_teller / (D - v_aftrek)); 44 = R (80) - 36 (verste merkafstand bij de slag)"
 gedeeld,v_aftrek,27,ticks,"VJ-03: D + 3 (knal) - 30 (stil na treffer)"
 gedeeld,v_grens,0.70,px/tick,"VJ-03: bovengrens voor elke vijand (44 / (D_max - 27), D_max = 90; gdd v0.8 4.8.5)"
 gedeeld,stil_na_treffer,30,ticks,"VJ-04: stil na elke treffer, ook na een merk of een ontploffing die hem niet doodt"
-# VJ-02 (1 LP per treffer, daarna 45 ticks onkwetsbaar) hoort bij P1 (LM-05) en staat in echo_v04.json: combat.p1_hit_damage en combat.p1_invulnerable_ticks.
+# VJ-02 (1 LP per treffer, daarna 45 ticks onkwetsbaar) hoort bij P1 (LM-05) en staat in echo_v04.json: combat.p1_hit_damage en combat.p1_invulnerable_ticks. Na een respawn (B-12, LM-05 gdd v0.8.1): combat.p1_respawn_invulnerable_ticks in echo_v04.json (vanaf de respawntick, r ... r + 44; niet na een dodelijke treffer).
 gedeeld,afstand_los,40,px,"VJ-05: vijanden die geen paar zijn, komen niet dichter bij elkaar"
 gedeeld,paar_e,28,px,"VJ-05: startafstand van een E-paar (binnen E = 32: één knal raakt beide)"
 gedeeld,paar_k,42,px,"VJ-05: startafstand van een K-paar (40-44, buiten E, binnen K = 48: ketting)"
@@ -23,6 +23,8 @@ kadeloper,herstel,20,ticks,"2.2 haakslag"
 kadeloper,vlak_breedte,20,px,"2.2 vlak vóór hem"
 kadeloper,vlak_hoogte,16,px,"2.2 vlak 4-20 px boven de vloer"
 kadeloper,vlak_onder,4,px,"2.2 onderkant van het vlak boven de vloer"
+kadeloper,aanloop_hoogte_min,-20,px,"VJ-08: aanloop alleen als de voeten van P1 minstens zo hoog boven zijn vloer zijn (negatief = lager)"
+kadeloper,aanloop_hoogte_max,20,px,"VJ-08: en hooguit zo hoog (de slag ligt 4-20 px boven de vloer, P1 is 24 px hoog)"
 kadeloper,terugkeer,1,ja/nee,"2.2 LM-13a (zolang het gemaal niet vol is)"
 # --- Schotdrager (2.3) ---
 schotdrager,breedte,16,px,"2.3 hurtbox (zelfde als de Kadeloper)"
@@ -39,6 +41,8 @@ schotdrager,herstel,20,ticks,"2.3 schotstoot"
 schotdrager,vlak_breedte,24,px,"2.3 schotstoot"
 schotdrager,vlak_hoogte,16,px,"2.3 schotstoot"
 schotdrager,vlak_onder,4,px,"2.3 schotstoot"
+schotdrager,aanloop_hoogte_min,-20,px,"VJ-08 (zoals de Kadeloper)"
+schotdrager,aanloop_hoogte_max,20,px,"VJ-08 (zoals de Kadeloper)"
 schotdrager,terugkeer,0,ja/nee,"2.3 komt niet terug"
 # --- Dwaallicht (2.4) ---
 dwaallicht,breedte,16,px,"2.4 hurtbox"
@@ -55,7 +59,7 @@ dwaallicht,herstel,40,ticks,"2.4 terug naar zijn baan, zonder schade"
 dwaallicht,duik_hoogte,16,px,"2.4 onderkant boven de vloer op het diepste punt"
 dwaallicht,terugkeer,1,ja/nee,"2.4 in het donker ja"
 dwaallicht,terugkeer_verlicht,0,ja/nee,"2.4 nee zodra de wijk verlicht is"
-# --- Gemaalmeester (3; B-5 - B-7, game/scripts/combat/gemaalmeester.gd) ---
+# --- Gemaalmeester (3; B-5 - B-8, game/scripts/combat/gemaalmeester.gd) ---
 # Arena-coördinaten: x van de linkermuur (0) tot de rechtermuur (arena_breedte), y = hoogte boven de vloer.
 gemaalmeester,se,1500,SE,"GMB-10"
 gemaalmeester,openingen,4,aantal,"GMB-11"
@@ -101,7 +105,7 @@ gemaalmeester,finisher_bron,600,ticks,"3.6 de laatste 600 ticks"
 gemaalmeester,arena_breedte,600,px,"3.2"
 gemaalmeester,schok_breuk_ticks,6,ticks,"B-11 schermschok bij schotbreuk"
 gemaalmeester,schok_breuk_px,2,px,"B-11"
-# Fase 2 en co-op-schaal (B-8, deel 2b van #190): NOG NIET GELEZEN. Een waarde hieronder aanpassen doet nu nog niets.
+# Fase 2: het grote rad (B-8) en de co-op-schaal. Knoppen voor de duur (3.9): kant_treffers en de SE van fase 2 (drempel_4 - wankel_se).
 gemaalmeester,coop_schaal,1.0,factor,"3.8 (eerst fase 2 x 1,25 in co-op als MP-7 het vraagt)"
 gemaalmeester,rad_breedte,96,px,"GMB-04"
 gemaalmeester,rad_y1,100,px,"GMB-04"

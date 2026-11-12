@@ -222,7 +222,7 @@ func _update_walker(tick: int, p1: Node2D) -> void:
 		return
 	var dx := p1.global_position.x - global_position.x
 	var reach := EnemyData.value(_group(), "bereik") + (body_size().x + Tuning.body_size().x) * 0.5
-	if absf(dx) <= reach:
+	if absf(dx) <= reach and _p1_in_height(p1):
 		_attack_facing = 1 if dx >= 0.0 else -1
 		facing = _attack_facing
 		_start_windup(tick)
@@ -232,6 +232,16 @@ func _update_walker(tick: int, p1: Node2D) -> void:
 	var next := global_position + Vector2(step, 0.0)
 	if _may_move_to(next) and _floor_ahead(next):
 		position.x += step
+
+
+## VJ-08: de voeten van P1 tussen `aanloop_hoogte_min` en `aanloop_hoogte_max` px boven zijn vloer
+## (−20 … +20): alleen dan kan het vlak hem raken. Een aanloop die loopt, loopt door.
+func _p1_in_height(p1: Node2D) -> bool:
+	var own_floor := global_position.y + body_size().y * 0.5
+	var feet := p1.global_position.y + Tuning.body_size().y * 0.5
+	var height := own_floor - feet
+	return height >= EnemyData.value(_group(), "aanloop_hoogte_min") - 0.0001 \
+		and height <= EnemyData.value(_group(), "aanloop_hoogte_max") + 0.0001
 
 
 ## Het vlak vóór hem, `vlak_onder` tot `vlak_onder + vlak_hoogte` boven de vloer (§2.2, §2.3).
