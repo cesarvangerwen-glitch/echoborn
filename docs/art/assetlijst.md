@@ -6,7 +6,7 @@ Wat de **grijze flow-kamer** en de **verticale slice** (polderwijk met het eerst
 
 **Prioriteit**
 - **P0**: flow-kamer. Placeholder mag (`_placeholder` in de bestandsnaam), maar wel met de juiste **maten, hitboxes en laag-taal** (licht/schaduw, vol/hol). Mag nu.
-- **P1**: begin van de slice-art. Pas **na F1** (R5-scène goedgekeurd met Kwaliteit ≥ 7 en `Visie-review: past`) **én een geslaagde flow-test** (besluit #51, 2A).
+- **P1**: begin van de slice-art. Na F1 (gehaald, #65). Eindkwaliteit per kamer pas als die kamer **maatvast** is (fasekader v0.4 §4, regel 3; besluit 2026-11-12 (1) vervangt de eis van een geslaagde flow-test). Placeholder en wat niet van kamermaten afhangt mag nu (`docs/art/slice-kadewijk.md`).
 - **P2**: maakt de slice af. Na P1.
 
 **Eigenaars (rollen):** AD = Art Director · CA = Concept Artist · EA = 2D Environment Artist · AN = Animator · TA = Technical Artist · UI = UI Artist. De Art Director reviewt alles (interne review).
@@ -57,6 +57,10 @@ Doel: de flownormen van pillar 1 meten (sprongketen, merk-arena, één gemaal). 
 | R5-scène (2 toestanden, Deck, ware grootte, grijswaarden/deuteranopie) | `docs/art/r5-scene/` | Bedoeld als eindkwaliteit; wacht op de F1-beoordeling |
 | Sprites speler 1 (idle, sprong, loop), speler 2 (idle, loop) | `docs/art/r5-scene/bron/sprites.py` | Idle en sprong als basis voor F-05/F-06; de loopcyclus is placeholder |
 | Palet (ramps kleur en grijs) | `docs/art/r5-scene/palet.png`, bible §3 | v0 |
+| S-01 palet Kadewijk (grijs, half, kleur; nieuwe ramps roest, vijandlijf, vijandkern) | `docs/art/slice/palet_kadewijk.png`, `slice-kadewijk.md` §3 | Placeholder (deel 1 van #85) |
+| Kleurscript en lichtovergang (studie) | `docs/art/slice/kleurscript_*`, `lichtovergang_*` | Placeholder (deel 1 van #85) |
+| S-04 tileset Kadewijk, eerste set (46 tegels) en props (pomprad 8f, straatlamp, halo, boograam, bolder, sluisbalk), 3 toestanden + index-atlas | `docs/art/slice/tiles/` | Placeholder (deel 1 van #85) |
+| S-03 / S-13 concept: 3 vijandtypes en de Gemaalmeester (stijlregels) | `docs/art/slice/concept_*` | Concept (deel 1 van #85) |
 
 ## 4. Open punten
 
