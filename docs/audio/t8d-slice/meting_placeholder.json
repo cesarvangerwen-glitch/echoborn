@@ -1,0 +1,1125 @@
+{
+ "kadeloper_aanloop": {
+  "bestand": "sfx/vijanden/kadeloper_aanloop_placeholder.wav",
+  "duur_s": 0.5,
+  "duur_ticks": 30.0,
+  "lufs_momentaan_max": -15.0,
+  "true_peak_dbtp": -4.8,
+  "aandeel_boven_250hz_pct": 99.7,
+  "zwaartepunt_hz": 2942,
+  "piek_op_s": 0.479,
+  "stijging_db": 14.0
+ },
+ "kadeloper_haakslag": {
+  "bestand": "sfx/vijanden/kadeloper_haakslag_placeholder.wav",
+  "duur_s": 0.4,
+  "duur_ticks": 24.0,
+  "lufs_momentaan_max": -14.2,
+  "true_peak_dbtp": -1.5,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 3102,
+  "piek_op_s": 0.02,
+  "stijging_db": -34.4
+ },
+ "kadeloper_dood": {
+  "bestand": "sfx/vijanden/kadeloper_dood_placeholder.wav",
+  "duur_s": 0.9,
+  "duur_ticks": 54.0,
+  "lufs_momentaan_max": -17.0,
+  "true_peak_dbtp": -7.5,
+  "aandeel_boven_250hz_pct": 99.1,
+  "zwaartepunt_hz": 517,
+  "piek_op_s": 0.457,
+  "stijging_db": -108.9
+ },
+ "schotdrager_aanloop": {
+  "bestand": "sfx/vijanden/schotdrager_aanloop_placeholder.wav",
+  "duur_s": 0.5,
+  "duur_ticks": 30.0,
+  "lufs_momentaan_max": -16.1,
+  "true_peak_dbtp": -1.5,
+  "aandeel_boven_250hz_pct": 99.9,
+  "zwaartepunt_hz": 761,
+  "piek_op_s": 0.461,
+  "stijging_db": 10.6
+ },
+ "schotdrager_schotstoot": {
+  "bestand": "sfx/vijanden/schotdrager_schotstoot_placeholder.wav",
+  "duur_s": 0.5,
+  "duur_ticks": 30.0,
+  "lufs_momentaan_max": -16.8,
+  "true_peak_dbtp": -1.5,
+  "aandeel_boven_250hz_pct": 56.1,
+  "zwaartepunt_hz": 754,
+  "piek_op_s": 0.073,
+  "stijging_db": -31.9
+ },
+ "pantser_tink": {
+  "bestand": "sfx/vijanden/pantser_tink_placeholder.wav",
+  "duur_s": 0.28,
+  "duur_ticks": 16.8,
+  "lufs_momentaan_max": -17.0,
+  "true_peak_dbtp": -2.2,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 3037,
+  "piek_op_s": 0.003,
+  "stijging_db": -53.2
+ },
+ "schotdrager_pantser_breekt": {
+  "bestand": "sfx/vijanden/schotdrager_pantser_breekt_placeholder.wav",
+  "duur_s": 1.0,
+  "duur_ticks": 60.0,
+  "lufs_momentaan_max": -17.0,
+  "true_peak_dbtp": -2.7,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 2930,
+  "piek_op_s": 0.282,
+  "stijging_db": -158.8
+ },
+ "dwaallicht_zweef_lus": {
+  "bestand": "sfx/vijanden/dwaallicht_zweef_lus_placeholder.wav",
+  "duur_s": 2.0,
+  "duur_ticks": 120.0,
+  "lufs_momentaan_max": -30.0,
+  "true_peak_dbtp": -24.8,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 792,
+  "piek_op_s": 0.961,
+  "stijging_db": -2.1
+ },
+ "dwaallicht_aanloop": {
+  "bestand": "sfx/vijanden/dwaallicht_aanloop_placeholder.wav",
+  "duur_s": 0.5,
+  "duur_ticks": 30.0,
+  "lufs_momentaan_max": -15.0,
+  "true_peak_dbtp": -9.8,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1022,
+  "piek_op_s": 0.495,
+  "stijging_db": 10.9
+ },
+ "dwaallicht_duik": {
+  "bestand": "sfx/vijanden/dwaallicht_duik_placeholder.wav",
+  "duur_s": 0.35,
+  "duur_ticks": 21.0,
+  "lufs_momentaan_max": -14.0,
+  "true_peak_dbtp": -4.0,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1697,
+  "piek_op_s": 0.038,
+  "stijging_db": -15.9
+ },
+ "dwaallicht_dood": {
+  "bestand": "sfx/vijanden/dwaallicht_dood_placeholder.wav",
+  "duur_s": 0.9,
+  "duur_ticks": 54.0,
+  "lufs_momentaan_max": -17.0,
+  "true_peak_dbtp": -7.1,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1872,
+  "piek_op_s": 0.024,
+  "stijging_db": -53.2
+ },
+ "gm_maat_tel_grijs": {
+  "bestand": "sfx/gemaalmeester/gm_maat_tel_grijs_placeholder.wav",
+  "duur_s": 1.4,
+  "duur_ticks": 84.0,
+  "lufs_momentaan_max": -17.0,
+  "true_peak_dbtp": -7.4,
+  "aandeel_boven_250hz_pct": 76.6,
+  "zwaartepunt_hz": 403,
+  "piek_op_s": 0.015,
+  "stijging_db": -68.7
+ },
+ "gm_maat_tel_kleur": {
+  "bestand": "sfx/gemaalmeester/gm_maat_tel_kleur_placeholder.wav",
+  "duur_s": 1.4,
+  "duur_ticks": 84.0,
+  "lufs_momentaan_max": -17.0,
+  "true_peak_dbtp": -6.2,
+  "aandeel_boven_250hz_pct": 93.0,
+  "zwaartepunt_hz": 410,
+  "piek_op_s": 0.01,
+  "stijging_db": -73.2
+ },
+ "gm_pompslag_aanloop_f1": {
+  "bestand": "sfx/gemaalmeester/gm_pompslag_aanloop_f1_placeholder.wav",
+  "duur_s": 0.667,
+  "duur_ticks": 40.0,
+  "lufs_momentaan_max": -15.0,
+  "true_peak_dbtp": -4.7,
+  "aandeel_boven_250hz_pct": 99.4,
+  "zwaartepunt_hz": 3237,
+  "piek_op_s": 0.662,
+  "stijging_db": 16.7
+ },
+ "gm_pompslag_aanloop_f2": {
+  "bestand": "sfx/gemaalmeester/gm_pompslag_aanloop_f2_placeholder.wav",
+  "duur_s": 0.5,
+  "duur_ticks": 30.0,
+  "lufs_momentaan_max": -15.0,
+  "true_peak_dbtp": -5.4,
+  "aandeel_boven_250hz_pct": 99.3,
+  "zwaartepunt_hz": 3061,
+  "piek_op_s": 0.478,
+  "stijging_db": 14.8
+ },
+ "gm_pompslag_aanloop_eerste": {
+  "bestand": "sfx/gemaalmeester/gm_pompslag_aanloop_eerste_placeholder.wav",
+  "duur_s": 1.0,
+  "duur_ticks": 60.0,
+  "lufs_momentaan_max": -15.0,
+  "true_peak_dbtp": -6.0,
+  "aandeel_boven_250hz_pct": 99.4,
+  "zwaartepunt_hz": 3227,
+  "piek_op_s": 0.974,
+  "stijging_db": 17.2
+ },
+ "gm_pompslag_slag": {
+  "bestand": "sfx/gemaalmeester/gm_pompslag_slag_placeholder.wav",
+  "duur_s": 1.0,
+  "duur_ticks": 60.0,
+  "lufs_momentaan_max": -15.7,
+  "true_peak_dbtp": -1.5,
+  "aandeel_boven_250hz_pct": 38.0,
+  "zwaartepunt_hz": 568,
+  "piek_op_s": 0.009,
+  "stijging_db": -52.8
+ },
+ "gm_zwiep_aanloop": {
+  "bestand": "sfx/gemaalmeester/gm_zwiep_aanloop_placeholder.wav",
+  "duur_s": 0.5,
+  "duur_ticks": 30.0,
+  "lufs_momentaan_max": -15.0,
+  "true_peak_dbtp": -2.9,
+  "aandeel_boven_250hz_pct": 99.7,
+  "zwaartepunt_hz": 1793,
+  "piek_op_s": 0.459,
+  "stijging_db": 11.1
+ },
+ "gm_zwiep_veeg": {
+  "bestand": "sfx/gemaalmeester/gm_zwiep_veeg_placeholder.wav",
+  "duur_s": 0.7,
+  "duur_ticks": 42.0,
+  "lufs_momentaan_max": -14.0,
+  "true_peak_dbtp": -5.0,
+  "aandeel_boven_250hz_pct": 99.9,
+  "zwaartepunt_hz": 3600,
+  "piek_op_s": 0.045,
+  "stijging_db": -41.2
+ },
+ "gm_spuigat_borrel": {
+  "bestand": "sfx/gemaalmeester/gm_spuigat_borrel_placeholder.wav",
+  "duur_s": 0.85,
+  "duur_ticks": 51.0,
+  "lufs_momentaan_max": -18.0,
+  "true_peak_dbtp": -8.4,
+  "aandeel_boven_250hz_pct": 97.8,
+  "zwaartepunt_hz": 617,
+  "piek_op_s": 0.38,
+  "stijging_db": -19.1
+ },
+ "gm_schot_tink": {
+  "bestand": "sfx/gemaalmeester/gm_schot_tink_placeholder.wav",
+  "duur_s": 0.4,
+  "duur_ticks": 24.0,
+  "lufs_momentaan_max": -17.3,
+  "true_peak_dbtp": -1.5,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 2056,
+  "piek_op_s": 0.003,
+  "stijging_db": -63.1
+ },
+ "gm_schot_breuk": {
+  "bestand": "sfx/gemaalmeester/gm_schot_breuk_placeholder.wav",
+  "duur_s": 1.6,
+  "duur_ticks": 96.0,
+  "lufs_momentaan_max": -15.5,
+  "true_peak_dbtp": -1.5,
+  "aandeel_boven_250hz_pct": 99.3,
+  "zwaartepunt_hz": 3756,
+  "piek_op_s": 0.003,
+  "stijging_db": -53.1
+ },
+ "gm_schot_dicht": {
+  "bestand": "sfx/gemaalmeester/gm_schot_dicht_placeholder.wav",
+  "duur_s": 0.783,
+  "duur_ticks": 47.0,
+  "lufs_momentaan_max": -17.0,
+  "true_peak_dbtp": -1.8,
+  "aandeel_boven_250hz_pct": 70.4,
+  "zwaartepunt_hz": 1191,
+  "piek_op_s": 0.336,
+  "stijging_db": -36.8
+ },
+ "gm_kern_puls_lus": {
+  "bestand": "sfx/gemaalmeester/gm_kern_puls_lus_placeholder.wav",
+  "duur_s": 2.0,
+  "duur_ticks": 120.0,
+  "lufs_momentaan_max": -30.0,
+  "true_peak_dbtp": -21.5,
+  "aandeel_boven_250hz_pct": 50.5,
+  "zwaartepunt_hz": 245,
+  "piek_op_s": 0.408,
+  "stijging_db": 2.9
+ },
+ "gm_kern_treffer": {
+  "bestand": "sfx/gemaalmeester/gm_kern_treffer_placeholder.wav",
+  "duur_s": 0.6,
+  "duur_ticks": 36.0,
+  "lufs_momentaan_max": -17.0,
+  "true_peak_dbtp": -2.5,
+  "aandeel_boven_250hz_pct": 37.7,
+  "zwaartepunt_hz": 273,
+  "piek_op_s": 0.009,
+  "stijging_db": -57.5
+ },
+ "gm_rad_treffer_1": {
+  "bestand": "sfx/gemaalmeester/gm_rad_treffer_1_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -17.0,
+  "true_peak_dbtp": -6.0,
+  "aandeel_boven_250hz_pct": 98.3,
+  "zwaartepunt_hz": 847,
+  "piek_op_s": 0.004,
+  "stijging_db": -45.2
+ },
+ "gm_rad_treffer_2": {
+  "bestand": "sfx/gemaalmeester/gm_rad_treffer_2_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -17.0,
+  "true_peak_dbtp": -6.6,
+  "aandeel_boven_250hz_pct": 98.3,
+  "zwaartepunt_hz": 1131,
+  "piek_op_s": 0.005,
+  "stijging_db": -45.2
+ },
+ "gm_rad_ratel": {
+  "bestand": "sfx/gemaalmeester/gm_rad_ratel_placeholder.wav",
+  "duur_s": 0.333,
+  "duur_ticks": 20.0,
+  "lufs_momentaan_max": -16.0,
+  "true_peak_dbtp": -1.5,
+  "aandeel_boven_250hz_pct": 99.9,
+  "zwaartepunt_hz": 2183,
+  "piek_op_s": 0.325,
+  "stijging_db": 7.7
+ },
+ "gm_rad_draai": {
+  "bestand": "sfx/gemaalmeester/gm_rad_draai_placeholder.wav",
+  "duur_s": 1.5,
+  "duur_ticks": 90.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -4.3,
+  "aandeel_boven_250hz_pct": 72.1,
+  "zwaartepunt_hz": 444,
+  "piek_op_s": 0.604,
+  "stijging_db": -50.3
+ },
+ "gm_fasewissel": {
+  "bestand": "sfx/gemaalmeester/gm_fasewissel_placeholder.wav",
+  "duur_s": 1.8,
+  "duur_ticks": 108.0,
+  "lufs_momentaan_max": -13.0,
+  "true_peak_dbtp": -4.0,
+  "aandeel_boven_250hz_pct": 79.1,
+  "zwaartepunt_hz": 2464,
+  "piek_op_s": 1.011,
+  "stijging_db": -41.0
+ },
+ "gm_wankel_start": {
+  "bestand": "sfx/gemaalmeester/gm_wankel_start_placeholder.wav",
+  "duur_s": 2.0,
+  "duur_ticks": 120.0,
+  "lufs_momentaan_max": -17.0,
+  "true_peak_dbtp": -8.5,
+  "aandeel_boven_250hz_pct": 20.1,
+  "zwaartepunt_hz": 172,
+  "piek_op_s": 0.082,
+  "stijging_db": -47.7
+ },
+ "gm_wankel_hapert_lus": {
+  "bestand": "sfx/gemaalmeester/gm_wankel_hapert_lus_placeholder.wav",
+  "duur_s": 3.0,
+  "duur_ticks": 180.0,
+  "lufs_momentaan_max": -26.0,
+  "true_peak_dbtp": -12.7,
+  "aandeel_boven_250hz_pct": 27.3,
+  "zwaartepunt_hz": 193,
+  "piek_op_s": 0.037,
+  "stijging_db": -15.1
+ },
+ "gm_merkplek_open": {
+  "bestand": "sfx/gemaalmeester/gm_merkplek_open_placeholder.wav",
+  "duur_s": 1.333,
+  "duur_ticks": 80.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -9.8,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 4275,
+  "piek_op_s": 0.337,
+  "stijging_db": -51.4
+ },
+ "finisher_start": {
+  "bestand": "sfx/finisher/finisher_start_placeholder.wav",
+  "duur_s": 0.5,
+  "duur_ticks": 30.0,
+  "lufs_momentaan_max": -17.0,
+  "true_peak_dbtp": -5.7,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1235,
+  "piek_op_s": 0.495,
+  "stijging_db": 39.1
+ },
+ "finisher_slag_p1_1": {
+  "bestand": "sfx/finisher/finisher_slag_p1_1_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -8.8,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 667,
+  "piek_op_s": 0.016,
+  "stijging_db": -59.0
+ },
+ "finisher_slag_p1_2": {
+  "bestand": "sfx/finisher/finisher_slag_p1_2_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -6.6,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 939,
+  "piek_op_s": 0.005,
+  "stijging_db": -58.9
+ },
+ "finisher_slag_p1_3": {
+  "bestand": "sfx/finisher/finisher_slag_p1_3_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -5.7,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 729,
+  "piek_op_s": 0.003,
+  "stijging_db": -68.0
+ },
+ "finisher_slag_p1_4": {
+  "bestand": "sfx/finisher/finisher_slag_p1_4_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -7.6,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1219,
+  "piek_op_s": 0.006,
+  "stijging_db": -61.3
+ },
+ "finisher_slag_p1_5": {
+  "bestand": "sfx/finisher/finisher_slag_p1_5_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -6.0,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1272,
+  "piek_op_s": 0.004,
+  "stijging_db": -69.4
+ },
+ "finisher_slag_p1_6": {
+  "bestand": "sfx/finisher/finisher_slag_p1_6_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -7.1,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1028,
+  "piek_op_s": 0.004,
+  "stijging_db": -65.3
+ },
+ "finisher_slag_p1_7": {
+  "bestand": "sfx/finisher/finisher_slag_p1_7_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -5.1,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1451,
+  "piek_op_s": 0.004,
+  "stijging_db": -68.8
+ },
+ "finisher_slag_p1_8": {
+  "bestand": "sfx/finisher/finisher_slag_p1_8_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -6.8,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1658,
+  "piek_op_s": 0.007,
+  "stijging_db": -78.9
+ },
+ "finisher_slag_p2_1": {
+  "bestand": "sfx/finisher/finisher_slag_p2_1_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -4.9,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 934,
+  "piek_op_s": 0.005,
+  "stijging_db": -59.7
+ },
+ "finisher_slag_p2_2": {
+  "bestand": "sfx/finisher/finisher_slag_p2_2_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -7.1,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1222,
+  "piek_op_s": 0.005,
+  "stijging_db": -64.0
+ },
+ "finisher_slag_p2_3": {
+  "bestand": "sfx/finisher/finisher_slag_p2_3_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -8.2,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1616,
+  "piek_op_s": 0.007,
+  "stijging_db": -56.4
+ },
+ "finisher_slag_p2_4": {
+  "bestand": "sfx/finisher/finisher_slag_p2_4_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -6.7,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1685,
+  "piek_op_s": 0.004,
+  "stijging_db": -63.0
+ },
+ "finisher_slag_p2_5": {
+  "bestand": "sfx/finisher/finisher_slag_p2_5_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -7.3,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1823,
+  "piek_op_s": 0.008,
+  "stijging_db": -58.5
+ },
+ "finisher_slag_p2_6": {
+  "bestand": "sfx/finisher/finisher_slag_p2_6_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -6.6,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1992,
+  "piek_op_s": 0.005,
+  "stijging_db": -64.0
+ },
+ "finisher_slag_p2_7": {
+  "bestand": "sfx/finisher/finisher_slag_p2_7_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -6.5,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 2165,
+  "piek_op_s": 0.007,
+  "stijging_db": -63.6
+ },
+ "finisher_slag_p2_8": {
+  "bestand": "sfx/finisher/finisher_slag_p2_8_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -19.0,
+  "true_peak_dbtp": -4.8,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 2832,
+  "piek_op_s": 0.006,
+  "stijging_db": -61.6
+ },
+ "finisher_slag_echo_1": {
+  "bestand": "sfx/finisher/finisher_slag_echo_1_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -23.0,
+  "true_peak_dbtp": -11.7,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1116,
+  "piek_op_s": 0.004,
+  "stijging_db": -73.2
+ },
+ "finisher_slag_echo_2": {
+  "bestand": "sfx/finisher/finisher_slag_echo_2_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -23.0,
+  "true_peak_dbtp": -10.8,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 768,
+  "piek_op_s": 0.016,
+  "stijging_db": -69.2
+ },
+ "finisher_slag_echo_3": {
+  "bestand": "sfx/finisher/finisher_slag_echo_3_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -23.0,
+  "true_peak_dbtp": -11.2,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1388,
+  "piek_op_s": 0.008,
+  "stijging_db": -70.5
+ },
+ "finisher_slag_echo_4": {
+  "bestand": "sfx/finisher/finisher_slag_echo_4_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -23.0,
+  "true_peak_dbtp": -12.3,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1467,
+  "piek_op_s": 0.008,
+  "stijging_db": -66.2
+ },
+ "finisher_slag_echo_5": {
+  "bestand": "sfx/finisher/finisher_slag_echo_5_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -23.0,
+  "true_peak_dbtp": -12.7,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1759,
+  "piek_op_s": 0.004,
+  "stijging_db": -81.2
+ },
+ "finisher_slag_echo_6": {
+  "bestand": "sfx/finisher/finisher_slag_echo_6_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -23.0,
+  "true_peak_dbtp": -8.2,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1649,
+  "piek_op_s": 0.004,
+  "stijging_db": -68.5
+ },
+ "finisher_slag_echo_7": {
+  "bestand": "sfx/finisher/finisher_slag_echo_7_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -23.0,
+  "true_peak_dbtp": -11.7,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1849,
+  "piek_op_s": 0.008,
+  "stijging_db": -78.2
+ },
+ "finisher_slag_echo_8": {
+  "bestand": "sfx/finisher/finisher_slag_echo_8_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -23.0,
+  "true_peak_dbtp": -10.6,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1807,
+  "piek_op_s": 0.009,
+  "stijging_db": -81.4
+ },
+ "finisher_slot": {
+  "bestand": "sfx/finisher/finisher_slot_placeholder.wav",
+  "duur_s": 5.0,
+  "duur_ticks": 300.0,
+  "lufs_momentaan_max": -12.0,
+  "true_peak_dbtp": -2.1,
+  "aandeel_boven_250hz_pct": 94.2,
+  "zwaartepunt_hz": 701,
+  "piek_op_s": 0.39,
+  "stijging_db": -57.2
+ },
+ "ontploffing_k1_grijs": {
+  "bestand": "sfx/merk/ontploffing_k1_grijs_placeholder.wav",
+  "duur_s": 3.4,
+  "duur_ticks": 204.0,
+  "lufs_momentaan_max": -13.0,
+  "true_peak_dbtp": -1.7,
+  "aandeel_boven_250hz_pct": 61.4,
+  "zwaartepunt_hz": 639,
+  "piek_op_s": 0.009,
+  "stijging_db": -90.1
+ },
+ "ontploffing_k1_kleur": {
+  "bestand": "sfx/merk/ontploffing_k1_kleur_placeholder.wav",
+  "duur_s": 3.4,
+  "duur_ticks": 204.0,
+  "lufs_momentaan_max": -13.6,
+  "true_peak_dbtp": -1.5,
+  "aandeel_boven_250hz_pct": 83.4,
+  "zwaartepunt_hz": 691,
+  "piek_op_s": 0.004,
+  "stijging_db": -102.2
+ },
+ "ontploffing_k2_grijs": {
+  "bestand": "sfx/merk/ontploffing_k2_grijs_placeholder.wav",
+  "duur_s": 3.4,
+  "duur_ticks": 204.0,
+  "lufs_momentaan_max": -13.5,
+  "true_peak_dbtp": -1.5,
+  "aandeel_boven_250hz_pct": 77.6,
+  "zwaartepunt_hz": 659,
+  "piek_op_s": 0.019,
+  "stijging_db": -95.9
+ },
+ "ontploffing_k2_kleur": {
+  "bestand": "sfx/merk/ontploffing_k2_kleur_placeholder.wav",
+  "duur_s": 3.4,
+  "duur_ticks": 204.0,
+  "lufs_momentaan_max": -13.0,
+  "true_peak_dbtp": -2.1,
+  "aandeel_boven_250hz_pct": 84.3,
+  "zwaartepunt_hz": 730,
+  "piek_op_s": 0.005,
+  "stijging_db": -91.9
+ },
+ "ontploffing_k3_grijs": {
+  "bestand": "sfx/merk/ontploffing_k3_grijs_placeholder.wav",
+  "duur_s": 3.4,
+  "duur_ticks": 204.0,
+  "lufs_momentaan_max": -13.0,
+  "true_peak_dbtp": -2.0,
+  "aandeel_boven_250hz_pct": 76.4,
+  "zwaartepunt_hz": 537,
+  "piek_op_s": 0.006,
+  "stijging_db": -90.3
+ },
+ "ontploffing_k3_kleur": {
+  "bestand": "sfx/merk/ontploffing_k3_kleur_placeholder.wav",
+  "duur_s": 3.4,
+  "duur_ticks": 204.0,
+  "lufs_momentaan_max": -13.3,
+  "true_peak_dbtp": -1.5,
+  "aandeel_boven_250hz_pct": 84.8,
+  "zwaartepunt_hz": 819,
+  "piek_op_s": 0.01,
+  "stijging_db": -93.2
+ },
+ "ontploffing_k4_grijs": {
+  "bestand": "sfx/merk/ontploffing_k4_grijs_placeholder.wav",
+  "duur_s": 3.4,
+  "duur_ticks": 204.0,
+  "lufs_momentaan_max": -13.0,
+  "true_peak_dbtp": -1.9,
+  "aandeel_boven_250hz_pct": 75.7,
+  "zwaartepunt_hz": 623,
+  "piek_op_s": 0.01,
+  "stijging_db": -92.4
+ },
+ "ontploffing_k4_kleur": {
+  "bestand": "sfx/merk/ontploffing_k4_kleur_placeholder.wav",
+  "duur_s": 3.4,
+  "duur_ticks": 204.0,
+  "lufs_momentaan_max": -14.4,
+  "true_peak_dbtp": -1.5,
+  "aandeel_boven_250hz_pct": 82.9,
+  "zwaartepunt_hz": 718,
+  "piek_op_s": 0.007,
+  "stijging_db": -93.6
+ },
+ "ontploffing_k5_grijs": {
+  "bestand": "sfx/merk/ontploffing_k5_grijs_placeholder.wav",
+  "duur_s": 3.4,
+  "duur_ticks": 204.0,
+  "lufs_momentaan_max": -13.0,
+  "true_peak_dbtp": -2.2,
+  "aandeel_boven_250hz_pct": 63.8,
+  "zwaartepunt_hz": 587,
+  "piek_op_s": 0.007,
+  "stijging_db": -90.6
+ },
+ "ontploffing_k5_kleur": {
+  "bestand": "sfx/merk/ontploffing_k5_kleur_placeholder.wav",
+  "duur_s": 3.4,
+  "duur_ticks": 204.0,
+  "lufs_momentaan_max": -13.0,
+  "true_peak_dbtp": -1.7,
+  "aandeel_boven_250hz_pct": 79.3,
+  "zwaartepunt_hz": 595,
+  "piek_op_s": 0.005,
+  "stijging_db": -92.6
+ },
+ "plank_signaal": {
+  "bestand": "sfx/signalen/plank_signaal_placeholder.wav",
+  "duur_s": 0.09,
+  "duur_ticks": 5.4,
+  "lufs_momentaan_max": -29.0,
+  "true_peak_dbtp": -10.4,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 1588,
+  "piek_op_s": 0.003,
+  "stijging_db": 0.0
+ },
+ "doelstreep_voorslag_grijs": {
+  "bestand": "sfx/signalen/doelstreep_voorslag_grijs_placeholder.wav",
+  "duur_s": 0.5,
+  "duur_ticks": 30.0,
+  "lufs_momentaan_max": -27.0,
+  "true_peak_dbtp": -17.1,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 2601,
+  "piek_op_s": 0.462,
+  "stijging_db": 37.2
+ },
+ "doelstreep_voorslag_kleur": {
+  "bestand": "sfx/signalen/doelstreep_voorslag_kleur_placeholder.wav",
+  "duur_s": 0.5,
+  "duur_ticks": 30.0,
+  "lufs_momentaan_max": -27.0,
+  "true_peak_dbtp": -13.3,
+  "aandeel_boven_250hz_pct": 100.0,
+  "zwaartepunt_hz": 2239,
+  "piek_op_s": 0.495,
+  "stijging_db": 48.3
+ },
+ "_luisterreeks": {
+  "duur_s": 52.8,
+  "lufs_geintegreerd": -18.9,
+  "true_peak_dbtp": -1.5,
+  "momenten_s": [
+   [
+    0.5,
+    "kadeloper_aanloop"
+   ],
+   [
+    1.0,
+    "kadeloper_haakslag"
+   ],
+   [
+    1.9,
+    "kadeloper_aanloop"
+   ],
+   [
+    2.4,
+    "kadeloper_haakslag"
+   ],
+   [
+    3.3,
+    "kadeloper_dood"
+   ],
+   [
+    4.7,
+    "schotdrager_aanloop"
+   ],
+   [
+    5.2,
+    "schotdrager_schotstoot"
+   ],
+   [
+    6.0,
+    "pantser_tink"
+   ],
+   [
+    6.9,
+    "ontploffing_k1_grijs"
+   ],
+   [
+    6.917,
+    "schotdrager_pantser_breekt"
+   ],
+   [
+    9.5,
+    "dwaallicht_zweef_lus"
+   ],
+   [
+    11.5,
+    "dwaallicht_zweef_lus"
+   ],
+   [
+    11.7,
+    "dwaallicht_aanloop"
+   ],
+   [
+    12.2,
+    "dwaallicht_duik"
+   ],
+   [
+    13.1,
+    "dwaallicht_dood"
+   ],
+   [
+    14.5,
+    "ontploffing_k1_grijs"
+   ],
+   [
+    14.545,
+    "ontploffing_k2_grijs"
+   ],
+   [
+    14.59,
+    "ontploffing_k3_grijs"
+   ],
+   [
+    14.635,
+    "ontploffing_k4_grijs"
+   ],
+   [
+    14.68,
+    "ontploffing_k5_grijs"
+   ],
+   [
+    18.0,
+    "gm_maat_tel_grijs"
+   ],
+   [
+    18.0,
+    "gm_pompslag_aanloop_eerste"
+   ],
+   [
+    19.0,
+    "gm_pompslag_slag"
+   ],
+   [
+    19.4,
+    "gm_schot_tink"
+   ],
+   [
+    20.0,
+    "gm_maat_tel_grijs"
+   ],
+   [
+    20.0,
+    "gm_pompslag_aanloop_f1"
+   ],
+   [
+    20.667,
+    "gm_pompslag_slag"
+   ],
+   [
+    22.0,
+    "gm_maat_tel_grijs"
+   ],
+   [
+    22.0,
+    "gm_pompslag_aanloop_f1"
+   ],
+   [
+    22.667,
+    "gm_pompslag_slag"
+   ],
+   [
+    23.1,
+    "gm_schot_breuk"
+   ],
+   [
+    23.7,
+    "gm_kern_puls_lus"
+   ],
+   [
+    24.3,
+    "gm_kern_treffer"
+   ],
+   [
+    24.75,
+    "gm_kern_treffer"
+   ],
+   [
+    25.7,
+    "gm_kern_puls_lus"
+   ],
+   [
+    26.0,
+    "gm_maat_tel_grijs"
+   ],
+   [
+    26.0,
+    "gm_pompslag_aanloop_f1"
+   ],
+   [
+    26.667,
+    "gm_pompslag_slag"
+   ],
+   [
+    27.4,
+    "gm_schot_dicht"
+   ],
+   [
+    28.0,
+    "gm_spuigat_borrel"
+   ],
+   [
+    28.05,
+    "gm_spuigat_borrel"
+   ],
+   [
+    29.5,
+    "gm_fasewissel"
+   ],
+   [
+    31.1,
+    "gm_maat_tel_grijs"
+   ],
+   [
+    31.1,
+    "gm_pompslag_aanloop_f2"
+   ],
+   [
+    31.6,
+    "gm_pompslag_slag"
+   ],
+   [
+    32.6,
+    "gm_maat_tel_grijs"
+   ],
+   [
+    32.6,
+    "gm_zwiep_aanloop"
+   ],
+   [
+    33.1,
+    "gm_zwiep_veeg"
+   ],
+   [
+    33.5,
+    "gm_rad_treffer_1"
+   ],
+   [
+    34.1,
+    "gm_maat_tel_grijs"
+   ],
+   [
+    34.1,
+    "gm_pompslag_aanloop_f2"
+   ],
+   [
+    34.6,
+    "gm_pompslag_slag"
+   ],
+   [
+    34.6,
+    "gm_rad_treffer_2"
+   ],
+   [
+    35.0,
+    "gm_rad_ratel"
+   ],
+   [
+    35.333,
+    "gm_rad_draai"
+   ],
+   [
+    35.6,
+    "gm_maat_tel_grijs"
+   ],
+   [
+    35.6,
+    "gm_zwiep_aanloop"
+   ],
+   [
+    36.1,
+    "gm_zwiep_veeg"
+   ],
+   [
+    37.6,
+    "gm_wankel_start"
+   ],
+   [
+    38.4,
+    "gm_wankel_hapert_lus"
+   ],
+   [
+    39.2,
+    "gm_merkplek_open"
+   ],
+   [
+    41.2,
+    "finisher_start"
+   ],
+   [
+    41.7,
+    "finisher_slag_p1_1"
+   ],
+   [
+    41.832,
+    "finisher_slag_echo_1"
+   ],
+   [
+    41.964,
+    "finisher_slag_p1_2"
+   ],
+   [
+    42.096,
+    "finisher_slag_echo_2"
+   ],
+   [
+    42.229,
+    "finisher_slag_p1_3"
+   ],
+   [
+    42.361,
+    "finisher_slag_echo_3"
+   ],
+   [
+    42.493,
+    "finisher_slag_p1_4"
+   ],
+   [
+    42.625,
+    "finisher_slag_echo_4"
+   ],
+   [
+    42.757,
+    "finisher_slag_p1_5"
+   ],
+   [
+    42.889,
+    "finisher_slag_echo_5"
+   ],
+   [
+    43.021,
+    "finisher_slag_p1_6"
+   ],
+   [
+    43.154,
+    "finisher_slag_echo_6"
+   ],
+   [
+    43.286,
+    "finisher_slag_p1_7"
+   ],
+   [
+    43.418,
+    "finisher_slag_echo_7"
+   ],
+   [
+    43.7,
+    "finisher_slot"
+   ],
+   [
+    48.3,
+    "plank_signaal"
+   ],
+   [
+    49.1,
+    "plank_signaal"
+   ],
+   [
+    49.9,
+    "doelstreep_voorslag_grijs"
+   ],
+   [
+    50.4,
+    "ontploffing_k1_grijs"
+   ]
+  ]
+ }
+}
