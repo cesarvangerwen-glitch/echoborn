@@ -34,6 +34,9 @@ const B4_GIVE_UP_TICKS := 300
 ## ticks na de top van de lancering dashen (0 = op de top, zoals de run).
 var b4_jump_delay := 0
 var b4_dash_delay := 0
+## B3 bij D ≥ 90, late bot (SM-review #220): dash zo veel ticks na de bounce;
+## -1 = op de top (de run). Het venster loopt van 14 tot ± 38.
+var b3_dash_after := -1
 ## Gevecht: herhaaltijd van de slag (zoals K2).
 const ATTACK_EVERY := 21
 
@@ -381,6 +384,10 @@ func _leg_b3() -> int:
 				return 0
 			# Dash op de top, zoals bij D = 60 (#217, besluit B3-galerij: het
 			# venster loopt van 14 tot ± 38 ticks na de bounce; op 14 bleef 2 px).
+			if b3_dash_after >= 0:
+				if _since == b3_dash_after and p.position.x > Layout.B3_GALLERY_TIP + 4.0:
+					return L | _tap(DASH)
+				return L
 			if p.motor.velocity.y >= 0.0 and _apex_tick < 0:
 				_apex_tick = _tick
 				if p.position.x > Layout.B3_GALLERY_TIP + 4.0:

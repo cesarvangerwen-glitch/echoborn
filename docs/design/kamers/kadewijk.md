@@ -176,7 +176,7 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 | 5 | **S3 alleen vooruit**: van de markt niet terug naar de bovenroute; terug via de lus (S9) | **Akkoord**: geen vastlopen (L-10 gaat over missen) |
 | 6 | **Geen tegels** van de AD: grijze blokken | — (opdracht) |
 | 7 | **B4 achter een keerpunt** (#217, §3a): een bolder van 8 × 8 op de rand als keerwand; de echo komt je in houding tegemoet. Wijkt af van de solo-werkwijze in gdd §4.3 B4 (aan de rand slaan, `T + D − 21 … T + D − 3` springen): bij **D = 60** spring je op de echo 62 px van de rand en heb je **na de lancering een dash nodig** (gdd: drager ≤ 8 px van de rand, 14 px marge zonder dash); zonder dash de kloof in en de langzame lijn. Bij D ≥ 90 draagt de echo je naar de bolder (16 px van de rand, zonder dash), maar is de echolijn trager dan de langzame lijn (309–399 tegen 287) | **Open** (Lead-review #217) |
-| 8 | **Besluit B3-galerij S2** (SM-review #208, besluit WLD): **de galerij blijft zoals ze is.** De 2 px bij D ≥ 90 kwam van de bot: hij dashte 14 ticks na de bounce, het vroegste moment waarop de dash de galerij nog haalt. Het venster loopt van 14 tot ± 38 ticks (2 … 42 px); op de top dashen, zoals bij D = 60, geeft **30 px**. De bot dasht nu op de top, en de test eist ≥ 9 px bij elke D. Verder de kom in laten steken kan niet zonder het gat onder 150 px te brengen (FK-6, test) | WLD (binnen de maten); ter info |
+| 8 | **Besluit B3-galerij S2** (SM-review #208, besluit WLD): **de galerij blijft zoals ze is.** De 2 px bij D ≥ 90 kwam van de bot: hij dashte 14 ticks na de bounce, het vroegste moment waarop de dash de galerij nog haalt. Het venster loopt van 14 tot ± 38 ticks (2 … 42 px); op de top dashen, zoals bij D = 60, geeft **30 px**. De bot dasht nu op de top, en de test eist ≥ 9 px bij elke D. De randen van het venster (dash 14 en 38 ticks na de bounce) draaien bij D ≥ 90 als late bot (`test_kadewijk_b3_late_bot`, rapport), zodat de krapste marge zichtbaar blijft: dash + 14 → 2 px, + 38 → 40 px, bij 90, 120 en 180 gelijk. Verder de kom in laten steken kan niet zonder het gat onder 150 px te brengen (FK-6, test) | WLD (binnen de maten); ter info |
 
 **Visie-review per kamer** (CD, [comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212#issuecomment-6831045448) op D = 60; één regel per kamer):
 
@@ -192,7 +192,7 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 | S1 | **Maatvast** na de merge van #217 (LGD bevestigt): bots groen, `past`, en het dash-punt dat de CD noemde is besloten (gdd v0.8.2 §4.8.7) en getest (W-12) |
 | S2 | **Kandidaat**: het B3-punt is besloten (8); de visie-review van de CD ontbreekt |
 | S3 | **Maatvast** na de merge van #217 (LGD bevestigt): bots groen, `past`; het lege stuk na golf 2 is een punt, geen herontwerp |
-| S4 | **Niet maatvast**: herontworpen (#217), wacht op de Lead-review (7) en een nieuwe visie-review van de CD |
+| S4 | **Niet maatvast**: herontworpen (#217). Pas **maatvast na een nieuwe `Visie-review: past` van de CD** (en de Lead-review van afwijking 7); tot dan geen eindkwaliteit-art |
 
 ## 9. Open punten
 

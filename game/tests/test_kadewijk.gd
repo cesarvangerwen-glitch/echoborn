@@ -47,6 +47,7 @@ const MAX_FRAMES := {
 	"test_kadewijk_langzame_lijn_met_dash_d180": 20000,
 	"test_kadewijk_b4_keerpunt": 12000,
 	"test_kadewijk_b4_late_bot": 12000,
+	"test_kadewijk_b3_late_bot": 12000,
 }
 ## Per D (echo aan / uit): duur van de run, per kamer, en per keerpunt
 ## (keren of langzame lijn, vanaf de wand), voor C-15 en de eis bij keren.
@@ -516,7 +517,7 @@ func _slow_with_dash(t, d: int) -> void:
 				fastest = r[0]
 		t.check(fastest > 0, "D=%d %s: geen dash-variant haalt de weg omhoog (%s)" % [d, spec[1], per])
 		t.check(fastest - keer[0] >= 20 and fastest <= 2 * keer[0],
-			"D=%d %s: keren %d, snelste langzame lijn met dash %d ticks vanaf de wand (gdd §4.8.7: ≥ 20 trager, ≤ 2×)" % [d, spec[1], keer[0], fastest])
+			"D=%d %s: keren %d, snelste van de zes dash-momenten (n = 4 … 24) %d ticks vanaf de wand (gdd §4.8.7: ≥ 20 trager, ≤ 2×)" % [d, spec[1], keer[0], fastest])
 		t.note("D=%d %s: keren %d, langzame lijn zonder dash %d, met dash na n ticks %s: snelste %d (+%d, %.2f×)" % [
 			d, spec[1], keer[0], plain[0], per, fastest, fastest - keer[0], float(fastest) / maxf(keer[0], 1)])
 
@@ -661,3 +662,23 @@ func test_kadewijk_b4_niet_over_zonder_lancering(t) -> void:
 			t.check(not over, "B4: sprong + dash (+%d) van %s haalt de overkant zonder lancering" % [n, key])
 			await _free(t, [wijk, null, progress])
 	t.note("B4 zonder lancering: verste middelpunt op vloerhoogte %.0f (overkant vanaf %.0f)" % [best, Layout.B4_FAR_EDGE - Layout.HALF_W])
+
+
+## Late bot voor S2-B3 bij D ≥ 90 (SM-review PR #220): de bot dasht op de top
+## (landing ≥ 9 px, check in de runs). Hier de randen van het venster, dash 14
+## en 38 ticks na de bounce, zodat de krapste marge zichtbaar blijft. Rapport
+## (note), geen eis.
+func test_kadewijk_b3_late_bot(t) -> void:
+	var rows := PackedStringArray()
+	for d in [90, 120, 180]:
+		for n in [14, 38]:
+			var parts := _wijk(t, d, true, &"S2")
+			var bot = parts[1]
+			bot.b3_dash_after = n
+			while not bot.leg_done.has("S2-B3") and parts[0].sim.tick < TICK_CAP:
+				await t.tree.physics_frame
+			var line: bool = bot.lines.get("S2-B3", false)
+			t.check(bot.leg_done.has("S2-B3"), "D=%d S2-B3: dash %d ticks na de bounce, stap niet afgerond" % [d, n])
+			rows.append("D=%d dash +%d: %s" % [d, n, ("landing %.0f px voorbij de tip" % bot.landed_from_wall.get("S2-B3", -INF)) if line else "mist (langzame lijn)"])
+			await _free(t, parts)
+	t.note("S2-B3 late bot (dash na de bounce): %s" % ", ".join(rows))

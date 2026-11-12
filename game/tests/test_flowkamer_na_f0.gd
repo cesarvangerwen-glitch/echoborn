@@ -531,7 +531,7 @@ func _slow_line_with_dash(t, d: int) -> void:
 		if d == BUILT_D:
 			t.check(fastest > 0, "D=%d: %s geen dash-variant haalt de weg omhoog (%s)" % [d, leg_name, line])
 			t.check(fastest - keer >= 20 and fastest <= 2 * maxi(keer, 1),
-				"D=%d: %s keren %d, snelste langzame lijn met dash %d ticks (gdd §4.8.7: ≥ 20 trager, ≤ 2×)" % [d, leg_name, keer, fastest])
+				"D=%d: %s keren %d, snelste van de zes dash-momenten (n = 4 … 24) %d ticks (gdd §4.8.7: ≥ 20 trager, ≤ 2×)" % [d, leg_name, keer, fastest])
 		rows.append("%s keren %d, zonder dash %s, met dash %s, snelste %d (%+d)" % [leg_name, keer, plain[leg_name], line, fastest, fastest - keer])
 	t.note("D=%d langzame lijn met dash (ticks vanaf de keerwand): %s" % [d, "; ".join(rows)])
 
