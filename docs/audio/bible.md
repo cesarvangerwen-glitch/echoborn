@@ -21,7 +21,7 @@ Deze bible legt vast hoe *Polderlight* (werktitel, besluit #96) klinkt en wat el
 Twee preciseringen, zodat de eis toetsbaar is:
 
 1. **Wat het fragment moet dragen.** Niet "mooi geluid" in het algemeen, maar de drie dingen waar de pillars van afhangen: (a) de **merk-aftelling met het carillon** (R-V1, E-14b), (b) een **echo die je hoort als jezelf, maar hol** (pillar 1, gdd O-4), en (c) **grijs → leven** (pillar 2). Het fragment in §9 bevat alle drie.
-2. **Hoe het beoordeeld wordt.** Geen rol in de studio kan luisteren; we beoordelen met metingen. Daarom haalt het fragment eerst de **harde drempels** uit §8 (loudness, piek, hoorbaarheid boven het bed). Daarnaast telt **één luistercheck door een mens** (besluit van de EP, eigenaar van het kader): **F2 = SM-score Kwaliteit ≥ 7 én drie keer "ja" van de CEO**, zonder eigen cijfer, op drie vragen: (1) klinkt het als een carillon, (2) hoor je dat de tweede slag "jij maar hol" is, (3) voelt het opgepompte deel warmer. Op koptelefoon en op tv-luidsprekers, ± 5 minuten, 0 runs. Er komt **één check, alleen op de versie die F2 claimt** (v2), in de CEO-sessie van T17; geen aparte CEO-vraag, want T8d wacht toch op F0.
+2. **Hoe het beoordeeld wordt.** Geen rol in de studio kan luisteren; we beoordelen met metingen. Daarom haalt het fragment eerst de **harde drempels** uit §8 (loudness, piek, hoorbaarheid boven het bed). Daarnaast telt **één luistercheck door een mens** (besluit van de EP, eigenaar van het kader): **F2 = SM-score Kwaliteit ≥ 7 én drie keer "ja" van de CEO**, zonder eigen cijfer, op drie vragen: (1) klinkt het als een carillon, (2) hoor je dat de tweede slag "jij maar hol" is, (3) voelt het opgepompte deel warmer. Op koptelefoon en op tv-luidsprekers, ± 3–5 minuten, 0 runs. Er komt **één check, alleen op de versie die F2 claimt** (v2), op de kaart van mijlpaaltest **MT2**, vóór T8d (besluit van de EP, Lead-review PR #199). Niet in MT1, zodat die kaart binnen ± 15 min blijft (`testplan-mt1.md` §1), en geen aparte CEO-sessie: de CEO test alleen bij mijlpalen (besluit 2026-11-12 (2)).
 
 ---
 
@@ -273,9 +273,9 @@ Alle waarden komen uit het script; de loudness ook onafhankelijk uit **ffmpeg eb
 
 **Zelfscore van de Audio Director:** carillon-onderdelen **± 7**, fragment als geheel **± 6,5–7**. Ik claim F2 op deze versie, maar het oordeel ligt bij de **SM-score Kwaliteit** en de **luistercheck van de CEO** (§0). Haalt v2 geen 7 of geen drie keer "ja", dan open ik een `brainstorm`-issue met de CEO, met als opties: (a) **eigen veldopnames** (water, steen, metaal) door een mens, als eigen werk vastgelegd in `docs/licenties.md`; (b) een **CC0-bibliotheek** voor alleen omgeving, na een licentiecheck door de BLA; (c) het palet nog smaller maken (minder omgeving, meer carillon en stilte). Een "nee" op één vraag wijst de bouwsteen aan: vraag 1 → klokken, vraag 2 → `echo_versie`, vraag 3 → water, harmonium en galm.
 
-### 9.4 Luistercheck voor de CEO (T17)
+### 9.4 Luistercheck voor de CEO (MT2)
 
-Eén keer, op dit fragment (`f2_merk_aftelling_carillon_placeholder.wav`), op koptelefoon én op tv-luidsprekers, ± 5 minuten. Antwoord per vraag met **ja** of **nee**, zonder cijfer; een korte opmerking mag.
+Eén keer, op de kaart van MT2 vóór T8d (§0), op dit fragment (`f2_merk_aftelling_carillon_placeholder.wav`), op koptelefoon én op tv-luidsprekers, ± 3–5 minuten. Antwoord per vraag met **ja** of **nee**, zonder cijfer; een korte opmerking mag.
 
 1. **Klinkt het als een carillon?** Luister naar de klokjes op 2,1 s en 2,35 s en de klokslag op 2,6 s; daarna 10,5–11,1 s.
 2. **Hoor je dat de slag op 2,6 s "jij, maar hol" is?** Vergelijk de slag van speler 1 op 0,6 s met de echo op 2,6 s (en 9,0 s met 11,0 s).
@@ -330,7 +330,7 @@ Master  (HardLimiter, plafond −1 dB)
 
 ## 13. Open punten
 
-- **QA Lead:** zet de drie luistervragen uit §9.4 op de CEO-kaart van T17 (fragment v2, koptelefoon en tv, ± 5 min, ja/nee zonder cijfer).
+- **QA Lead:** zet de drie luistervragen uit §9.4 op de kaart van **MT2**, vóór T8d (fragment v2, koptelefoon en tv, ± 3–5 min, ja/nee zonder cijfer); niet op de kaart van MT1, geen aparte CEO-sessie (EP-besluit, PR #199).
 - **Fragment v2** (§9) claimt F2: SM-score Kwaliteit en de luistercheck van de CEO op die versie. Haalt het geen 7 of geen drie keer "ja", dan een `brainstorm`-issue met de opties uit §9.3.
 - **Assetlijst** (`docs/audio/assetlijst.md`) en muziek per gebied: v1, na T3a (welke events en vaardigheden er komen).
 - **gdd O-4** (speelt de echo audio af?) is met §2 A1 beantwoord: ja, gedempt. De LGD kan O-4 sluiten.
@@ -342,7 +342,7 @@ Master  (HardLimiter, plafond −1 dB)
 
 | Versie | Datum | Wijziging |
 |---|---|---|
-| 0.4 | 2026-11-12 | Op D = 60 (besluit 2026-11-12, #196): kop met werkaanname D = 60, bereik 60–180 ticks, merk solo D + 30 / co-op 150 (C-12e), knal op D + 3 en de doelstreep; §2 A2 en §6.1 met de knal op D + 3 en de aftelling naast de doelstreep (slag 1 blijft, slag 2 en 3 vallen weg, voorslag t 33 → knal t 63; streep weg vóór D: slag 3 terug; co-op ongewijzigd), zoals in `slice-audio.md` v0.1.1 §3.1; §10 `MerkAudio` met levensduur `L` en dezelfde regel; §9 (F2) als klankreferentie, gemaakt op D = 120; §12 en §13 bijgewerkt. |
+| 0.4 | 2026-11-12 | Op D = 60 (besluit 2026-11-12, #196): kop met werkaanname D = 60, bereik 60–180 ticks, merk solo D + 30 / co-op 150 (C-12e), knal op D + 3 en de doelstreep; §2 A2 en §6.1 met de knal op D + 3 en de aftelling naast de doelstreep (slag 1 blijft, slag 2 en 3 vallen weg, voorslag t 33 → knal t 63; streep weg vóór D: slag 3 terug; co-op ongewijzigd), zoals in `slice-audio.md` v0.1.1 §3.1; §10 `MerkAudio` met levensduur `L` en dezelfde regel; §9 (F2) als klankreferentie, gemaakt op D = 120; §12 en §13 bijgewerkt. Lead-review EP (PR #199): de luistercheck gaat naar de kaart van MT2, vóór T8d, niet MT1 en geen aparte sessie (§0, §9.4, §13). |
 | 0.3 | 2026-11-09 | Fragment v2 dat F2 claimt (§9): water als bellenmodel, gelaagde P1-slag, harmonium met celeste, riet-geruis en toetsklik, galm met spiegelbronnen en nagalm per band, droger grijs, gemaal zonder subsonisch laag, dukken van bed en muziek, levensduur zonder echo (doven op D + 30) als losse reeks; metingen met ffmpeg ebur128 en timing op ticks; luistervragen klaar voor T17 (§9.4). §3, §4, §5 bijgewerkt met de v2-metingen. |
 | 0.2 | 2026-11-09 | Lead-review EP (PR #106): doven op D + 30 met een zachte slag 4 op D + 15 (§6.1, §10); EP-besluit over de luistercheck (§0, §9, §13); WAV byte-gelijk, OGG per build (§9). |
 | 0.1 | 2026-11-09 | Eerste versie (#66, T2): akkoord op de F2-eis (A10) met twee preciseringen, pijlers, palet, echo tegenover levend, grijs → leven, carillon en gemaal, mixregels, F2-fragment met metingen en eerlijke beoordeling, techniek in Godot 4.6. |
