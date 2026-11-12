@@ -19,6 +19,8 @@ Deze repo is tegelijk de game én de studio. Elke functie is een rolbestand in `
 | `docs/` | Ontwerpdocumenten (pitch, GDD, art bible, technisch ontwerp, …) |
 | `game/` | Het Godot-project |
 | `.github/ISSUE_TEMPLATE/` | Templates voor taken, CEO-beslissingen, bugs |
+| `consultancy/` | Extern consultancyteam (wekelijkse audit voor de CEO). Geen studiorol, zie WERKWIJZE §5.6 |
+| `docs/audits/` | Auditrapporten en verbeterlog van het externe team |
 
 ## Rol van de CEO
 

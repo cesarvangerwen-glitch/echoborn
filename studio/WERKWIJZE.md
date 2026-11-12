@@ -45,6 +45,7 @@ Je onthoudt niets tussen runs. **Alles wat de volgende run moet weten, staat in 
    Bij alle andere PR's telt `Lead-review: akkoord` als goedkeuring: de regisseur zet `status:goedgekeurd` (besluit #47).
 4. Bij goedkeuring merget de regisseur de PR. Bij afkeuring gaat het terug naar het team.
 5. **CEO** komt alleen in beeld via `ceo-beslissing` of het fase-statusrapport.
+6. **Extern consultancyteam.** PR's met het label `extern:audit` (map `consultancy/`, rapporten in `docs/audits/`) zijn van een extern team dat rechtstreeks aan de CEO rapporteert. Geen enkele rol, ook de regisseur niet, reviewt, wijzigt, labelt of merget ze. Alleen de CEO beslist erover.
 
 | Rol | Team Lead voor interne review |
 |---|---|
