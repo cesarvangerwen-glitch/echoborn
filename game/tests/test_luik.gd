@@ -4,10 +4,12 @@ extends RefCounted
 ## x 180–220 waarin het luik ligt, en 200 px lager een benedenvloer. P1 staat
 ## op het luik (handmatige input), springt en doet een neerslag op de klep.
 ##
-## - Solo met de echo Actief (alle D): de klep gaat van laag 1 naar laag 5,
-##   P1 valt erdoor; de echo staat op de schaduwklep, speelt de neerslag af op
-##   `breuk + D` (de schaduwklep is dan weg, door de echo) en valt achter P1
-##   aan; de echo breekt nooit.
+## - Solo met de echo Actief (alle D): de klep gaat op de breuk `b` van laag 1
+##   naar laag 5 en P1 valt erdoor. De neerslag is een AANVAL in de lucht
+##   (V-01a), dus P1 zette al vóór `b` af van de klep (op `s`). De echo staat
+##   tot zijn sprong (`s + D`) op de schaduwklep en breekt niet; hij speelt de
+##   neerslag af op `b + D` (de schaduwklep is dan weg, door de echo) en valt
+##   achter P1 aan; de echo breekt nooit.
 ## - Echo uit: geen schaduwklep, het luik breekt in één keer.
 ## - Echo aan maar Leeg op de breuk (bij het begin, of na een respawn op het
 ##   luik): wel een schaduwklep (besluit LGD, #232); de echo staat erop, haalt
@@ -95,6 +97,12 @@ func test_schaduwklep_echo_valt_mee_alle_d(t) -> void:
 		luik.schaduwklep_weg.connect(func(tick: int, by: String) -> void:
 			weg["tick"] = tick
 			weg["by"] = by)
+		# Per tick (na stap 5): staat P1 op de vloer, en waar staat de echo?
+		var p1_floor := {}
+		var echo_at := {}
+		sim.tick_finished.connect(func(tick: int) -> void:
+			p1_floor[tick] = p1.motor.on_floor
+			echo_at[tick] = echo.position if echo.is_present() else Vector2.INF)
 		# Wachten tot de echo Actief is (D ticks), dan naar het luik.
 		await t.run_ticks(sim, d + 20)
 		t.check(echo.is_present() and not luik.is_open, "D=%d: echo niet Actief vóór de sprong (open %s)" % [d, luik.is_open])
@@ -105,6 +113,13 @@ func test_schaduwklep_echo_valt_mee_alle_d(t) -> void:
 		t.check(luik.schaduwklep and luik.klep().collision_layer == Layers.SHADOW_GEOMETRY,
 			"%s: geen schaduwklep op laag 5 na de breuk (laag %d)" % [label, luik.klep().collision_layer])
 		t.check(luik.schaduwklep_tot == hit + d + g, "%s: schaduwklep tot %d (breuk + D + G = %d)" % [label, luik.schaduwklep_tot, hit + d + g])
+		# `s`: de afzet van P1 van de klep (de eerste tick in de lucht vóór de breuk).
+		var s := -1
+		for k in range(hit, hit - 30, -1):
+			if p1_floor.get(k, true) and k < hit:
+				s = k + 1
+				break
+		t.check(s > 0 and s <= hit, "%s: geen afzet van P1 vóór de breuk %d (s %d)" % [label, hit, s])
 		# P1 ziet laag 5 niet: zijn neerslag raakt de schaduwklep niet, de echo wel.
 		var box: Rect2 = sim.combat.neerslag_box(Vector2(LUIK_X, FLOOR - 25.0))
 		t.check(not luik.is_hit_by(box, Layers.LIGHT) and luik.is_hit_by(box, Layers.SHADOW),
@@ -113,6 +128,18 @@ func test_schaduwklep_echo_valt_mee_alle_d(t) -> void:
 		await t.run_ticks(sim, 50)
 		t.check(p1.position.y > FLOOR + 30.0, "%s: P1 viel niet door het luik (P1 %s)" % [label, p1.position])
 		t.check(luik.schaduwklep, "%s: de schaduwklep ging te vroeg weg (tick %d, %s)" % [label, weg["tick"], weg["by"]])
+		# De echo staat tot zijn sprong (s + D) op de klep, vanaf de breuk dus op
+		# de schaduwklep, en zet op s + D af.
+		await t.run_ticks(sim, s + d + 1 - sim.tick)
+		var stand := FLOOR - 15.0
+		var off := []
+		for k in range(hit, s + d):
+			var at: Vector2 = echo_at.get(k, Vector2.INF)
+			if at == Vector2.INF or absf(at.y - stand) > 0.5:
+				off.append([k, at])
+		t.check(s + d - 1 >= hit and off.is_empty(), "%s: de echo stond niet op de schaduwklep van de breuk %d tot s + D − 1 = %d (%s)" % [label, hit, s + d - 1, off])
+		var jump_at: Vector2 = echo_at.get(s + d, Vector2.INF)
+		t.check(jump_at != Vector2.INF and jump_at.y < stand - 0.5, "%s: de echo zette niet af op s + D = %d (echo %s)" % [label, s + d, jump_at])
 		# De echo speelt de neerslag af: de schaduwklep is weg op breuk + D, door de echo.
 		await t.run_ticks(sim, hit + d + 1 - sim.tick)
 		t.check(weg["tick"] == hit + d and weg["by"] == "echo" and not luik.schaduwklep and luik.klep().collision_layer == 0,
