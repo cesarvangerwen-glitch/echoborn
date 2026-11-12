@@ -143,6 +143,14 @@ func is_stunned(tick: int) -> bool:
 	return tick < _stunned_until
 
 
+## Doet niets tot `until` (bv. een add die uit de stoom stapt, §3.4): niet lopen, niet aanvallen.
+## Raakbaar blijft hij wel.
+func hold_until(until: int) -> void:
+	_stunned_until = maxi(_stunned_until, until)
+	phase = Phase.IDLE
+	active_box = Rect2()
+
+
 ## VJ-04: na elke treffer 30 ticks stil; de aanloop breekt af. Een Dwaallicht dat duikt, keert
 ## meteen terug naar zijn baan (zonder schade).
 func stun(tick: int) -> void:
@@ -179,6 +187,12 @@ func tink(tick: int) -> void:
 ## Stap (5): bewegen en aanvallen (§2.2–§2.4). Alleen P1 wordt aangevallen (E-14h, C-02).
 func sim_update(tick: int, bodies: Array[Node2D]) -> void:
 	if not alive:
+		return
+	# C-14e: tijdens een finisher vallen vijanden niet aan; een aanval die liep, breekt af.
+	if combat != null and "finisher_running" in combat and combat.finisher_running:
+		phase = Phase.IDLE
+		active_box = Rect2()
+		_update_visual(tick)
 		return
 	var p1: Node2D = null
 	for body in bodies:

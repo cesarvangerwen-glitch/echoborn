@@ -42,6 +42,9 @@ signal tick_finished(tick: int)
 
 ## V-01b: een neerslag van P1 of P2 raakte iets; het lichaam stuit (`v.y = −5`, dash terug).
 signal stuit(tick: int, player: Node2D)
+## Een lichaam voerde in stap (4) een AANVAL-event uit: P1, P2 of de echo als hij Actief is, ook
+## als dat event een merksprong is (E-02m). Voor het finisherlog van een boss (C-04, C-14).
+signal attack_executed(tick: int, actor: Node2D)
 
 ## P2 is opgelost bij een drop-out (breek-effect op `at`, C-05).
 signal partner_left(tick: int, at: Vector2)
@@ -170,6 +173,8 @@ func add_object(object: SimObject) -> void:
 	objects.append(object)
 	if object is CombatTarget:
 		combat.add_target(object)
+	# Vijanden en bosses (`Boss`): een aanvalsvlak dat P1 raakt (LM-05, VJ-02).
+	if object.has_signal(&"hit_player"):
 		object.hit_player.connect(_on_enemy_hit_player)
 		# Vijanden van de slice lezen D en hun buren uit Combat (VJ-03, VJ-05).
 		if "combat" in object:
@@ -270,6 +275,9 @@ func _physics_process(delta: float) -> void:
 	for echo in echoes:
 		if echo.is_present():
 			_run_events(echo, echo.tick_events)
+			# C-04: een merksprong is het AANVAL-event van de echo, al voert hij geen treffer uit.
+			if echo.has_method("merksprong_start_tick") and echo.merksprong_start_tick() == tick:
+				attack_executed.emit(tick, echo)
 			# E-02m: de echo laat op tick t + 3 zijn doelmerk ontploffen.
 			if "detonate_mark" in echo and echo.detonate_mark != null:
 				combat.detonate(tick, echo.detonate_mark)
@@ -590,6 +598,7 @@ func _execute(kind: int, actor: Node2D) -> void:
 				facing = actor.facing
 			if "neerslag" in actor:
 				down = actor.neerslag
+		attack_executed.emit(tick, actor)
 		var struck := combat.attack(tick, attacker, (actor as CollisionObject2D).collision_layer,
 			actor.global_position, facing, down)
 		# V-01b: één stuit per neerslag; de echo stuit niet (V-01e).

@@ -130,6 +130,11 @@ func is_outside() -> bool:
 	return _outside
 
 
+## De tick waarop de merksprong van nu begon (het AANVAL-event van frame `p`, E-02m), of -1.
+func merksprong_start_tick() -> int:
+	return _ms_start if in_merksprong else -1
+
+
 func stop() -> void:
 	finished = true
 	tick_events = 0
