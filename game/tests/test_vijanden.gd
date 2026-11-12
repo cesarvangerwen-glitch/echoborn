@@ -94,15 +94,16 @@ func test_b11_slice_csv_complete_and_consistent(t) -> void:
 	var all := EnemyData.parse(EnemyData.PATH)
 	for g: String in ["gedeeld", "kadeloper", "schotdrager", "dwaallicht", "gemaalmeester"]:
 		t.check(all.has(g), "groep '%s' ontbreekt in slice.csv" % g)
-	var walker_keys := ["breedte", "hoogte", "levens", "v_max", "bereik", "aanloop", "actief", "herstel",
-		"vlak_breedte", "vlak_hoogte", "vlak_onder", "terugkeer"]
-	for g: String in ["kadeloper", "schotdrager"]:
-		for key: String in walker_keys:
-			t.check(all.get(g, {}).has(key), "%s.%s ontbreekt" % [g, key])
-	for key: String in ["breedte", "hoogte", "levens", "v_max", "baan_hoogte", "baan_min", "baan_max",
-			"bereik", "aanloop", "actief", "herstel", "duik_hoogte", "terugkeer", "terugkeer_verlicht"]:
-		t.check(all.get("dwaallicht", {}).has(key), "dwaallicht.%s ontbreekt" % key)
+	# Elke sleutel die de code leest (EnemyData.REQUIRED), ook een typefout in gedeeld.
+	var missing := EnemyData.missing_keys(all)
+	t.check(missing.is_empty(), "ontbreekt in slice.csv: %s" % ", ".join(missing))
+	# Zelfcontrole: een CSV met een typefout wordt gevonden.
+	var broken := all.duplicate(true)
+	broken["gedeeld"].erase("v_grens")
+	t.check(EnemyData.missing_keys(broken) == PackedStringArray(["gedeeld.v_grens"]),
+		"missing_keys vindt een ontbrekende sleutel niet")
 	var c: Dictionary = Tuning.combat()
+	t.check(int(c["p1_hit_damage"]) == 1 and int(c["p1_invulnerable_ticks"]) == 45, "VJ-02 in echo_v04.json")
 	for g: String in ["kadeloper", "schotdrager", "dwaallicht"]:
 		# VJ-01: aanloop ≥ 30 ticks, actief vlak ≤ 8 ticks; VJ-03: v_max onder de grens.
 		t.check(EnemyData.ticks(g, "aanloop") >= 30, "%s: aanloop %d < 30" % [g, EnemyData.ticks(g, "aanloop")])

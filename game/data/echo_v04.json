@@ -66,6 +66,8 @@
 		"enemy_windup_ticks": 30,
 		"enemy_attack_ticks": 6,
 		"p1_health": 5,
+		"p1_hit_damage": 1,
+		"p1_invulnerable_ticks": 45,
 		"neerslag_box": [
 			16,
 			20

@@ -8,6 +8,20 @@ extends RefCounted
 const PATH := "res://data/vijanden/slice.csv"
 const Tuning = preload("res://scripts/echo/tuning.gd")
 
+## Elke sleutel die de code leest, per groep (B-11). `missing_keys` toetst de CSV hiertegen, zodat
+## een typefout de CSV-test rood maakt en niet stil 0,0 geeft. De groep `gemaalmeester` staat hier
+## pas vanaf B-5.
+const REQUIRED := {
+	"gedeeld": ["v_teller", "v_aftrek", "v_grens", "stil_na_treffer", "afstand_los", "paar_e", "paar_k",
+		"verlicht_snelheid", "verlicht_aanloop_extra"],
+	"kadeloper": ["breedte", "hoogte", "levens", "v_max", "bereik", "aanloop", "actief", "herstel",
+		"vlak_breedte", "vlak_hoogte", "vlak_onder", "terugkeer"],
+	"schotdrager": ["breedte", "hoogte", "levens", "v_max", "bereik", "aanloop", "actief", "herstel",
+		"vlak_breedte", "vlak_hoogte", "vlak_onder", "terugkeer", "pantser", "beeld_breedte", "beeld_hoogte"],
+	"dwaallicht": ["breedte", "hoogte", "levens", "v_max", "baan_hoogte", "baan_min", "baan_max", "bereik",
+		"aanloop", "actief", "herstel", "duik_hoogte", "terugkeer", "terugkeer_verlicht"],
+}
+
 static var _data: Dictionary = {}
 
 
@@ -43,6 +57,16 @@ static func parse(path: String) -> Dictionary:
 	return result
 
 
+## De sleutels uit REQUIRED die in `data` ontbreken, als "groep.sleutel" (leeg = compleet).
+static func missing_keys(data: Dictionary) -> PackedStringArray:
+	var missing: PackedStringArray = []
+	for group_name: String in REQUIRED:
+		for key: String in REQUIRED[group_name]:
+			if not data.get(group_name, {}).has(key):
+				missing.append("%s.%s" % [group_name, key])
+	return missing
+
+
 ## Eén groep (bv. `kadeloper`).
 static func group(name: String) -> Dictionary:
 	var all := groups()
@@ -55,6 +79,8 @@ static func group(name: String) -> Dictionary:
 static func value(group_name: String, key: String) -> float:
 	var g := group(group_name)
 	if not g.has(key):
+		# Een fout, geen stille standaard: de testrunner maakt elke test rood die hier komt
+		# (error_log.gd), en `missing_keys` laat de CSV-test falen.
 		push_error("EnemyData: '%s.%s' ontbreekt in %s" % [group_name, key, PATH])
 		return 0.0
 	return float(g[key])
