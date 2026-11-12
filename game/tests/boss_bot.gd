@@ -227,8 +227,9 @@ func _decide_p1() -> int:
 	if p == null or _boss.is_defeated():
 		return 0
 	_update_stuck(p)
+	# Vóór BOSS_START naar het midden van de arena (in de Kadewijk komt P1 rechts binnen, #83).
 	if _boss.state == _boss.State.IDLE:
-		return _walk(1)
+		return _walk(1 if _ax(p) < _boss.middle() else -1)
 	if _boss.is_wankel() or _boss.is_finisher_running():
 		return _wankel_p1(p)
 	if _boss.phase == Gemaalmeester.Phase.ONE:

@@ -127,6 +127,17 @@ func attach(p_sim: Node) -> void:
 		sim.stuit.connect(_on_stuit)
 
 
+## `Boss.detach` (de arena ontlaadt, #83): de stuit los, en de adds weg bij de Sim en uit de boom.
+func on_detach() -> void:
+	if sim.has_signal(&"stuit") and sim.stuit.is_connected(_on_stuit):
+		sim.stuit.disconnect(_on_stuit)
+	for add: SliceEnemy in adds:
+		if is_instance_valid(add):
+			sim.remove_object(add)
+			add.queue_free()
+	adds.clear()
+
+
 ## D van de sessie (`Combat.tail_ticks`; zonder Sim de standaard uit `echo_v04.json`).
 func tail_ticks() -> int:
 	if combat != null and "tail_ticks" in combat:

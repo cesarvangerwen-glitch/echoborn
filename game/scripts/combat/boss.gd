@@ -58,6 +58,18 @@ var se := 0
 var wankel_se := 0
 ## Breedte van de arena (px, vanaf de linkermuur): P1 hierbinnen = BOSS_START.
 var arena_width := 600.0
+## BOSS_START pas als het middelpunt van P1 zo ver binnen elke muur staat (px). 0 = op de muur (de
+## arena van de tests); in een gebied staat P1 dan helemaal binnen als de deur dichtgaat (#83).
+var start_inset := 0.0
+## BOSS_START alleen als het middelpunt van P1 hooguit zo hoog boven de vloer staat (px). INF = elke
+## hoogte; in een gebied ligt er een kamer boven de arena (Kadewijk: S6 boven S8, #83).
+var arena_height := INF
+## BOSS_START pas als elk lichaam (P1, P2, de echo die afspeelt; C-01) in de arena staat, en met een
+## echo pas als P1 er al D ticks in staat (dan loopt ook de echo, die P1 D ticks later volgt, er
+## helemaal in). In een gebied gaat bij BOSS_START een deur dicht, en een echo die daar nog loopt,
+## breekt erop (E-08); zo komt P2 ook niet buiten te staan (werkaanname GP, #83). Uit = alleen P1,
+## meteen (de arena van de tests).
+var start_with_all_bodies := false
 var arena_closed := false
 var start_tick := -1
 ## `t_f` (C-14 b), of -1.
@@ -88,6 +100,8 @@ var _log: Array = []
 var _strikes: Array = []
 ## Deuren van de arena: [lichaam, laag als hij dicht is].
 var _doors: Array = []
+## Sinds deze tick staat P1 (onafgebroken) in de arena, of -1 (`start_with_all_bodies`).
+var _inside_since := -1
 var _attack_hit := false
 var _attack_start := 0
 var _windup_end := 0
@@ -123,6 +137,29 @@ func attach(p_sim: Node) -> void:
 		sim.add_object(part)
 	sim.attack_executed.connect(_on_attack_executed)
 	sim.tick_finished.connect(after_tick)
+
+
+## Meldt de boss, zijn delen en zijn signalen bij de Sim af: de kamer van de arena ontlaadt (R10,
+## #83). Aanroepen tussen twee ticks of in `sim_track`, zoals `Sim.remove_object`. De node zelf
+## ruimt de aanroeper op; daarna doet hij niets meer.
+func detach() -> void:
+	if sim == null:
+		return
+	abort_attack(sim.tick)
+	_end_finisher()
+	on_detach()
+	for part: BossPart in parts:
+		sim.remove_object(part)
+	sim.remove_object(self)
+	if sim.attack_executed.is_connected(_on_attack_executed):
+		sim.attack_executed.disconnect(_on_attack_executed)
+	if sim.tick_finished.is_connected(after_tick):
+		sim.tick_finished.disconnect(after_tick)
+	# `Sim.add_object` verbond `hit_player` met de Sim; alleen die verbinding gaat los.
+	for c: Dictionary in hit_player.get_connections():
+		if (c["callable"] as Callable).get_object() == sim:
+			hit_player.disconnect(c["callable"])
+	sim = null
 
 
 ## GM-01: een deur die dicht is (botsing op `closed_layer`) zolang de arena dicht is.
@@ -184,6 +221,13 @@ func arena_x(at: Vector2) -> float:
 	return at.x - global_position.x
 
 
+## Staat het wereldpunt `at` (het middelpunt van P1) in de arena: BOSS_START (GM-01, L-13 a)?
+func is_in_arena(at: Vector2) -> bool:
+	var x := arena_x(at)
+	var up := global_position.y - at.y
+	return x >= start_inset and x <= arena_width - start_inset and up <= arena_height
+
+
 ## BOSS_START (normaal: P1 komt de arena in, `sim_update`).
 func start(tick: int) -> void:
 	if state != State.IDLE:
@@ -238,8 +282,11 @@ func sim_update(tick: int, bodies: Array[Node2D]) -> void:
 	if p1_actor != null and p1_actor.died and (state == State.FIGHT or state == State.WANKEL):
 		reset(tick)
 	if state == State.IDLE and p1 != null:
-		var x := arena_x(p1.global_position)
-		if x >= 0.0 and x <= arena_width:
+		if not is_in_arena(p1.global_position):
+			_inside_since = -1
+		elif _inside_since < 0:
+			_inside_since = tick
+		if _inside_since >= 0 and (not start_with_all_bodies or _all_inside(tick, bodies)):
 			start(tick)
 	if state == State.FIGHT:
 		_step_attack(tick, p1)
@@ -260,6 +307,7 @@ func reset(tick: int) -> void:
 	state = State.IDLE
 	se = se_max
 	start_tick = -1
+	_inside_since = -1
 	finisher_tick = -1
 	_log.clear()
 	_strikes.clear()
@@ -298,6 +346,11 @@ func on_wankel(_tick: int) -> void:
 
 
 func on_reset(_tick: int) -> void:
+	pass
+
+
+## `detach`: de soort ruimt zijn eigen objecten bij de Sim op (adds, extra signalen).
+func on_detach() -> void:
 	pass
 
 
@@ -451,6 +504,16 @@ func _on_attack_executed(tick: int, actor: Node2D) -> void:
 	_log.append([tick, who])
 	while not _log.is_empty() and int(_log[0][0]) < tick - _finisher_source:
 		_log.pop_front()
+
+
+## `start_with_all_bodies`: elk lichaam in de arena, en met een echo P1 al D ticks.
+func _all_inside(tick: int, bodies: Array[Node2D]) -> bool:
+	for body in bodies:
+		if not is_in_arena(body.global_position):
+			return false
+	if sim != null and not sim.echoes.is_empty() and combat != null and "tail_ticks" in combat:
+		return tick - _inside_since >= int(combat.tail_ticks)
+	return true
 
 
 func _p1_of(bodies: Array[Node2D]) -> Node2D:
