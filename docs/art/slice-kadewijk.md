@@ -12,7 +12,7 @@ Bronnen: `docs/design/wereld.md` v0.2 §2 (slice Kadewijk), `docs/design/combat/
 | CEO-besluit 2026-11-12 (1) | Fase 2 loopt parallel en slice-art mag starten. Volgens §4, regel 3 van het kader komt **eindkwaliteit alleen op maatvaste kamers**. Op dit moment is **geen enkele slice-kamer maatvast**. |
 | CEO-besluit 2026-11-12 (D = 60) | Het vloerteken onder het rad schuift mee met D (`D` tot `D + 68` px). Verder hangt hier niets van D af. |
 | F1 (#65) | Gehaald: de R5-scène is de maatstaf voor eindkwaliteit |
-| Maatvast (kamerdoc v0.2 §8, #212, PR #220) | **S1 en S3 zijn maatvast** (bots groen op D = 60, `Visie-review: past` van de CD, LGD bevestigd). S2 en S4 niet: daar komt nog geen eindkwaliteit. Deel 2 (§9) maakt S1 en S3 op eindkwaliteit. |
+| Maatvast (kamerdoc v0.2 §8, #212, PR #220) | **S1 en S3 zijn maatvast** (bots groen op D = 60, `Visie-review: past` van de CD, LGD bevestigd). S2 en S4 zijn maatvast (CD `past` in #212, PR #221 gemerged; LGD bevestigd in #223); hun eindkwaliteit volgt in deel 3. Deel 2 (§9) maakt S1 en S3 op eindkwaliteit. |
 | **Werkaanname AD (deel 1)** | Alles in deel 1 is **placeholder** (`_placeholder` in de bestandsnaam). Ik maak alleen wat niet van kamermaten afhangt: palet, regels, tegels die je in elke layout kunt hergebruiken, en concepten. Er staat **niets in `game/`**. De Technical Artist zet de tegels pas in `game/art/wereld/kadewijk/` als de importconventie er is (assetlijst §4) en de eerste kamer maatvast is. |
 
 **Weggooirisico:** klein. Het palet, de overgang en de stijlregels hangen niet af van de layout. De tegels zijn generiek (16×16 en tegelbaar). De concepten volgen de maten van combat §3.2 alleen als schets. Verandert de echo of de boss, dan gaan alleen de twee concept-sheets opnieuw. Opnieuw maken kost ± 2 s: `python3 docs/art/slice/bron/genereer_slice_deel1.py`.
@@ -181,7 +181,7 @@ Bladen: `concept_vijanden_x4_placeholder.png` (per type: silhouet, idle, aanloop
 | Punt | Wie | Wanneer |
 |---|---|---|
 | Eindkwaliteit S1 en S3 | Art Director | **Gedaan in deel 2 (§9)** |
-| Eindkwaliteit S2, S4, en daarna S5–S9 (interieurs S5, S7, S8) | Art Director met Environment Artist | Per kamer zodra ze maatvast is (S2: visie-review CD; S4: nieuwe visie-review na #217) |
+| Eindkwaliteit S2, S4, en daarna S5–S9 (interieurs S5, S7, S8) | Art Director met Environment Artist | S2 en S4: maatvast (#212, #221, #223), eindkwaliteit in deel 3; S5–S9 zodra ze maatvast zijn |
 | Koppeling van de S1/S3-lagen aan de kamerscènes (§9.4) | Technical Artist (met TD voor de `--import`-stap in CI) | Volgende stap; SM-review (code in `game/`) |
 | Regels van §4.2 (bovenrand 2 px, tell-taal, amber/cyaan alleen als merk-overlay) en de drie nieuwe ramps opnemen in bible v1 §3 en §6, met de drempels: **bovenrand ΔL\* ≥ 50** tegen de directe achtergrond (ring van 2–6 px), in grijs én kleur (gemeten 50–75); de bestaande eis van **ΔL\* ≥ 40** op vulling of contour wordt voor vijanden "op bovenrand of kern" (het lijf haalt 2,6–37); kleurafstanden **ΔE76 ≥ 30, en ≥ 25 bij deuteranopie**, anders ΔL\* ≥ 20 of vorm (bible §7.1); en uit het kleurscript (§1) een **gemiddelde chroma ≤ ± 12 tot trap 2** (gemeten 3–12), en de beat na trap 2 minstens ± 1,5× de hoogste grijze beat (gemeten 20 tegen 12) | Art Director | Bible v1 |
 | De LUT-shader en de kleurgolf in Godot 4.6, met de kost tegen het lichtbudget (≤ 20 LE) | Technical Artist | Vóór de eerste maatvaste kamer |
@@ -204,7 +204,7 @@ Deel 1: alles in `docs/art/slice/` (behalve `eindkwaliteit/`) wordt gemaakt door
 
 ## 9. Deel 2: eindkwaliteit S1 Kade-ingang en S3 Vismarkt
 
-**Werkaanname (kader §5):** S1 en S3 zijn maatvast (kamerdoc v0.2 §8: bots groen op D = 60, `Visie-review: past` van de CD in #212, LGD bevestigd bij de merge van #220). De art volgt `kadewijk_layout.gd` op D = 60. **Wat van D afhangt zit niet in de kamerlagen** (zie §9.3), dus bij een andere D blijft de art kloppen. S2 en S4 zijn niet maatvast en krijgen nog geen eindkwaliteit. Het gemaal van S6 bestaat nog niet. Voor de kleurgolf neem ik aan dat het rechts van S5 staat, op **wereld (4960, 150)** (`GEMAAL_WERELD`). De TA neemt de echte plek uit `wijk_gemaal` zodra die er is. Geen nieuwe CEO-besluiten nodig.
+**Werkaanname (kader §5):** S1 en S3 zijn maatvast (kamerdoc v0.2 §8: bots groen op D = 60, `Visie-review: past` van de CD in #212, LGD bevestigd bij de merge van #220). De art volgt `kadewijk_layout.gd` op D = 60. **Wat van D afhangt zit niet in de kamerlagen** (zie §9.3), dus bij een andere D blijft de art kloppen. S2 en S4 zijn maatvast (CD `past` in #212, PR #221 gemerged; LGD bevestigd in #223); hun eindkwaliteit volgt in deel 3. Het gemaal van S6 bestaat nog niet. Voor de kleurgolf neem ik aan dat het rechts van S5 staat, op **wereld (4960, 150)** (`GEMAAL_WERELD`). De TA neemt de echte plek uit `wijk_gemaal` zodra die er is. Geen nieuwe CEO-besluiten nodig.
 
 **Weggooirisico:** klein. De kamerlagen hangen af van de vaste maten van S1 en S3, en die zijn maatvast. Verandert er toch een maat, dan pas je de constante in de generator aan en draai je hem opnieuw (± 40 s).
 
@@ -282,7 +282,7 @@ De generator gebruikt deel 1 (palet, tegels, props, vijanden) en de R5-figuren. 
 
 - **Koppeling in de scènes en de `--import`-stap** (§9.4): TA met TD; SM-review.
 - **LUT-shader en kleurgolf in de engine** (§2), met de kost op de Deck: TA.
-- **S2 en S4** op eindkwaliteit na hun visie-review (CD), daarna S5–S9.
+- **S2 en S4** zijn maatvast (CD `past` in #212, PR #221 gemerged; LGD bevestigd in #223): eindkwaliteit volgt in deel 3, daarna S5–S9.
 - **Bevroren echo van de bakker** (S-12) op de kade van S1: Animator.
 - **Echo in kleur vóór een verlicht raam** (S3, ΔL\* 35 tegen ≥ 40): de amberen rand valt weg tegen warm raamlicht. Dat los je niet op in de achtergrond, want verlichte ramen horen bij de kleurtoestand. Voorstel voor de TA (echo-weergave F-07/S-10): een donkere buitencontour van 1 px die blijft staan, ook in kleur. Ik meet opnieuw als de echo-shader er is.
 - **Bible v1:** de drempel voor het loopvlak (ΔL\* ≥ 20) en de chroma op volle art (§9.5).
