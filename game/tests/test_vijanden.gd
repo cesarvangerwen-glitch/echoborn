@@ -753,11 +753,11 @@ func test_b12_vj08_windup_continues_when_p1_jumps(t) -> void:
 
 
 ## B-12 / VJ-02, LM-05 (gdd v0.8.1): de dodelijke treffer geeft geen onkwetsbaarheid; na de respawn is
-## P1 45 ticks onkwetsbaar (`onkwetsbaar_respawn`, `r … r + 44`): een Kadeloper die op het respawnpunt
+## P1 45 ticks onkwetsbaar (`combat.p1_respawn_invulnerable_ticks`, `r … r + 44`): een Kadeloper die op het respawnpunt
 ## al in zijn aanloop zat, raakt P1 niet; zijn volgende aanval (na r + 45) wel.
 func test_b12_vj02_invulnerable_after_respawn(t) -> void:
-	t.check(EnemyData.ticks("gedeeld", "onkwetsbaar_respawn") == 45, "onkwetsbaar_respawn %d (45)"
-		% EnemyData.ticks("gedeeld", "onkwetsbaar_respawn"))
+	t.check(int(Tuning.combat()["p1_respawn_invulnerable_ticks"]) == 45, "p1_respawn_invulnerable_ticks %d (45)"
+		% int(Tuning.combat()["p1_respawn_invulnerable_ticks"]))
 	var w := _world(t, 400.0)
 	var sim = w["sim"]
 	var p1: PlayerActor = w["p1"]

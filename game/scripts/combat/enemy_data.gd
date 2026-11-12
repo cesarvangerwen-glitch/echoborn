@@ -12,7 +12,7 @@ const Tuning = preload("res://scripts/echo/tuning.gd")
 ## een typefout de CSV-test rood maakt en niet stil 0,0 geeft (B-5–B-8 en B-12).
 const REQUIRED := {
 	"gedeeld": ["v_teller", "v_aftrek", "v_grens", "stil_na_treffer", "afstand_los", "paar_e", "paar_k",
-		"verlicht_snelheid", "verlicht_aanloop_extra", "onkwetsbaar_respawn"],
+		"verlicht_snelheid", "verlicht_aanloop_extra"],
 	"kadeloper": ["breedte", "hoogte", "levens", "v_max", "bereik", "aanloop", "actief", "herstel",
 		"vlak_breedte", "vlak_hoogte", "vlak_onder", "terugkeer", "aanloop_hoogte_min", "aanloop_hoogte_max"],
 	"schotdrager": ["breedte", "hoogte", "levens", "v_max", "bereik", "aanloop", "actief", "herstel",

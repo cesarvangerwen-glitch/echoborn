@@ -14,7 +14,6 @@ const InputBits = preload("res://scripts/input/input_bits.gd")
 const Layers = preload("res://scripts/world/layers.gd")
 const Tuning = preload("res://scripts/echo/tuning.gd")
 const GameEvents = preload("res://scripts/events/game_events.gd")
-const EnemyData = preload("res://scripts/combat/enemy_data.gd")
 
 ## ROOM: kamerwissel naar een kamer die geen buur is (E-04a), gezet door de
 ## AreaLoader na stap (3).
@@ -82,7 +81,7 @@ var _stance_held := false        ## AANVAL sindsdien aaneengesloten ingedrukt
 ## VJ-02 (LM-05): schade per vijandelijke treffer en ticks onkwetsbaar daarna (uit data, in `setup`).
 var _hit_damage := 1
 var _invulnerable_ticks := 45
-## VJ-02 (B-12): ticks onkwetsbaar na een respawn (`slice.csv`, `gedeeld.onkwetsbaar_respawn`).
+## VJ-02 (B-12): ticks onkwetsbaar na een respawn (`combat.p1_respawn_invulnerable_ticks`).
 var _respawn_invulnerable_ticks := 45
 
 
@@ -93,7 +92,7 @@ func setup(p_player_index: int, p_input_source: RefCounted, color: Color,
 	health = int(Tuning.combat()["p1_health"])
 	_hit_damage = int(Tuning.combat()["p1_hit_damage"])
 	_invulnerable_ticks = int(Tuning.combat()["p1_invulnerable_ticks"])
-	_respawn_invulnerable_ticks = EnemyData.ticks("gedeeld", "onkwetsbaar_respawn")
+	_respawn_invulnerable_ticks = int(Tuning.combat()["p1_respawn_invulnerable_ticks"])
 	# E-02: recorder-capaciteit uit de data, tenzij de aanroeper hem opgeeft.
 	recorder = EchoRecorder.new(capacity if capacity > 0 else int(Tuning.echo()["recorder_capacity"]))
 	name = "Player%d" % player_index

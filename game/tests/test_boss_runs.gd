@@ -148,7 +148,8 @@ func _table_row(name: String, m: Dictionary) -> String:
 # --- B-9: scripted runs per D ---------------------------------------------------
 
 ## B-9 en C-16 (3) op de Gemaalmeester: de run wint (BOSS_VERSLAGEN), MP-1 ≤ 300, de echo breekt
-## nooit; bij D = 60 duurt de solo-run 90–150 s (§3.9).
+## nooit; bij D = 60 duurt de solo-run 90–150 s (§3.9). Let op: met 2 slagen per bounce, zonder
+## ontwijken in fase 2, en P1 kan niet doodgaan (hoge LP; de treffers staan in de note).
 func _solo(t, d: int) -> void:
 	var run := _arena(t, d, false)
 	var m := await _play_run(t, run)
@@ -156,7 +157,8 @@ func _solo(t, d: int) -> void:
 	_check_run(t, "solo D = %d" % d, m)
 	if d == 60:
 		var s := float(m.get("total", 0)) / 60.0
-		t.check(s >= 90.0 and s <= 150.0, "solo D = 60: %.1f s (90–150, §3.9)" % s)
+		t.check(s >= 90.0 and s <= 150.0, ("solo D = 60: %.1f s (90–150, §3.9; 2 slagen per bounce, "
+			+ "zonder ontwijken, P1 kan niet doodgaan)") % s)
 	await t.cleanup()
 
 
