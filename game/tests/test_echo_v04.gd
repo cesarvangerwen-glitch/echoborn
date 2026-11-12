@@ -18,6 +18,8 @@ const GameEvents = preload("res://scripts/events/game_events.gd")
 const Layers = preload("res://scripts/world/layers.gd")
 const SpikeWorld = preload("res://scripts/world/spike_world.gd")
 const Zone = preload("res://scripts/objects/zone.gd")
+const Tuning = preload("res://scripts/echo/tuning.gd")
+const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
 
 const L := InputBits.LEFT
 const R := InputBits.RIGHT
@@ -132,6 +134,22 @@ func test_e02_tail_follows_exactly_all_d(t) -> void:
 ## E-02 (gdd v0.8 §4.6, G-6): wissel van D op t0 van 60 naar 120: Leeg tot
 ## t0 + 120, dan op de positie van P1 op t0. Bij D = 60 houdt de recorder
 ## 600 frames. De wissel 120 -> 180 (tot v0.8) draait mee als regressie.
+## G-6 (SM-punt PR #194): `echo.tail_options` heeft precies vier waarden, één per debugtoets
+## (F1/F2/F3/F7), en de standaard `tail_ticks` staat erin. Zo wordt een typefout in data hier
+## rood en niet pas in de HUD.
+func test_e02_tail_options_four_values_with_default(t) -> void:
+	var echo: Dictionary = Tuning.echo()
+	var options: Array = echo["tail_options"]
+	var ints: Array = options.map(func(v: Variant) -> int: return int(v))
+	t.check(options.size() == 4, "tail_options heeft %d waarden (4): %s" % [options.size(), options])
+	t.check(ints.has(int(echo["tail_ticks"])), "tail_ticks %s staat niet in tail_options %s" % [echo["tail_ticks"], options])
+	var slots: Array = FlowRoom.DEBUG_TAIL_KEYS.values()
+	slots.sort()
+	t.check(slots == range(options.size()), "debugtoetsen wijzen naar plekken %s, niet 0–%d" % [slots, options.size() - 1])
+	for key: int in FlowRoom.DEBUG_TAIL_KEYS:
+		t.check(FlowRoom.debug_tail(key) == ints[FlowRoom.DEBUG_TAIL_KEYS[key]], "toets %d geeft een andere D" % key)
+
+
 func test_e02_switching_d_is_a_reset(t) -> void:
 	for pair: Array in [[60, 120], [120, 180]]:
 		var from: int = pair[0]

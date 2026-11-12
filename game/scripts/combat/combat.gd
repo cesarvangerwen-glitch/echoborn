@@ -79,13 +79,17 @@ func begin_tick(tick: int) -> void:
 
 ## Stap (4): een AANVAL-event van een lichaam (E-10a). `attacker` is "p1",
 ## "p2" of "echo"; `layer` de laag van het lichaam (E-06). Elk doel dat het
-## aanvalsvlak overlapt, wordt geraakt.
-func attack(tick: int, attacker: String, layer: int, center: Vector2, facing: int) -> void:
-	var box := attack_box(center, facing)
+## aanvalsvlak overlapt, wordt geraakt. `down`: een neerslag (V-01a), met het
+## vlak onder het lichaam. Geeft het aantal geraakte doelen (V-01b: > 0 = stuit).
+func attack(tick: int, attacker: String, layer: int, center: Vector2, facing: int,
+		down := false) -> int:
+	var box := neerslag_box(center) if down else attack_box(center, facing)
 	var c: Dictionary = Tuning.combat()
+	var struck := 0
 	for target in targets:
 		if not target.is_hit_by(box, layer):
 			continue
+		struck += 1
 		var mark := mark_on(target)
 		var damage := 0
 		if attacker == "echo":
@@ -102,9 +106,11 @@ func attack(tick: int, attacker: String, layer: int, center: Vector2, facing: in
 				_set_mark(tick, target, attacker)
 		if target.armor_intact:
 			damage = 0  # E-14g: een intact pantser krijgt niets van treffers
+			target.tink(tick)  # VJ-07: eigen geluid en vonk
 		var done := target.apply_damage(tick, damage, attacker)
 		target.stun(tick)
 		hit.emit(tick, attacker, target, done)
+	return struck
 
 
 ## Het aanvalsvlak: 20 × 16 px direct vóór het lichaam (E-10a).
@@ -115,6 +121,14 @@ func attack_box(center: Vector2, facing: int) -> Rect2:
 	var half := Tuning.body_size().x * 0.5
 	var box_center := center + Vector2(facing * (half + box.x * 0.5), 0.0)
 	return Rect2(box_center - box * 0.5, box)
+
+
+## V-01a: het neerslagvlak, 16 × 20 px direct onder het lichaam.
+func neerslag_box(center: Vector2) -> Rect2:
+	var size: Array = Tuning.combat()["neerslag_box"]
+	var box := Vector2(float(size[0]), float(size[1]))
+	var bottom := center.y + Tuning.body_size().y * 0.5
+	return Rect2(Vector2(center.x - box.x * 0.5, bottom), box)
 
 
 ## E-02m: het doelmerk voor een AANVAL van de echo op `from` (frame p): het

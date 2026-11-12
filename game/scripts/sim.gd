@@ -25,6 +25,7 @@ const Motor = preload("res://scripts/echo/motor.gd")
 const Layers = preload("res://scripts/world/layers.gd")
 const Tuning = preload("res://scripts/echo/tuning.gd")
 const Zone = preload("res://scripts/objects/zone.gd")
+const InputBits = preload("res://scripts/input/input_bits.gd")
 
 ## Vlak vóór elke stap van een actor of object. `phase` is de stap uit E-07b:
 ## "1", "2", "3", "4" of "5". Bedoeld voor tests en debug-overlays; zonder
@@ -38,6 +39,9 @@ signal event_executed(tick: int, kind: int, actor: Node2D, target: Node)
 ## Na stap (5), vóór `tick` ophoogt. Alle standen van deze tick zijn dan af;
 ## een echo die deze tick zijn laatste frame speelde, staat er nog.
 signal tick_finished(tick: int)
+
+## V-01b: een neerslag van P1 of P2 raakte iets; het lichaam stuit (`v.y = −5`, dash terug).
+signal stuit(tick: int, player: Node2D)
 
 ## P2 is opgelost bij een drop-out (breek-effect op `at`, C-05).
 signal partner_left(tick: int, at: Vector2)
@@ -167,6 +171,9 @@ func add_object(object: SimObject) -> void:
 	if object is CombatTarget:
 		combat.add_target(object)
 		object.hit_player.connect(_on_enemy_hit_player)
+		# Vijanden van de slice lezen D en hun buren uit Combat (VJ-03, VJ-05).
+		if "combat" in object:
+			object.combat = combat
 	if object.get_parent() == null:
 		add_child(object)
 
@@ -569,15 +576,26 @@ func _execute(kind: int, actor: Node2D) -> void:
 			target.interact(actor, tick)
 	elif kind == GameEvents.ATTACK:
 		# E-10a: aanvalsvlak in de (opgenomen) kijkrichting, 1 tick actief.
+		# V-01a: in de lucht met DOWN is het een neerslag, met het vlak onder het lichaam.
 		var facing := 1
 		var attacker := "echo"
+		var down := false
 		if actor is PlayerActor:
-			facing = (actor as PlayerActor).motor.facing
-			attacker = "p%d" % (actor as PlayerActor).player_index
-		elif "facing" in actor:
-			facing = actor.facing
-		combat.attack(tick, attacker, (actor as CollisionObject2D).collision_layer,
-			actor.global_position, facing)
+			var player := actor as PlayerActor
+			facing = player.motor.facing
+			attacker = "p%d" % player.player_index
+			down = not player.motor.on_floor and player.last_input & InputBits.DOWN != 0
+		else:
+			if "facing" in actor:
+				facing = actor.facing
+			if "neerslag" in actor:
+				down = actor.neerslag
+		var struck := combat.attack(tick, attacker, (actor as CollisionObject2D).collision_layer,
+			actor.global_position, facing, down)
+		# V-01b: één stuit per neerslag; de echo stuit niet (V-01e).
+		if down and struck > 0 and actor is PlayerActor:
+			(actor as PlayerActor).bounce_off(tick)
+			stuit.emit(tick, actor)
 	event_executed.emit(tick, kind, actor, target)
 
 

@@ -162,6 +162,11 @@ func plank_since_ground(index: int) -> bool:
 	return _plank_since_ground[index] == 1
 
 
+## De inputbits van frame `index` (toestand, bv. DOWN voor de Neerslag, V-01e).
+func input(index: int) -> int:
+	return _inputs[index]
+
+
 func events(index: int) -> int:
 	return _events[index]
 
