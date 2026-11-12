@@ -2,7 +2,7 @@
 
 Versie 2.2 · 2026-11-12 · Eigenaar: Producer · Issue: [#73](https://github.com/cesarvangerwen-glitch/echoborn/issues/73) (T18; eerder #9 en #32) · Lead-review: Executive Producer
 Werktitel *Polderlight* (besluit #96), vervangt *Wraithstep* (#24, #61) en *Echoborn*. Niet publiek gebruiken vóór de formele merkcheck (#24, 3A). Repo en mappen heten voorlopig nog "echoborn".
-Bronnen: `docs/concept/pitch.md` v0.4 (§10 R-V1–R-V12), `docs/productie/fase-2-kader.md` v0.4 (§1–§4, §6, §7, §9), `docs/business/ideecheck-v0-4.md`, `docs/beslissingen.md` (#2, #24, #47, #51, #52, #61, #96, #124 en de besluiten van 2026-11-12), `docs/qa/ceo-kaart-f0.md` en `docs/qa/testplan-f0.md`. Versie 1.2 (fase 1, met de volledige onderbouwing per risico) staat in de git-geschiedenis.
+Bronnen: `docs/concept/pitch.md` v0.4 (§10 R-V1–R-V12), `docs/productie/fase-2-kader.md` v0.4 (§1–§4, §6, §7, §9), `docs/business/ideecheck-v0-4.md`, `docs/beslissingen.md` (#2, #24, #47, #51, #52, #61, #96, #124 en de besluiten van 2026-11-12: echo 1 s / D = 60, fase 2 parallel ook bouwen, de CEO test bij mijlpalen), `docs/qa/ceo-kaart-f0.md` en `docs/qa/testplan-f0.md`. Versie 1.2 (fase 1, met de volledige onderbouwing per risico) staat in de git-geschiedenis.
 
 **Werkaannames die dit document gebruikt** (kader §5): extern budget fase 2 € 0 (EP, kader §7); totaalbudget en releasevenster volgen per fase (werkaanname in `beslissingen.md`). Kans en impact zijn de inschatting van de Producer, behalve waar een bron staat. Alle andere uitgangspunten zijn CEO-besluiten, waaronder de omvang van fase 2 van ≈ 61–88 maak-taken (besluit #51: 2A; kader §8).
 
