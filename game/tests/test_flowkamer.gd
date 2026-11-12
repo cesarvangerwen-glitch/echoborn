@@ -71,16 +71,28 @@ func _free(t, room) -> void:
 
 
 ## De kamer laadt: drie kamers als buren, geen zones (FK-4), het B3-blok per D
-## (gdd §4.3: B = D − 60), het pomprad 15–40 px boven de vloer (FK-5).
+## (gdd v0.8 §4.3: B = max(D − 60, 0); bij D = 60 geen blok en geen collision,
+## G-6), het pomprad 15–40 px boven de vloer (FK-5).
 func test_room_loads(t) -> void:
-	for d in [90, 120, 180]:
+	for d in [60, 90, 120, 180]:
 		var pair := _room(t, d, true)
 		var room = pair[0]
 		await t.tree.physics_frame
 		t.check(room.sim != null and room.p1 != null and room.echo != null, "D=%d: Sim, P1 of echo ontbreekt" % d)
-		var block: StaticBody2D = room.get_node("Level/B3Blok")
-		var size: Vector2 = (block.get_child(0).shape as RectangleShape2D).size
-		t.check(is_equal_approx(size.x, d - 60.0), "D=%d: B3-blok %.0f px (verwacht %d)" % [d, size.x, d - 60])
+		var block: StaticBody2D = room.get_node_or_null("Level/B3Blok")
+		if d == 60:
+			# Geen blok: niets botst in de kom tussen de ingang en de keerwand.
+			var query := PhysicsPointQueryParameters2D.new()
+			query.position = Vector2(Layout.B3_BLOCK_LEFT - 2.0, Layout.FLOOR - 20.0)
+			var hits: Array = room.get_world_2d().direct_space_state.intersect_point(query)
+			var wall: StaticBody2D = room.get_node("Level/B3Wand")
+			var wall_left: float = wall.position.x - (wall.get_child(0).shape as RectangleShape2D).size.x * 0.5
+			t.check(block == null and hits.is_empty() and is_equal_approx(wall_left, Layout.B3_BLOCK_LEFT),
+				"D=60: B3-blok %s, botsing vóór de wand %s, wand op %.0f (verwacht geen blok, wand op %.0f)" % [
+				block, hits, wall_left, Layout.B3_BLOCK_LEFT])
+		else:
+			var size: Vector2 = (block.get_child(0).shape as RectangleShape2D).size if block else Vector2.ZERO
+			t.check(block != null and is_equal_approx(size.x, d - 60.0), "D=%d: B3-blok %.0f px (verwacht %d)" % [d, size.x, d - 60])
 		var zones: Array = room.find_children("*", "Area2D", true, false)
 		t.check(zones.is_empty(), "D=%d: zones in de flow-kamer (FK-4): %s" % [d, zones])
 		t.check(room.vanes.size() == Layout.PUMP_VANES.size() and room.gemaal.vanes.size() == room.vanes.size(),

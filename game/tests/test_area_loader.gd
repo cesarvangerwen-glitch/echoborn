@@ -3,7 +3,7 @@ extends RefCounted
 ## (1)–(5) en E-04e uit gdd §4.6, plus het laden en ontladen van de inhoud
 ## van kamers en een rechte doorloop door drie kamers zonder reset (FK-3).
 ##
-## "(alle D)" = voor D = 90, 120 en 180. Posities van de echo worden exact
+## "(alle D)" = voor D = 60, 120 en 180 (en 90 als regressie). Posities van de echo worden exact
 ## vergeleken (standaarden §6).
 
 const Fx = preload("res://tests/echo_fixture.gd")
@@ -19,7 +19,9 @@ const AreaLoader = preload("res://scripts/world/area_loader.gd")
 
 const R := InputBits.RIGHT
 const L := InputBits.LEFT
-const ALL_D := [90, 120, 180]
+## "(alle D)" (gdd v0.8 §4.6, G-8): D = 60, 120 en 180; D = 90 draait mee als
+## regressie (tot v0.8 was "(alle D)" 90 / 120 / 180).
+const ALL_D := [60, 120, 180, 90]
 ## Hoogte van alle testkamers: ruim boven en onder de vloer (y = 400).
 const TOP := -400.0
 const HEIGHT := 1200.0

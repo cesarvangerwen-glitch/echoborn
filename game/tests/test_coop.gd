@@ -20,7 +20,9 @@ const J := InputBits.JUMP
 const A := InputBits.ATTACK
 const D := InputBits.DASH
 const E := InputBits.ECHO
-const ALL_D := [90, 120, 180]
+## "(alle D)" (gdd v0.8 §4.6, G-8): D = 60, 120 en 180; D = 90 draait mee als
+## regressie (tot v0.8 was "(alle D)" 90 / 120 / 180).
+const ALL_D := [60, 120, 180, 90]
 const TOP := Fx.STAND_Y - 15.0      ## bovenkant van een lichaam op de vloer (370)
 const ON_TOP := Fx.ON_ECHO_Y        ## middelpunt van een lichaam erop (355)
 const EPS := 0.01
@@ -582,18 +584,20 @@ func test_c04_d_switch_in_coop_then_drop_out(t) -> void:
 
 
 func test_c05_drop_out_long_after_reset_is_active_at_once(t) -> void:
-	var sim = Fx.world(t)
-	var p1 := Fx.manual_player(sim, 1, Vector2(200, Fx.STAND_Y))
-	sim.drop_in(_new_p2())
-	_bits(p1, R)
-	await t.run_ticks(sim, 120 + 300)
-	var echo: TailEcho = sim.drop_out()
-	var at_drop: int = sim.tick
-	var expected := p1.recorder.post_position(p1.recorder.index_of_tick(at_drop - 120))
-	await t.run_ticks(sim, 1)
-	t.check(echo.is_present() and echo.position == expected,
-		"echo op de drop-out-tick op %s (Actief, %s)" % [echo.position, expected])
-	await t.cleanup()
+	for d: int in ALL_D:
+		var sim = Fx.world(t)
+		var p1 := Fx.manual_player(sim, 1, Vector2(200, Fx.STAND_Y))
+		sim.set_tail_ticks(d)
+		sim.drop_in(_new_p2())
+		_bits(p1, R)
+		await t.run_ticks(sim, d + 300)
+		var echo: TailEcho = sim.drop_out()
+		var at_drop: int = sim.tick
+		var expected := p1.recorder.post_position(p1.recorder.index_of_tick(at_drop - d))
+		await t.run_ticks(sim, 1)
+		t.check(echo.is_present() and echo.tail_ticks == d and echo.position == expected,
+			"D = %d: echo op de drop-out-tick op %s (Actief, %s)" % [d, echo.position, expected])
+		await t.cleanup()
 
 
 func test_c05_p1_on_p2_falls_at_drop_out(t) -> void:

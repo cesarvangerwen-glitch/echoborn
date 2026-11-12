@@ -19,8 +19,10 @@
 		"dash_ground_cooldown_ticks": 20
 	},
 	"echo": {
-		"tail_ticks": 120,
+		"_uitleg": "tail_ticks = D, de staartlengte (E-02): de standaard van elke sessie, op deze ene plek (CEO-besluit 2026-11-12: D = 60, 1 s; gdd v0.8 §4.8.4 G-6). tail_options = de keuzes van het debugmenu, in de volgorde van de toetsen F1, F2, F3, F7 (gdd §4.1; bereik 60–180).",
+		"tail_ticks": 60,
 		"tail_options": [
+			60,
 			90,
 			120,
 			180
@@ -42,6 +44,7 @@
 		"hit_p2": 10,
 		"hit_echo": 5,
 		"mark_extra_life_ticks": 30,
+		"mark_coop_life_ticks": 150,
 		"mark_countdown_ticks": 60,
 		"explosion_radius_px": 32.0,
 		"explosion_damage": 20,

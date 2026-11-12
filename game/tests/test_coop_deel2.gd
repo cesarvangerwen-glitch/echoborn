@@ -30,7 +30,9 @@ const R := InputBits.RIGHT
 const J := InputBits.JUMP
 const A := InputBits.ATTACK
 const E := InputBits.ECHO
-const ALL_D := [90, 120, 180]
+## "(alle D)" (gdd v0.8 §4.6, G-8): D = 60, 120 en 180; D = 90 draait mee als
+## regressie (tot v0.8 was "(alle D)" 90 / 120 / 180).
+const ALL_D := [60, 120, 180, 90]
 const ON_TOP := Fx.ON_ECHO_Y
 
 
@@ -477,7 +479,8 @@ func test_c12_chain_armor_lp_and_fade(t) -> void:
 	t.check(not armored.armor_intact and body_damage.all(func(x: int) -> bool: return x == 0),
 		"pantser intact %s, schade %s (gebroken, 0)" % [armored.armor_intact, str(body_damage)])
 	await t.cleanup()
-	# Een merk dat niemand laat knallen, dooft op x + D + 30 (alle D).
+	# Een merk dat niemand laat knallen, dooft in co-op op x + 150, bij elke D
+	# (C-12e, gdd v0.8; tot v0.8 was dat x + D + 30).
 	for d: int in ALL_D:
 		a = _pair(t, Vector2(100, Fx.STAND_Y), Vector2(120, Fx.STAND_Y))
 		sim = a["sim"]
@@ -489,9 +492,71 @@ func test_c12_chain_armor_lp_and_fade(t) -> void:
 		sim.combat.mark_set.connect(func(tick: int, _m: Combat.Mark) -> void: set_at["t"] = tick)
 		sim.combat.mark_faded.connect(func(tick: int, _m: Combat.Mark) -> void: faded["t"] = tick)
 		await _hit(t, sim, a["p2"], v)
-		await t.run_ticks(sim, d + 40)
-		t.check(set_at["t"] >= 0 and faded["t"] == set_at["t"] + d + 30,
-			"D=%d: merk op %d doofde op %d (x + D + 30)" % [d, set_at["t"], faded["t"]])
+		await t.run_ticks(sim, 170)
+		t.check(set_at["t"] >= 0 and faded["t"] == set_at["t"] + 150,
+			"D=%d: merk op %d doofde op %d (x + 150)" % [d, set_at["t"], faded["t"]])
+		await t.cleanup()
+
+
+## C-12e en E-14b (gdd v0.8, G-7): in co-op leeft een merk 150 ticks, los van
+## D; solo D + 30. Een merk van P1 op tick x knalt door een treffer van P2 op
+## `x + 149`, niet op `x + 150` (dan is het gedoofd en zet P2 een eigen merk).
+## Stopt P2 na het zetten (C-05), dan leeft het merk zijn 150 ticks uit; een
+## merk dat solo is gezet, houdt D + 30.
+func test_c12e_coop_mark_lives_150_ticks_all_d(t) -> void:
+	for d: int in ALL_D:
+		for offset: int in [149, 150]:
+			var a := _pair(t, Vector2(100, Fx.STAND_Y), Vector2(120, Fx.STAND_Y))
+			var sim: Node = a["sim"]
+			sim.combat.tail_ticks = d
+			var v := Fx.target(sim, CombatTarget.Kind.ENEMY, 400.0)
+			v.health = 1000
+			var set_rows: Array = []
+			var exploded: Array = []
+			var p2_hits: Array = []
+			sim.combat.mark_set.connect(func(tick: int, m: Combat.Mark) -> void: set_rows.append([tick, m.setter, m.expires]))
+			sim.combat.mark_exploded.connect(func(tick: int, _m: Combat.Mark, _link: int) -> void: exploded.append(tick))
+			sim.combat.hit.connect(func(tick: int, attacker: String, _target: Node2D, _damage: int) -> void:
+				if attacker == "p2":
+					p2_hits.append(tick))
+			await _hit(t, sim, a["p1"], v)
+			a["p1"].respawn_at(Vector2(100, Fx.STAND_Y))
+			var x: int = set_rows[0][0] if set_rows.size() > 0 else -1
+			t.check(set_rows.size() == 1 and set_rows[0][1] == "p1" and set_rows[0][2] == x + 150,
+				"D = %d: merk van P1 %s (verwacht levensduur 150)" % [d, str(set_rows)])
+			# P2 naast het doel; de AANVAL valt op tick x + offset.
+			a["p2"].respawn_at(Vector2(v.position.x - 20.0, Fx.STAND_Y))
+			await t.run_ticks(sim, x + offset - sim.tick)
+			a["p2"].input_source.bits = A
+			await t.run_ticks(sim, 1)
+			a["p2"].input_source.bits = 0
+			await t.run_ticks(sim, 5)
+			t.check(p2_hits == [x + offset], "D = %d: treffer van P2 op %s (verwacht x + %d = %d)" % [
+				d, str(p2_hits), offset, x + offset])
+			if offset == 149:
+				t.check(exploded == [x + 149], "D = %d: x + 149: ontploffing %s (verwacht op %d)" % [d, str(exploded), x + 149])
+			else:
+				t.check(exploded.is_empty() and set_rows.size() == 2 and set_rows[1][1] == "p2",
+					"D = %d: x + 150: ontploffing %s, merken %s (gedoofd; P2 zet een eigen merk)" % [
+					d, str(exploded), str(set_rows)])
+			await t.cleanup()
+		# Drop-out na het zetten: het merk leeft zijn 150 ticks uit (C-05, C-12e).
+		var b := _pair(t, Vector2(100, Fx.STAND_Y), Vector2(120, Fx.STAND_Y))
+		var sim2: Node = b["sim"]
+		sim2.combat.tail_ticks = d
+		var w := Fx.target(sim2, CombatTarget.Kind.ENEMY, 400.0)
+		w.health = 1000
+		var rows: Array = []
+		sim2.combat.mark_set.connect(func(tick: int, m: Combat.Mark) -> void: rows.append([tick, m.expires]))
+		await _hit(t, sim2, b["p2"], w)
+		sim2.drop_out()
+		await t.run_ticks(sim2, 1)
+		t.check(not sim2.is_coop() and rows.size() == 1 and rows[0][1] == rows[0][0] + 150,
+			"D = %d: merk van P2 na drop-out %s (x + 150)" % [d, str(rows)])
+		# Solo (na de drop-out) zet P1 een merk met D + 30.
+		await _hit(t, sim2, b["p1"], Fx.target(sim2, CombatTarget.Kind.ENEMY, 600.0))
+		t.check(rows.size() == 2 and rows[1][1] == rows[1][0] + d + 30,
+			"D = %d: solo-merk %s (x + D + 30 = x + %d)" % [d, str(rows), d + 30])
 		await t.cleanup()
 
 

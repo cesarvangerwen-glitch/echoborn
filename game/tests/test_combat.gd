@@ -5,7 +5,7 @@ extends RefCounted
 ## Geometrische gevallen van de merksprong gebruiken een spookbron met D = 1
 ## (EchoFixture.ghost): de echo staat op tick t op het frame van t − 1, met
 ## een AANVAL-event op een gekozen plek. Gevallen met "(alle D)" gebruiken de
-## echte echo van P1 voor D = 90, 120 en 180. Merken zet P1 zelf, met een
+## echte echo van P1 voor D = 60, 120 en 180 (en 90 als regressie). Merken zet P1 zelf, met een
 ## treffer (E-14a); hij wordt daarvoor naast het doel gezet (respawn).
 
 const Fx = preload("res://tests/echo_fixture.gd")
@@ -19,6 +19,7 @@ const GameEvents = preload("res://scripts/events/game_events.gd")
 const Layers = preload("res://scripts/world/layers.gd")
 const Lever = preload("res://scripts/objects/lever.gd")
 const Zone = preload("res://scripts/objects/zone.gd")
+const Tuning = preload("res://scripts/echo/tuning.gd")
 
 const L := InputBits.LEFT
 const R := InputBits.RIGHT
@@ -26,7 +27,9 @@ const J := InputBits.JUMP
 const A := InputBits.ATTACK
 const I := InputBits.INTERACT
 const E := InputBits.ECHO
-const ALL_D := [90, 120, 180]
+## "(alle D)" (gdd v0.8 §4.6, G-8): D = 60, 120 en 180; D = 90 draait mee als
+## regressie (tot v0.8 was "(alle D)" 90 / 120 / 180).
+const ALL_D := [60, 120, 180, 90]
 const ENEMY := CombatTarget.Kind.ENEMY
 const ARMORED := CombatTarget.Kind.ARMORED
 const DUMMY := CombatTarget.Kind.DUMMY
@@ -183,7 +186,9 @@ func test_e14_a_c_e_marks_and_plain_hits(t) -> void:
 	t.check(_damage_of(log, 0).map(func(r: Array) -> int: return r[2]) == [10, 10],
 		"schade %s (10, 10)" % str(_damage_of(log, 0)))
 	t.check(log["exploded"].is_empty(), "ontploffing zonder ontsteker: %s" % str(log["exploded"]))
-	t.check(faded["tick"] == x + 150, "merk doofde op %d (x + D + 30 = %d)" % [faded["tick"], x + 150])
+	# Zonder echo geldt de standaard-D uit data (G-6: 60, dus x + 90).
+	var life: int = int(Tuning.echo()["tail_ticks"]) + 30
+	t.check(faded["tick"] == x + life, "merk doofde op %d (x + D + 30 = %d)" % [faded["tick"], x + life])
 	await t.cleanup()
 	# (e) gewone echo-treffer op een doel zonder merk.
 	a = await _arena(t, [360.0])
@@ -235,6 +240,11 @@ func test_e14_d_explosion_and_chain(t) -> void:
 	await t.cleanup()
 	# Ketting V1 – V2 – V3 op 40 px; V3 op 80 px van V1. Merk op 49 px: geen ketting.
 	a = await _arena(t, [400.0, 440.0, 480.0, 529.0], ENEMY, 1000)
+	# D vast op 120 (merk leeft 150 ticks): P1 zet hier vier en zes merken na
+	# elkaar (± 22 ticks per merk), en ze moeten allemaal nog staan als de
+	# ketting begint. Bij de standaard-D 60 (90 ticks) zou het eerste al gedoofd
+	# zijn. De levensduur zelf testen E-14b (alle D) en C-12e.
+	a["sim"].combat.tail_ticks = 120
 	for i in 4:
 		await _mark(t, a, a["targets"][i])
 	g = _ghost_attack(t, a, Vector2(340, Fx.STAND_Y))
@@ -257,6 +267,7 @@ func test_e14_d_explosion_and_chain(t) -> void:
 	for i in 6:
 		xs.append(400.0 + 40.0 * i)
 	a = await _arena(t, xs, ENEMY, 1000)
+	a["sim"].combat.tail_ticks = 120  # zie hierboven
 	for i in 6:
 		await _mark(t, a, a["targets"][i])
 	g = _ghost_attack(t, a, Vector2(340, Fx.STAND_Y))
@@ -492,7 +503,11 @@ func test_e02m_10_walking_enemy_all_d(t) -> void:
 		enemy.damaged.connect(func(tick: int, amount: int, _s: String) -> void: damage.append([tick, amount]))
 		await t.run_ticks(sim, d + 20)
 		var limit := 36.0 + 0.25 * (d - 30) + 3.0
-		t.check(jumps == [10 + d] and gap["at"] <= limit and gap["at"] > 36.0,
+		# Bij D ≥ 90 is de vijand op x + D al weggelopen (> 36 px). Bij D = 60
+		# staat hij dan nog op zijn plek (32,6 px: stil na de treffer en zijn
+		# aanloop duren langer dan 60 ticks); de grens geldt ook dan.
+		var walked: bool = gap["at"] > 36.0 or d < 90
+		t.check(jumps == [10 + d] and gap["at"] <= limit and walked,
 			"D = %d: merksprong %s op %.1f px (≤ %.1f)" % [d, str(jumps), gap["at"], limit])
 		t.check(damage.size() == 2 and damage[1] == [10 + d + 3, 20], "D = %d: schade %s" % [d, str(damage)])
 		await t.cleanup()

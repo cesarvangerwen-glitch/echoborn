@@ -82,6 +82,7 @@ func add_player(player: PlayerActor) -> bool:
 	players.sort_custom(func(a: PlayerActor, b: PlayerActor) -> bool:
 		return a.player_index < b.player_index)
 	add_child(player)
+	combat.coop = is_coop()
 	# C-01: doet P2 mee, dan stopt het afspelen meteen. Waar P2 verschijnt
 	# (C-03), regelt de drop-in (T16c), niet de Sim.
 	if player.player_index != 1:
@@ -102,6 +103,7 @@ func can_add_player(player_index: int) -> bool:
 
 func remove_player(player: PlayerActor) -> void:
 	players.erase(player)
+	combat.coop = is_coop()
 	player.collision_layer = 0
 	player.visible = false
 	player.queue_free()

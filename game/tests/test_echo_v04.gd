@@ -4,9 +4,9 @@ extends RefCounted
 ## breken (E-08a–d, met E-08b: zweven op een schaduwlichaam) en Loslaten
 ## (E-09). T16a, #76.
 ##
-## "(alle D)" = de test draait voor D = 90, 120 en 180 (gdd §4.6). Posities
-## van de echo worden exact vergeleken (standaarden §6): hij speelt de
-## opgenomen toestand af.
+## "(alle D)" = de test draait voor D = 60, 120 en 180, en 90 als regressie
+## (gdd v0.8 §4.6). Posities van de echo worden exact vergeleken
+## (standaarden §6): hij speelt de opgenomen toestand af.
 
 const Fx = preload("res://tests/echo_fixture.gd")
 const InputBits = preload("res://scripts/input/input_bits.gd")
@@ -24,7 +24,9 @@ const R := InputBits.RIGHT
 const J := InputBits.JUMP
 const I := InputBits.INTERACT
 const E := InputBits.ECHO
-const ALL_D := [90, 120, 180]
+## "(alle D)" (gdd v0.8 §4.6, G-8): D = 60, 120 en 180; D = 90 draait mee als
+## regressie (tot v0.8 was "(alle D)" 90 / 120 / 180).
+const ALL_D := [60, 120, 180, 90]
 
 ## 400 ticks lopen, springen, keren en stilstaan.
 const WALK := [
@@ -127,25 +129,34 @@ func test_e02_tail_follows_exactly_all_d(t) -> void:
 		await t.cleanup()
 
 
-## Wissel van D op t0 (120 -> 180): Leeg tot t0 + 180, dan op de positie van
-## P1 op t0. Bij D = 120 houdt de recorder 600 frames.
+## E-02 (gdd v0.8 §4.6, G-6): wissel van D op t0 van 60 naar 120: Leeg tot
+## t0 + 120, dan op de positie van P1 op t0. Bij D = 60 houdt de recorder
+## 600 frames. De wissel 120 -> 180 (tot v0.8) draait mee als regressie.
 func test_e02_switching_d_is_a_reset(t) -> void:
-	var sim = Fx.world(t)
-	var p1 := Fx.p1(sim, WALK + WALK + WALK)
-	var echo := Fx.tail_echo(sim, p1, 120)
-	var log := _trace(sim, p1, echo)
-	await t.run_ticks(sim, 300)
-	var t0: int = sim.tick
-	echo.set_tail_ticks(180, t0)
-	await t.run_ticks(sim, 200)
-	var leeg := true
-	for tick in range(t0, t0 + 180):
-		leeg = leeg and not log["present"][tick]
-	t.check(leeg, "echo niet Leeg tussen t0 en t0 + 180")
-	t.check(log["present"][t0 + 180] and log["echo"][t0 + 180] == log["p1"][t0],
-		"op t0 + 180 niet op de positie van P1 op t0")
-	await t.run_ticks(sim, 400)
-	t.check(p1.recorder.size() == 600, "recorder %d frames (600)" % p1.recorder.size())
+	for pair: Array in [[60, 120], [120, 180]]:
+		var from: int = pair[0]
+		var to: int = pair[1]
+		var sim = Fx.world(t)
+		var p1 := Fx.p1(sim, WALK + WALK + WALK)
+		var echo := Fx.tail_echo(sim, p1, from)
+		var log := _trace(sim, p1, echo)
+		await t.run_ticks(sim, 300)
+		var t0: int = sim.tick
+		t.check(log["present"][t0 - 1] and log["echo"][t0 - 1] == log["p1"][t0 - 1 - from],
+			"%d -> %d: vóór de wissel niet op P1 van D = %d ticks geleden" % [from, to, from])
+		echo.set_tail_ticks(to, t0)
+		await t.run_ticks(sim, to + 20)
+		var leeg := true
+		for tick in range(t0, t0 + to):
+			leeg = leeg and not log["present"][tick]
+		t.check(leeg, "%d -> %d: echo niet Leeg tussen t0 en t0 + %d" % [from, to, to])
+		t.check(log["present"][t0 + to] and log["echo"][t0 + to] == log["p1"][t0],
+			"%d -> %d: op t0 + %d niet op de positie van P1 op t0" % [from, to, to])
+		t.check(echo.tail_ticks == to and sim.combat.tail_ticks == to,
+			"%d -> %d: D van echo %d, van Combat %d" % [from, to, echo.tail_ticks, sim.combat.tail_ticks])
+		await t.run_ticks(sim, 600)
+		t.check(p1.recorder.size() == 600, "%d -> %d: recorder %d frames (600)" % [from, to, p1.recorder.size()])
+		await t.cleanup()
 
 
 ## (alle D) Reset op t0; P1 deed op t0 − 5 INTERACTIE bij een schaduwhendel.
