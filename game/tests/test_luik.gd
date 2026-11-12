@@ -8,7 +8,10 @@ extends RefCounted
 ##   P1 valt erdoor; de echo staat op de schaduwklep, speelt de neerslag af op
 ##   `breuk + D` (de schaduwklep is dan weg, door de echo) en valt achter P1
 ##   aan; de echo breekt nooit.
-## - Echo Leeg of uit: geen schaduwklep, het luik breekt in één keer.
+## - Echo uit: geen schaduwklep, het luik breekt in één keer.
+## - Echo aan maar Leeg op de breuk (bij het begin, of na een respawn op het
+##   luik): wel een schaduwklep (besluit LGD, #232); de echo staat erop, haalt
+##   hem weg met zijn neerslag op `breuk + D` en breekt 0×.
 ## - De echo komt niet (Leeg na de breuk): de schaduwklep gaat weg op
 ##   `breuk + D + G`.
 ## - Co-op: geen schaduwklep (P2 botst met laag 5); P2 valt mee door het gat.
@@ -29,7 +32,7 @@ const LOW := 600.0
 const LUIK_X := 200.0
 ## Startplek van P1 met echo: links van het luik.
 const START_X := 120.0
-const MAX_FRAMES := {"test_schaduwklep_echo_valt_mee_alle_d": 2400}
+const MAX_FRAMES := {"test_schaduwklep_echo_valt_mee_alle_d": 2400, "test_luik_respawn_op_luik_echo_breekt_niet": 2400}
 
 
 ## Wereld met het gat en het luik; geeft [sim, luik].
@@ -121,20 +124,69 @@ func test_schaduwklep_echo_valt_mee_alle_d(t) -> void:
 		await _free(t)
 
 
-## Geen echo, of een echo die nog Leeg is op de breuk: het luik breekt in één keer.
-func test_luik_zonder_actieve_echo_geen_schaduwklep(t) -> void:
-	for with_echo in [false, true]:
+## Echo uit (geen staart-echo): geen schaduwklep, het luik breekt in één keer.
+func test_luik_echo_uit_geen_schaduwklep(t) -> void:
+	var w := _world(t)
+	var sim = w[0]
+	var luik: Luik = w[1]
+	var p1 := Fx.manual_player(sim, 1, Vector2(LUIK_X, FLOOR - 15.0))
+	await t.run_ticks(sim, 10)
+	var hit := await _jump_and_neerslag(t, sim, p1)
+	t.check(hit > 0 and luik.is_open and not luik.schaduwklep and luik.klep().collision_layer == 0,
+		"echo uit: open %s, schaduwklep %s, laag %d (verwacht open, geen schaduwklep, laag 0)" % [luik.is_open, luik.schaduwklep, luik.klep().collision_layer])
+	await _free(t)
+
+
+## Volgt de breuk binnen D ticks op `valid_from` (de echo is Leeg op de
+## breuktick), dan komt er toch een schaduwklep (besluit LGD, #232): de echo
+## speelt daarna de frames van P1 op de klep af, staat op de schaduwklep en
+## haalt hem weg met zijn neerslag op `breuk + D` (uiterlijk `breuk + D + G`).
+## De echo breekt 0×.
+func _lege_echo_breuk(t, sim, luik: Luik, p1: PlayerActor, echo: TailEcho, label: String) -> void:
+	var d: int = echo.tail_ticks
+	var g := int(Tuning.echo()["break_tolerance_ticks"])
+	var breaks := {"n": 0}
+	echo.broke.connect(func(_tick: int, _at: Vector2) -> void: breaks["n"] += 1)
+	var weg := {"tick": -1, "by": ""}
+	luik.schaduwklep_weg.connect(func(tick: int, by: String) -> void:
+		weg["tick"] = tick
+		weg["by"] = by)
+	await t.run_ticks(sim, 10)
+	var hit := await _jump_and_neerslag(t, sim, p1, -INF)
+	t.check(not echo.is_present(), "%s: de echo was al Actief op de breuk" % label)
+	t.check(hit > 0 and luik.schaduwklep and luik.klep().collision_layer == Layers.SHADOW_GEOMETRY and luik.schaduwklep_tot == hit + d + g,
+		"%s: geen schaduwklep tot breuk + D + G na de breuk (tick %d, schaduwklep %s, laag %d, tot %d)" % [label, hit, luik.schaduwklep, luik.klep().collision_layer, luik.schaduwklep_tot])
+	await t.run_ticks(sim, hit + d + g + 60 - sim.tick)
+	t.check(weg["tick"] == hit + d and weg["by"] == "echo", "%s: schaduwklep weg op %d door %s (verwacht %d door de echo)" % [label, weg["tick"], weg["by"], hit + d])
+	t.check(breaks["n"] == 0 and echo.is_present() and echo.position.y > FLOOR + 30.0,
+		"%s: de echo brak %d× of viel niet door het luik (echo %s)" % [label, breaks["n"], echo.position])
+
+
+## Lege echo: de echo begint op het luik (Leeg, D ticks) en P1 breekt het luik
+## vóór de echo Actief is.
+func test_luik_lege_echo_wel_schaduwklep(t) -> void:
+	for d: int in [60, 180]:
+		var w := _world(t)
+		var p1 := Fx.manual_player(w[0], 1, Vector2(LUIK_X, FLOOR - 15.0))
+		var echo := Fx.tail_echo(w[0], p1, d)
+		await _lege_echo_breuk(t, w[0], w[1], p1, echo, "D=%d Lege echo" % d)
+		await _free(t)
+
+
+## Respawn op het luik (de echo is weer Leeg, E-04b), breuk binnen D ticks:
+## de echo breekt niet.
+func test_luik_respawn_op_luik_echo_breekt_niet(t) -> void:
+	for d: int in [60, 180]:
 		var w := _world(t)
 		var sim = w[0]
-		var luik: Luik = w[1]
-		var p1 := Fx.manual_player(sim, 1, Vector2(LUIK_X, FLOOR - 15.0))
-		var echo: TailEcho = Fx.tail_echo(sim, p1, 60) if with_echo else null
-		await t.run_ticks(sim, 10)
-		var hit := await _jump_and_neerslag(t, sim, p1)
-		var label := "echo %s" % ("Leeg" if with_echo else "uit")
-		t.check(echo == null or not echo.is_present(), "%s: de echo was al Actief" % label)
-		t.check(hit > 0 and luik.is_open and not luik.schaduwklep and luik.klep().collision_layer == 0,
-			"%s: open %s, schaduwklep %s, laag %d (verwacht open, geen schaduwklep, laag 0)" % [label, luik.is_open, luik.schaduwklep, luik.klep().collision_layer])
+		var p1 := Fx.manual_player(sim, 1, Vector2(START_X, FLOOR - 15.0))
+		var echo := Fx.tail_echo(sim, p1, d)
+		await t.run_ticks(sim, d + 20)
+		t.check(echo.is_present(), "D=%d: echo niet Actief vóór de respawn" % d)
+		p1.respawn_at(Vector2(LUIK_X, FLOOR - 15.0))
+		await t.run_ticks(sim, 2)
+		t.check(absf(p1.position.x - LUIK_X) < 0.5 and echo.valid_from >= sim.tick - 2, "D=%d: geen respawn op het luik (P1 %s)" % [d, p1.position])
+		await _lege_echo_breuk(t, sim, w[1], p1, echo, "D=%d respawn op het luik" % d)
 		await _free(t)
 
 

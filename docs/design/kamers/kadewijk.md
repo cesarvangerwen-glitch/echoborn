@@ -416,14 +416,15 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 - **`BOSS_VERSLAGEN` in de save**: nu blijft de boss verslagen zolang de scène loopt (`boss_defeated_tick`), nog niet als vlag in `game_state` (samen met S9 en de lus).
 - **Co-op in de Kadewijk-arena**: de boss-bot speelt hier alleen solo; co-op (MP-7) met de co-op-bot van de Kadewijk (§9 T8a).
 - ~~`@export` voor de baan van het Dwaallicht~~ **Gedaan** (#83): `lane_from`, `lane_to`, `floor_top` van `SliceEnemy` staan in `s7_sluiskelder.tscn`; `kadewijk.gd` zet ze niet meer.
-- **Het luik als systeemobject** (V-01, SL-04, L-03): `kadewijk_luik.gd` is een placeholder van de WLD (open = `verslagen`); verplaatsen naar `scripts/` en het beeld van de scheur mag.
+- ~~**Het luik als systeemobject**~~ **Gedaan** (#232): `scripts/objects/luik.gd` (open = `verslagen`). Het beeld van de scheur blijft voor de art.
 - **Lampglas, logbladzijden 1–2 en de sokkel** als objecten (WS-08; nu markeringen `Lampglas`, `Logbladzijde1/2`, `Sokkel` op de juiste plek in de inhoud).
 - Trap 2 en `s = 2` (SL-02) voor S9: het gemaal heeft nog één trap (`Gemaal.MAX` = 100). Bij trap 2 `set_door(&"S9", "Hoogwater", false)` (of het blok vervangen door `Diepwater`/`Sluis`, LM-10) en `lit` van de vijanden in S9 uit de waterstand.
 
 **Gameplay Programmer (deel 3, S9):**
 - **De run S1 → S9 → S1 door de arena**: `BOSS_VERSLAGEN` opent `DeurLinks` (gedaan, #229); de bot heeft de stappen van S9 vanaf `S9-kade`, de boss-bot de arena.
 - **`SLICE_EIND`** als echt event (nu een rij in de meetlog van `kadewijk.gd`, `_pick_up`), en logbladzijde 3 als object (WS-08; nu de markering `Logbladzijde3` en de rij `LOGBLAD`).
-- **De schaduwklep in `Luik`** (besluit 1, #227; S7 en S9).
+- ~~**De schaduwklep in `Luik`**~~ **Gedaan** (#232; besluit 1, #227, uitgebreid door de LGD in #232: altijd bij een solo-breuk met de echo aan, ook als die Leeg is).
+- **Schaduwklep en drop-in van P2** (TD, Lead-review #232): komt P2 erbij terwijl de schaduwklep er nog ligt, dan kan P2 hooguit `D + G` ticks op een onzichtbare klep op laag 5 staan. Mogelijke oplossing: bij `combat.coop` de schaduwklep in `sim_update` meteen weghalen (`"tijd"`). Komt niet voor in de slice-runs.
 - **Motor: wie tegen een muur aan loopt, verliest de vloer** (gezien in S1, S7 en S9): het lichaam blijft 0,08 px boven de vloer hangen, `on_floor` is onwaar, en springen werkt pas na de coyote-tijd niet meer, tot je de richting loslaat. Een speler die tegen de kademuur van 45 in S9 aan loopt en springt, komt er dus niet op. De bot springt 16 px ervoor. Voorstel: `floor_snap`/`floor_block_on_wall` in `motor.gd` nakijken (test: tegen een muur lopen en springen).
 
 **Technical Artist / Art (deel 3):** het snelluik in de gang van S1 (x 460–500, afwijking 14) in de art van S1 (#226); S9 heeft nog geen art.

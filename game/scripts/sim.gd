@@ -268,10 +268,10 @@ func _physics_process(delta: float) -> void:
 	# van P1 (E-04a–c, E-09), zodat zijn events in (4) dan niet meer uitgaan.
 	for echo in echoes:
 		echo.sim_after_source(tick)
-	combat.echo_present = false
+	combat.echo_on = false
 	for echo in echoes:
-		if echo.is_present():
-			combat.echo_present = true
+		if echo.is_active():
+			combat.echo_on = true
 	# (4) events, eerst van P1, dan van de schaduw.
 	for player in players:
 		if player.player_index == 1:

@@ -15,7 +15,8 @@ extends "res://scripts/combat/combat_target.gd"
 ## doel.
 ##
 ## **De schaduwklep** (V-01d, aanvulling LGD in #227, voorstel A). Breekt P1
-## solo het luik terwijl de echo Actief is (E-03), dan gaat de klep van laag 1
+## solo het luik met de echo aan (`Combat.echo_on`; ook als de echo op die
+## tick Leeg is, besluit LGD in #232), dan gaat de klep van laag 1
 ## naar **laag 5** (schaduwgeometrie) in plaats van weg. P1 botst niet met
 ## laag 5 (E-05) en valt erdoor; de echo vindt hem met zijn steuncontrole
 ## (E-08b ziet laag 1 en 5) en blijft erop staan tot hij de neerslag van P1 op
@@ -23,9 +24,14 @@ extends "res://scripts/combat/combat_target.gd"
 ## weg, op die tick in stap (4); de echo valt daarna achter P1 aan. Komt die
 ## treffer niet (de echo is Leeg, gebroken, doet een merksprong of slaat
 ## anders), dan gaat de schaduwklep in stap (5) van tick `breuk + D + G` weg
-## (D = `Combat.tail_ticks`, G = `break_tolerance_ticks`, E-08). E-08 zelf
-## verandert niet. In co-op (`Combat.coop`) is er geen schaduwklep: P2 botst
-## met laag 5, en hij is geen afspeler; het luik breekt in één keer.
+## (D = `Combat.tail_ticks`, G = `break_tolerance_ticks`, E-08). Elk frame van
+## P1 op de klep ligt vóór de breuk en wordt uiterlijk op `breuk + D`
+## afgespeeld, dus `D + G` dekt ook een Lege echo die na een respawn of reset
+## frames van P1 op de klep gaat afspelen. E-08 zelf verandert niet. In co-op
+## (`Combat.coop`) en met de echo uit is er geen schaduwklep: P2 botst met
+## laag 5 en is geen afspeler; het luik breekt in één keer. Komt P2 erbij
+## terwijl de schaduwklep er nog ligt, dan kan hij er hooguit `D + G` ticks
+## op staan (TD, Lead-review #232; kamerdoc §9).
 ## De schaduwklep is onzichtbaar (beeld: Art Director); voor P1 is het luik
 ## open vanaf de breuk (`is_open`, `opened`).
 ##
@@ -43,7 +49,7 @@ signal schaduwklep_weg(tick: int, by: String)
 ## bovenkant van de klep: daar ligt het middelpunt van de hurtbox (8 px hoog).
 @export var size := Vector2(40, 16)
 
-## Combat van de Sim (gezet door `Sim.add_object`): `coop`, `echo_present`
+## Combat van de Sim (gezet door `Sim.add_object`): `coop`, `echo_on`
 ## en `tail_ticks`. Zonder Combat (een losse test) is er geen schaduwklep.
 var combat: RefCounted = null
 
@@ -136,9 +142,9 @@ func apply_damage(tick: int, _amount: int, source: String) -> int:
 	return 0
 
 
-## V-01d (#227): alleen P1, solo, met de echo Actief op de tick van de breuk.
+## V-01d (#227, #232): alleen P1, solo, met de echo aan (ook als hij Leeg is).
 func _wants_schaduwklep(source: String) -> bool:
-	return source == "p1" and combat != null and not combat.coop and combat.echo_present
+	return source == "p1" and combat != null and not combat.coop and combat.echo_on
 
 
 func _end_schaduwklep(tick: int, by: String) -> void:
