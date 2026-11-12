@@ -1,6 +1,6 @@
 # Slice-audio (T8d), deel 1: SFX-set, signalen en muziekplan
 
-Versie 0.1 · 2026-11-12 · Eigenaar: **Composer/Sound Designer** · Lead-review: Audio Director · Issue [#86](https://github.com/cesarvangerwen-glitch/echoborn/issues/86) (T8d, `docs/productie/fase-2-kader.md` v0.4 §2 en §4)
+Versie 0.1.1 · 2026-11-12 · Eigenaar: **Composer/Sound Designer** · Lead-review: Audio Director · Issue [#86](https://github.com/cesarvangerwen-glitch/echoborn/issues/86) (T8d, `docs/productie/fase-2-kader.md` v0.4 §2 en §4)
 Bouwt op: `docs/audio/bible.md` v0.3 (§2–§8, §10, §11), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.1 (§2, §3, §7, §9), `docs/design/gdd.md` v0.8 (E-02t, E-07d, E-14b, C-12e, C-14), `docs/design/wereld.md` §2.2 (kamerlijst S1–S9), `game/scripts/echo/echo_hints.gd` (signalen `plank_signal_on`, `doelstreep_on`).
 
 Dit is **deel 1** van T8d: alles wat **niet** van de staart D afhangt. Het F2-fragment (`docs/audio/f2-fragment/`) is de klankbron: dezelfde klokken, hetzelfde water en dezelfde `echo_versie`, want de CEO vond de F0-geluiden "heel leuk" en het fragment klonk als een beiaard en "jij, maar hol". Deel 2 (na de vaste timing) staat in §5.
@@ -43,7 +43,7 @@ Dit is **deel 1** van T8d: alles wat **niet** van de staart D afhangt. Het F2-fr
 
 ## 2. De SFX-set: event → bestand → duur → leesbaarheid
 
-**Regel voor elk aanloop-bestand:** het duurt **precies** zijn aanloop en eindigt op de tick waarop het actieve vlak begint. De code start het op het begin van de aanloop (de vlag `aanloop` van B-6); dan valt het hoogtepunt vanzelf framexact op de slag. Elke aanloop **stijgt** (gemeten: laatste 100 ms tegenover de eerste 100 ms, kolom "↑"), dus je hoort *wanneer*; de klankvorm verschilt per aanval, dus je hoort *wat* en *waar* (§9 van het combat-document: "de aanloop toont waar het vlak komt, niet alleen dat er iets komt"). Alle tells liggen voor ≥ 97 % boven 250 Hz: hoorbaar op de Deck en een tv (bible §8.2).
+**Regel voor elk aanloop-bestand:** het duurt **precies** zijn aanloop en eindigt op de tick waarop het actieve vlak begint. De code start het op het begin van de aanloop (de vlag `aanloop` van B-6); dan valt het hoogtepunt vanzelf framexact op de slag. Elke aanloop **stijgt** (gemeten: laatste 100 ms tegenover de eerste 100 ms, kolom "↑"), dus je hoort *wanneer*; de klankvorm verschilt per aanval, dus je hoort *wat* en *waar* (§9 van het combat-document: "de aanloop toont waar het vlak komt, niet alleen dat er iets komt"). Alle aanlopen en tells van aanvallen liggen voor ≥ 97 % boven 250 Hz, de maat-tel `gm_maat_tel_grijs` voor 77 % (de grijze klok D4 heeft zijn hum op D3); allemaal hoorbaar op de Deck en een tv (bible §8.2).
 
 Paden: `docs/audio/t8d-slice/sfx/<map>/<naam>_placeholder.wav`. Duur in ticks (60/s).
 
@@ -54,7 +54,7 @@ Paden: `docs/audio/t8d-slice/sfx/<map>/<naam>_placeholder.wav`. Duur in ticks (6
 | Kadeloper: haakslag, aanloop (B-2, `aanloop`) | `kadeloper_aanloop` | **30** t (0,5 s), ↑ 14 dB | IJzer schraapt over steen: schokjes die **versnellen** (22 → 82 per s) en een toon die met de haak **meestijgt**; eindigt met één droge tik = de haak op zijn top. Ruisachtig en hoog (zwaartepunt ± 2,9 kHz): "dichtbij, op de grond, ga weg of spring" |
 | Kadeloper: haakslag, actief 6 t | `kadeloper_haakslag` | 24 t (0,4 s) | Veeg die in 6 ticks **daalt** (3,4 → 0,7 kHz) + korte ijzerklank: de slag zelf, ook als hij mist |
 | Kadeloper/Schotdrager: dood | `kadeloper_dood` | 54 t | Slok + dalende bellen: lost op in donker water (§9.1), zacht, geen vleesgeluid (PEGI 12) |
-| Schotdrager: schotstoot, aanloop | `schotdrager_aanloop` | **30** t, ↑ 9 dB | **Piepend roestig scharnier** (een toon met ruwheid, 330 → 560 Hz) + rammelende plaat. Tonaal en lager dan de Kadeloper: je hoort aan de klank dat het de gepantserde is, vóór je hem ziet |
+| Schotdrager: schotstoot, aanloop | `schotdrager_aanloop` | **30** t, ↑ 11 dB | **Piepend roestig scharnier** (een toon met ruwheid, 330 → 560 Hz) + rammelende plaat die aanzwelt; het schot slaat in zijn stand met de **piek in de laatste 3 ticks** (gemeten 0,461 s = t 27,7). Tonaal en lager dan de Kadeloper: je hoort aan de klank dat het de gepantserde is, vóór je hem ziet |
 | Schotdrager: schotstoot, actief 6 t | `schotdrager_schotstoot` | 30 t | Plaat-dreun + luchtstoot |
 | **Treffer op intact pantser, 0 SE** (VJ-07, B-3 event) | `pantser_tink` | 17 t (0,28 s) | **Klein, droog, hoog en meteen gedempt**: geen lijf, geen hout, geen naklank (> 1,2 kHz, gedempt na 45 ms). Elke treffer *mét* schade heeft lijf en koper (`p1_slag` van F2); de tink mist dat juist. Zegt: "dit is pantser, slaan helpt niet" |
 | Pantser breekt (eerste ontploffing op de Schotdrager) | `schotdrager_pantser_breekt` | 60 t | Roest knispert, plaat scheurt (12 t, = de animatie), valt twee keer op de steen. Alles **boven 1,2 kHz**, zodat de klok D5 van de ontploffing eronder hoorbaar blijft |
@@ -113,7 +113,20 @@ Beide zijn **steun voor wat je al ziet** (de CEO zag de doelstreep en de cirkel 
 | Signaal | Bestand (`signalen/`) | Duur | Niveau | Klank | Hoe aansluiten (voor de Audio Director / Gameplay Programmer) |
 |---|---|---|---|---|---|
 | `plank_signal_on(tick)` (E-07d) | `plank_signaal` | **5 t** (90 ms) | −29 LUFS (14 LU onder een tell) | Eén **zachte houten tok, hol** (de klankfamilie van de echo: hout van speler 1, door een korte holle kam), zonder lijf, 1,6 kHz | Eén keer op de flank (het signaal geeft alleen de flank). **Niet vaker dan 1× per 30 ticks** (één tok per nadering, ook als het signaal flakkert). Speelt op de positie van de echo (2D) |
-| `doelstreep_on(tick, mark_id)` (E-02t) | `doelstreep_voorslag_grijs` (`_kleur` in S9) | **30 t** (0,5 s) | −27 LUFS, ↑ 37 dB | **Carillon-voorslag**: een omgekeerd klokje (E6) dat aanzwelt en **precies op de slag van de echo ophoudt**; de knal neemt het over. Geen aanslag, dus het lijkt niet op een aftelslag | Start bij `doelstreep_on`, **met beginpunt** `(1 − doelstreep_strength) × 0,5 s` in het bestand: komt de streep later dan 30 t vóór de slag aan, dan valt het eind toch op de slag. **Eén voorslag per `mark_id`**: springt de streep naar een ander merk, dan loopt de lopende voorslag door (geen tweede); verdwijnt de streep (`doelstreep = false`), dan 30 ms uitfaden. Max. 1 tegelijk |
+| `doelstreep_on(tick, mark_id)` (E-02t) | `doelstreep_voorslag_grijs` (`_kleur` in S9) | **30 t** (0,5 s) | −27 LUFS, ↑ 37 dB | **Carillon-voorslag**: een omgekeerd klokje (E6) dat aanzwelt en **precies op de slag van de echo ophoudt**; de knal neemt het over. Geen aanslag, dus het lijkt niet op een aftelslag | De streep gaat aan op **t 30** na de slag van P1 (`x + D − 30`, E-02t); de merksprong begint op t 60, de **knal valt op t 63** (D + 3). Het bestand (30 t) moet op de knal eindigen. Met `ahead = 1 + (1 − doelstreep_strength) × 30` (ticks tot het AANVAL-frame) op de tick van `doelstreep_on`: **wacht** `max(0, ahead + 3 − 30)` ticks en speel vanaf **beginpunt** `max(0, 30 − (ahead + 3))` ticks in het bestand. Gewoon geval: de streep gaat aan met `ahead = 30` → 3 t wachten, start op **t 33**, einde op **t 63**; komt de streep later aan, dan begint het bestand verderop en valt het eind toch op de knal. **Eén voorslag per `mark_id`**: springt de streep naar een ander merk, dan loopt de lopende voorslag door (geen tweede); verdwijnt de streep (`doelstreep = false`), dan 30 ms uitfaden. Max. 1 tegelijk |
+
+### 3.1 Aftelling naast de doelstreep (besluit Audio Director, Lead-review PR #193)
+
+Alleen audio; de aftelling in beeld blijft zoals ze is. Solo, D = 60, merk gezet op t 0 (leeft 90 t, aftelling op t 30, 45, 60, 75; bible §6.1):
+
+| Situatie | Wat je hoort |
+|---|---|
+| De doelstreep staat op **dit** merk | **Slag 1 op t 30 blijft**; **slag 2 (t 45) en slag 3 (t 60) vallen weg**; de voorslag loopt van t 33 en **eindigt op de knal (t 63)**. Klinkt als: "één, … *zwel* … boem" |
+| De streep **verdwijnt vóór t 60** (doel dood, merk gedoofd, ander merk dichter) | **Slag 3 komt terug** op t 60, daarna volgens §6.1 van de bible (zachte slag 4 op t 75, doven op t 90). De lopende voorslag faden in 30 ms uit |
+| Geen doelstreep op dit merk (echo Leeg, gebroken of op een ander merk) | Aftelling volgens bible §6.1, ongewijzigd |
+| **Co-op** (merk 150 t, C-12e) | **Ongewijzigd**: aftelling op t 90, 105, 120, 135; er is geen echo, dus geen voorslag op dit merk |
+
+De Audio Director meldt dit aan de LGD en neemt het op in bible v0.4 (§2 A2, §6.1, §10 `MerkAudio`).
 
 **Haakje in de code:** de signalen bestaan al (`echo_hints.gd`, regel `signal plank_signal_on`, `signal doelstreep_on`); het commentaar daar zegt dat het geluid van de Audio Director komt (T10). Ik verander niets in `game/`: aansluiten is implementatie, en dat is van de Audio Director (rolbestand: "Wat je níét doet").
 
@@ -171,7 +184,7 @@ Waarom 120 BPM: een **aanloop van 30 ticks is precies één tel**. De zwiep en d
 
 | # | Wat | Waarom het wacht | Wanneer |
 |---|---|---|---|
-| 1 | **Merk-aftelling op D = 60** (E-14b): solo leeft een merk 90 t, de aftelslagen vallen op t 30, 45, 60, 75 na het zetten | Hangt aan D. Twee nieuwe dingen bij D = 60: (a) de echo knalt op **D + 3 = 63**, niet op 60 (bible §6.1 "boem op slag 3" klopt dus op 3 ticks na); (b) de **doelstreep start op t 33**, vlak na aftelslag 1 (t 30): de voorslag en de aftelling lopen over elkaar. **Voorstel:** slag 3 vervalt als de doelstreep op dat merk aanstaat (de streep voorspelt de knal), en de voorslag vervangt bij D = 60 slag 2. In co-op (150 t, C-12e) blijft de aftelling zoals ze is (t 90–135). Beslissing: Audio Director, met de LGD | Na een groene bot-run op D = 60 |
+| 1 | **Merk-aftelling op D = 60** (E-14b): solo leeft een merk 90 t, de aftelslagen vallen op t 30, 45, 60, 75 na het zetten | Hangt aan D. Bij D = 60: (a) de echo knalt op **D + 3 = 63**, niet op 60; (b) de **doelstreep gaat aan op t 30**, tegelijk met aftelslag 1, en de voorslag loopt van t 33 tot de knal op t 63. **Besluit Audio Director** (Lead-review PR #193): zie §3.1 (slag 2 en 3 vallen weg zolang de streep op dat merk staat, slag 1 blijft, co-op ongewijzigd). Wat in deel 2 nog moet: de bible naar D = 60 (Audio Director, v0.4), de aftelslagen opnieuw renderen/zetten op t 30/45/60/75 en de regel in de bots/het log nalopen | Na de bible v0.4 en een groene bot-run op D = 60 |
 | 2 | **Echo-varianten** van de slice-geluiden (bible §4: afgeleid met `echo_versie`) | De omgekeerde aanloop (0,35 s) is een derde van een staart van 1 s; of dat bij D = 60 nog prettig klinkt, hoort bij de vaste D | Deel 2 |
 | 3 | **Muziek-stems van de boss** | De maat (120/90 t) en de aanlopen zijn startwaarden die B-9 zet | Na B-9/B-10 en de waarden van de Combat Designer |
 | 4 | **Framexact op de animaties** (Animator §9.1) | Er zijn nog geen animaties | Met de Animator, op de slice-build |
@@ -187,7 +200,7 @@ Waarom 120 BPM: een **aanloop van 30 ticks is precies één tel**. De zwiep en d
 |---|---|
 | **Audio Director** | (1) Lead-review van deze set en van het muziekplan. (2) Bible naar D = 60 (kop, §6.1, §9 en §10 staan nog op D = 120) en een besluit over voorstel §5 punt 1. (3) Wanneer gaat de set naar `game/audio/sfx/` (bible §11)? Dan ook de import-instellingen en de lus-punten van de drie `_lus`-bestanden. |
 | **Combat Designer** | Mag de aanloop van de pompslag in fase 1 van **40 naar 30 of 60 ticks** (één of twee tellen bij 120 BPM)? Niet nodig voor de leesbaarheid, wel voor muziek die met de maat meetelt (§4.4). Blijft het 40, dan valt de slag gewoon tussen de tellen. |
-| **Gameplay Programmer** | Voor de aansluiting later: B-6 levert per aanval een vlag `aanloop`/`actief` en B-10 de events; het geluid hoort op de eerste tick van de aanloop te starten (niet op het actieve vlak), zie §2. Voor de doelstreep: `doelstreep_strength` op de tick van `doelstreep_on` bepaalt het beginpunt in het bestand (§3). |
+| **Gameplay Programmer** | Voor de aansluiting later: B-6 levert per aanval een vlag `aanloop`/`actief` en B-10 de events; het geluid hoort op de eerste tick van de aanloop te starten (niet op het actieve vlak), zie §2. Voor de doelstreep: `doelstreep_strength` op de tick van `doelstreep_on` bepaalt wachttijd en beginpunt in het bestand (§3), en de aftelling volgt §3.1. |
 | **Iedereen** | Niemand in de studio kan luisteren. De metingen (niveaus, stijging, aandeel boven 250 Hz, tickduur) bewijzen de vorm, niet dat het goed klinkt. Het eerste echte oordeel is de luisterreeks bij de Audio Director en het spel bij MT2. |
 
 **Beperkingen:** de geluiden zijn placeholder (eerste versie, niet beluisterd); de grootste risico's zijn dat de stoom van de pompslag en de schraap van de Kadeloper te veel op ruis lijken, en dat de maat-tel (± 55 keer per gevecht) gaat vervelen ondanks de demping. Twee bestanden liggen vooral onder 250 Hz (`gm_wankel_start` en de Wankel-lus, 20–27 % erboven): dat mag, omdat hun informatie de **stilte** van het carillon is, niet het geluid zelf.
@@ -196,4 +209,5 @@ Waarom 120 BPM: een **aanloop van 30 ticks is precies één tel**. De zwiep en d
 
 | Versie | Wat |
 |---|---|
+| 0.1.1 | Lead-review Audio Director (PR #193, klein): timing van de doelstreep-voorslag gecorrigeerd (streep aan op t 30, voorslag t 33 → knal t 63; wachttijd en beginpunt in §3); besluit over de aftelling naast de doelstreep opgenomen (§3.1, §5 punt 1); zin over het aandeel boven 250 Hz klopt nu voor de maat-tel (§2); `schotdrager_aanloop` met de piek in de laatste 3 ticks (§2.1). |
 | 0.1 | Eerste versie (T8d deel 1, #86): 72 placeholder-SFX (vijanden, Gemaalmeester, finisher, ketting, signalen) met tabel en metingen, luisterreeks, signalen voor plank en doelstreep, muziekplan grijs → licht met de motieven M1/M2, en wat pas na de vaste timing kan. |

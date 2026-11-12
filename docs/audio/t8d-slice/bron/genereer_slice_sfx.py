@@ -163,10 +163,17 @@ def schotdrager_aanloop():
     tt = 0.02
     while tt < sec:
         leg(rammel, modi([(760, 0.5, 0.012), (1890, 0.35, 0.008), (3120, 0.2, 0.006)], 0.05), tt,
-            r.uniform(0.3, 1.0) * (0.3 + tt / sec))
+            r.uniform(0.6, 1.0) * (0.15 + 0.85 * (tt / sec) ** 2))
         tt += r.uniform(0.03, 0.07)
     y = 0.12 * piep * np.interp(t, [0, sec], [0.3, 1.0]) + 0.5 * rammel
-    y += klik(sec, sec - 0.012, 1500, 7000, 2.5, 0.4)
+    # het schot slaat in zijn stand: de piek valt in de laatste 3 ticks vóór de slag (Lead-review #193)
+    # (eigen seed, zodat de rest van de set byte-gelijk blijft)
+    tt = np.arange(n(tk(3))) / SR
+    ph = np.random.default_rng(8653).uniform(0, 6.3, 3)
+    stand = sum(a * np.exp(-tt / tau) * np.sin(2 * np.pi * f * tt + p)
+                for (f, a, tau), p in zip([(760, 0.5, 0.02), (1890, 0.4, 0.015), (3120, 0.25, 0.01)], ph))
+    leg(y, stand, sec - tk(2.5), 0.5)
+    y += klik(sec, sec - tk(2.5), 1500, 7000, 2.5, 0.4)
     return kap(y, sec)
 
 

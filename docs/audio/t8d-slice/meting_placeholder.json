@@ -36,12 +36,12 @@
   "bestand": "sfx/vijanden/schotdrager_aanloop_placeholder.wav",
   "duur_s": 0.5,
   "duur_ticks": 30.0,
-  "lufs_momentaan_max": -15.0,
-  "true_peak_dbtp": -5.5,
-  "aandeel_boven_250hz_pct": 99.8,
-  "zwaartepunt_hz": 825,
-  "piek_op_s": 0.341,
-  "stijging_db": 9.1
+  "lufs_momentaan_max": -16.1,
+  "true_peak_dbtp": -1.5,
+  "aandeel_boven_250hz_pct": 99.9,
+  "zwaartepunt_hz": 761,
+  "piek_op_s": 0.461,
+  "stijging_db": 10.6
  },
  "schotdrager_schotstoot": {
   "bestand": "sfx/vijanden/schotdrager_schotstoot_placeholder.wav",
@@ -793,7 +793,7 @@
  },
  "_luisterreeks": {
   "duur_s": 52.8,
-  "lufs_geintegreerd": -18.8,
+  "lufs_geintegreerd": -18.9,
   "true_peak_dbtp": -1.5,
   "momenten_s": [
    [
