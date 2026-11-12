@@ -1,12 +1,13 @@
 # Audio bible v0: audiorichting
 
-Versie 0.3 · Eigenaar: Audio Director · Issue: #66 (T2 uit `docs/productie/fase-2-kader.md` §2) · Met: Composer/Sound Designer · Basis: pitch v0.4 (besluit #51), art bible v0 (`docs/art/bible.md`), `docs/design/gdd.md` (E-02, E-14, C-14)
+Versie 0.4 · Eigenaar: Audio Director · Issue: #66 (T2 uit `docs/productie/fase-2-kader.md` §2), v0.4: #196 · Met: Composer/Sound Designer · Basis: pitch v0.5, art bible v0 (`docs/art/bible.md`), `docs/design/gdd.md` v0.8 (E-02m, E-02t, E-14b, C-12e, C-14), fasekader v0.4, `docs/audio/slice-audio.md` v0.1.1
 
 Deze bible legt vast hoe *Polderlight* (werktitel, besluit #96) klinkt en wat elke audiorol moet halen. Ze is **v0**: genoeg voor de grijze flow-kamer en voor het F2-fragment. Muziek per gebied en de assetlijst volgen in v1 (§13).
 
 **Werkaannames** (fasekader §5):
-- **Staart D = 120 ticks** (± 2 s, besluit #51: 8A; bereik 90–180) op de vaste simulatietick van **60 Hz** (`docs/tech/ontwerp.md` §2).
-- **Merk leeft D + 30 ticks en telt de laatste 60 ticks af** in beeld en geluid (E-14b, startwaarden van de LGD). Het ritme van de aftelling in §6 hangt hieraan.
+- **Staart D = 60 ticks** (1 s, besluit 2026-11-12, als werkaanname; bereik **60–180 ticks** = 1–3 s) op de vaste simulatietick van **60 Hz** (`docs/tech/ontwerp.md` §2). Was D = 120 (± 2 s, #51: 8A) tot v0.3. Let op: D = 60 is nog niet gespeeld en niet met de bots gemeten (besluit 2026-11-12); de regels hieronder staan daarom in D, met de waarde bij D = 60 erbij.
+- **Merk leeft solo D + 30 ticks (90 bij D = 60), in co-op vast 150 ticks** (C-12e), en telt de laatste 60 ticks af in beeld en geluid (E-14b, gdd v0.8). De echo knalt op **D + 3** (E-02m: de merksprong begint op D, de knal 3 ticks later; t 63 bij D = 60). Het ritme van de aftelling in §6 hangt hieraan.
+- **Doelstreep** (E-02t): staat aan van D − 30 tot de merksprong (t 30–60 bij D = 60). De aftelling past zich daaraan aan (§6.1, besluit Audio Director in de Lead-review van PR #193).
 - **Co-op 7A** (#51): solo speler 1 + echo, co-op speler 1 + speler 2, nooit meer dan twee lichamen, plus de gedeelde echo als finisher (C-14).
 - **€ 0 extern** (fasekader §7): alle audio is eigen synthese met code. Geen externe samples, bibliotheken of plug-ins zonder licentie in `docs/licenties.md`.
 - **Speler 1 is altijd "in kleur"** (art bible §5): zijn geluid blijft vol, ook in een grijze wijk.
@@ -20,7 +21,7 @@ Deze bible legt vast hoe *Polderlight* (werktitel, besluit #96) klinkt en wat el
 Twee preciseringen, zodat de eis toetsbaar is:
 
 1. **Wat het fragment moet dragen.** Niet "mooi geluid" in het algemeen, maar de drie dingen waar de pillars van afhangen: (a) de **merk-aftelling met het carillon** (R-V1, E-14b), (b) een **echo die je hoort als jezelf, maar hol** (pillar 1, gdd O-4), en (c) **grijs → leven** (pillar 2). Het fragment in §9 bevat alle drie.
-2. **Hoe het beoordeeld wordt.** Geen rol in de studio kan luisteren; we beoordelen met metingen. Daarom haalt het fragment eerst de **harde drempels** uit §8 (loudness, piek, hoorbaarheid boven het bed). Daarnaast telt **één luistercheck door een mens** (besluit van de EP, eigenaar van het kader): **F2 = SM-score Kwaliteit ≥ 7 én drie keer "ja" van de CEO**, zonder eigen cijfer, op drie vragen: (1) klinkt het als een carillon, (2) hoor je dat de tweede slag "jij maar hol" is, (3) voelt het opgepompte deel warmer. Op koptelefoon en op tv-luidsprekers, ± 5 minuten, 0 runs. Er komt **één check, alleen op de versie die F2 claimt** (v2), in de CEO-sessie van T17; geen aparte CEO-vraag, want T8d wacht toch op F0.
+2. **Hoe het beoordeeld wordt.** Geen rol in de studio kan luisteren; we beoordelen met metingen. Daarom haalt het fragment eerst de **harde drempels** uit §8 (loudness, piek, hoorbaarheid boven het bed). Daarnaast telt **één luistercheck door een mens** (besluit van de EP, eigenaar van het kader): **F2 = SM-score Kwaliteit ≥ 7 én drie keer "ja" van de CEO**, zonder eigen cijfer, op drie vragen: (1) klinkt het als een carillon, (2) hoor je dat de tweede slag "jij maar hol" is, (3) voelt het opgepompte deel warmer. Op koptelefoon en op tv-luidsprekers, ± 3–5 minuten, 0 runs. Er komt **één check, alleen op de versie die F2 claimt** (v2), op de kaart van mijlpaaltest **MT2**, vóór T8d (besluit van de EP, Lead-review PR #199). Niet in MT1, zodat die kaart binnen ± 15 min blijft (`testplan-mt1.md` §1), en geen aparte CEO-sessie: de CEO test alleen bij mijlpalen (besluit 2026-11-12 (2)).
 
 ---
 
@@ -37,7 +38,7 @@ Elke audiopijler hangt aan een design pillar. **Toetsvraag voor elk geluid:** *V
 | # | Pijler | Hangt aan | Wat het betekent |
 |---|---|---|---|
 | A1 | **De echo klinkt als jij, maar hol** | P1 | De echo speelt hetzelfde geluid als zijn eigenaar, met hetzelfde ritme en dezelfde toonhoogte, maar zonder lijf en door een holle buis (§4). Je herkent je eigen slag een tel later terug. Antwoord op gdd **O-4**: ja, de echo speelt audio af, gedempt (−7 tot −8 dB), ook om hem buiten beeld te volgen. |
-| A2 | **Het carillon is de klok van de echo** | P1, R-V1 | Het merk telt af met vier carillonslagen. De echo komt altijd op slag 3: "één, twee, **boem**" (§6). |
+| A2 | **Het carillon is de klok van de echo** | P1, R-V1 | Het merk telt af met carillonslagen, één per 15 ticks. De echo komt altijd op de plek van slag 3: de merksprong op D, de **knal op D + 3**. Staat de doelstreep op het merk, dan vallen slag 2 en 3 weg en zwelt een voorslag aan tot de knal: "één, … *zwel* … **boem**" (§6.1). |
 | A3 | **De terts komt terug met het licht** | P2 | Grijs klinkt in lege kwinten en klokken zonder terts. Pomp je licht in, dan keert de terts terug: in de klokken, in de muziek, in de galm (§5). |
 | A4 | **Leesbaarheid vóór sfeer** | P2 (pitch: "Gevolg voor Art en Audio") | Spelinformatie (merk, aftelling, tells, echo) heeft altijd voorrang in de mix; sfeer wijkt (§8). |
 | A5 | **Twee spelers, twee materialen** | P3 | Speler 1 (amber) = warm koper en hout; speler 2 (cyaan) = ijzer en glas (zijn pikhaak). De gedeelde echo (finisher) = beide materialen om en om, met het volle carillon (§6). Zo volgt audio de kleurregel van de art bible §6. |
@@ -90,10 +91,20 @@ Gemeten op de **wereld zonder spelers** (bed, muziek, galm), fragment v2: het sp
 
 ### 6.1 Merk-aftelling (E-14b)
 
-- Een merk leeft D + 30 ticks; de laatste **60 ticks** telt het af met **vier carillonslagen, één per 15 ticks**.
-- Omdat de echo de treffer precies D ticks later herhaalt, valt de **echo altijd op slag 3** (30 ticks voor het einde), voor elke D van 90 tot 180. Dat geeft een vast, leerbaar ritme: **"één, twee, boem"**. Vraag aan de LGD: houd de levensduur op **D + 30**; dan blijft deze regel vanzelf kloppen.
-- **Tonen:** A5, B5, C♯6, D6. De aftelling stijgt naar de grondtoon. Slag 3 (C♯6, de leidtoon) hoor je alleen als de echo niet komt; komt hij wel, dan neemt de **ontploffing** de plaats van slag 3 in en lost op naar D (de grote klok D5, hum D4).
-- **Ontploft het merk niet op slag 3** (de echo is Leeg of gebroken): je hoort slag 3 (C♯6), en op slag 4 (D + 15) nog eens de leidtoon C♯6, 6 dB zachter: het merk leeft nog en kan in co-op nog ontploffen. Pas op **D + 30**, het einde van de levensduur (E-14b), dooft het: de leidtoon sterft gedempt weg (`merk_dooft`). Onopgelost, met opzet. Het geluid meldt "weg" dus nooit vóór het merk echt weg is. De D6 (`aftelling_4_*` in de losse SFX) is een reserve, bv. voor een merk dat de LGD later langer laat leven.
+- Een merk leeft solo **D + 30 ticks** (90 bij D = 60), in co-op vast **150 ticks** (C-12e). De laatste **60 ticks** telt het af met **carillonslagen, één per 15 ticks**: solo op **D − 30, D − 15, D en D + 15** na het zetten (t 30, 45, 60, 75 bij D = 60), co-op op t 90, 105, 120 en 135.
+- **Tonen:** A5, B5, C♯6, D6. De aftelling stijgt naar de grondtoon (motief M1, §7).
+- **De echo knalt op D + 3.** De echo herhaalt de treffer precies D ticks later; de merksprong begint op D en de knal valt **3 ticks later, op D + 3** (E-02m; t 63 bij D = 60). De knal valt dus altijd 3 ticks na de plek van slag 3 (D), voor elke D van 60 tot 180. De **ontploffing** lost op naar D (de grote klok D5, hum D4). Vraag aan de LGD (gdd v0.8 houdt dit al zo): houd de solo-levensduur op **D + 30**; dan blijft deze regel vanzelf kloppen.
+- **Aftelling naast de doelstreep** (besluit Audio Director, Lead-review PR #193; `slice-audio.md` §3.1). De doelstreep (E-02t) gaat aan op **D − 30**, tegelijk met slag 1. Alleen audio; de aftelling in beeld blijft zoals ze is.
+
+  | Situatie (solo, merk gezet op t 0) | Wat je hoort | Bij D = 60 |
+  |---|---|---|
+  | De doelstreep staat op **dit** merk | **Slag 1 blijft**; **slag 2 en slag 3 vallen weg**. De **doelstreep-voorslag** (een omgekeerd klokje E6, `doelstreep_voorslag_*`) zwelt aan en **eindigt op de knal**. Klinkt als: "één, … *zwel* … boem" | slag 1 op t 30; voorslag t 33 → knal t 63 |
+  | De streep **verdwijnt vóór D** (doel dood, merk gedoofd, ander merk dichter) | De slagen die nog moeten komen, klinken weer: **slag 3 komt terug** op D, daarna de zachte slag 4 op D + 15 en het doven op D + 30 (zie hieronder). De lopende voorslag fadet in 30 ms uit | slag 3 op t 60, slag 4 op t 75, doven op t 90 |
+  | Geen doelstreep op dit merk (echo Leeg, gebroken of op een ander merk) | De gewone aftelling: slag 1, 2 en 3, zie hieronder | t 30, 45, 60 |
+  | **Co-op** (merk 150 ticks, C-12e) | **Ongewijzigd**: vier slagen in de laatste 60 ticks. Er is geen echo, dus geen doelstreep en geen voorslag; het merk knalt waar de treffer van het andere lichaam valt | t 90, 105, 120, 135; doven t 150 |
+
+  De regel werkt per merk (`mark_id`): alleen de slagen die vallen terwijl de streep op dít merk staat, vallen weg. Wachttijd en beginpunt van de voorslag (zodat hij ook bij een late streep op de knal eindigt) staan in `slice-audio.md` §3; één voorslag per `mark_id`, max. 1 tegelijk.
+- **Ontploft het merk niet** (de echo is Leeg of gebroken): je hoort slag 3 (C♯6, de leidtoon), en op slag 4 (D + 15) nog eens de leidtoon C♯6, 6 dB zachter: het merk leeft nog. Pas op **D + 30**, het einde van de levensduur (E-14b), dooft het: de leidtoon sterft gedempt weg (`merk_dooft`). Onopgelost, met opzet. Het geluid meldt "weg" dus nooit vóór het merk echt weg is. In co-op idem, op t 120, 135 en 150. De D6 (`aftelling_4_*` in de losse SFX) is een reserve, bv. voor een merk dat de LGD later langer laat leven.
 - **Merk zetten:** een klein klokje (A6) met een korte glinstering: de lichtvonk in de vorm van een peil- of sluismerk (E-14i). Geen gong, zegel of tempelklok (ideecheck §2, afwijkpunt 5).
 - **Meerdere merken tegelijk:** **één aftelling tegelijk is hoorbaar**: die van het merk dat het eerst afloopt. Andere merken zoemen alleen zacht.
 
@@ -147,7 +158,9 @@ De finisher speelt jullie laatste 10 s versneld ×5 af in 120 ticks. Elke finish
 
 **Versie v2: dit is de versie die F2 claimt** (§0). v1 staat in de geschiedenis van de repo; het script en de bestanden hieronder zijn v2.
 
-**Werkaannames** (fasekader §5): D = 120 ticks op 60 Hz, merk leeft D + 30 ticks, aftelling in de laatste 60 ticks (één slag per 15 ticks), solo (speler 1 + echo), € 0 extern (alles eigen synthese). Zie de kop van deze bible.
+**Referentie, gemaakt op D = 120.** Het fragment is een **klankreferentie** (carillon, `echo_versie`, grijs → leven, mix), geen timingreferentie voor D = 60. Alle ticks en tijden in §9 horen bij D = 120 en bij de regels van v0.3: geen doelstreep-voorslag, slag 2 klinkt nog, de ontploffing valt op slag 3 (de knal op D + 3 is in het fragment niet apart gezet). Voor D = 60 gelden §6.1 en §10. We renderen het fragment **niet** opnieuw: het is de basis van F2 en van de slice-SFX (`slice-audio.md`); de aftelling op D = 60 komt in slice-audio deel 2 (`slice-audio.md` §5 punt 1).
+
+**Werkaannames van het fragment** (fasekader §5, toen): D = 120 ticks op 60 Hz, merk leeft D + 30 ticks, aftelling in de laatste 60 ticks (één slag per 15 ticks), solo (speler 1 + echo), € 0 extern (alles eigen synthese). De werkaannames van deze bible staan in de kop (D = 60).
 
 **Bestanden** in `docs/audio/f2-fragment/`:
 
@@ -164,7 +177,7 @@ De finisher speelt jullie laatste 10 s versneld ×5 af in 120 ticks. Elke finish
 
 **Waarom nog `_placeholder`:** niemand heeft het fragment beluisterd. Het verliest het achtervoegsel pas wanneer deze versie SM-Kwaliteit ≥ 7 én drie keer "ja" van de CEO haalt (§0). Dan hernoemt de Audio Director de bestanden **en past hij in dezelfde commit de bestandsnamen in `bron/genereer_f2.py` aan**, zodat het script de nieuwe namen blijft maken; de inhoud verandert niet.
 
-### 9.1 Wat je hoort (tijdlijn, D = 120 ticks)
+### 9.1 Wat je hoort (tijdlijn, gemaakt op D = 120 ticks)
 
 | Tijd (s) | Tick | Wat | Pillar |
 |---|---|---|---|
@@ -181,7 +194,7 @@ De finisher speelt jullie laatste 10 s versneld ×5 af in 120 ticks. Elke finish
 | 11,30 | 678 | De tweede echo-slag vindt geen merk meer: alleen de holle slag | A1 |
 | 11–15,5 | — | Galm van het belfort, gemaal met spattend schoepenrad, harmonium D-groot add9; uitfaden | P2 |
 
-### 9.2 Metingen (v2)
+### 9.2 Metingen (v2, gemaakt op D = 120)
 
 Alle waarden komen uit het script; de loudness ook onafhankelijk uit **ffmpeg ebur128** (`-af ebur128=peak=true+sample`).
 
@@ -260,9 +273,9 @@ Alle waarden komen uit het script; de loudness ook onafhankelijk uit **ffmpeg eb
 
 **Zelfscore van de Audio Director:** carillon-onderdelen **± 7**, fragment als geheel **± 6,5–7**. Ik claim F2 op deze versie, maar het oordeel ligt bij de **SM-score Kwaliteit** en de **luistercheck van de CEO** (§0). Haalt v2 geen 7 of geen drie keer "ja", dan open ik een `brainstorm`-issue met de CEO, met als opties: (a) **eigen veldopnames** (water, steen, metaal) door een mens, als eigen werk vastgelegd in `docs/licenties.md`; (b) een **CC0-bibliotheek** voor alleen omgeving, na een licentiecheck door de BLA; (c) het palet nog smaller maken (minder omgeving, meer carillon en stilte). Een "nee" op één vraag wijst de bouwsteen aan: vraag 1 → klokken, vraag 2 → `echo_versie`, vraag 3 → water, harmonium en galm.
 
-### 9.4 Luistercheck voor de CEO (T17)
+### 9.4 Luistercheck voor de CEO (MT2)
 
-Eén keer, op dit fragment (`f2_merk_aftelling_carillon_placeholder.wav`), op koptelefoon én op tv-luidsprekers, ± 5 minuten. Antwoord per vraag met **ja** of **nee**, zonder cijfer; een korte opmerking mag.
+Eén keer, op de kaart van MT2 vóór T8d (§0), op dit fragment (`f2_merk_aftelling_carillon_placeholder.wav`), op koptelefoon én op tv-luidsprekers, ± 3–5 minuten. Antwoord per vraag met **ja** of **nee**, zonder cijfer; een korte opmerking mag.
 
 1. **Klinkt het als een carillon?** Luister naar de klokjes op 2,1 s en 2,35 s en de klokslag op 2,6 s; daarna 10,5–11,1 s.
 2. **Hoor je dat de slag op 2,6 s "jij, maar hol" is?** Vergelijk de slag van speler 1 op 0,6 s met de echo op 2,6 s (en 9,0 s met 11,0 s).
@@ -290,7 +303,8 @@ Master  (HardLimiter, plafond −1 dB)
 - **Afspelen op de simulatietick.** Geluiden starten op het event van de Sim (`_physics_process`, `docs/tech/ontwerp.md` §2, event-systeem §4a), nooit vanuit `_process` of een animatie-callback. Zo klopt een SFX framexact met de gameplay, ook voor de echo.
 - **De echo gebruikt dezelfde events.** Speelt de echo een opgenomen event af (E-02), dan roept de code dezelfde geluidsfunctie aan met `bron = ECHO`; die kiest de holle variant en de bus Echo. Geen tweede systeem.
 - **Holle varianten voorrenderen** in plaats van de kam live op de bus te zetten: goedkoper op de Steam Deck en precies wat in het fragment klinkt.
-- **Merk-aftelling:** een kleine `MerkAudio`-node per merk die op ticks `D − 30`, `D − 15` en `D` na het zetten een slag speelt, op `D + 15` de zachte slag 4 en op `D + 30` (einde levensduur, E-14b) het doven, tenzij een ander merk al hoorbaar aftelt (§6.1). Ontploffing en dooft stoppen de aftelling.
+- **Merk-aftelling:** een kleine `MerkAudio`-node per merk. Met levensduur `L` (solo `D + 30`, co-op 150, C-12e) speelt hij op ticks `L − 60`, `L − 45` en `L − 30` na het zetten een slag, op `L − 15` de zachte slag 4 en op `L` (einde levensduur, E-14b) het doven, tenzij een ander merk al hoorbaar aftelt (§6.1). Solo bij D = 60: t 30, 45, 60, 75 en doven op 90; co-op: t 90, 105, 120, 135 en doven op 150. Ontploffing en dooft stoppen de aftelling.
+  - **Naast de doelstreep** (§6.1): `MerkAudio` luistert naar `doelstreep_on(tick, mark_id)` en de vlag `doelstreep` (`game/scripts/echo/echo_hints.gd`). Zolang de streep op **dit** merk staat, speelt hij geen aftelslagen (slag 1 op `D − 30`, dezelfde tick als `doelstreep_on`, klinkt nog; slag 2 en 3 vallen weg) en start hij één keer de voorslag, met wachttijd en beginpunt uit `doelstreep_strength` (`slice-audio.md` §3), zodat die op de knal (`D + 3`, t 63) eindigt. Gaat de streep uit vóór `D`, dan fadet hij de voorslag in 30 ms uit en speelt hij de slagen die nog komen (slag 3 op `D`, slag 4, doven). Co-op: geen doelstreep, dus ongewijzigd.
 - **Ruimtelijk:** `AudioStreamPlayer2D` voor wereldgeluid (vijanden, gemaal, merk), gewone `AudioStreamPlayer` voor de spelers en de UI (de gedeelde camera houdt ze in beeld). `max_polyphony` per speler volgens §8.3.
 - **Variatie:** `AudioStreamRandomizer` voor voetstappen, slagen en water; niet voor klokken (§8.5).
 - **Muziek:** `AudioStreamSynchronized` voor de grijze en de opgepompte laag (zelfde tempo en lengte), met het volume per laag gestuurd door de lichtstand van de wijk; `AudioStreamInteractive` voor de overgang naar de gevechtslaag.
@@ -311,22 +325,24 @@ Master  (HardLimiter, plafond −1 dB)
 | Composer/Sound Designer | Leid de echo-variant af van het levende geluid (§4); houd klokken op toonhoogte; lever het script mee | Geen apart "spookgeluid" voor de echo; geen samples zonder licentie |
 | Combat Designer | Geef per gevaarlijke aanval het tell-moment in ticks door | Geen tell korter dan 10 frames |
 | Gameplay Programmer | Start geluid op het Sim-event, ook voor de echo (§10) | Geen geluid vanuit `_process` of een animatie-callback |
-| Lead Game Designer | Houd de merk-levensduur op D + 30 (§6.1) | — |
+| Lead Game Designer | Houd de merk-levensduur solo op D + 30 en de knal op D + 3 (§6.1); co-op 150 ticks (C-12e) | — |
 | Art Director | Laat de kleurgolf en de kruisfade van de galm samen lopen (± 2 s) | — |
 
 ## 13. Open punten
 
-- **QA Lead:** zet de drie luistervragen uit §9.4 op de CEO-kaart van T17 (fragment v2, koptelefoon en tv, ± 5 min, ja/nee zonder cijfer).
+- **QA Lead:** zet de drie luistervragen uit §9.4 op de kaart van **MT2**, vóór T8d (fragment v2, koptelefoon en tv, ± 3–5 min, ja/nee zonder cijfer); niet op de kaart van MT1, geen aparte CEO-sessie (EP-besluit, PR #199).
 - **Fragment v2** (§9) claimt F2: SM-score Kwaliteit en de luistercheck van de CEO op die versie. Haalt het geen 7 of geen drie keer "ja", dan een `brainstorm`-issue met de opties uit §9.3.
 - **Assetlijst** (`docs/audio/assetlijst.md`) en muziek per gebied: v1, na T3a (welke events en vaardigheden er komen).
 - **gdd O-4** (speelt de echo audio af?) is met §2 A1 beantwoord: ja, gedempt. De LGD kan O-4 sluiten.
 - **Geluid van speler 2** (ijzer en glas, A5) en de **finisher** (§6.4) zitten nog niet in het fragment.
+- **D = 60 (v0.4):** de aftelling naast de doelstreep (§6.1) is een besluit van de Audio Director; de LGD krijgt er een melding van (alleen audio, geen regel in de gdd). Nog niet gerenderd: de aftelslagen en de voorslag samen op t 30/33/63 komen in slice-audio deel 2 (`slice-audio.md` §5 punt 1), na een groene bot-run op D = 60. Ook daar: of de omgekeerde aanloop van de echo (± 0,35 s, §4) bij een staart van 1 s nog prettig klinkt (`slice-audio.md` §5 punt 2).
 - **Hulpmiddelen** (numpy, scipy, ffmpeg met libvorbis) worden alleen gebruikt om audio te maken en gaan niet mee in de game. De BLA beslist of ze in `docs/licenties.md` horen.
 
 ### Logboek
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.4 | 2026-11-12 | Op D = 60 (besluit 2026-11-12, #196): kop met werkaanname D = 60, bereik 60–180 ticks, merk solo D + 30 / co-op 150 (C-12e), knal op D + 3 en de doelstreep; §2 A2 en §6.1 met de knal op D + 3 en de aftelling naast de doelstreep (slag 1 blijft, slag 2 en 3 vallen weg, voorslag t 33 → knal t 63; streep weg vóór D: slag 3 terug; co-op ongewijzigd), zoals in `slice-audio.md` v0.1.1 §3.1; §10 `MerkAudio` met levensduur `L` en dezelfde regel; §9 (F2) als klankreferentie, gemaakt op D = 120; §12 en §13 bijgewerkt. Lead-review EP (PR #199): de luistercheck gaat naar de kaart van MT2, vóór T8d, niet MT1 en geen aparte sessie (§0, §9.4, §13). |
 | 0.3 | 2026-11-09 | Fragment v2 dat F2 claimt (§9): water als bellenmodel, gelaagde P1-slag, harmonium met celeste, riet-geruis en toetsklik, galm met spiegelbronnen en nagalm per band, droger grijs, gemaal zonder subsonisch laag, dukken van bed en muziek, levensduur zonder echo (doven op D + 30) als losse reeks; metingen met ffmpeg ebur128 en timing op ticks; luistervragen klaar voor T17 (§9.4). §3, §4, §5 bijgewerkt met de v2-metingen. |
 | 0.2 | 2026-11-09 | Lead-review EP (PR #106): doven op D + 30 met een zachte slag 4 op D + 15 (§6.1, §10); EP-besluit over de luistercheck (§0, §9, §13); WAV byte-gelijk, OGG per build (§9). |
 | 0.1 | 2026-11-09 | Eerste versie (#66, T2): akkoord op de F2-eis (A10) met twee preciseringen, pijlers, palet, echo tegenover levend, grijs → leven, carillon en gemaal, mixregels, F2-fragment met metingen en eerlijke beoordeling, techniek in Godot 4.6. |
