@@ -28,6 +28,8 @@ const PLANK_MAX_N := 4
 const BOUNCE := 2
 const LAUNCH := 4
 const CATCH := 3
+## C-14 c: per finisherslag.
+const FINISHER_STRIKE := 1
 
 var value := 0
 ## `n` van LM-02 voor P1: springplank-landingen sinds P1 voor het laatst
@@ -50,6 +52,14 @@ func _init(sim: Node, p1: Node) -> void:
 	sim.combat.hit.connect(_on_hit)
 	sim.combat.mark_exploded.connect(_on_exploded)
 	sim.tick_finished.connect(_on_tick)
+
+
+## Een boss (`Boss`): elke finisherslag +1 LP (C-14 c); bij BOSS_VERSLAGEN naar 100 LP (GM-10).
+func watch_boss(boss: Node) -> void:
+	boss.finisher_strike.connect(func(tick: int, who: String) -> void:
+		add(tick, FINISHER_STRIKE, "finisherslag", who))
+	boss.boss_defeated.connect(func(tick: int) -> void:
+		add(tick, MAX - value, "boss", "p1"))
 
 
 ## Licht toevoegen (LM-01: boven 100 gaat het teveel verloren).

@@ -45,6 +45,9 @@ var tail_ticks := int(Tuning.echo()["tail_ticks"])
 ## Doet P2 mee (co-op)? De Sim zet dit bij elke speler die erbij komt of
 ## weggaat. Bepaalt de levensduur van een nieuw merk (C-12e).
 var coop := false
+## C-14e: loopt er een finisher? Dan zet een treffer geen merk en vallen vijanden niet aan. De boss
+## zet dit (`Boss`).
+var finisher_running := false
 var targets: Array[CombatTarget] = []
 var marks: Array[Mark] = []
 
@@ -102,7 +105,7 @@ func attack(tick: int, attacker: String, layer: int, center: Vector2, facing: in
 			continue
 		else:
 			damage = int(c["hit_p1"]) if attacker == "p1" else int(c["hit_p2"])
-			if mark == null and target.is_markable():
+			if mark == null and target.is_markable() and not finisher_running:
 				_set_mark(tick, target, attacker)
 		if target.armor_intact:
 			damage = 0  # E-14g: een intact pantser krijgt niets van treffers
@@ -129,6 +132,15 @@ func neerslag_box(center: Vector2) -> Rect2:
 	var box := Vector2(float(size[0]), float(size[1]))
 	var bottom := center.y + Tuning.body_size().y * 0.5
 	return Rect2(Vector2(center.x - box.x * 0.5, bottom), box)
+
+
+## Doven zonder effect (E-14b), bv. de merken op een boss bij een fasewissel (GMB-12).
+func fade_marks_on(on_targets: Array, tick: int) -> void:
+	for mark in marks:
+		if mark.alive and on_targets.has(mark.target):
+			mark.alive = false
+			mark_faded.emit(tick, mark)
+	marks = marks.filter(func(m: Mark) -> bool: return m.alive)
 
 
 ## E-02m: het doelmerk voor een AANVAL van de echo op `from` (frame p): het

@@ -9,8 +9,8 @@ const PATH := "res://data/vijanden/slice.csv"
 const Tuning = preload("res://scripts/echo/tuning.gd")
 
 ## Elke sleutel die de code leest, per groep (B-11). `missing_keys` toetst de CSV hiertegen, zodat
-## een typefout de CSV-test rood maakt en niet stil 0,0 geeft. De groep `gemaalmeester` staat hier
-## pas vanaf B-5.
+## een typefout de CSV-test rood maakt en niet stil 0,0 geeft. Van de groep `gemaalmeester` staan
+## hier de sleutels van B-5–B-7; die van het rad en de co-op-schaal volgen met B-8 (deel 2b).
 const REQUIRED := {
 	"gedeeld": ["v_teller", "v_aftrek", "v_grens", "stil_na_treffer", "afstand_los", "paar_e", "paar_k",
 		"verlicht_snelheid", "verlicht_aanloop_extra"],
@@ -20,6 +20,16 @@ const REQUIRED := {
 		"vlak_breedte", "vlak_hoogte", "vlak_onder", "terugkeer", "pantser", "beeld_breedte", "beeld_hoogte"],
 	"dwaallicht": ["breedte", "hoogte", "levens", "v_max", "baan_hoogte", "baan_min", "baan_max", "bereik",
 		"aanloop", "actief", "herstel", "duik_hoogte", "terugkeer", "terugkeer_verlicht"],
+	"gemaalmeester": ["se", "openingen", "drempel_1", "drempel_2", "drempel_3", "drempel_4",
+		"opening_ticks", "fasewissel_ticks", "wankel_se", "lichaam_x1", "lichaam_x2", "schot_x1",
+		"schot_x2", "schot_y1", "schot_y2", "merkplek_x", "merkplek_y", "spuigat_links", "spuigat_rechts",
+		"adds_max", "spuigat_gloei", "add_inactief", "maat_fase1", "maat_fase2", "eerste_aanloop",
+		"pomp1_aanloop", "pomp1_actief", "pomp1_herstel", "pomp_breedte", "pomp_hoogte", "pomp2_aanloop",
+		"pomp2_actief", "pomp2_herstel", "zwiep_aanloop", "zwiep_actief", "zwiep_herstel", "zwiep_breedte",
+		"zwiep_y1", "zwiep_y2", "finisher_ticks", "finisher_bron", "arena_breedte", "schok_breuk_ticks",
+		"schok_breuk_px"],
+	"testboss": ["se", "wankel_se", "breedte", "hoogte", "maat", "aanloop", "actief", "herstel",
+		"vlak_breedte", "vlak_hoogte", "finisher_ticks", "finisher_bron", "arena_breedte"],
 }
 
 static var _data: Dictionary = {}
