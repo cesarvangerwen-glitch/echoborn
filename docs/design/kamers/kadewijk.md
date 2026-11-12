@@ -1,10 +1,10 @@
 # Kamers: de Kadewijk (wijk 1.3, de slice): S1–S8
 
-Versie 0.3.1 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
+Versie 0.3.2 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
 
 Bronnen: `docs/design/wereld.md` v0.2 §2 (kamerlijst §2.2, SL-regels §2.3, vijandtypes §2.4, T8a §2.5, acceptatie §2.6), `docs/design/gdd.md` v0.8.2 (§4.3 bouwstenen met D in formules, L-08–L-14, §4.5 normen, §4.8.5 vaste basis, §4.8.7 de langzame lijn met dash), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.3 (§2.6 plaatsing, VJ-01–VJ-08, §3.2 arena), `docs/design/gemaalmeester.md` v0.2.1 (GM-01, GM-07, GM-11), `docs/productie/fase-2-kader.md` v0.4 §4, `docs/tech/ontwerp.md` v0.3 (§3a, §7, §12 "naar T8a"), de visie-review van de CD ([comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), `docs/concept/visie-review/kadewijk/`).
 
-**Stand.** S1–S8 staan als grijze, speelbare kamers in `game/levels/kadewijk/`, op de systemen van T5b en T8b: `Kamer` + `AreaLoader` met meestreamende inhoud, `Progress` + `Checkpoint` + `Respawn`, `LightMeter`, `Gemaal` met vier schoepen, de `SliceEnemy`s. Een gescripte bot loopt elke kamer en de route van S1 door het gemaal tot in S7 bij D = 60, met 120 en 180 als regressie, en haalt de normen (§6, §6b). **Deel 2 (#83): S5 (B2 naar de zolder, het lampglas), S6 (de pompgang, het gemaal = `wijk_gemaal` van elke kamer, het checkpoint), S7 (het luik, het kanaal met twee Dwaallichten) en S8 als lege arena op de maten van de Gemaalmeester (§3b–§3e).** **SL-01: 112 LP vóór de eerste pompslag bij D = 60** (§6b). **Nog niet gebouwd: S9 (de lage kade, de lus terug naar S1), de waterstand per wijk, en de boss en zijn deuren in S8** (GP, §9).
+**Stand.** S1–S8 staan als grijze, speelbare kamers in `game/levels/kadewijk/`, op de systemen van T5b en T8b: `Kamer` + `AreaLoader` met meestreamende inhoud, `Progress` + `Checkpoint` + `Respawn`, `LightMeter`, `Gemaal` met vier schoepen, de `SliceEnemy`s. Een gescripte bot loopt elke kamer en de route van S1 door het gemaal tot in S7 bij D = 60, met 120 en 180 als regressie, en haalt de normen (§6, §6b). **Deel 2 (#83): S5 (B2 naar de zolder, het lampglas), S6 (de pompgang, het gemaal = `wijk_gemaal` van elke kamer, het checkpoint), S7 (het luik, het kanaal met twee Dwaallichten) en S8 als lege arena op de maten van de Gemaalmeester (§3b–§3e).** **SL-01: 112 LP vóór de eerste pompslag bij D = 60** (§6b). **De Gemaalmeester staat in S8** (GP, §3e): de deuren gaan met de boss open en dicht, en de boss-bot wint solo bij D = 60/90/120/180 in de echte arena (§6b). **Nog niet gebouwd: S9 (de lage kade, de lus terug naar S1) en de waterstand per wijk** (§9).
 
 ## 1. Doel
 
@@ -128,7 +128,10 @@ Op de maten van GM-01 en `slice-vijanden-en-boss.md` §3.2, als layout-data (`ka
 - **`Layout.ARENA_ORIGIN` = (4180, 680)**: de linkermuur op de bovenkant van de vloer, de `origin` van `gemaalmeester.gd`; `ARENA_W` = 600.
 - **Deuren** (blokken `DeurRechts` en `DeurLinks`): rechts (van S7, x 4780–4800, y 360–620) staat bij het laden open; links (naar S9) is dicht. `Kadewijk.set_door(&"S8", "DeurRechts", true)` sluit hem (bij `BOSS_START`); de koppeling met de boss is van de GP.
 - **Getest**: keren tegen de linkermuur en op de echo springen brengt het aanvalsvlak in de hurtbox van het rad (x `D − 14 … D + 82` van de muur, y 100–140), bij D = 60, 90, 120 en 180 (bounce op 54 / 92 / 122 / 182 px van de muur).
-- De boss zelf staat er niet in (opdracht: de GP koppelt boss en arena). Placeholders: de plek van het lichaam en de twee spuigaten (GMB-03), alleen beeld.
+- **De boss** (GP, #83): als S8 laadt, zet `kadewijk.gd` de Gemaalmeester op `ARENA_ORIGIN` met `ARENA_W`; als S8 ontlaadt, gaat hij weg (`Boss.detach`: boss, delen, adds en signalen los van de Sim). `BOSS_START` sluit `DeurRechts`, `BOSS_VERSLAGEN` opent `DeurLinks` (`set_door`); een reset opent `DeurRechts` weer. Na `BOSS_VERSLAGEN` komt hij niet terug zolang de scène loopt; de lichtmeter gaat naar 100 LP (GM-10). `run_end = Kadewijk.RUN_END_BOSS` eindigt de run op `BOSS_VERSLAGEN`.
+- **Wanneer `BOSS_START`** (werkaanname GP, voor de LGD): pas als P1 24 px binnen de muren staat (het lichaam is dan helemaal binnen), elk lichaam (P1, P2, de echo die afspeelt) in de arena is, en met een echo P1 al D ticks binnen staat. Anders gaat de deur dicht op de echo, die erop breekt (E-08; gemeten: 1× per run bij elke D), of staat P2 buiten. Bij binnenkomst van rechts is dat 77 / 107 / 137 / 197 ticks bij D = 60 / 90 / 120 / 180. Een punt in S6 boven de arena (zelfde x) start hem niet (`arena_height` = 320).
+- **Respawn** (GM-11, SL-03, §5): bij 0 levenspunten in S8 respawnt P1 op het checkpoint van het gemaal (S6); S8 ontlaadt, en terug in S8 (555 ticks) staat er een nieuwe boss op 100 % in fase 1.
+- Placeholders: de plek van het lichaam en de twee spuigaten (GMB-03), alleen beeld; de boss tekent zijn eigen placeholder-lichaam.
 
 ## 4. Encounters (`slice-vijanden-en-boss.md` §2.6)
 
@@ -248,6 +251,19 @@ De runs van deel 1 (§6, tot `END_X`) zijn met deel 2 niet veranderd (zelfde tic
 
 **De lege loop na golf 2 in S3** (punt van de CD, #212). Gemeten bij D = 60: de laatste ontploffing in S3 is op tick 2161 (x 1862), de volgende echo-actie de lancering in S4 op tick 2701: **540 ticks (9,0 s)**, waarvan ± 5 s in S3 (van x 1954 tot de uitgang) en ± 4 s de aanloop van S4. MP-2 en L-11 houdt het (≤ 40 s; het langste gat blijft 715 ticks, S2 → S3). **Niet opgelost in deze run**: in de overgang S3 → S4 is er geen plek voor een echo-actie zonder (a) een vijand meer of een verplaatste vijand (de plaatsing van §2.6 is van de Combat Designer; bv. de Kadeloper van S4 aan het begin van de aanloop in plaats van aan de overkant), (b) een bouwsteen in het oostelijke deel van de markt (S3 is maatvast, geen herontwerp), of (c) een kortere aanloop in S4 (de bolder kan ± 110 px naar links, aanloop ≥ D + 24 tot D = 180: ± 55 ticks minder, het gat blijft ± 8 s). Voorstel aan de LGD en de CD in §9.
 
+### De Gemaalmeester in S8 (`test_kadewijk_boss.gd`, #83)
+
+De gescripte geoefende boss-run (`boss_bot.gd`, B-9/B-9b: 2 slagen per bounce, met ontwijken, 5 LP), solo, van het begin van S8 (de drempel bij de deur rechts) tot `BOSS_VERSLAGEN`. Ter vergelijking de lege arena van `test_boss_runs.gd` (P1 begint daar al binnen).
+
+| D | Tot BOSS_START | Fase 1 | Fase 2 | Totaal (s) | Arena-test (s) | MP-1 | Treffers | Kanten (tijd) |
+|---|---|---|---|---|---|---|---|---|
+| 60 | 77 | 1425 | 5968 | 7758 (**129,3**) | 123,1 | 56 | 0 | 16 (0) |
+| 90 | 107 | 678 | 5967 | 7025 (117,1) | 122,5 | 56 | 0 | 16 (0) |
+| 120 | 137 | 999 | 5979 | 7373 (122,9) | 122,0 | 92 | 0 | 16 (0) |
+| 180 | 197 | 1198 | 6063 | 7686 (128,1) | 131,9 | 61 | 0 | 16 (0) |
+
+Normen (gemaalmeester.md §7, GM-09, GM-10; §3.9): verslagen zonder dood ✓, MP-1 ≤ 300 ✓, de echo breekt niet ✓, schot gebroken (GM-06) en het rad met een bounce geraakt (GM-07; 34× per run) ✓, `RAD_DRAAI` tijd ≤ 1 bij D ≤ 120 ✓, D = 60 binnen 90–150 s ✓, deur rechts dicht bij `BOSS_START` en links open na `BOSS_VERSLAGEN` ✓, 100 LP na afloop ✓, P1 het hele gevecht in de arena ✓. Fase 1 verschilt per D en met de arena-test (de plek van P1 en de echo bij de start bepaalt wanneer de merksprong de eerste keer het schot haalt); fase 2 is bij elke D gelijk.
+
 ## 7. Checklist (wereld.md §2.6, voor S1–S4)
 
 | Punt | Stand |
@@ -309,16 +325,19 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 - **Waterstand per wijk** (`s` 0/1/2, LM-10, WS-03) met `Diepwater` en `Sluis`-objecten, in `Progress`/schema v2 (ontwerp.md §12 punt 2); de Kadewijk-kamers krijgen dan `wijk_gemaal` = het gemaal van S6 (`S6/Gemaal`). Nu leeg, want `validate()` vraagt een bestaande kamer.
 - **`lit` volgt de waterstand** (VJ-06): verlicht bij `s = 2`, niet per vijand met de hand (ontwerp.md §12).
 - **De arena van de Gemaalmeester in S8**: de kamer zelf (maten GM-01 `D + 24` per kant, GM-07 `D + 34`) bouwt de WLD als layout-data zoals hier; de boss-code (#190, deel 2b) en `BOSS_START`/`BOSS_VERSLAGEN` zijn van de GP.
-- `@export` voor de paargenoot van een `SliceEnemy` en voor de baan van het Dwaallicht (`lane_from`, `lane_to`, `floor_top`), zodat paren en banen in de scène staan; nu zet `kadewijk.gd` de paren.
+- `@export` voor de paargenoot van een `SliceEnemy`, zodat paren in de scène staan; nu zet `kadewijk.gd` de paren (de baan van het Dwaallicht staat al in de scène, #83).
 - Een **weksone** per vijand in `SliceEnemy` (nu de regel in `kadewijk.gd`, §4).
 - `Meetlog` en de camera van de flow-kamer (`flow_meetlog.gd`, `flow_room.gd` `camera_view`) worden hier alleen gelezen; naar `scripts/` verplaatsen mag.
 - Co-op-bot (duo) voor de Kadewijk, zoals `flow_duo.gd`, voor MP-7 en SL-01 co-op (ook B4 in co-op met de bolder: de drager staat dan tegen de bolder, 16 px van de rand).
 
 **Gameplay Programmer (deel 2, S5–S8):**
-- **De boss in de arena**: `gemaalmeester.gd` op `Layout.ARENA_ORIGIN` (4180, 680), breedte `ARENA_W` = 600; `BOSS_START` sluit `DeurRechts` (`Kadewijk.set_door`), `BOSS_VERSLAGEN` opent `DeurLinks` (naar S9); respawn bij 0 levenspunten in S8 op het checkpoint van het gemaal (SL-03, GM-11: 555 ticks tot de deur, gemeten). De boss-bot (B-9) in de Kadewijk-arena.
+- ~~**De boss in de arena**~~ **Gedaan** (#83, §3e, §6b): boss op `ARENA_ORIGIN`, deuren met `set_door`, respawn op het gemaal, boss-bot solo bij D = 60/90/120/180.
+- **LGD**: de werkaanname voor `BOSS_START` (§3e: P1, P2 en de echo binnen, met een echo P1 D ticks binnen) bevestigen of anders kiezen.
+- **`BOSS_VERSLAGEN` in de save**: nu blijft de boss verslagen zolang de scène loopt (`boss_defeated_tick`), nog niet als vlag in `game_state` (samen met S9 en de lus).
+- **Co-op in de Kadewijk-arena**: de boss-bot speelt hier alleen solo; co-op (MP-7) met de co-op-bot van de Kadewijk (§9 T8a).
+- ~~`@export` voor de baan van het Dwaallicht~~ **Gedaan** (#83): `lane_from`, `lane_to`, `floor_top` van `SliceEnemy` staan in `s7_sluiskelder.tscn`; `kadewijk.gd` zet ze niet meer.
 - **Het luik als systeemobject** (V-01, SL-04, L-03): `kadewijk_luik.gd` is een placeholder van de WLD (open = `verslagen`); verplaatsen naar `scripts/` en het beeld van de scheur mag.
 - **Lampglas, logbladzijden 1–2 en de sokkel** als objecten (WS-08; nu markeringen `Lampglas`, `Logbladzijde1/2`, `Sokkel` op de juiste plek in de inhoud).
-- `@export` voor de baan van het Dwaallicht: nu zet `kadewijk.gd` de banen bij het laden van S7.
 - Trap 2 en `s = 2` (SL-02) voor S9.
 
 **Volgende WLD-run (deel 3):**
@@ -356,6 +375,7 @@ Besluiten: D = 60 als werkaanname, bereik 1–3 s, en fase 2 parallel, ook bouwe
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie: S1–S4 als grijze kamers, bot en tests bij D = 60 (120/180 regressie) |
 | 0.1.1 | 2026-11-12 | Lead-review #208: langzame lijn met dash gemeten bij 60/90/120 (§6), besluiten van de LGD per afwijking en maatvast-stand per kamer (§8), open punten bijgewerkt (§9) |
+| 0.3.2 | 2026-11-12 | GP, [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83): **de Gemaalmeester in S8** (§3e: plaatsing, deuren, wanneer `BOSS_START`, respawn op het gemaal), boss-bot solo bij D = 60/90/120/180 in de arena (§6b), de baan van het Dwaallicht als `@export` in de scène; open punten (§9) |
 | 0.3.1 | 2026-11-12 | Lead-review #223: besluiten bij afwijking 7 en 9–12 (§8), visie-review per kamer (S2 en S4 "past", #212), S2 en S4 maatvast |
 | 0.3 | 2026-11-12 | [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) deel 2: **S5–S8** grijs en speelbaar (§2, §3b–§3e): S5 B2 naar de zolder met het lampglas, S6 de pompgang, het gemaal (`wijk_gemaal` = `S6/Gemaal` voor elke kamer), het checkpoint en de trap terug, S7 het luik en het kanaal met twee Dwaallichten, S8 de lege arena (GM-01). Bot en `test_kadewijk_deel2.gd` (§6b): **SL-01 112 LP** bij D = 60, B2 bij elke D met en zonder dash, gemaal → arena-deur 9,2 s, de bounce haalt het rad. Afwijkingen 9–13 (§8), de lege loop na golf 2 gemeten (§6b), open punten (§9) |
 | 0.2 | 2026-11-12 | [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217): **S4 herontworpen**, B4 achter een keerpunt (bolder 8 × 8 op de rand; §2, §3, §3a); bot en tests (geen stilstand vóór de lancering, bij D = 60 sneller dan de langzame lijn, late bot, zonder lancering niet over). **W-12**: de langzame lijn met dash als test bij elke D (§6). SM-punten #208: noot MP-3 bij 120/180, besluit B3-galerij (galerij blijft, bot dasht op de top: 30 px; §8 punt 8). Visie-review per kamer en maatvast-stand (§8), open punten (§9); §6 opnieuw gemeten |
