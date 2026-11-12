@@ -23,17 +23,17 @@ extends RefCounted
 ## komen uit gdd §4.3; waar de gdd een keuze laat, staat de keuze hier en in
 ## `docs/design/kamers/flowkamer.md`.
 ##
-## **Keerzone** (gdd §4.3, W-1, W-2): bij elk keerpunt van B1 en B2 ligt
-## binnen 120 px van de keerwand niets landbaars lager dan 120 px boven de
-## vloer, behalve de treden van de langzame lijn (45 en 90 px tegen de wand).
-## De weg omhoog begint op 120 px. Twee toevoegingen van de WLD (afwijking,
-## gemeld in de review): een **overhang** (30 px breed, 85–129 px boven de
-## vloer, 40–70 px van de wand) tussen de treden en de weg omhoog, zodat je van
-## de treden alleen naar de richel op 135 px kunt (anders haal je met sprong +
-## dash van de trede op 45 px de weg omhoog, even snel als keren), en een
-## **dicht stuk** van 215 px aan de wandkant van elke richel van B2 (niet van
-## onder door te springen), zodat je vanaf de richel op 135 px niet naar de
-## richel twee hoger springt (anders sla je een verdieping over).
+## **Keerzone** (gdd §4.3, W-1, W-2; op D = 60 herzien in T16f, W-8): bij
+## elk keerpunt van B1 en B2 ligt binnen `KEERZONE` = Z = D + 30 = 90 px van
+## de keerwand niets landbaars lager dan 120 px boven de vloer, behalve de
+## treden van de langzame lijn (30, 60 en 90 px tegen de wand). De weg omhoog
+## begint op 90 px. De kamer is op D = 60 gebouwd; bij een langere D werkt
+## dezelfde keerzone (gdd §4.3). De **overhang** van F0-2 is weg (gdd v0.8
+## §4.8.3 punt 1): bij D = 60 bounct de echolijn op 40–62 px van de wand,
+## precies waar hij lag. De richel op 135 en het **dichte stuk** van 215 px
+## aan de wandkant van elke richel van B2 blijven (ze raken de echolijn niet,
+## W-8): vanaf de richel op 135 spring je anders naar de richel twee hoger en
+## sla je een verdieping over.
 ##
 ## Alle geometrie is laag 1 (wereld). Er is geen schaduwgeometrie, geen
 ## FelLicht en geen Schaduwgevaar (FK-4).
@@ -80,14 +80,16 @@ const COLUMN_LEFT := 20.0
 const COLUMN_RIGHT := 500.0
 const SHAFT_LEFT := COLUMN_LEFT
 const SHAFT_RIGHT := COLUMN_RIGHT
-## Keerzone en langzame lijn (gdd §4.3, W-1, W-2); afstanden vanaf de keerwand.
-const KEERZONE := 120.0
+## Keerzone en langzame lijn (gdd §4.3, W-8); afstanden vanaf de keerwand.
+## Z = D + 30 bij D = 60 (de kamer is op D = 60 gebouwd).
+const KEERZONE := 90.0
 const TREAD_W := 40.0
-const OVERHANG_FROM := 40.0
-const OVERHANG_TO := 70.0
-const OVERHANG_LOW := 85.0   ## onderkant boven de vloer (een sprong vanaf de vloer haalt met het lichaam 80)
+## Treden van de langzame lijn tegen de keerwand, hoogte boven de vloer (gdd
+## §4.3 startvoorstel: drie van 30 px; FK-6: ≤ 45 per stap).
+const TREADS := [30.0, 60.0, 90.0]
 const LEDGE135_LEN := 150.0
-const LEDGE_LEN := 360.0
+## Richels van B2: 480 − Z = 450 − D bij D = 60.
+const LEDGE_LEN := 390.0
 ## Dicht stuk aan de wandkant van elke richel (zie boven).
 const LEDGE_SOLID := 215.0
 ## Massief rechts van de schacht; plafond van de startgang.
@@ -236,18 +238,16 @@ static func blocks(d: int) -> Array:
 		else:
 			out.append(["Richel%d" % (i + 1), Rect2(COLUMN_RIGHT - LEDGE_LEN, y, LEDGE_LEN - LEDGE_SOLID, ONE_WAY_T), true])
 			out.append(["Richel%d_dicht" % (i + 1), Rect2(COLUMN_RIGHT - LEDGE_SOLID, y, LEDGE_SOLID, ONE_WAY_T), false])
-	# Langzame lijn bij elk keerpunt: treden op 45 en 90 tegen de keerwand,
-	# de overhang, en de richel op 135 over de keerzone. De treden zijn
+	# Langzame lijn bij elk keerpunt: treden op 30, 60 en 90 tegen de
+	# keerwand en de richel op 135 over de keerzone. De treden zijn
 	# eenrichtingsrichels: je loopt eronder door tot de wand (het keerpunt).
 	for tp: Dictionary in turn_points():
 		var n: String = tp["name"].replace("-", "")
 		var wall: float = tp["wall"]
 		var y: float = tp["floor"]
 		var away := -float(tp["side"])  # richting van de wand af
-		out.append(["%sTrede45" % n, _strip(wall, away, 0.0, TREAD_W, y - 45.0, ONE_WAY_T), true])
-		out.append(["%sTrede90" % n, _strip(wall, away, 0.0, TREAD_W, y - 90.0, ONE_WAY_T), true])
-		out.append(["%sOverhang" % n, _strip(wall, away, OVERHANG_FROM, OVERHANG_TO, y - 135.0 + ONE_WAY_T,
-			135.0 - ONE_WAY_T - OVERHANG_LOW), false])
+		for h: float in TREADS:
+			out.append(["%sTrede%d" % [n, int(h)], _strip(wall, away, 0.0, TREAD_W, y - h, ONE_WAY_T), true])
 		out.append(["%sRichel135" % n, _strip(wall, away, 0.0, LEDGE135_LEN, y - 135.0, ONE_WAY_T), true])
 	# Rechterwand van de schacht, massief erachter, bovenroute (richel 4 loopt erin over).
 	out.append(["Massief", Rect2(COLUMN_RIGHT, TOP, MASSIEF_RIGHT - COLUMN_RIGHT, SHAFT_BOTTOM - TOP), false])

@@ -1,25 +1,31 @@
 extends RefCounted
-## Tests voor de flow-kamer na F0 (T16d, #176; gdd §4.7.4 W-1–W-4).
+## Tests voor de flow-kamer na F0 (T16d, #176; gdd §4.7.4 W-1–W-4) en op
+## D = 60 (T16f, #189; gdd v0.8 §4.8.4 W-8).
 ##
-## - **Geometrie** (W-1, W-2; gdd §4.3 *Keerzone*, FK-6, L-08 voor zover de
-##   geometrie): bij elk keerpunt van B1 en B2 de keerwand, D + 24 px vlakke
-##   vloer, niets landbaars binnen 120 px van de wand lager dan 120 px boven de
-##   vloer behalve de treden, de weg omhoog van 120 tot ≥ 270 px op 70–100 px,
-##   de langzame lijn (45, 90, 135) en de landing na de bounce per D.
+## - **Geometrie** (W-1, W-2, W-8; gdd §4.3 *Keerzone*, FK-6, L-08 voor zover
+##   de geometrie): bij elk keerpunt van B1 en B2 de keerwand, D + 24 px vlakke
+##   vloer, niets landbaars binnen Z = D + 30 = 90 px van de wand lager dan
+##   120 px boven de vloer behalve de treden (30, 60, 90), geen overhang, de
+##   weg omhoog van 90 tot ≥ 240 px op 70–100 px, de richel op 135, en de
+##   landing na de bounce per D.
 ## - **K2 in paren** (W-3, L-13 (d)): per golf paren die ≤ 32 px uit elkaar
 ##   beginnen, paren ≥ 160 px uit elkaar, golf 2 aan de kant van de ingang,
 ##   het pantserdoel in golf 2.
 ## - **Keren** (L-08 (c), headless per D): de gescripte geoefende run haalt bij
 ##   elk keerpunt de weg omhoog via de echo, zonder stilstand van 20 ticks of
-##   langer vóór de landing (MP-3 per keerpunt), en keren is sneller dan de
-##   langzame lijn van dezelfde bot met echo uit (gdd §4.3), hooguit 2× (FK-2).
+##   langer vóór de landing (MP-3 per keerpunt). Bij D = 60 (W-8): de landing
+##   ≥ 9 px voorbij de rand, en de snelste langzame lijn van dezelfde bot met
+##   echo uit is ≥ 30 ticks trager dan keren en ≤ 2× (FK-2). Bij 90 en 120
+##   (regressie) is keren sneller en de langzame lijn ≤ 2×; bij 180 ≤ 2× en
+##   een ondergrens: de langzame lijn hooguit 32 ticks sneller dan keren en
+##   ≥ 100 ticks (de kamer is op D = 60 gebouwd: `flowkamer.md` §12).
 ##
 ## - **K3 pompgang** (W-4; gdd §4.2, FK-5): vier schoepen, 80 px, 15–40 px
 ##   boven de vloer, ≥ 280 px droge vloer naar de sluis, de trap terug naar K2.
 ##
 ## FK-2 met echo uit (≤ 4 terugkeren, ≤ 2× de run) en de LM-04-run door K3
-## staan in `test_flowkamer.gd`; de wachtbot en de late bot (W-6) in
-## `test_wachtbot.gd`.
+## staan in `test_flowkamer.gd`; de wachtbot, de late bot en het afzetvenster
+## in `test_wachtbot.gd`.
 
 const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
 const FlowBot = preload("res://levels/flowkamer/flow_bot.gd")
@@ -27,7 +33,10 @@ const FlowReport = preload("res://levels/flowkamer/flow_report.gd")
 const Layout = preload("res://levels/flowkamer/flow_layout.gd")
 
 const TICK_CAP := 7000
-const DS := [90, 120, 180]
+const DS := [60, 90, 120, 180]
+## De D waarop de kamer gebouwd is (CEO-besluit 2026-11-12; gdd v0.8 §4.8.4):
+## daar gelden de eisen van W-8; 90, 120 en 180 draaien als regressie.
+const BUILT_D := 60
 ## Tijd van keren tot het volgende niveau per keerpunt, met echo, per D.
 static var _turn_ticks := {}
 
@@ -83,8 +92,13 @@ func _wall_at(blocks: Array, wall: float, side: int, y0: float, y1: float) -> bo
 	return false
 
 
-## W-1, W-2: keerzone, weg omhoog, langzame lijn en maten bij elk keerpunt.
+## W-1, W-2, W-8: keerzone, weg omhoog, langzame lijn en maten bij elk
+## keerpunt. De kamer is op D = 60 gebouwd: Z = D + 30 = 90 px (gdd v0.8
+## §4.3, §4.8.4 W-8), geen overhang; bij 90, 120 en 180 dezelfde geometrie
+## (alleen het B3-blok volgt D), als regressie.
 func test_keerzone_geometry(t) -> void:
+	t.check(is_equal_approx(Layout.KEERZONE, 60.0 + 30.0), "Z = %.0f px (W-8: D + 30 = 90 bij D = 60)" % Layout.KEERZONE)
+	var z := Layout.KEERZONE
 	for d: int in DS:
 		var blocks: Array = Layout.blocks(d)
 		for tp: Dictionary in Layout.turn_points():
@@ -101,50 +115,63 @@ func test_keerzone_geometry(t) -> void:
 			var x0 := minf(wall, wall + away * (d + 24.0))
 			var x1 := maxf(wall, wall + away * (d + 24.0))
 			t.check(_covered(blocks, y, x0, x1) >= d + 24.0 - 0.5, "%s: minder dan D + 24 px vloer vóór de wand" % tag)
-			# Keerzone: binnen 120 px van de wand (beide kanten) niets landbaars
-			# lager dan 120 px boven de vloer, behalve de treden op 45 en 90.
-			var hits := _landable(blocks, wall - Layout.KEERZONE, wall + Layout.KEERZONE, y - 120.0, y)
+			# Keerzone: binnen Z px van de wand (beide kanten) niets landbaars
+			# lager dan 120 px boven de vloer, behalve de treden op 30, 60 en 90.
+			var hits := _landable(blocks, wall - z, wall + z, y - 120.0, y)
 			var short := n.replace("-", "")
-			var allowed := ["%sTrede45" % short, "%sTrede90" % short]
+			var allowed: Array = []
+			for h: float in Layout.TREADS:
+				allowed.append("%sTrede%d" % [short, int(h)])
 			for h: String in hits:
 				t.check(h in allowed, "%s: %s is landbaar in de keerzone" % [tag, h])
-			t.check(hits.size() == 2, "%s: treden van de langzame lijn ontbreken (%s)" % [tag, hits])
-			# Weg omhoog: op 70–100 px (FK-6), van 120 tot ≥ 270 px van de wand.
+			t.check(hits.size() == allowed.size(), "%s: treden van de langzame lijn ontbreken (%s)" % [tag, hits])
+			# Weg omhoog: op 70–100 px (FK-6), van Z tot ≥ Z + 150 (en ≥ D + 90) px van de wand.
 			t.check(y - up >= 70.0 and y - up <= 100.0, "%s: weg omhoog op %.0f px (FK-6: 70–100)" % [tag, y - up])
-			var w0 := minf(wall + away * 120.0, wall + away * 270.0)
-			var w1 := maxf(wall + away * 120.0, wall + away * 270.0)
-			t.check(_covered(blocks, up, w0, w1) >= 149.5, "%s: weg omhoog dekt 120–270 px niet" % tag)
-			var start := minf(wall + away * 119.0, wall + away * 121.0)
-			t.check(_covered(blocks, up, start, start + 2.0) < 1.5, "%s: weg omhoog begint niet op 120 px" % tag)
-			# Langzame lijn: treden op 45 en 90 (≤ 45 px per stap, FK-6), richel op
-			# 135 over de keerzone tot voorbij 120 px.
-			for step in [45.0, 90.0]:
+			var reach := maxf(z + 150.0, 60.0 + 90.0)
+			var w0 := minf(wall + away * z, wall + away * reach)
+			var w1 := maxf(wall + away * z, wall + away * reach)
+			t.check(_covered(blocks, up, w0, w1) >= reach - z - 0.5, "%s: weg omhoog dekt %.0f–%.0f px niet" % [tag, z, reach])
+			var start := minf(wall + away * (z - 1.0), wall + away * (z + 1.0))
+			t.check(_covered(blocks, up, start, start + 2.0) < 1.5, "%s: weg omhoog begint niet op %.0f px" % [tag, z])
+			# Langzame lijn: treden op 30, 60 en 90 tegen de wand (≤ 45 px per
+			# stap, FK-6), richel op 135 over de keerzone.
+			var prev := 0.0
+			for step: float in Layout.TREADS:
 				var tread := _block(blocks, "%sTrede%d" % [short, int(step)])
-				t.check(not tread.is_empty() and is_equal_approx((tread[1] as Rect2).position.y, y - step),
-					"%s: trede op %.0f ontbreekt" % [tag, step])
+				t.check(not tread.is_empty() and tread[2] and is_equal_approx((tread[1] as Rect2).position.y, y - step),
+					"%s: eenrichtingstrede op %.0f ontbreekt" % [tag, step])
+				t.check(step - prev <= 45.0, "%s: trede op %.0f is %.0f px hoger dan de vorige (FK-6: ≤ 45)" % [tag, step, step - prev])
+				prev = step
 			var ledge := _block(blocks, "%sRichel135" % short)
 			t.check(not ledge.is_empty() and is_equal_approx((ledge[1] as Rect2).position.y, y - 135.0)
-				and (ledge[1] as Rect2).size.x > Layout.KEERZONE + 16.0, "%s: richel op 135 ontbreekt of is te kort" % tag)
-			# Overhang (WLD): dicht van 85 tot 129 px boven de vloer, 40–70 px van de wand.
-			var over := _block(blocks, "%sOverhang" % short)
-			t.check(not over.is_empty() and not over[2] and is_equal_approx((over[1] as Rect2).end.y, y - Layout.OVERHANG_LOW),
-				"%s: overhang ontbreekt" % tag)
-			# Landing na keren zonder dash: D + 68 px van de wand, ≥ 30 px voorbij
-			# de rand van de weg omhoog op 120 + 8 (gdd §4.3).
-			t.check(d + 68.0 >= Layout.KEERZONE + 8.0 + 30.0 - 0.5, "%s: landing %.0f px, rand + marge %.0f" % [tag, d + 68.0, Layout.KEERZONE + 38.0])
+				and (ledge[1] as Rect2).size.x > z + 16.0, "%s: richel op 135 ontbreekt of is te kort" % tag)
+			# Geen overhang (gdd v0.8 §4.8.3 punt 1): tussen de wand en Z is
+			# niets dicht van de vloer tot 135 px erboven (daar bounct de echolijn
+			# op 40–62 px van de wand).
+			var space := Rect2(minf(wall, wall + away * z) + 0.5, y - 135.0 + 0.5, z - 1.0, 135.0 - 1.0)
+			for spec: Array in blocks:
+				if not spec[2]:
+					t.check(not (spec[1] as Rect2).intersects(space), "%s: %s is dicht in de keerzone (overhang)" % [tag, spec[0]])
+			# Landing na keren zonder dash (gdd §4.3): bij D = 60 bounce op
+			# 40–62 px, landing op ± x_b + 68 = 108–130, voorbij de rand op Z + 8
+			# met ≥ 9 px marge; bij D ≥ 90 op D + 68, ≥ 30 px marge.
+			if d < 65:
+				t.check(40.0 + 68.0 >= z + 8.0 + 9.0 - 0.5, "%s: landing 108 px, rand + marge %.0f" % [tag, z + 17.0])
+			else:
+				t.check(d + 68.0 >= z + 8.0 + 30.0 - 0.5, "%s: landing %.0f px, rand + marge %.0f" % [tag, d + 68.0, z + 38.0])
 		# B2: de landing (≤ D + 88 px van de wand) ligt ≥ D + 24 px van de
 		# volgende keerwand (W-2, gdd §4.3 nagerekend per D).
 		var shaft := Layout.COLUMN_RIGHT - Layout.COLUMN_LEFT
 		t.check(shaft - (d + 88.0) >= d + 24.0, "D=%d: B2 landing %.0f px van de volgende wand (≥ %d)" % [d, shaft - d - 88.0, d + 24])
-	# B1 (W-1): gang van 320 px; B2 (W-2): schacht 480, richels 360, gat 120.
-	var blocks: Array = Layout.blocks(120)
+	# B1 (W-1): gang van 320 px; B2 (W-2, W-8): schacht 480, richels 480 − Z = 390, gat Z.
+	var blocks: Array = Layout.blocks(60)
 	t.check(is_equal_approx(_covered(blocks, Layout.LEVEL_540, Layout.COLUMN_LEFT, Layout.COLUMN_LEFT + 400.0), 320.0),
 		"B1: gang is geen 320 px")
 	t.check(is_equal_approx(Layout.COLUMN_RIGHT - Layout.COLUMN_LEFT, 480.0), "B2: schacht is geen 480 px")
 	for i in Layout.LEDGES.size():
 		var ledge_blocks := blocks.filter(func(spec: Array) -> bool: return str(spec[0]).begins_with("Richel%d" % (i + 1)))
 		var len := _covered(ledge_blocks, Layout.LEDGES[i], Layout.COLUMN_LEFT, Layout.COLUMN_RIGHT)
-		t.check(is_equal_approx(len, 360.0), "B2: richel %d is %.0f px (360)" % [i + 1, len])
+		t.check(is_equal_approx(len, 480.0 - z), "B2: richel %d is %.0f px (480 − Z = %.0f)" % [i + 1, len, 480.0 - z])
 
 
 ## Vanaf de richel op 135 kun je niet naar de richel twee hoger springen: het
@@ -339,6 +366,12 @@ func _turns_with_echo(t, d: int) -> void:
 		var done: int = bot.leg_done.get(leg_name, -1)
 		t.check(turn >= 0 and done > turn, "D=%d: %s zonder keertick" % [d, leg_name])
 		times[leg_name] = done - turn
+		if d == BUILT_D:
+			# Rapport F0-2 §8.3 punt 3, gdd §4.3: zonder dash ≥ 9 px voorbij de
+			# rand van de weg omhoog (Z + 8).
+			var landed: float = bot.landed_from_wall.get(leg_name, -1.0)
+			t.check(landed >= Layout.KEERZONE + 8.0 + 9.0, "D=%d: %s landing %.0f px van de wand, rand %.0f + 9 marge" % [
+				d, leg_name, landed, Layout.KEERZONE + 8.0])
 		# MP-3 per keerpunt: de landing na het keren zonder stilstand ≥ 20 ticks
 		# in de 120 ticks ervoor.
 		var landing := -1
@@ -364,18 +397,50 @@ func _turns_without_echo(t, d: int) -> void:
 	var bot = pair[1]
 	t.check(room.run_over, "D=%d: met echo uit geen RUN_EIND" % d)
 	var times := {}
+	var slower_at_180: Array = []
 	for leg_name: String in TURNS:
 		var turn: int = bot.turned.get(leg_name, -1)
 		var done: int = bot.leg_done.get(leg_name, -1)
 		times[leg_name] = done - turn
 		var echo_t: int = with_echo.get(leg_name, 0)
-		t.check(echo_t > 0 and times[leg_name] > echo_t, "D=%d: %s langzame lijn %d ticks, keren %d (keren moet sneller)" % [
-			d, leg_name, times[leg_name], echo_t])
+		t.check(echo_t > 0, "D=%d: %s zonder keertijd met echo" % [d, leg_name])
+		if d == BUILT_D:
+			# W-8 (gdd v0.8 §4.3, §4.8.4): keren ≥ 30 ticks sneller dan de
+			# snelste langzame lijn, vanaf de wand.
+			t.check(times[leg_name] - echo_t >= 30, "D=%d: %s langzame lijn %d ticks, keren %d: verschil %d (W-8: ≥ 30)" % [
+				d, leg_name, times[leg_name], echo_t, times[leg_name] - echo_t])
+		elif d <= 120:
+			# Regressie: bij 90 en 120 blijft keren sneller.
+			t.check(times[leg_name] > echo_t, "D=%d: %s langzame lijn %d ticks, keren %d (keren moet sneller)" % [
+				d, leg_name, times[leg_name], echo_t])
+		else:
+			# D = 180: keren duurt D/2 + 34 ≈ 124 ticks, en de langzame lijn van
+			# de kamer op D = 60 hooguit 2 × 68 = 136 (W-8). Beide eisen samen
+			# kunnen bij 180 niet; dat staat als bevinding in flowkamer.md §12.
+			# Gemeten (T16f): langzame lijn 104–105, keren 125–133, dus de
+			# langzame lijn is 20–29 ticks sneller. Ondergrens: hooguit 32 ticks
+			# sneller, en de langzame lijn zelf ≥ 100 ticks; een verslechtering
+			# (sneller treden of trager keren) faalt dan.
+			t.check(echo_t - times[leg_name] <= 32, "D=%d: %s langzame lijn %d ticks, keren %d: langzame lijn %d ticks sneller (grens 32, gemeten 20–29)" % [
+				d, leg_name, times[leg_name], echo_t, echo_t - times[leg_name]])
+			t.check(times[leg_name] >= 100, "D=%d: %s langzame lijn %d ticks (≥ 100; gemeten 104–105)" % [d, leg_name, times[leg_name]])
+			if times[leg_name] <= echo_t:
+				slower_at_180.append("%s %d ≤ %d" % [leg_name, times[leg_name], echo_t])
 		t.check(times[leg_name] <= 2 * maxi(echo_t, 1), "D=%d: %s langzame lijn %d ticks > 2× keren %d (FK-2)" % [
 			d, leg_name, times[leg_name], echo_t])
 	t.note("D=%d langzame lijn vanaf de keerwand (ticks): %s" % [d, times])
+	if not slower_at_180.is_empty():
+		t.note("D=%d: langzame lijn niet trager dan keren (kamer op D = 60; ondergrens: hooguit 32 ticks sneller): %s" % [d, ", ".join(slower_at_180)])
 	room.queue_free()
 	await t.tree.process_frame
+
+
+func test_turns_with_echo_d60(t) -> void:
+	await _turns_with_echo(t, 60)
+
+
+func test_turns_without_echo_d60(t) -> void:
+	await _turns_without_echo(t, 60)
 
 
 func test_turns_with_echo_d90(t) -> void:

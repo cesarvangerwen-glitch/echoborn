@@ -58,25 +58,25 @@ const RUNUP_PX := 66.0
 ## "lift" = de drager wacht rond `spot` op niveau `level` (± `PATROL_PX`, onder
 ## het open (eenrichtings) deel van `next` en niet onder een trede); de
 ## springer bounct naar `next`; de drager neemt daarna de langzame lijn vanaf
-## de trede op `tread` (midden-x, bovenkant): `steps` keer recht omhoog
-## springen (B3: 1, de trede; B1 en B2: 3, de treden op 45 en 90 en de richel op
-## 135, gdd §4.3 na F0), dan in richting `dir` naar `next`.
+## de trede op `tread` (x, bovenkant): `steps` treden van `rise` px op
+## (B3: 1 trede van 35; B1 en B2: 2, de treden op 30 en 60, gdd §4.3 v0.8,
+## W-8), van de bovenste schuin in richting `dir` naar `next`.
 ## "omkeer" = de opstap aan het eind van de startgang (geen bouwsteen).
 const STEPS := [
 	["B4", "launch", 2, {}],
 	["Omkeer", "omkeer", 0, {}],
 	["B3", "lift", 1, {"level": Layout.FLOOR, "next": Layout.LEVEL_540, "spot": 260.0,
-		"tread": [Layout.B3_GALLERY_TIP + 20.0, Layout.FLOOR - 35.0], "steps": 1, "dir": -1}],
+		"tread": [Layout.B3_GALLERY_TIP + 20.0, Layout.FLOOR - 35.0], "steps": 1, "rise": 35.0, "dir": -1}],
 	["B1", "lift", 2, {"level": Layout.LEVEL_540, "next": Layout.LEVEL_450, "spot": 240.0,
-		"tread": [Layout.COLUMN_LEFT + 16.0, Layout.LEVEL_540 - 45.0], "steps": 3, "dir": 1}],
+		"tread": [Layout.COLUMN_LEFT + 16.0, Layout.LEVEL_540 - 30.0], "steps": 2, "rise": 30.0, "dir": 1}],
 	["B2-0", "lift", 1, {"level": Layout.LEVEL_450, "next": 360.0, "spot": 310.0,
-		"tread": [Layout.COLUMN_RIGHT - 16.0, Layout.LEVEL_450 - 45.0], "steps": 3, "dir": -1}],
+		"tread": [Layout.COLUMN_RIGHT - 16.0, Layout.LEVEL_450 - 30.0], "steps": 2, "rise": 30.0, "dir": -1}],
 	["B2-1", "lift", 2, {"level": 360.0, "next": 270.0, "spot": 210.0,
-		"tread": [Layout.COLUMN_LEFT + 16.0, 360.0 - 45.0], "steps": 3, "dir": 1}],
+		"tread": [Layout.COLUMN_LEFT + 16.0, 360.0 - 30.0], "steps": 2, "rise": 30.0, "dir": 1}],
 	["B2-2", "lift", 1, {"level": 270.0, "next": 180.0, "spot": 310.0,
-		"tread": [Layout.COLUMN_RIGHT - 16.0, 270.0 - 45.0], "steps": 3, "dir": -1}],
+		"tread": [Layout.COLUMN_RIGHT - 16.0, 270.0 - 30.0], "steps": 2, "rise": 30.0, "dir": -1}],
 	["B2-3", "lift", 2, {"level": 180.0, "next": 90.0, "spot": 210.0,
-		"tread": [Layout.COLUMN_LEFT + 16.0, 180.0 - 45.0], "steps": 3, "dir": 1}],
+		"tread": [Layout.COLUMN_LEFT + 16.0, 180.0 - 30.0], "steps": 2, "rise": 30.0, "dir": 1}],
 	["Bovenroute", "top", 0, {}],
 	["K2", "arena", 0, {}],
 	["K3", "gemaal", 0, {}],
@@ -351,7 +351,7 @@ func _lift(s: Seat, spec: Array) -> int:
 					s.sub = "slow"
 					return 0
 				return 0
-		return _slow_tread(s, level, tread, int(args["steps"]), args["dir"])
+		return _slow_tread(s, level, tread, int(args["steps"]), args["dir"], float(args["rise"]))
 	# Springer.
 	match s.sub:
 		"":
@@ -386,20 +386,25 @@ func _lift(s: Seat, spec: Array) -> int:
 
 
 ## Langzame lijn van de drager: naar de trede, `steps` keer recht omhoog
-## springen (trede op trede), dan in richting `dir` naar het volgende niveau
-## (B3: van de trede af springen; B1, B2: van de richel op 135 aflopen).
-func _slow_tread(s: Seat, level: float, tread: Array, steps: int, dir: int) -> int:
+## springen (trede op trede, `rise` px per trede), en van de bovenste schuin in
+## richting `dir` naar het volgende niveau (B3: van de trede af springen; B1,
+## B2: van de trede op 60 naar de weg omhoog, vanaf de buitenrand van de trede).
+func _slow_tread(s: Seat, level: float, tread: Array, steps: int, dir: int, rise: float) -> int:
 	var tx: float = tread[0]
 	var top: float = tread[1]
+	var b := _body(s)
 	for i in steps:
-		if _on_level(s, top - 45.0 * i):
+		if _on_level(s, top - rise * i):
 			s.from_tread = true
 			if i < steps - 1:
 				return _tap(s, J)
-			if steps == 1:
-				return _walk(dir) | _tap(s, J)
+			if steps > 1:
+				# Eerst naar de buitenrand van de trede (B1, B2), dan schuin omhoog.
+				var edge := tx + dir * 20.0
+				if (edge - b.position.x) * dir > 2.0:
+					return _walk(dir)
 			s.off_ledge = true
-			return _walk(dir)
+			return _walk(dir) | _tap(s, J)
 	if _on_level(s, level):
 		s.from_tread = false
 		s.off_ledge = false

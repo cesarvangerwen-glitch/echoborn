@@ -1,6 +1,7 @@
 extends RefCounted
 ## Flow-test T17 (#80), co-op: de gescripte geoefende co-op-run van de WLD
-## (`flow_duo.gd`, gdd §4.5; #125) per staart D = 90 / 120 / 180.
+## (`flow_duo.gd`, gdd §4.5; #125) per staart D = 60 / 90 / 120 / 180 (60 is de
+## standaard; 90, 120 en 180 als regressie, gdd v0.8 §4.8.4 W-10).
 ##
 ## P1 en P2 zijn allebei een inputbron van het duo: lancering in B4 (P2 vliegt
 ## over P1), bounce in beide richtingen in B3, B1 en B2, merk-combo's in K2 en
@@ -31,6 +32,7 @@ const TICK_CAP := 7000
 const B4_MIN_X := 1180.0
 
 static var _duo120_csv := ""
+static var _duo60_csv := ""
 
 
 func _run(t, d: int) -> String:
@@ -144,6 +146,8 @@ func _run(t, d: int) -> String:
 		if not (f.begins_with("MP-3") or f.begins_with("MP-7a")):
 			required.append(f)
 	t.check(required.is_empty(), "duo D=%d: de gescripte co-op-run haalt niet: %s" % [d, "; ".join(required)])
+	# LP ≥ 100 na K1 + K2, ook in co-op (gdd §4.2; §4.8.4 W-10).
+	t.check(rep.lp_before_k3 >= 100, "duo D=%d: %d LP na K1 + K2 (gdd §4.2: ≥ 100)" % [d, rep.lp_before_k3])
 	t.note(("T17 co-op duo D=%d · drop-in tick %d · tijd %d ticks (%.1f s) · MP-1 P1 %d · MP-2 %.2f/min (K1 %.2f, K2 %.2f), gat %d · " +
 		"MP-3 %.2f landingen/min, %.0f %% zonder stilstand · lancering %d (B4 %d), bounce P1 %d / P2 %d, merk-combo %d (K2 %d), vang %d · " +
 		"acties per bouwsteen %s · MP-4 zonder tweede lichaam %.1f %% · MP-6 co-op %.0f %% van %d LP (LP vóór K3 %d), pompslagen P1 %d / P2 %d · " +
@@ -166,6 +170,17 @@ func _run(t, d: int) -> String:
 
 
 # --- Tests (één run per test: de runner geeft 7200 frames) ---------------------
+
+func test_t17_coop_duo_d60(t) -> void:
+	_duo60_csv = await _run(t, 60)
+
+
+## Dezelfde run nog eens: hetzelfde meetlog (gdd §4.5: het log is deterministisch).
+func test_t17_coop_duo_d60_deterministic(t) -> void:
+	t.check(_duo60_csv != "", "geen eerste duo-run D=60")
+	var again: String = await _run(t, 60)
+	t.check(again == _duo60_csv, "duo-run D=60 gaf de tweede keer een ander meetlog")
+
 
 func test_t17_coop_duo_d90(t) -> void:
 	await _run(t, 90)

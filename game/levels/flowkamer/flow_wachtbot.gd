@@ -18,7 +18,7 @@ extends RefCounted
 ##
 ## Uitkomst (`result`): "omhoog" (geland op het niveau van de weg omhoog, buiten
 ## de keerzone), "trede" (op de treden of de richel op 135 van de langzame
-## lijn), "vloer" (terug op de eigen vloer), "lager" (van het niveau af
+## lijn: 30, 60, 90 of 135), "vloer" (terug op de eigen vloer), "lager" (van het niveau af
 ## gevallen), "geen_echo" (de echo kwam niet
 ## onder hem binnen `GIVE_UP` ticks) of "anders". `waited` = ticks tussen
 ## stoppen en springen.
@@ -179,8 +179,15 @@ func _finish(p: CharacterBody2D) -> void:
 		result = "vloer"
 	elif y > floor_y + 1.5:
 		result = "lager"
-	elif landed_x < Layout.LEDGE135_LEN + 8.0 and (absf(y - (floor_y - 45.0)) < 1.5 \
-			or absf(y - (floor_y - 90.0)) < 1.5 or absf(y - (floor_y - 135.0)) < 1.5):
+	elif landed_x < Layout.LEDGE135_LEN + 8.0 and _on_tread_height(y, floor_y):
 		result = "trede"
 	else:
 		result = "anders"
+
+
+## Op de hoogte van een trede van de langzame lijn (30, 60, 90) of de richel op 135?
+func _on_tread_height(y: float, floor_y: float) -> bool:
+	for h: float in Layout.TREADS + [135.0]:
+		if absf(y - (floor_y - h)) < 1.5:
+			return true
+	return false
