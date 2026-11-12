@@ -31,6 +31,7 @@ const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
 const EnemyData = preload("res://scripts/combat/enemy_data.gd")
 const Luik = preload("res://levels/kadewijk/kadewijk_luik.gd")
 const ScriptedInput = preload("res://scripts/input/scripted_input.gd")
+const SlowDash = preload("res://tests/slow_dash_input.gd")
 const InputBits = preload("res://scripts/input/input_bits.gd")
 
 const TICK_CAP := 8000
@@ -43,12 +44,15 @@ const MAX_FRAMES := {
 	"test_s9_zonder_echo_d120": 9000,
 	"test_s9_run_d180": 9000,
 	"test_s9_zonder_echo_d180": 9000,
+	"test_s9_met_dash_d60": 20000,
 }
+## W-12: dash `n` ticks na de afzet van de sprong naar de weg omhoog (gdd §4.6).
+const DASH_NS := [4, 8, 12, 16, 20, 24]
 ## Per D (echo aan / uit): duur van de run en per kamer, voor C-15.
 static var _runs := {}
 
 
-func _wijk(t, d: int, echo_on: bool, start: StringName = &"S9", run_end: StringName = &"SLICE_EIND", input: RefCounted = null) -> Array:
+func _wijk(t, d: int, echo_on: bool, start: StringName = &"S9", run_end: StringName = &"SLICE_EIND", input: RefCounted = null, at := Vector2.INF) -> Array:
 	var progress := Progress.new()
 	progress.name = "TestProgress"
 	t.tree.root.add_child(progress)
@@ -57,7 +61,7 @@ func _wijk(t, d: int, echo_on: bool, start: StringName = &"S9", run_end: StringN
 	wijk.echo_on = echo_on
 	wijk.show_hud = false
 	wijk.progress = progress
-	wijk.start_at = Layout.ROOM_START[start]
+	wijk.start_at = Layout.ROOM_START[start] if at == Vector2.INF else at
 	wijk.run_end = run_end
 	var bot = null
 	if input == null:
@@ -194,6 +198,29 @@ func test_s9_maten_per_d(t) -> void:
 			var tr := _rect(_block(wijk, &"S9", "B1Trede%d" % h))
 			t.check(is_equal_approx(Layout.S9_LAAG - tr.position.y, h) and is_equal_approx(tr.position.x, Layout.S9_WALL)
 				and tr.end.x - Layout.S9_WALL < z, "D=%d S9: B1-trede op %d %s (binnen Z)" % [d, h, tr])
+		# De brugpijler (B2, twee verdiepingen, zoals S5; Lead-review #231): schacht
+		# 480, richels `480 − Z` met een gat van Z (`b2_keerzone`) om en om tegen de
+		# wanden, 90 en 180 boven de kade, treden 30/60/90 tegen elke keerwand.
+		var zb := Layout.b2_keerzone(d)
+		t.check(is_equal_approx(Layout.S9_B2_RIGHT - Layout.S9_B2_LEFT, 480.0), "S9: pijlerschacht %.0f px (480)" % (Layout.S9_B2_RIGHT - Layout.S9_B2_LEFT))
+		var r1 := _rect(_block(wijk, &"S9", "PijlerRichel1"))
+		var r2 := _rect(_block(wijk, &"S9", "PijlerRichel2"))
+		t.check(is_equal_approx(r1.size.x, 480.0 - zb) and is_equal_approx(r1.end.x, Layout.S9_B2_RIGHT)
+			and is_equal_approx(r1.position.x - Layout.S9_B2_LEFT, zb) and is_equal_approx(Layout.S9_KADE - r1.position.y, 90.0),
+			"D=%d S9 pijler richel 1 %s (breedte 480 − Z = %.0f, gat Z = %.0f bij de pijler, 90 boven de kade)" % [d, r1, 480.0 - zb, zb])
+		t.check(is_equal_approx(r2.size.x, 480.0 - zb) and is_equal_approx(r2.position.x, Layout.S9_B2_LEFT)
+			and is_equal_approx(Layout.S9_B2_RIGHT - r2.end.x, zb) and is_equal_approx(Layout.S9_KADE - r2.position.y, 180.0)
+			and is_equal_approx(r2.position.y, Layout.S9_PIJLER.position.y),
+			"D=%d S9 pijler richel 2 %s (breedte 480 − Z, gat Z bij de wand, 180 boven de kade, op de pijler)" % [d, r2])
+		for tp: Dictionary in Layout.turn_points(d).slice(9, 11):
+			var prefix := String(tp["name"]).trim_prefix("S9-")
+			for h in [30, 60, 90]:
+				var tb := _rect(_block(wijk, &"S9", "%sTrede%d" % [prefix, h]))
+				var wall: float = tp["wall"]
+				var at_wall := is_equal_approx(tb.position.x, wall) if int(tp["side"]) < 0 else is_equal_approx(tb.end.x, wall)
+				var reach := maxf(absf(tb.position.x - wall), absf(tb.end.x - wall))
+				t.check(tb.size.x > 0.0 and at_wall and is_equal_approx(float(tp["floor"]) - tb.position.y, h) and reach < float(tp["z"]),
+					"D=%d %s: trede op %d %s (tegen de wand, binnen Z = %.0f)" % [d, tp["name"], h, tb, tp["z"]])
 		await _free(t, parts)
 	var prev := Layout.S9_UP
 	for y: float in Layout.S9_SHAFT + [Layout.S1_FLOOR]:
@@ -322,6 +349,72 @@ func test_s9_zonder_echo_d180(t) -> void:
 	var out := await _s9_run(t, 180, false)
 	await _free(t, out[0])
 	_check_slow_lines(t, 180)
+
+
+# --- W-12: de langzame lijn met dash (gdd v0.8.2 §4.8.7; Lead-review #231) ----
+
+## Waar een meting van een keerpunt begint: B2 van de pijler op de kade rechts
+## van de pijlerwand (aanloop 620 px), B1 op de benedenkade onder het luik.
+const KEER_START := {
+	"S9-B2a": Vector2(3200, Layout.S9_KADE - Layout.HALF_H),
+	"S9-B1": Vector2(580, Layout.S9_LAAG - Layout.HALF_H),
+}
+
+
+## Vanaf `KEER_START[from_leg]` tot de bot `legs` heeft afgerond. Geeft per stap
+## [ticks van keren tot klaar, mist] (-1 als de echolijn gevraagd was maar niet lukte).
+func _keer_run(t, echo_on: bool, from_leg: String, legs: Array, dash_n: int) -> Dictionary:
+	var parts := _wijk(t, 60, echo_on, &"S9", &"SLICE_EIND", null, KEER_START[from_leg])
+	var wijk = parts[0]
+	var bot = parts[1]
+	bot.leg = bot._legs.find(bot._legs.filter(func(l: Array) -> bool: return l[0] == from_leg)[0])
+	var source := SlowDash.new(bot, wijk, Layout.turn_points(60), dash_n)
+	wijk.input_override = source
+	wijk.p1.input_source = source
+	while not bot.leg_done.has(legs[-1]) and wijk.sim.tick < 4000:
+		await t.tree.physics_frame
+	var out := {}
+	for leg: String in legs:
+		var ticks := -1
+		if bot.leg_done.has(leg) and bot.turned.has(leg):
+			ticks = int(bot.leg_done[leg]) - int(bot.turned[leg])
+		if echo_on and not bot.lines.get(leg, false):
+			ticks = -1
+		out[leg] = [ticks, source.missed.get(leg, false)]
+	await _free(t, parts)
+	return out
+
+
+## Bij D = 60 voor de drie keerpunten van S9: keren, de langzame lijn zonder dash
+## (≥ 30 trager, ≤ 2×) en de snelste langzame lijn met een dash n = 4 … 24 ticks
+## na de afzet (≥ 20 trager, ≤ 2×). Bij de andere D dekken de maatcheck en de
+## tests van S5 (B2) en S1 (B1) het, want de maten zijn gelijk.
+func test_s9_met_dash_d60(t) -> void:
+	for group: Array in [["S9-B2a", ["S9-B2a", "S9-B2b"]], ["S9-B1", ["S9-B1"]]]:
+		var keer: Dictionary = await _keer_run(t, true, group[0], group[1], -1)
+		var plain: Dictionary = await _keer_run(t, false, group[0], group[1], -1)
+		var per := {}
+		var fastest := {}
+		for n: int in DASH_NS:
+			var r: Dictionary = await _keer_run(t, false, group[0], group[1], n)
+			for leg: String in group[1]:
+				var v: Array = r[leg]
+				if not per.has(leg):
+					per[leg] = {}
+				per[leg][n] = "mist" if v[1] or v[0] < 0 else v[0]
+				if not v[1] and v[0] > 0 and (not fastest.has(leg) or v[0] < fastest[leg]):
+					fastest[leg] = v[0]
+		for leg: String in group[1]:
+			var k: int = keer[leg][0]
+			var p: int = plain[leg][0]
+			var f: int = fastest.get(leg, -1)
+			t.check(k > 0, "D=60 %s: keren niet gemeten (echolijn)" % leg)
+			t.check(p > 0 and p - k >= 30 and p <= 2 * k, "D=60 %s: keren %d, langzame lijn zonder dash %d (≥ 30 trager, ≤ 2×)" % [leg, k, p])
+			t.check(f > 0, "D=60 %s: geen dash-variant haalt de weg omhoog (%s)" % [leg, per.get(leg)])
+			t.check(f - k >= 20 and f <= 2 * k,
+				"D=60 %s: keren %d, snelste langzame lijn met dash (n = 4 … 24) %d (gdd §4.8.7: ≥ 20 trager, ≤ 2×)" % [leg, k, f])
+			t.note("D=60 %s: keren %d, zonder dash %d, met dash na n ticks %s: snelste %d (+%d, %.2f×)" % [
+				leg, k, p, per.get(leg), f, f - k, float(f) / maxf(k, 1)])
 
 
 # --- Poorten en de trap ----------------------------------------------------------

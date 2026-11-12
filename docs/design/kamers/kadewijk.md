@@ -1,6 +1,6 @@
 # Kamers: de Kadewijk (wijk 1.3, de slice): S1–S9
 
-Versie 0.4 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8, deel 3 S9) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
+Versie 0.4.1 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8, deel 3 S9) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
 
 Bronnen: `docs/design/wereld.md` v0.2 §2 (kamerlijst §2.2, SL-regels §2.3, vijandtypes §2.4, T8a §2.5, acceptatie §2.6), `docs/design/gdd.md` v0.8.2 (§4.3 bouwstenen met D in formules, L-08–L-14, §4.5 normen, §4.8.5 vaste basis, §4.8.7 de langzame lijn met dash), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.3 (§2.6 plaatsing, VJ-01–VJ-08, §3.2 arena), `docs/design/gemaalmeester.md` v0.2.1 (GM-01, GM-07, GM-11), `docs/productie/fase-2-kader.md` v0.4 §4, `docs/tech/ontwerp.md` v0.3 (§3a, §7, §12 "naar T8a"), de visie-review van de CD ([comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), `docs/concept/visie-review/kadewijk/`).
 
@@ -289,6 +289,7 @@ Solo. De run loopt van het begin van S9 (bij de deur van de arena, het hoogwater
 | S9 → gang S1 met echo | **3003 ticks (50,0 s)** (S9 2952, S1 50) | 2979 | 2995 | — |
 | Zonder echo | 3221 (**1,07×**, marge 2785 ticks tot 2×) | 3220 (1,08×) | 3220 (1,08×) | ≤ 2× (C-15, FK-2): ✓ |
 | Keren / langzame lijn zonder dash: B2a, B2b (pijler), B1 (grachtwand) | **68 / 104 (+36, 1,53×)** elk (B1 105) | 95 / 145 (+50) | 124–133 / 186 (+53 … +62) | ≥ 30, ≤ 2× (gdd §4.3): ✓ |
+| Snelste langzame lijn met dash (W-12, n = 4 … 24), B2a, B2b, B1 | **94 (+26, 1,38×)** elk (dash 8; dash 4 mist) | — | — | ≥ 20, ≤ 2× (gdd §4.8.7): ✓ (alleen D = 60, [Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983); de andere D dekken de maatcheck en S5/S1) |
 | Bounce / landing (van de wand) | 54 / 120 | 122 / 190 | 166–182 / 234–250 | landing ≥ Z + 8 |
 | MP-1 langste stilstand S9 (met / zonder echo) | 2 / 46 | 4 / 46 | 4 / 46 | ≤ 300: ✓ |
 | **MP-2 per kamer S9** | **4,9 per min** (pijler 2, B1 1, het E-paar 1) | 4,9 | 4,9 | ≥ 3,0: ✓ |
@@ -344,11 +345,23 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 
 | # | Afwijking | Besluit LGD |
 |---|---|---|
-| 14 | **Het snelluik in S1** (maatvast): de gang van S1 heeft nu een eenrichtingsvloer van 40 px op x 460–500 (achter het begin op 440, buiten de aanloop van B1), de uitgang van de schacht van S9. De runs van deel 1 geven dezelfde ticks. De art van S1 (TA, #226) tekent daar nu dichte vloer: het luik moet erbij | — |
-| 15 | **De trap naar het plein loopt door de hoek van S5** (x 4100–4160, y 260–360, onder de rechterwand van het huis, achter een wand van 20 px): S5 en S9 worden buren. Anders kan het niet: tussen S9 (x < 4160, y ≥ 360) en het plein (x ≥ 4160, y < 360) liggen alleen S5 en S8. De runs van deel 2 geven dezelfde ticks | — |
-| 16 | **De brugpijler (B2, twee verdiepingen) op de lage kade**, niet in de opzet van §9 v0.3.1. Zonder haalde S9 MP-2 per kamer niet: **2,93 per min** (één bounce en één ketting in 41 s, waarvan ± 29 s lopen over 3500 px kade). Met de pijler 4,9 per min. De pijler gebruikt de maten van B2 in S5 (schacht 480, `b2_keerzone`) | — |
-| 17 | **De lage kade op 635** in plaats van 620 (voorstel §9 v0.3.1): 45 boven de vloer bij de deur (één trede, FK-6), en onder het luik 49 px vrij boven de benedenkade (700) | — |
-| 18 | **Placeholders van de WLD**: het hoogwater (een blok tot `s = 2`), `SLICE_EIND` (in `kadewijk.gd` als P1 van S9 op de gang van S1 staat), logbladzijde 3 (een markering; `LOGBLAD` in de meetlog), `lit` van het E-paar met de hand. De echte objecten (trap 2, `Diepwater`/`Sluis`, de pick-up) zijn van de GP | — (ter info) |
+| 14 | **Het snelluik in S1** (maatvast): de gang van S1 heeft nu een eenrichtingsvloer van 40 px op x 460–500 (achter het begin op 440, buiten de aanloop van B1), de uitgang van de schacht van S9. De runs van deel 1 geven dezelfde ticks. De art van S1 (TA, #226) tekent daar nu dichte vloer: het luik moet erbij | **Akkoord** ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)): een toevoeging achter het begin, buiten de aanloop van B1, dezelfde ticks; S1 blijft maatvast. De art van S1 (#226) neemt het luik mee |
+| 15 | **De trap naar het plein loopt door de hoek van S5** (x 4100–4160, y 260–360, onder de rechterwand van het huis, achter een wand van 20 px): S5 en S9 worden buren. Anders kan het niet: tussen S9 (x < 4160, y ≥ 360) en het plein (x ≥ 4160, y < 360) liggen alleen S5 en S8. De runs van deel 2 geven dezelfde ticks | **Akkoord** ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)): anders kan het niet; S5 is nog kandidaat |
+| 16 | **De brugpijler (B2, twee verdiepingen) op de lage kade**, niet in de opzet van §9 v0.3.1. Zonder haalde S9 MP-2 per kamer niet: **2,93 per min** (één bounce en één ketting in 41 s, waarvan ± 29 s lopen over 3500 px kade). Met de pijler 4,9 per min. De pijler gebruikt de maten van B2 in S5 (schacht 480, `b2_keerzone`) | **Akkoord** ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)): MP-2 4,9 met de maten van B2 en de eis bij keren bij elke D; of de ± 29 s kade past, is een vraag voor de CD |
+| 17 | **De lage kade op 635** in plaats van 620 (voorstel §9 v0.3.1): 45 boven de vloer bij de deur (één trede, FK-6), en onder het luik 49 px vrij boven de benedenkade (700) | **Akkoord** ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)): FK-6, één trede van 45 |
+| 18 | **Placeholders van de WLD**: het hoogwater (een blok tot `s = 2`), `SLICE_EIND` (in `kadewijk.gd` als P1 van S9 op de gang van S1 staat), logbladzijde 3 (een markering; `LOGBLAD` in de meetlog), `lit` van het E-paar met de hand. De echte objecten (trap 2, `Diepwater`/`Sluis`, de pick-up) zijn van de GP | Ter info ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)) |
+
+**Visie-review van S5–S7** (CD, [comment in #227](https://github.com/cesarvangerwen-glitch/echoborn/issues/227#issuecomment-6835171911), bot-doorloop op D = 60; één regel per kamer):
+
+- **S5 Sluiswachtershuis: Visie-review: past** (CD, #227): vier keer keren, de echo tegemoet, een verdieping hoger (68 tegen 104 ticks), geen stilstand; het trappenhuis is een ritme. Punten: vier keer hetzelfde (variatie), de meter vol na B2b (R-V2), het lampglas op de zoldervloer (telt niet voor R-V2).
+- **S6 Gemaalplein: Visie-review: past** (CD, #227): de sterkste kamer van deel 2; de echo is je tweede slag en je pomp (K-paar, vier schoepen, het gemaal vol in één doorgang). Punt voor art en audio: de pompslag van de echo even zwaar als die van P1.
+- **S7 Sluiskelder: Visie-review: past niet** (CD, #227): het kanaal werkt (stuiten, de echo knalt de merken), maar **de echo breekt op het luik** (tick 4992): als hij de neerslag afspeelt, is de klep weg (E-08b). Her-review alleen van het luik.
+
+**Besluiten LGD bij de visie-review** ([comment in #227](https://github.com/cesarvangerwen-glitch/echoborn/issues/227#issuecomment-6836180810)):
+
+1. **S7 (en S9), de echo breekt op het luik: voorstel A.** V-01d krijgt een aanvulling (E-08 blijft): breekt P1 solo een luik terwijl de echo Actief is, dan blijft er een **schaduwklep op laag 5** tot de echo zijn neerslag op dat luik afspeelt, uiterlijk `D + G` ticks. P1 valt erdoor, de echo valt achter je aan. In co-op geen schaduwklep. Voorstel B (de sokkel) gaat niet door. De **GP** bouwt het in `Luik` (naar `scripts/`), de **WLD** zet daarna de check "de echo breekt 0×" in de runs S1 → S8 en S9 (§9).
+2. **S5, de meter vol na B2b: zo laten.** Licht vóór S6 is de bedoeling (SL-01, LM-01); de echo loont in S5 in hoogte en tempo (C-15 b), en een volle meter vóór het gemaal zegt: ga pompen.
+3. **S5, een Kadeloper op richel 2: nee.** Hij staat in de landingszone van de bounce en breekt het ritme; variatie komt uit art en audio (#226, T8c/T8d). MT2 meet of het verveelt.
 
 **Visie-review per kamer** (CD, [comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212#issuecomment-6831045448) op D = 60; één regel per kamer):
 
@@ -365,9 +378,10 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 | S2 | **Maatvast** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): bots groen, `Visie-review: past` (#212), het B3-punt besloten (8) |
 | S3 | **Maatvast** na de merge van #217 (LGD bevestigt): bots groen, `past`; het lege stuk na golf 2 is een punt, geen herontwerp |
 | S4 | **Maatvast** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): bots groen, `Visie-review: past` (#212), afwijking 7 akkoord (#220) |
-| S5, S6, S7 | **Kandidaat**: bots groen op D = 60 (§6b), afwijking 9–12 besloten (#223); de visie-review van de CD ontbreekt |
+| S5, S6 | **Maatvast na de merge van de contactbladen (#228)** (LGD, #227): bots groen, `Visie-review: past`, besluiten 2 en 3 |
+| S7 | **Kandidaat** tot de schaduwklep er is (besluit 1, GP) en de CD bij de her-review van het luik `past` geeft |
 | S8 | **Kandidaat voor de maten**: de arena volgt GM-01 en §3.2; maatvast pas met de boss erin (GP, B-9 in de arena) |
-| S9 | **Kandidaat**: bots groen op D = 60 (§6c), afwijking 14–17 open; de visie-review van de CD ontbreekt |
+| S9 | **Kandidaat** ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)): bots groen (§6c), afwijking 14–17 akkoord; de visie-review van de CD ontbreekt en het luik volgt besluit 1 |
 
 ## 9. Open punten
 
@@ -390,6 +404,7 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 **Gameplay Programmer (deel 3, S9):**
 - **De deur naar S9**: `BOSS_VERSLAGEN` opent `DeurLinks`; daarna de run S1 → S9 → S1 door de arena (de bot heeft de stappen van S9 vanaf `S9-kade`).
 - **`SLICE_EIND`** als echt event (nu een rij in de meetlog van `kadewijk.gd`, `_pick_up`), en logbladzijde 3 als object (WS-08; nu de markering `Logbladzijde3` en de rij `LOGBLAD`).
+- **De schaduwklep in `Luik`** (besluit 1, #227; S7 en S9).
 - **Motor: wie tegen een muur aan loopt, verliest de vloer** (gezien in S1, S7 en S9): het lichaam blijft 0,08 px boven de vloer hangen, `on_floor` is onwaar, en springen werkt pas na de coyote-tijd niet meer, tot je de richting loslaat. Een speler die tegen de kademuur van 45 in S9 aan loopt en springt, komt er dus niet op. De bot springt 16 px ervoor. Voorstel: `floor_snap`/`floor_block_on_wall` in `motor.gd` nakijken (test: tegen een muur lopen en springen).
 
 **Technical Artist / Art (deel 3):** het snelluik in de gang van S1 (x 460–500, afwijking 14) in de art van S1 (#226); S9 heeft nog geen art.
@@ -397,7 +412,7 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 **Volgende WLD-run:**
 - ~~S9 de lage kade~~ gebouwd (deel 3, §3f, §6c).
 - Co-op door alle kamers (C-15 d, MP-7, SL-01 co-op), ook S9 (het snelluik en de trap in co-op).
-- S9 met dash (W-12, gdd §4.8.7) is niet apart getest: B2 van de pijler en B1 van de grachtwand hebben de maten van S5 en S1 (zelfde keren en langzame lijn, §6c), en daar draait de test bij elke D. Als de LGD hem ook voor S9 wil: ± 1 min extra suite.
+- **Na de schaduwklep van de GP** (besluit 1, #227): in `test_kadewijk_deel2.gd` en `test_kadewijk_s9.gd` de check "de echo breekt 0×" in de run S1 → S8 en in S9, en het luik opnieuw naar de CD.
 - **S3, punt van de CD**: zie §6b (gemeten 9,0 s tussen de laatste ontploffing en de lancering). Voorstel: de Kadeloper van S4 naar het begin van de aanloop (Combat Designer), of de aanloop van S4 korter (± 55 ticks).
 
 **Lead Game Designer:**
@@ -407,7 +422,7 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 
 **Creative Director:** visie-review van S5–S7 (§3b–§3d; in de run van deel 2 bij D = 60: S5 tick ± 3005–4310, S6 ± 4310–4810). S2 en S4: "past" (#212, gedaan). S9 (§3f; de run van §6c, 50 s): ± 29 s daarvan is lopen over de kade, met de pijler, het E-paar en het luik ertussen; past dat bij "de wijk is je beloning"?
 
-**Lead Game Designer (deel 3):** afwijking 14–17 (§8).
+**Lead Game Designer (deel 3):** ~~afwijking 14–17~~ akkoord ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)).
 
 **Lead Game Designer (deel 2):** ~~afwijking 9–12~~ besloten (Lead-review #223, §8). De lege loop na golf 2 (§6b): binnen MP-2 en L-11, geen ombouw nu; de Kadeloper van S4 verplaatsen is een punt voor de CD na MT2.
 
@@ -432,6 +447,7 @@ Besluiten: D = 60 als werkaanname, bereik 1–3 s, en fase 2 parallel, ook bouwe
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie: S1–S4 als grijze kamers, bot en tests bij D = 60 (120/180 regressie) |
 | 0.1.1 | 2026-11-12 | Lead-review #208: langzame lijn met dash gemeten bij 60/90/120 (§6), besluiten van de LGD per afwijking en maatvast-stand per kamer (§8), open punten bijgewerkt (§9) |
+| 0.4.1 | 2026-11-12 | [Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983): besluiten bij afwijking 14–18 (§8); kleine punten: maatcheck van de pijler per D en W-12 voor de drie keerpunten van S9 bij D = 60 (§6c). Visie-review S5–S7 (#227) per kamer en de besluiten 1–3 van de LGD (§8), maatvast-stand, open punten (§9) |
 | 0.4 | 2026-11-12 | [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) deel 3: **S9 de lage kade** grijs en speelbaar (§2, §3f): de trap naar het plein (voor trap 2), het hoogwater (placeholder voor `s = 2`), de brugpijler (B2), het E-paar verlicht, het luik (SL-04), B1 met logbladzijde 3 (L-12) en de schacht naar het snelluik in S1 (`SLICE_EIND`). Bot en `test_kadewijk_s9.gd` (§6c) bij D = 60/120/180: zonder echo 1,07×, MP-2 S9 4,9 per min. SM-punten #223: de marge per D bij de run zonder echo, C-15 met gelijk licht in de melding van S6. Afwijkingen 14–18 (§8), open punten (§9) |
 | 0.3.1 | 2026-11-12 | Lead-review #223: besluiten bij afwijking 7 en 9–12 (§8), visie-review per kamer (S2 en S4 "past", #212), S2 en S4 maatvast |
 | 0.3 | 2026-11-12 | [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) deel 2: **S5–S8** grijs en speelbaar (§2, §3b–§3e): S5 B2 naar de zolder met het lampglas, S6 de pompgang, het gemaal (`wijk_gemaal` = `S6/Gemaal` voor elke kamer), het checkpoint en de trap terug, S7 het luik en het kanaal met twee Dwaallichten, S8 de lege arena (GM-01). Bot en `test_kadewijk_deel2.gd` (§6b): **SL-01 112 LP** bij D = 60, B2 bij elke D met en zonder dash, gemaal → arena-deur 9,2 s, de bounce haalt het rad. Afwijkingen 9–13 (§8), de lege loop na golf 2 gemeten (§6b), open punten (§9) |
