@@ -1,0 +1,17 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://dpelxjk7vbhoh"
+path="res://.godot/imported/polderletter_normaal.fnt-26a686cd6c0e0224276e6e46cff19f16.fontdata"
+
+[deps]
+
+source_file="res://art/ui/font/polderletter_normaal.fnt"
+dest_files=["res://.godot/imported/polderletter_normaal.fnt-26a686cd6c0e0224276e6e46cff19f16.fontdata"]
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=2
