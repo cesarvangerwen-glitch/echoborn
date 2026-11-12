@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
+[ext_resource type="Script" path="res://scripts/combat/slice_enemy.gd" id="2_enemy"]
+
+[node name="S3Inhoud" type="Node2D"]
+position = Vector2(-2080, -180)
+script = ExtResource("1_inhoud")
+kamer_id = &"S3"
+
+[node name="Golf1" type="Node2D" parent="."]
+
+[node name="Paar1A" type="Node2D" parent="Golf1"]
+position = Vector2(2140, 248)
+script = ExtResource("2_enemy")
+
+[node name="Paar1B" type="Node2D" parent="Golf1"]
+position = Vector2(2168, 248)
+script = ExtResource("2_enemy")
+
+[node name="Los" type="Node2D" parent="Golf1"]
+position = Vector2(2360, 248)
+script = ExtResource("2_enemy")
+
+[node name="Golf2" type="Node2D" parent="."]
+
+[node name="Paar1A" type="Node2D" parent="Golf2"]
+position = Vector2(1770, 248)
+script = ExtResource("2_enemy")
+enemy_type = 1
+
+[node name="Paar1B" type="Node2D" parent="Golf2"]
+position = Vector2(1798, 248)
+script = ExtResource("2_enemy")
+
+[node name="Los" type="Node2D" parent="Golf2"]
+position = Vector2(1990, 248)
+script = ExtResource("2_enemy")

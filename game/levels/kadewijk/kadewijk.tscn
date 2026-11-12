@@ -1,0 +1,67 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk.gd" id="1_wijk"]
+[ext_resource type="Script" path="res://scripts/world/kamer.gd" id="2_kamer"]
+[ext_resource type="PackedScene" path="res://levels/kadewijk/s1_kade_ingang.tscn" id="3_s1"]
+[ext_resource type="PackedScene" path="res://levels/kadewijk/s2_kadegang.tscn" id="4_s2"]
+[ext_resource type="PackedScene" path="res://levels/kadewijk/s3_vismarkt.tscn" id="5_s3"]
+[ext_resource type="PackedScene" path="res://levels/kadewijk/s4_brugkloof.tscn" id="6_s4"]
+
+[sub_resource type="RectangleShape2D" id="Rect_s1"]
+size = Vector2(640, 360)
+
+[sub_resource type="RectangleShape2D" id="Rect_s2"]
+size = Vector2(960, 360)
+
+[sub_resource type="RectangleShape2D" id="Rect_s3"]
+size = Vector2(960, 360)
+
+[sub_resource type="RectangleShape2D" id="Rect_s4"]
+size = Vector2(960, 360)
+
+[node name="Kadewijk" type="Node2D"]
+script = ExtResource("1_wijk")
+
+[node name="Achtergrond" type="Polygon2D" parent="."]
+color = Color(0.13, 0.13, 0.15, 1)
+polygon = PackedVector2Array(0, -20, 3520, -20, 3520, 380, 0, 380)
+
+[node name="S1" type="Area2D" parent="."]
+position = Vector2(320, 180)
+script = ExtResource("2_kamer")
+kamer_id = &"S1"
+buren = PackedStringArray("S2")
+inhoud = ExtResource("3_s1")
+
+[node name="Vlak" type="CollisionShape2D" parent="S1"]
+shape = SubResource("Rect_s1")
+
+[node name="S2" type="Area2D" parent="."]
+position = Vector2(1120, 180)
+script = ExtResource("2_kamer")
+kamer_id = &"S2"
+buren = PackedStringArray("S1", "S3")
+inhoud = ExtResource("4_s2")
+
+[node name="Vlak" type="CollisionShape2D" parent="S2"]
+shape = SubResource("Rect_s2")
+
+[node name="S3" type="Area2D" parent="."]
+position = Vector2(2080, 180)
+script = ExtResource("2_kamer")
+kamer_id = &"S3"
+buren = PackedStringArray("S2", "S4")
+inhoud = ExtResource("5_s3")
+
+[node name="Vlak" type="CollisionShape2D" parent="S3"]
+shape = SubResource("Rect_s3")
+
+[node name="S4" type="Area2D" parent="."]
+position = Vector2(3040, 180)
+script = ExtResource("2_kamer")
+kamer_id = &"S4"
+buren = PackedStringArray("S3")
+inhoud = ExtResource("6_s4")
+
+[node name="Vlak" type="CollisionShape2D" parent="S4"]
+shape = SubResource("Rect_s4")
