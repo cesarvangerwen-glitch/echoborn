@@ -1,7 +1,13 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
 [ext_resource type="Script" path="res://scripts/save/checkpoint.gd" id="2_checkpoint"]
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_art.gd" id="10_art"]
+[ext_resource type="Texture2D" uid="uid://b5tqv0u7qeica" path="res://art/wereld/kadewijk/s1_kade_ingang_achter_grijs.png" id="11_achter"]
+[ext_resource type="Texture2D" uid="uid://bv1uaj28hp5n7" path="res://art/wereld/kadewijk/s1_kade_ingang_midden_grijs.png" id="12_midden"]
+[ext_resource type="Texture2D" uid="uid://bawq6fn53orlp" path="res://art/wereld/kadewijk/s1_kade_ingang_speelvlak_grijs.png" id="13_speelvlak"]
+[ext_resource type="Texture2D" uid="uid://bm36iktj7judw" path="res://art/wereld/kadewijk/s1_kade_ingang_licht_grijs.png" id="14_licht"]
+[ext_resource type="Texture2D" uid="uid://dg07h8sh17u2v" path="res://art/wereld/kadewijk/s1_kade_ingang_voor_grijs.png" id="15_voor"]
 
 [sub_resource type="RectangleShape2D" id="Rect_checkpoint"]
 size = Vector2(40, 40)
@@ -10,6 +16,43 @@ size = Vector2(40, 40)
 position = Vector2(-320, -180)
 script = ExtResource("1_inhoud")
 kamer_id = &"S1"
+
+[node name="Art" type="Node2D" parent="."]
+texture_filter = 1
+script = ExtResource("10_art")
+kamer_id = &"S1"
+naam = "s1_kade_ingang"
+verberg = Array[NodePath]([NodePath("../Proloogdeur")])
+
+[node name="Achter" type="Sprite2D" parent="Art"]
+z_index = -30
+position = Vector2(0, 0)
+texture = ExtResource("11_achter")
+centered = false
+
+[node name="Midden" type="Sprite2D" parent="Art"]
+z_index = -20
+position = Vector2(0, 0)
+texture = ExtResource("12_midden")
+centered = false
+
+[node name="Speelvlak" type="Sprite2D" parent="Art"]
+z_index = -10
+position = Vector2(0, 0)
+texture = ExtResource("13_speelvlak")
+centered = false
+
+[node name="Licht" type="Sprite2D" parent="Art"]
+z_index = -5
+position = Vector2(0, 0)
+texture = ExtResource("14_licht")
+centered = false
+
+[node name="Voor" type="Sprite2D" parent="Art"]
+z_index = 20
+position = Vector2(0, 0)
+texture = ExtResource("15_voor")
+centered = false
 
 [node name="Proloogdeur" type="Polygon2D" parent="."]
 position = Vector2(470, 320)
