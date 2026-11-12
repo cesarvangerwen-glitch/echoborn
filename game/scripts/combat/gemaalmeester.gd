@@ -1,6 +1,6 @@
 extends "res://scripts/combat/boss.gd"
-## De Gemaalmeester, de boss van de slice (T8b B-5–B-8; slice-vijanden-en-boss.md v0.1.2 §3,
-## gemaalmeester.md v0.2). Alle waarden uit `slice.csv`, groep `gemaalmeester`.
+## De Gemaalmeester, de boss van de slice (T8b B-5–B-8, B-13; slice-vijanden-en-boss.md v0.1.3 §3,
+## gemaalmeester.md v0.2.1). Alle waarden uit `slice.csv`, groep `gemaalmeester`.
 ##
 ## Fase 1, het schot (GMB-02, GMB-11, §3.4): de ketel is een `Pantserdoel` op de merkplek (300, 36);
 ## alleen een merk-ontploffing breekt het schot. Dan ligt de kern open tot de drempel van de opening
@@ -9,9 +9,12 @@ extends "res://scripts/combat/boss.gd"
 ## drempel de fasewissel (60 ticks, GMB-12), dan fase 2.
 ## Fase 2, het grote rad (GMB-04, §3.5, B-8): een tweede deel (96 × 40 op y 100–140, middelpunt
 ## `x_rad = D + rad_offset` van de muur aan zijn kant; volgt D, ook bij een wissel van D in het
-## debugmenu, SL-05). Niet `Merkbaar`; P1/P2 doen 15 SE, de echo 5. Na `kant_treffers` treffers van
-## P1 en P2 samen (de echo telt niet) of `kant_ticks` ticks trilt het `rad_tril` ticks en draait het
-## in `rad_draai` ticks naar de andere muur; dan niet raakbaar.
+## debugmenu, SL-05; in co-op vast op `rad_coop_muur` (94 px), los van D, B-13). Niet `Merkbaar`;
+## P1/P2 doen `rad_treffer` (18) SE, in co-op gedeeld door `coop_schaal` (1,5: 12), de echo 5. Na
+## `kant_treffers` treffers van P1 en P2 samen (de echo telt niet) of `kant_ticks` (480) ticks trilt
+## het `rad_tril` ticks en draait het in `rad_draai` ticks naar de andere muur; dan niet raakbaar.
+## Wisselt de modus in fase 2 (drop-in/out) en verandert daardoor de plek, dan trilt en draait het
+## meteen (RAD_DRAAI reden "modus", §3.5).
 ## Maat en aanvallen (B-6, GM-04): fase 1 elke 120 ticks een pompslag op de helft van P1 (eerste
 ## aanloop 60), fase 2 elke 90 ticks om en om een pompslag op de x van P1 en een schoepenzwiep.
 ## Wankel op 300 SE (GMB-13): de merkplek op de ketel; de finisher regelt `Boss`.
@@ -29,8 +32,8 @@ signal screen_shake(tick: int, ticks: int, px: float)
 ## RAD_TREFFER (B-10): `source` "p1", "p2" of "echo"; `action` hoe de aanvaller daar kwam:
 ## "bounce", "lancering", "vang", "stuit" (na een neerslag-stuit), "sprong", of "echo".
 signal rad_hit(tick: int, source: String, action: String, amount: int)
-## RAD_DRAAI (B-10): de kant is klaar (`reason` "treffers" of "tijd"); het rad trilt en draait
-## daarna naar `to_side` (−1 links, +1 rechts).
+## RAD_DRAAI (B-10): de kant is klaar (`reason` "treffers", "tijd" of "modus": een drop-in/out
+## verplaatste de plek, B-13); het rad trilt en draait daarna naar `to_side` (−1 links, +1 rechts).
 signal rad_turning(tick: int, reason: String, to_side: int)
 
 const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
@@ -95,6 +98,8 @@ var _rad_from_x := 0.0
 ## Hoe kwam P1/P2 in de lucht (RAD_TREFFER, B-10): {"p1": actie, "p2": actie}.
 var _air_action := {}
 var _noted_tick := -1
+## B-13: de modus (co-op of niet) waarin het rad nu hangt.
+var _rad_coop := false
 
 
 ## De boss op `origin`: de linkermuur van de arena, op de bovenkant van de vloer.
@@ -129,16 +134,29 @@ func tail_ticks() -> int:
 	return EnemyData.default_tail()
 
 
-## GMB-04: arena-x van het middelpunt van het rad aan kant `side`: `D + rad_offset` van die muur.
+## Co-op (twee spelers, `Combat.coop`)?
+func is_coop() -> bool:
+	return combat != null and "coop" in combat and combat.coop
+
+
+## GMB-04: arena-x van het middelpunt van het rad aan kant `side`: solo `D + rad_offset` van die
+## muur, in co-op `rad_coop_muur` (94 px, los van D; v0.1.3, B-13).
 func rad_x(side: int) -> float:
-	var from_wall := float(tail_ticks()) + EnemyData.value(data_group, "rad_offset")
+	var from_wall := _rad_from_wall()
 	return from_wall if side < 0 else arena_width - from_wall
 
 
+func _rad_from_wall() -> float:
+	if is_coop():
+		return EnemyData.value(data_group, "rad_coop_muur")
+	return float(tail_ticks()) + EnemyData.value(data_group, "rad_offset")
+
+
 ## GMB-04: het vloerteken onder het rad aan kant `side`, van `D` tot `D + 68` px van de muur
-## (arena-x, van – tot). Alleen beeld.
+## (arena-x, van – tot). Alleen beeld. In co-op (geen echo) onder de vaste plek van het rad: van
+## `rad_coop_muur − rad_offset` tot `+ 68` (60–128, de plek van D = 60; werkaanname GP).
 func floor_mark(side: int) -> Vector2:
-	var d := float(tail_ticks())
+	var d := _rad_from_wall() - EnemyData.value(data_group, "rad_offset")
 	var w := EnemyData.value(data_group, "vloerteken_breedte")
 	return Vector2(d, d + w) if side < 0 else Vector2(arena_width - d - w, arena_width - d)
 
@@ -214,15 +232,15 @@ func damage_floor(part: BossPart) -> int:
 	return se
 
 
-## §3.5: op het rad doen P1 en P2 `rad_treffer` (15), de echo `rad_echo` (5). In co-op deelt
-## `coop_schaal` de schade (×1,25 = 600 → 750 SE in fase 2, §3.8; start 1,0).
+## §3.5: op het rad doen P1 en P2 `rad_treffer` (18), de echo `rad_echo` (5). In co-op deelt
+## `coop_schaal` de schade (1,5: 18 → 12 SE, fase 2 telt als 900 in plaats van 600 SE; §3.8).
 func damage_for(part: BossPart, amount: int, source: String) -> int:
 	if part != rad:
 		return amount
 	var g := data_group
 	var key := "rad_echo" if source == "echo" else "rad_treffer"
 	var base := EnemyData.ticks(g, key)
-	if combat != null and "coop" in combat and combat.coop:
+	if is_coop():
 		var scale := EnemyData.value(g, "coop_schaal")
 		if scale > 0.0:
 			base = int(round(float(base) / scale))
@@ -409,6 +427,7 @@ func _rad_hang(tick: int) -> void:
 	rad_side_hits = 0
 	_rad_since = tick
 	_rad_until = -1
+	_rad_coop = is_coop()
 
 
 ## §3.5: na `kant_treffers` of `kant_ticks` trilt het rad `rad_tril` ticks en draait het in
@@ -417,12 +436,19 @@ func _update_rad(tick: int) -> void:
 	var g := data_group
 	match rad_state:
 		RadState.HANGING:
-			rad.position.x = rad_x(rad_side)  # volgt D (SL-05)
 			var reason := ""
-			if rad_side_hits >= EnemyData.ticks(g, "kant_treffers"):
-				reason = "treffers"
-			elif tick - _rad_since >= EnemyData.ticks(g, "kant_ticks"):
-				reason = "tijd"
+			# B-13 (§3.5): een drop-in/out verandert de plek van het rad: meteen trillen en draaien,
+			# naar de plek van de nieuwe modus aan de andere muur. Zelfde plek (D = 60): niets.
+			if is_coop() != _rad_coop:
+				if absf(rad_x(rad_side) - rad.position.x) > 0.01:
+					reason = "modus"
+				_rad_coop = is_coop()
+			if reason == "":
+				rad.position.x = rad_x(rad_side)  # volgt D (SL-05)
+				if rad_side_hits >= EnemyData.ticks(g, "kant_treffers"):
+					reason = "treffers"
+				elif tick - _rad_since >= EnemyData.ticks(g, "kant_ticks"):
+					reason = "tijd"
 			if reason != "":
 				rad_state = RadState.SHAKING
 				rad.hittable = false
