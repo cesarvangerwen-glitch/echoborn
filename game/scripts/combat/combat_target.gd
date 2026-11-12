@@ -21,6 +21,8 @@ signal died(tick: int)
 signal hit_player(tick: int, player: Node2D)
 ## Een treffer op een intact pantser: 0 SE, wel een merk; eigen geluid en vonk (VJ-07, T8b).
 signal armor_tinked(tick: int)
+## De basisvijand begint zijn aanloop (§4.3; voor tests en meetlog).
+signal windup_started(tick: int)
 
 const Tuning = preload("res://scripts/echo/tuning.gd")
 const BodyBuilder = preload("res://scripts/echo/body_builder.gd")
@@ -222,7 +224,10 @@ func stun(tick: int) -> void:
 
 
 ## Stap (5): de basisvijand loopt naar P1 en valt aan (§4.3). Hij springt
-## niet en blijft op zijn hoogte.
+## niet en blijft op zijn hoogte. Een aanloop begint alleen als P1 binnen
+## bereik is én zijn voeten binnen de hoogtegrens van de vloer van de vijand
+## zijn (gdd v0.8.2 §4.3, G-9; zoals VJ-08); anders loopt hij door naar P1.
+## Een aanloop die loopt, loopt door.
 func sim_update(tick: int, bodies: Array[Node2D]) -> void:
 	if not alive or not walks:
 		return
@@ -246,12 +251,24 @@ func sim_update(tick: int, bodies: Array[Node2D]) -> void:
 			_attack_left = int(c["enemy_attack_ticks"])
 			_attack_hit = false
 		return
-	if absf(dx) <= float(c["enemy_attack_range_px"]) + shape.get_rect().size.x:
+	if absf(dx) <= float(c["enemy_attack_range_px"]) + shape.get_rect().size.x \
+			and _p1_in_windup_height(p1, c):
 		facing = 1 if dx >= 0.0 else -1
 		_windup_left = int(c["enemy_windup_ticks"])
+		windup_started.emit(tick)
 		return
 	facing = 1 if dx > 0.0 else -1
 	position.x += float(c["enemy_speed"]) * facing
+
+
+## G-9 (gdd v0.8.2 §4.3, VJ-08): de voeten van P1 tussen `enemy_windup_height_min` en
+## `enemy_windup_height_max` px boven de vloer van de vijand (−20 … +20; negatief = lager).
+func _p1_in_windup_height(p1: Node2D, c: Dictionary) -> bool:
+	var own_floor := global_position.y + shape.get_rect().size.y * 0.5
+	var feet := p1.global_position.y + Tuning.body_size().y * 0.5
+	var height := own_floor - feet
+	return height >= float(c["enemy_windup_height_min"]) - 0.0001 \
+		and height <= float(c["enemy_windup_height_max"]) + 0.0001
 
 
 func _attack_box(c: Dictionary) -> Rect2:

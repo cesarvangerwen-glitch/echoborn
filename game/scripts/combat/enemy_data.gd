@@ -29,7 +29,7 @@ const REQUIRED := {
 		"zwiep_y1", "zwiep_y2", "finisher_ticks", "finisher_bron", "arena_breedte", "schok_breuk_ticks",
 		"schok_breuk_px", "coop_schaal", "rad_breedte", "rad_y1", "rad_y2", "rad_offset", "vloerteken_breedte",
 		"rad_treffer", "rad_echo", "kant_treffers", "kant_ticks", "rad_tril", "rad_draai", "schok_rad_ticks",
-		"schok_rad_px"],
+		"schok_rad_px", "rad_coop_muur"],
 	"testboss": ["se", "wankel_se", "breedte", "hoogte", "maat", "aanloop", "actief", "herstel",
 		"vlak_breedte", "vlak_hoogte", "finisher_ticks", "finisher_bron", "arena_breedte"],
 }

@@ -1,6 +1,8 @@
 extends RefCounted
 ## Tests voor fase 2 van de Gemaalmeester, het grote rad (T8b-bouw deel 2b, #190): B-8 uit
-## `docs/design/combat/slice-vijanden-en-boss.md` v0.1.2 §3.2 (GMB-04), §3.5, §3.8, §6 en §7.
+## `docs/design/combat/slice-vijanden-en-boss.md` v0.1.2 §3.2 (GMB-04), §3.5, §3.8, §6 en §7, en
+## B-13 uit v0.1.3 (#218): radtreffer 18 (ook in co-op, `coop_schaal` 1,0), `kant_ticks` 480, het rad in co-op vast op
+## 94 px van de muur (`rad_coop_muur`), en trillen en draaien bij een wissel van modus in fase 2.
 ##
 ## Gevallen "(alle D)" draaien op D = 60, 120 en 180, met 90 als regressie. De arena en de bot komen
 ## uit `test_boss_runs.gd` en `boss_bot.gd`; alle waarden uit `slice.csv`.
@@ -18,20 +20,22 @@ const Layers = preload("res://scripts/world/layers.gd")
 const ALL_D := [60, 120, 180, 90]
 const MAX_FRAMES := {
 	"test_b8_jump_never_hits_rad": 30000, "test_b8_turn_bounce_hits_rad": 22000,
-	"test_b8_launch_neerslag_two_hits": 16000, "test_b8_coop_bounce_on_p2_every_x": 22000,
+	"test_b8_launch_neerslag_two_hits": 16000, "test_b8_coop_bounce_on_p2_every_x": 30000,
 }
 
 var _runs := Runs.new()
 
 
 ## Arena met de Gemaalmeester en P1 met handmatige input, zonder echo (D = `d`); de boss in fase 2
-## (debug op 900 SE; na de fasewissel van 60 ticks hangt het rad).
-func _phase2_manual(t, d: int, x := 200.0) -> Dictionary:
+## (debug op 900 SE; na de fasewissel van 60 ticks hangt het rad). Met `coop` staat P2 (handmatig)
+## er al vóór de fasewissel, op x = 340.
+func _phase2_manual(t, d: int, x := 200.0, coop := false) -> Dictionary:
 	var sim = Fx.world(t)
 	Fx.block(t, "MuurLinks", Rect2(-40, Fx.FLOOR_TOP - 400, 40, 400), Layers.WORLD)
 	Fx.block(t, "MuurRechts", Rect2(600, Fx.FLOOR_TOP - 400, 40, 400), Layers.WORLD)
 	var p1 := Fx.manual_player(sim, 1, Vector2(x, Fx.STAND_Y))
 	p1.health = 100000
+	var p2: PlayerActor = Fx.manual_player(sim, 2, Vector2(340, Fx.STAND_Y)) if coop else null
 	sim.set_tail_ticks(d)
 	var boss := Gemaalmeester.new()
 	boss.setup_gemaalmeester(Vector2(0, Fx.FLOOR_TOP))
@@ -39,7 +43,7 @@ func _phase2_manual(t, d: int, x := 200.0) -> Dictionary:
 	await t.run_ticks(sim, 2)
 	boss.set_health(sim.tick, 900)
 	await t.run_ticks(sim, 61)
-	return {"sim": sim, "p1": p1, "boss": boss}
+	return {"sim": sim, "p1": p1, "p2": p2, "boss": boss}
 
 
 ## Een run van de bot vanaf fase 2 (debug op 900 SE), met de radtreffers in `rad`.
@@ -58,13 +62,15 @@ func _phase2_bot(t, d: int, coop: bool) -> Dictionary:
 ## GMB-04, §7 (alle D): het rad is 96 × 40 op y 100–140, middelpunt `D + 34` van de muur aan zijn
 ## kant (60: 94 / 506; 120: 154 / 446; 180: 214 / 386); vloerteken van D tot D + 68; niet `Merkbaar`;
 ## in fase 1 niet raakbaar. Een wissel van D (debugmenu, SL-05) verplaatst het hangende rad mee.
+## B-13: de waarden van v0.1.3 in slice.csv (18, 480, 1,0, 94; `kant_treffers` blijft 2).
 func test_b8_rad_place_per_d(t) -> void:
 	var g := "gemaalmeester"
-	t.check(EnemyData.ticks(g, "rad_treffer") == 15 and EnemyData.ticks(g, "rad_echo") == 5
-		and EnemyData.ticks(g, "kant_treffers") == 2 and EnemyData.ticks(g, "kant_ticks") == 180
+	t.check(EnemyData.ticks(g, "rad_treffer") == 18 and EnemyData.ticks(g, "rad_echo") == 5
+		and EnemyData.ticks(g, "kant_treffers") == 2 and EnemyData.ticks(g, "kant_ticks") == 480
 		and EnemyData.ticks(g, "rad_tril") == 20 and EnemyData.ticks(g, "rad_draai") == 60
-		and EnemyData.value(g, "rad_offset") == 34.0 and EnemyData.value(g, "coop_schaal") == 1.0,
-		"rad-waarden in slice.csv (§3.5)")
+		and EnemyData.value(g, "rad_offset") == 34.0 and EnemyData.value(g, "coop_schaal") == 1.0
+		and EnemyData.value(g, "rad_coop_muur") == 94.0,
+		"rad-waarden in slice.csv (§3.5, v0.1.3: 18, 2, 480, 20, 60, 34, 1,0, 94)")
 	for d: int in ALL_D:
 		var w := await _phase2_manual(t, d)
 		var boss: Gemaalmeester = w["boss"]
@@ -102,10 +108,10 @@ func test_b8_rad_place_per_d(t) -> void:
 	await t.cleanup()
 
 
-## §3.5: een treffer van P1 op het rad doet 15 SE, van de echo 5, geen merk; na 2 treffers van P1 (de
-## echo telt niet) trilt het 20 ticks en draait het in 60 ticks naar de andere muur (RAD_DRAAI
-## "treffers"); trillen en draaien zijn niet raakbaar; na 180 ticks zonder 2 treffers draait het ook
-## ("tijd"). Schermschok 3 ticks / 1 px per treffer (B-11).
+## §3.5: een treffer van P1 op het rad doet 18 SE (v0.1.3, B-13), van de echo 5, geen merk; na 2
+## treffers van P1 (de echo telt niet) trilt het 20 ticks en draait het in 60 ticks naar de andere muur
+## (RAD_DRAAI "treffers"); trillen en draaien zijn niet raakbaar; na 480 ticks zonder 2 treffers draait
+## het ook ("tijd"). Schermschok 3 ticks / 1 px per treffer (B-11).
 func test_b8_damage_and_turning(t) -> void:
 	var w := await _phase2_manual(t, 60)
 	var sim = w["sim"]
@@ -122,42 +128,55 @@ func test_b8_damage_and_turning(t) -> void:
 	sim.combat.attack(tick, "echo", Layers.SHADOW, at, 1)
 	t.check(boss.se == 895 and boss.rad_side_hits == 0, "echo: %d SE, kant %d (895, 0)" % [boss.se, boss.rad_side_hits])
 	sim.combat.attack(tick, "p1", Layers.LIGHT, at, 1)
-	t.check(boss.se == 880 and boss.rad_side_hits == 1 and boss.shake_at(tick) == 1.0 and boss.shake_at(tick + 3) == 0.0,
+	t.check(boss.se == 877 and boss.rad_side_hits == 1 and boss.shake_at(tick) == 1.0 and boss.shake_at(tick + 3) == 0.0,
 		"P1: %d SE, kant %d, schok %s" % [boss.se, boss.rad_side_hits, boss.shake_at(tick)])
 	t.check(sim.combat.mark_on(boss.rad) == null, "merk op het rad")
 	sim.combat.attack(tick, "p1", Layers.LIGHT, at, 1)
 	await t.run_ticks(sim, 1)
-	t.check(boss.se == 865 and hits.map(func(h: Array) -> int: return h[3]) == [5, 15, 15]
+	t.check(boss.se == 859 and hits.map(func(h: Array) -> int: return h[3]) == [5, 18, 18]
 		and hits.map(func(h: Array) -> String: return h[1]) == ["echo", "p1", "p1"], "treffers %s" % [hits])
 	t.check(turns.size() == 1 and turns[0][1] == "treffers" and turns[0][2] == -side and not boss.is_rad_hittable(),
 		"na 2 treffers: %s" % [turns])
 	var s0: int = turns[0][0]
 	await t.run_ticks(sim, 15)
 	sim.combat.attack(sim.tick, "p1", Layers.LIGHT, at, 1)
-	t.check(boss.se == 865 and boss.rad_state == Gemaalmeester.RadState.SHAKING, "raakbaar tijdens trillen")
+	t.check(boss.se == 859 and boss.rad_state == Gemaalmeester.RadState.SHAKING, "raakbaar tijdens trillen")
 	await t.run_ticks(sim, 30)
 	t.check(boss.rad_state == Gemaalmeester.RadState.TURNING and not boss.is_rad_hittable(), "draait niet of is raakbaar")
 	await _runs._run_until(t, sim, func() -> bool: return boss.is_rad_hittable(), 200, 1)
 	t.check(boss.rad_side == -side and boss.rad_since() == s0 + 80 and is_equal_approx(boss.rad.position.x, boss.rad_x(-side)),
 		"hangt sinds %d (verwacht %d) aan kant %d" % [boss.rad_since(), s0 + 80, boss.rad_side])
-	# Tijd: 180 ticks zonder treffers.
+	# Tijd: 480 ticks zonder treffers (v0.1.3).
 	var hang2: int = boss.rad_since()
-	await _runs._run_until(t, sim, func() -> bool: return turns.size() == 2, 300, 1)
-	t.check(turns.size() == 2 and turns[1][1] == "tijd" and turns[1][0] == hang2 + 180, "tijd: %s (hangt sinds %d)" % [turns, hang2])
+	await _runs._run_until(t, sim, func() -> bool: return turns.size() == 2, 600, 1)
+	t.check(turns.size() == 2 and turns[1][1] == "tijd" and turns[1][0] == hang2 + 480, "tijd: %s (hangt sinds %d)" % [turns, hang2])
 	await t.cleanup()
 
 
-## §3.8: in co-op deelt `coop_schaal` de radschade (start 1,0: 15 SE); Wankel op 300 SE (GMB-13)
-## klemt de laatste radtreffer en maakt het rad niet raakbaar.
+## §3.8 (v0.1.3 na PR #219, B-13): in co-op deelt `coop_schaal` = 1,0 de radschade (18 SE, P1 en P2);
+## Wankel op 300 SE (GMB-13) klemt de laatste radtreffer en maakt het rad niet raakbaar. P2 komt
+## erbij in fase 2 bij D = 60: de co-op-plek (94) is de solo-plek, dus het rad blijft hangen.
 func test_b8_coop_scale_and_wankel(t) -> void:
 	var w := await _phase2_manual(t, 60)
 	var sim = w["sim"]
 	var boss: Gemaalmeester = w["boss"]
+	var turns := []
+	boss.rad_turning.connect(func(tick: int, reason: String, _s: int) -> void: turns.append([tick, reason]))
+	var before: float = boss.rad.position.x
 	Fx.manual_player(sim, 2, Vector2(300, Fx.STAND_Y))
+	await t.run_ticks(sim, 2)
 	t.check(sim.combat.coop, "geen co-op")
+	t.check(turns.is_empty() and boss.is_rad_hittable() and boss.rad.position.x == before,
+		"drop-in bij D = 60: rad %s → %s, draaien %s (blijft hangen)" % [before, boss.rad.position.x, turns])
 	var at := boss.rad.global_position - Vector2(18, 0)
 	sim.combat.attack(sim.tick, "p2", Layers.SHADOW, at, 1)
-	t.check(boss.se == 885, "P2 in co-op: %d SE (885)" % boss.se)
+	t.check(boss.se == 882, "P2 in co-op: %d SE (882: 18)" % boss.se)
+	sim.combat.attack(sim.tick, "p1", Layers.LIGHT, at, 1)
+	t.check(boss.se == 864, "P1 in co-op: %d SE (864: 18)" % boss.se)
+	# Twee treffers: het rad draait weg; wachten tot het aan de andere kant hangt.
+	await t.run_ticks(sim, 1)
+	await _runs._run_until(t, sim, func() -> bool: return boss.is_rad_hittable(), 200, 1)
+	at = boss.rad.global_position - Vector2(18, 0)
 	boss.set_health(sim.tick, 310)
 	sim.combat.attack(sim.tick, "p1", Layers.LIGHT, at, 1)
 	t.check(boss.se == 300 and boss.is_wankel() and not boss.is_rad_hittable(), "Wankel: %d SE, raakbaar %s" % [boss.se, boss.is_rad_hittable()])
@@ -183,7 +202,8 @@ func test_b8_jump_never_hits_rad(t) -> void:
 		while from_wall <= 592.0:
 			# Afstand tot de muur aan de kant van het rad (de arena is symmetrisch): zo telt elke x
 			# van de vloer, met het rad raakbaar, zonder op een bepaalde kant te wachten.
-			if not boss.is_rad_hittable() or sim.tick - boss.rad_since() > 155:
+			# Een sprong duurt 22 ticks: niet meer beginnen vlak voor `kant_ticks` (het rad draait dan weg).
+			if not boss.is_rad_hittable() or sim.tick - boss.rad_since() > EnemyData.ticks("gemaalmeester", "kant_ticks") - 25:
 				await t.run_ticks(sim, 1)
 				continue
 			var x := from_wall if boss.rad_side < 0 else 600.0 - from_wall
@@ -218,7 +238,7 @@ func test_b8_turn_bounce_hits_rad(t) -> void:
 			var rad: Array = run["rad"]
 			await _runs._run_until(t, run["sim"], func() -> bool: return not rad.is_empty(), 1500, 5)
 			var first: Array = rad[0] if not rad.is_empty() else []
-			t.check(not first.is_empty() and first[1] == "p1" and first[2] == "bounce" and first[3] == 15,
+			t.check(not first.is_empty() and first[1] == "p1" and first[2] == "bounce" and first[3] == 18,
 				"D = %d, %d te laat: eerste radtreffer %s" % [d, late, first])
 			await t.cleanup()
 
@@ -246,17 +266,22 @@ func test_b8_launch_neerslag_two_hits(t) -> void:
 		await t.cleanup()
 
 
-## B-8 (4): co-op, P2 staat op elke x onder het rad (stap 8 px, het midden ± 48): P1 springt op hem,
-## bouncet en raakt het rad (D = 60 en 180).
+## B-8 (4) en B-13: co-op, het rad hangt bij D = 60 / 120 / 180 op 94 px van de muur
+## (`rad_coop_muur`); P2 staat op elke x onder het rad (stap 8 px, het midden ± 48): P1 springt op
+## hem, bouncet en raakt het rad.
 func test_b8_coop_bounce_on_p2_every_x(t) -> void:
-	for d: int in [60, 180]:
+	for d: int in [60, 120, 180]:
 		for k in range(13):
-			var w := await _phase2_manual(t, d)
+			var w := await _phase2_manual(t, d, 200.0, true)
 			var sim = w["sim"]
 			var boss: Gemaalmeester = w["boss"]
 			var cx := boss.rad_x(boss.rad_side)
+			t.check(is_equal_approx(cx, 94.0 if boss.rad_side < 0 else 506.0) and is_equal_approx(boss.rad.position.x, cx),
+				"D = %d co-op: rad op %s (94 px van de muur)" % [d, boss.rad.position.x])
 			var x2 := cx - 48.0 + 8.0 * k
-			var p2 := Fx.manual_player(sim, 2, Vector2(x2, Fx.STAND_Y))
+			var p2: PlayerActor = w["p2"]
+			p2.position = Vector2(x2, Fx.STAND_Y)
+			p2.velocity = Vector2.ZERO
 			var bot := BossBot.new(sim, boss)
 			var p1: PlayerActor = w["p1"]
 			p1.input_source = bot.p1_source
@@ -268,3 +293,46 @@ func test_b8_coop_bounce_on_p2_every_x(t) -> void:
 			t.check(not rad.is_empty() and rad[0][1] == "p1" and rad[0][2] == "bounce" and absf(p2.position.x - x2) < 0.01,
 				"D = %d, P2 op %s (midden %s): %s" % [d, x2, cx, rad])
 			await t.cleanup()
+
+
+# --- B-13: de plek van het rad in co-op en een wissel van modus in fase 2 --------------------
+
+## B-13 (GMB-04, §3.5): in co-op hangt het rad bij elke D op 94 px van de muur (bij de fasewissel en
+## na elke kant). Solo bij D = 120 hangt het op 154. Een drop-out in fase 2 bij D = 120 (co-op → solo)
+## laat het rad meteen trillen (RAD_DRAAI "modus", 20 ticks) en in 60 ticks naar `D + 34` aan de andere
+## muur draaien; een drop-in bij D = 120 (solo → co-op) naar 94 aan de andere muur.
+func test_b13_rad_coop_place_and_mode_switch(t) -> void:
+	for d: int in [60, 120, 180]:
+		var w := await _phase2_manual(t, d, 200.0, true)
+		var boss: Gemaalmeester = w["boss"]
+		var want := 94.0 if boss.rad_side < 0 else 506.0
+		t.check(boss.rad_state == Gemaalmeester.RadState.HANGING and is_equal_approx(boss.rad.position.x, want),
+			"co-op D = %d: rad op %s (%s)" % [d, boss.rad.position.x, want])
+		t.check(boss.floor_mark(-1) == Vector2(60, 128), "co-op D = %d: vloerteken %s (60–128)" % [d, boss.floor_mark(-1)])
+		await t.cleanup()
+	for case: String in ["drop-out", "drop-in"]:
+		var coop := case == "drop-out"
+		var w := await _phase2_manual(t, 120, 200.0, coop)
+		var sim = w["sim"]
+		var boss: Gemaalmeester = w["boss"]
+		var side := boss.rad_side
+		var turns := []
+		boss.rad_turning.connect(func(tick: int, reason: String, to_side: int) -> void: turns.append([tick, reason, to_side]))
+		var at_hang: float = boss.rad.position.x
+		var t0: int = sim.tick
+		if coop:
+			sim.drop_out()
+		else:
+			Fx.manual_player(sim, 2, Vector2(340, Fx.STAND_Y))
+		await t.run_ticks(sim, 1)
+		t.check(turns.size() == 1 and turns[0][1] == "modus" and turns[0][2] == -side and turns[0][0] <= t0 + 1
+			and boss.rad_state == Gemaalmeester.RadState.SHAKING and not boss.is_rad_hittable(),
+			"%s bij D = 120: draaien %s, stand %d (meteen trillen, reden modus)" % [case, turns, boss.rad_state])
+		t.check(is_equal_approx(boss.rad.position.x, at_hang), "%s: rad sprong tijdens het trillen naar %s" % [case, boss.rad.position.x])
+		var from_wall := 154.0 if coop else 94.0
+		var want := from_wall if -side < 0 else 600.0 - from_wall
+		await _runs._run_until(t, sim, func() -> bool: return boss.is_rad_hittable(), 200, 1)
+		t.check(boss.rad_side == -side and is_equal_approx(boss.rad.position.x, want) and boss.rad_since() == turns[0][0] + 80,
+			"%s: hangt op %s aan kant %d sinds %d (verwacht %s, kant %d, %d)" % [case, boss.rad.position.x, boss.rad_side,
+				boss.rad_since(), want, -side, turns[0][0] + 80])
+		await t.cleanup()

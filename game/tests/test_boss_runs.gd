@@ -1,7 +1,14 @@
 extends RefCounted
-## Scripted boss-runs tegen de Gemaalmeester (T8b-bouw deel 2b, #190): B-9 (`boss_bot.gd`, solo en
-## co-op per D, de C-16-runs, drop-out van P2) en B-10 (meetlog-events). Bron:
-## `docs/design/combat/slice-vijanden-en-boss.md` v0.1.2 §3.9, §6, §7; gdd v0.8.1 §4.5, §4.6 (C-16).
+## Scripted boss-runs tegen de Gemaalmeester (T8b-bouw deel 2b, #190; B-9b, #218): B-9 (`boss_bot.gd`,
+## solo en co-op per D, de C-16-runs, drop-out van P2) en B-10 (meetlog-events). Bron:
+## `docs/design/combat/slice-vijanden-en-boss.md` v0.1.3 §3.5, §3.9, §6, §7; gdd v0.8.1 §4.5, §4.6 (C-16).
+##
+## B-9b: de bot ontwijkt in fase 2 (keren op de maat, sprong over de pompslag) en P1 speelt met
+## `p1_health` = 5 LP, zonder genezing van buiten het spel. Elke run: verslagen zonder dood (geen
+## RESPAWN, ≤ 4 treffers op P1 in de hele run; doel 0 in fase 2), MP-1 ≤ 300. Solo en co-op bij D = 60
+## 90–150 s, ook de realistische speler; MP-7 (co-op ÷ solo) ≥ 0,5 bij 60 / 90 / 120 (180 als note);
+## `RAD_DRAAI` reden `tijd` hooguit 1 per solo-run bij D ≤ 120. Rapport: lopend wachten per keer-run en
+## de beginner-run met 1 slag per bounce.
 ##
 ## Elke run: arena van 600 px met twee muren, de Gemaalmeester op de linkermuur, P1 (en P2) met de
 ## bot als inputbron, meetlog met `watch_boss`. De run duurt van BOSS_START tot BOSS_VERSLAGEN; de
@@ -18,6 +25,7 @@ const Meetlog = preload("res://scripts/events/meetlog.gd")
 const FlowReport = preload("res://levels/flowkamer/flow_report.gd")
 const LightMeter = preload("res://scripts/light/light_meter.gd")
 const Layers = preload("res://scripts/world/layers.gd")
+const Tuning = preload("res://scripts/echo/tuning.gd")
 
 ## Een run duurt bij D = 180 langer dan 2 minuten speltijd; de grens is ruim, de run zelf stopt bij
 ## BOSS_VERSLAGEN of op `RUN_LIMIT`.
@@ -28,8 +36,10 @@ const MAX_FRAMES := {
 	"test_b9_coop_d120": 22000, "test_b9_coop_d180": 22000, "test_b9_drop_out_phase1": 22000,
 	"test_b9_drop_out_wankel": 22000, "test_b9_c16_solo_echo_off": 13000,
 	"test_b9_c16_coop_p2_never_hits": 13000, "test_b9_one_strike_per_bounce": 22000,
-	"test_b10_meetlog_events": 22000,
+	"test_b10_meetlog_events": 22000, "test_b9b_realistic_solo_d60": 22000,
 }
+## B-9b: totale duur (ticks) van de solo-run per D, voor MP-7 in de co-op-run.
+static var _solo_ticks := {}
 
 
 # --- arena en run -------------------------------------------------------------
@@ -46,8 +56,8 @@ func _arena(t, d: int, coop: bool, echo_on := true) -> Dictionary:
 	p1.setup(1, bot.p1_source, Color.WHITE)
 	p1.position = Vector2(200, Fx.STAND_Y)
 	sim.add_player(p1)
-	# Een geoefende run meet de duur; P1 mag er niet tussendoor aan doodgaan (de treffers tellen we).
-	p1.health = 100000
+	# B-9b: P1 speelt met zijn echte levenspunten (5), zonder genezing van buiten het spel.
+	p1.health = int(Tuning.combat()["p1_health"])
 	var p2: PlayerActor = null
 	var echo: TailEcho = null
 	if coop:
@@ -114,7 +124,9 @@ func _measure(run: Dictionary) -> Dictionary:
 	var rep = FlowReport.from_rows(rows, run["echo"] != null)
 	var m := {"at": at, "rad": rad, "turns": turns, "first_break": first_break, "mp1": rep.longest_still,
 		"mp1_p2": rep.longest_still_p2, "hits": run["hits"].size(), "breaks": run["breaks"],
-		"defeated": run["boss"].is_defeated()}
+		"defeated": run["boss"].is_defeated(), "health": run["p1"].health,
+		"respawns": run["log"].count("RESPAWN"), "waits": run["bot"].waits, "jl": run["bot"].jl,
+		"closed": run["bot"].closed}
 	if at.has("start") and at.has("verslagen"):
 		m["total"] = int(at["verslagen"]) - int(at["start"])
 	# Treffers op P1 per deel (de bot ontwijkt alleen de pompslag van fase 1).
@@ -138,42 +150,86 @@ func _table_row(name: String, m: Dictionary) -> String:
 			return "?"
 		return "%d" % (int(at[b]) - int(at[a]))
 	return ("%s: fase 1 %s · wissel %s · fase 2 %s · wankel+finisher %s · totaal %s ticks (%.1f s) · " +
-		"MP-1 P1 %d (P2 %d) · treffers op P1 %s · rad %s · kanten %s · eerste SCHOT_BREUK na %d") % [name,
+		"MP-1 P1 %d (P2 %d) · treffers op P1 %s · LP over %d · rad %s · kanten %s · eerste SCHOT_BREUK na %d" +
+		" · %s") % [name,
 		part.call("start", "wissel"), part.call("wissel", "2"), part.call("2", "wankel"),
 		part.call("wankel", "verslagen"), str(m.get("total", "?")), float(m.get("total", 0)) / 60.0,
-		m["mp1"], m["mp1_p2"], "%d %s" % [m["hits"], m["hits_per_part"]], m["rad"], m["turns"],
-		int(m["first_break"]) - int(at.get("start", 0))]
+		m["mp1"], m["mp1_p2"], "%d %s" % [m["hits"], m["hits_per_part"]], m["health"], m["rad"], m["turns"],
+		int(m["first_break"]) - int(at.get("start", 0)), _waits_text(m)]
+
+
+## B-9b, rapport: lopend wachten vóór het keervenster per keer-run (max en gemiddelde), en J en L na het
+## keren (min–max).
+func _waits_text(m: Dictionary) -> String:
+	var waits: Array = m["waits"]
+	if waits.is_empty():
+		return "lopend wachten: geen keer-runs"
+	var total := 0
+	var most := 0
+	for w: int in waits:
+		total += w
+		most = maxi(most, w)
+	var text := "lopend wachten per keer-run: max %d, gem. %.0f ticks (%d keer-runs)" % [most, float(total) / waits.size(),
+		waits.size()]
+	var jl: Array = m["jl"]
+	if not jl.is_empty():
+		var j := jl.map(func(r: Array) -> int: return r[0])
+		var l := jl.map(func(r: Array) -> int: return r[1])
+		text += " · J − T %d–%d, L − T %d–%d" % [j.min(), j.max(), l.min(), l.max()]
+	text += " · eerdere keertick gesloten door %s" % str(m["closed"])
+	return text
 
 
 # --- B-9: scripted runs per D ---------------------------------------------------
 
-## B-9 en C-16 (3) op de Gemaalmeester: de run wint (BOSS_VERSLAGEN), MP-1 ≤ 300, de echo breekt
-## nooit; bij D = 60 duurt de solo-run 90–150 s (§3.9). Let op: met 2 slagen per bounce, zonder
-## ontwijken in fase 2, en P1 kan niet doodgaan (hoge LP; de treffers staan in de note).
+## B-9, B-9b en C-16 (3) op de Gemaalmeester, 2 slagen per bounce, met ontwijken, 5 LP: de run wint
+## (BOSS_VERSLAGEN) zonder dood, MP-1 ≤ 300, de echo breekt nooit; bij D = 60 duurt de solo-run
+## 90–150 s (§3.9); `RAD_DRAAI` reden `tijd` hooguit 1 bij D ≤ 120.
 func _solo(t, d: int) -> void:
+	var name := "solo D = %d (2 slagen per bounce, met ontwijken, 5 LP)" % d
 	var run := _arena(t, d, false)
 	var m := await _play_run(t, run)
-	t.note(_table_row("solo D = %d" % d, m))
-	_check_run(t, "solo D = %d" % d, m)
+	t.note(_table_row(name, m))
+	_check_run(t, name, m)
+	_solo_ticks[d] = int(m.get("total", 0))
+	if d <= 120:
+		t.check(int(m["turns"].get("tijd", 0)) <= 1, "%s: %d keer RAD_DRAAI reden tijd (≤ 1)" % [name, m["turns"].get("tijd", 0)])
 	if d == 60:
 		var s := float(m.get("total", 0)) / 60.0
-		t.check(s >= 90.0 and s <= 150.0, ("solo D = 60: %.1f s (90–150, §3.9; 2 slagen per bounce, "
-			+ "zonder ontwijken, P1 kan niet doodgaan)") % s)
+		t.check(s >= 90.0 and s <= 150.0, "%s: %.1f s (90–150, §3.9)" % [name, s])
 	await t.cleanup()
 
 
+## B-9b: verslagen zonder dood (geen RESPAWN, P1 leeft, ≤ 4 treffers in de hele run); de treffers in
+## fase 2 (doel 0) staan in de note.
 func _check_run(t, name: String, m: Dictionary) -> void:
 	t.check(m["defeated"], "%s: niet verslagen in %d ticks (%s)" % [name, RUN_LIMIT, m["at"]])
+	t.check(m["respawns"] == 0 and m["health"] > 0 and m["hits"] <= 4,
+		"%s: %d treffers op P1 %s (≤ 4), %d LP over, %d respawns (verslagen zonder dood)" % [name, m["hits"],
+			m["hits_per_part"], m["health"], m["respawns"]])
 	t.check(m["mp1"] <= 300, "%s: MP-1 %d > 300" % [name, m["mp1"]])
 	t.check(m["breaks"] == 0, "%s: de echo brak %d keer" % [name, m["breaks"]])
 	t.check(int(m["first_break"]) >= 0, "%s: geen SCHOT_BREUK" % name)
 
 
+## B-9b: co-op met 5 LP; bij D = 60 90–150 s; MP-7 (co-op ÷ solo bij dezelfde D) ≥ 0,5 bij 60 / 90 / 120,
+## bij 180 een note als het niet haalt. Co-op duurt niet langer dan solo (MP-7 ≤ 1,0; v0.1.3 §3.9
+## besluit 1, na PR #219), ook bij 60 / 90 / 120; bij 180 een note.
 func _coop(t, d: int) -> void:
+	var name := "co-op D = %d (2 slagen per bounce, met ontwijken, 5 LP)" % d
 	var run := _arena(t, d, true)
 	var m := await _play_run(t, run)
-	t.note(_table_row("co-op D = %d" % d, m))
-	_check_run(t, "co-op D = %d" % d, m)
+	var solo: int = _solo_ticks.get(d, 0)
+	var mp7 := float(m.get("total", 0)) / float(solo) if solo > 0 else -1.0
+	t.note(_table_row(name, m) + " · MP-7 %.2f (solo %d ticks)" % [mp7, solo])
+	_check_run(t, name, m)
+	if d == 60:
+		var s := float(m.get("total", 0)) / 60.0
+		t.check(s >= 90.0 and s <= 150.0, "%s: %.1f s (90–150, §3.9)" % [name, s])
+	if d <= 120:
+		t.check(mp7 >= 0.5 and mp7 <= 1.0, "%s: MP-7 %.2f (0,5 … 1,0; solo %d ticks)" % [name, mp7, solo])
+	elif mp7 < 0.5 or mp7 > 1.0:
+		t.note("%s: MP-7 %.2f buiten 0,5 … 1,0 (D = 180, regressie, geen eis)" % [name, mp7])
 	await t.cleanup()
 
 
@@ -209,15 +265,29 @@ func test_b9_coop_d180(t) -> void:
 	await _coop(t, 180)
 
 
-## B-9: §3.5 rekent met één slag per bounce; de geoefende run slaat er twee (cooldown 20 < venster
-## 28). Hier dezelfde solo-run met één slag per bounce, voor de tabel van de Combat Designer: hij wint,
-## MP-1 ≤ 300, de echo breekt niet; de duur staat in de note (geen eis).
+## B-9b, rapport: de beginner, dezelfde solo-run met 1 slag per bounce (met ontwijken, 5 LP). Hij wint
+## zonder dood, MP-1 ≤ 300, de echo breekt niet; de duur en de kanten op treffers/tijd staan in de
+## note (geen eis voor de duur).
 func test_b9_one_strike_per_bounce(t) -> void:
 	var run := _arena(t, 60, false)
 	run["bot"].strikes_per_bounce = 1
 	var m := await _play_run(t, run)
-	t.note(_table_row("solo D = 60, 1 slag per bounce", m))
+	t.note(_table_row("beginner: solo D = 60, 1 slag per bounce, met ontwijken, 5 LP", m))
 	_check_run(t, "solo D = 60, 1 slag per bounce", m)
+	await t.cleanup()
+
+
+## B-9b: de realistische speler, solo D = 60 (2 slagen per bounce, geen dash in fase 2, 40 ticks
+## aarzelen vóór elke oversteek, 5 LP): verslagen zonder dood, 90–150 s, MP-1 ≤ 300.
+func test_b9b_realistic_solo_d60(t) -> void:
+	var name := "realistische speler: solo D = 60 (2 slagen per bounce, geen dash in fase 2, 40 ticks aarzelen, 5 LP)"
+	var run := _arena(t, 60, false)
+	run["bot"].realistic = true
+	var m := await _play_run(t, run)
+	t.note(_table_row(name, m))
+	_check_run(t, name, m)
+	var s := float(m.get("total", 0)) / 60.0
+	t.check(s >= 90.0 and s <= 150.0, "%s: %.1f s (90–150, §3.9)" % [name, s])
 	await t.cleanup()
 
 

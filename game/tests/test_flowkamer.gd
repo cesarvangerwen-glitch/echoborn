@@ -48,11 +48,17 @@ func _room(t, d: int, echo_on: bool, input: RefCounted = null) -> Array:
 
 
 ## Speelt de run tot RUN_EIND. Zet als meta op de kamer de tick waarop P1 bij
-## de sluis is (`aankomst`, LM-04) en het grootste aantal levende vijanden
-## tegelijk in K2 (`max_vijanden`, L-13 (f), W-5).
+## de sluis is (`aankomst`, LM-04), het grootste aantal levende vijanden
+## tegelijk in K2 (`max_vijanden`, L-13 (f), W-5), en voor G-11 (gdd v0.8.2
+## §4.8.7, W-13) het aantal aanlopen van de vijanden en de treffers op P1 in K2
+## (`aanlopen_k2`, `treffers_k2`; rapport, geen voorwaarde).
 func _run(t, room) -> void:
 	var arrival := -1
 	var most := 0
+	var windups := 0
+	var hits := 0
+	var health: int = room.p1.health
+	var windup_ticks := int(preload("res://scripts/echo/tuning.gd").combat()["enemy_windup_ticks"])
 	while not room.run_over and room.sim.tick < TICK_CAP:
 		await t.tree.physics_frame
 		if arrival < 0 and room.room == "K3" and room.p1.position.x <= Layout.SLUICE.end.x + 10.0:
@@ -61,9 +67,16 @@ func _run(t, room) -> void:
 		for e in room.enemies:
 			if e.alive:
 				alive += 1
+				if e._windup_left == windup_ticks:
+					windups += 1
 		most = maxi(most, alive)
+		if room.room == "K2" and room.p1.health < health:
+			hits += health - room.p1.health
+		health = room.p1.health
 	room.set_meta("aankomst", arrival)
 	room.set_meta("max_vijanden", most)
+	room.set_meta("aanlopen_k2", windups)
+	room.set_meta("treffers_k2", hits)
 
 
 func _free(t, room) -> void:
@@ -166,8 +179,9 @@ func _check_run(t, room, bot, d: int) -> FlowReport:
 	for v: Vector2 in Layout.PUMP_VANES:
 		vane_xs.append(int(v.x))
 	t.check(p1_pumps == vane_xs, "D=%d: pompslagen P1 op %s (elke schoep één keer: %s)" % [d, p1_pumps, vane_xs])
-	t.note("D=%d: K3 GEMAAL_VOL %d ticks vóór P1 bij de sluis, langste stilstand in K3 %d; max. %d vijanden tegelijk in K2" % [
-		d, arrival - rep.gemaal_full_tick, k3_still, room.get_meta("max_vijanden", 0)])
+	t.note("D=%d: K3 GEMAAL_VOL %d ticks vóór P1 bij de sluis, langste stilstand in K3 %d; max. %d vijanden tegelijk in K2; K2: %d aanlopen, %d treffers op P1" % [
+		d, arrival - rep.gemaal_full_tick, k3_still, room.get_meta("max_vijanden", 0), room.get_meta("aanlopen_k2", 0),
+		room.get_meta("treffers_k2", 0)])
 	# Elk event van de kamer staat erin (gdd §4.6, meetlog).
 	for event in ["RUN_START", "RUN_EIND", "KAMER", "STIL_START", "STIL_EIND", "ECHO_LEEG_EIND",
 			"SPRINGPLANK", "BOUNCE", "LANCERING", "MERK_GEZET", "MERKSPRONG", "ONTPLOFFING", "LP", "POMP", "GEMAAL_VOL"]:

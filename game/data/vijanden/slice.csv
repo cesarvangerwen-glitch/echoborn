@@ -1,5 +1,5 @@
 groep,sleutel,waarde,eenheid,bron
-# Vijanden en boss van de slice (T8b). Bron: docs/design/combat/slice-vijanden-en-boss.md v0.1.2. Startwaarden van de Combat Designer op D = 60; aanpassen mag zonder code. Regels met # zijn uitleg. Tests: game/tests/test_vijanden.gd.
+# Vijanden en boss van de slice (T8b). Bron: docs/design/combat/slice-vijanden-en-boss.md v0.1.3 (B-13: rad_treffer, kant_ticks, coop_schaal, rad_coop_muur). Startwaarden van de Combat Designer op D = 60; aanpassen mag zonder code. Regels met # zijn uitleg. Tests: game/tests/test_vijanden.gd.
 # --- Gedeelde regels (VJ-01 - VJ-07) ---
 gedeeld,v_teller,44,px,"VJ-03: v(D) = min(v_max; v_teller / (D - v_aftrek)); 44 = R (80) - 36 (verste merkafstand bij de slag)"
 gedeeld,v_aftrek,27,ticks,"VJ-03: D + 3 (knal) - 30 (stil na treffer)"
@@ -106,16 +106,17 @@ gemaalmeester,arena_breedte,600,px,"3.2"
 gemaalmeester,schok_breuk_ticks,6,ticks,"B-11 schermschok bij schotbreuk"
 gemaalmeester,schok_breuk_px,2,px,"B-11"
 # Fase 2: het grote rad (B-8) en de co-op-schaal. Knoppen voor de duur (3.9): kant_treffers en de SE van fase 2 (drempel_4 - wankel_se).
-gemaalmeester,coop_schaal,1.0,factor,"3.8 (eerst fase 2 x 1,25 in co-op als MP-7 het vraagt)"
+gemaalmeester,coop_schaal,1.0,factor,"3.8 v0.1.3 (na PR #219): in co-op deelt dit de radtreffer; 1,0 = ook 18 SE (co-op mag niet langer duren dan solo)"
 gemaalmeester,rad_breedte,96,px,"GMB-04"
 gemaalmeester,rad_y1,100,px,"GMB-04"
 gemaalmeester,rad_y2,140,px,"GMB-04"
-gemaalmeester,rad_offset,34,px,"GMB-04: x_rad = D + rad_offset van de muur"
+gemaalmeester,rad_offset,34,px,"GMB-04: x_rad = D + rad_offset van de muur (solo)"
+gemaalmeester,rad_coop_muur,94,px,"GMB-04 v0.1.3: in co-op het middelpunt van het rad op deze afstand van de muur, los van D"
 gemaalmeester,vloerteken_breedte,68,px,"GMB-04: van D tot D + 68 px van de muur"
-gemaalmeester,rad_treffer,15,SE,"3.5 treffer van P1 of P2"
+gemaalmeester,rad_treffer,18,SE,"3.5 v0.1.3: treffer van P1 of P2 (was 15)"
 gemaalmeester,rad_echo,5,SE,"3.5 gewone echo-treffer"
 gemaalmeester,kant_treffers,2,aantal,"3.5 treffers van P1 en P2 samen per kant"
-gemaalmeester,kant_ticks,180,ticks,"3.5"
+gemaalmeester,kant_ticks,480,ticks,"3.5 v0.1.3: het rad draait weg na zo veel ticks zonder kant_treffers (was 180)"
 gemaalmeester,rad_tril,20,ticks,"3.5"
 gemaalmeester,rad_draai,60,ticks,"3.5"
 gemaalmeester,schok_rad_ticks,3,ticks,"B-11 schermschok bij een radtreffer"
