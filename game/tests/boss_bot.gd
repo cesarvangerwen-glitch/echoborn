@@ -112,6 +112,9 @@ var realistic := false
 ## B-9b, rapport: lopend wachten in `hold` per keer-run (ticks), en [J − T, L − T] per keer-run.
 var waits: Array[int] = []
 var jl: Array = []
+## B-9b, rapport (v0.1.3 §3.9 besluit 2): per keer-run de regel die de vroegst haalbare keertick aan de
+## gekozen kant sloot: "rad" (de slagen vallen niet in een venster), "zwiep", "pompslag", beide, of "geen".
+var closed := {"rad": 0, "zwiep": 0, "pompslag": 0, "zwiep+pompslag": 0, "geen": 0}
 ## De bits per stoel, vanaf de eerste `sample`.
 var recorded := {1: PackedInt32Array(), 2: PackedInt32Array()}
 ## Huidige stap van P1 (debug, tests).
@@ -462,6 +465,7 @@ func _plan(p: CharacterBody2D) -> void:
 	var best_strike := 1 << 40
 	var best_turn := _tick
 	var best_race := true
+	var best_earliest := _tick
 	for s: int in [_target_side(), -_target_side()]:
 		var dist := absf(_ax(p) - _wall_x(s))
 		var to_need := absf(need - dist) / speed
@@ -481,11 +485,34 @@ func _plan(p: CharacterBody2D) -> void:
 			best_strike = strike
 			best_side = s
 			best_turn = turn
+			best_earliest = earliest_turn
 			best_race = best_turn <= earliest_turn + 4
 			break
 	_side = best_side
 	_turn_at = best_turn
 	_race = best_race
+	closed[_closing_rule(best_earliest, best_turn, _rad_windows(best_side), beats)] += 1
+
+
+## Welke regel sloot de vroegst haalbare keertick `earliest` (rapport)? "geen" als hij gekozen is.
+func _closing_rule(earliest: int, chosen: int, windows: Array[Vector2i], beats: Array) -> String:
+	if chosen <= earliest:
+		return "geen"
+	var strike := earliest + _d() / 2 + 12
+	var in_window := false
+	for w: Vector2i in windows:
+		if strike >= w.x + 2 and strike + (strikes_per_bounce - 1) * ATTACK_COOLDOWN <= w.y - 4:
+			in_window = true
+	if not in_window:
+		return "rad"
+	# Beide regels apart, zodat een keertick die door allebei sneuvelt ook zo telt.
+	var zwiep := _maat_reason(earliest, beats.filter(func(b: Array) -> bool: return b[1] == "zwiep"), true) != ""
+	var pomp := _maat_reason(earliest, beats.filter(func(b: Array) -> bool: return b[1] == "pomp"), true) != ""
+	if zwiep and pomp:
+		return "zwiep+pompslag"
+	if zwiep:
+		return "zwiep"
+	return "pompslag" if pomp else "geen"
 
 
 ## B-9b (§3.5 *Keren op de maat*): past een keer-run met keertick `turn` in de maat? Met
@@ -497,6 +524,11 @@ func _plan(p: CharacterBody2D) -> void:
 ## de val na de bounce (`L + 44 … L + 60`) is niet te ontwijken. Co-op toetst alleen (b), en geen
 ## afzet vlak vóór een actieve pompslag. Marge `PLAN_MARGIN` aan elke kant.
 func _maat_ok(turn: int, beats: Array, solo: bool) -> bool:
+	return _maat_reason(turn, beats, solo) == ""
+
+
+## Zoals `_maat_ok`, maar met de regel die faalt: "" (past), "zwiep" of "pompslag".
+func _maat_reason(turn: int, beats: Array, solo: bool) -> String:
 	var d := _d()
 	var m := PLAN_MARGIN
 	var j := turn + (maxi(0, int(ceil((2.0 * d - 130.0) / 4.0))) if solo else 0)
@@ -512,7 +544,7 @@ func _maat_ok(turn: int, beats: Array, solo: bool) -> bool:
 			var z0 := start + zwiep_lead
 			var z1 := z0 + zwiep_len - 1
 			if _overlap(z0, z1, j + 1 - m, l + 6 + m) or _overlap(z0, z1, l + 42 - m, l + 52 + m):
-				return false
+				return "zwiep"
 			continue
 		var a := start + pomp_lead
 		var a1 := a + pomp_len - 1
@@ -521,21 +553,21 @@ func _maat_ok(turn: int, beats: Array, solo: bool) -> bool:
 			# vlak vóór een actieve pompslag (P1 is pas na 6 ticks boven 24 px), en geen pompslag in
 			# de val na de bounce (als de kant klaar is, loopt P2 weg en valt P1 tot de vloer).
 			if _overlap(a, a1, j - m, j + 5 + m) or _overlap(a, a1, l + 44 - m, l + 60):
-				return false
+				return "pompslag"
 			continue
 		if a1 < turn - 140 or a > l + 60:
 			continue
 		if a >= j + 6 + m and a1 <= l + 43 - m:
 			continue
 		if _overlap(a, a1, l + 44 - m, l + 60):
-			return false
+			return "pompslag"
 		var j0 := a - DODGE_LEAD
 		var j1 := a + 24
 		if j0 <= j + m and j1 >= j - m:
-			return false
+			return "pompslag"
 		if solo and _overlap(j0, j1, l - d - 10 - m, l - d + 5 + m):
-			return false
-	return true
+			return "pompslag"
+	return ""
 
 
 func _overlap(a0: int, a1: int, b0: int, b1: int) -> bool:

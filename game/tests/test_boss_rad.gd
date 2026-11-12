@@ -1,7 +1,7 @@
 extends RefCounted
 ## Tests voor fase 2 van de Gemaalmeester, het grote rad (T8b-bouw deel 2b, #190): B-8 uit
 ## `docs/design/combat/slice-vijanden-en-boss.md` v0.1.2 §3.2 (GMB-04), §3.5, §3.8, §6 en §7, en
-## B-13 uit v0.1.3 (#218): radtreffer 18 (co-op 12), `kant_ticks` 480, het rad in co-op vast op
+## B-13 uit v0.1.3 (#218): radtreffer 18 (ook in co-op, `coop_schaal` 1,0), `kant_ticks` 480, het rad in co-op vast op
 ## 94 px van de muur (`rad_coop_muur`), en trillen en draaien bij een wissel van modus in fase 2.
 ##
 ## Gevallen "(alle D)" draaien op D = 60, 120 en 180, met 90 als regressie. De arena en de bot komen
@@ -62,15 +62,15 @@ func _phase2_bot(t, d: int, coop: bool) -> Dictionary:
 ## GMB-04, §7 (alle D): het rad is 96 × 40 op y 100–140, middelpunt `D + 34` van de muur aan zijn
 ## kant (60: 94 / 506; 120: 154 / 446; 180: 214 / 386); vloerteken van D tot D + 68; niet `Merkbaar`;
 ## in fase 1 niet raakbaar. Een wissel van D (debugmenu, SL-05) verplaatst het hangende rad mee.
-## B-13: de waarden van v0.1.3 in slice.csv (18, 480, 1,5, 94; `kant_treffers` blijft 2).
+## B-13: de waarden van v0.1.3 in slice.csv (18, 480, 1,0, 94; `kant_treffers` blijft 2).
 func test_b8_rad_place_per_d(t) -> void:
 	var g := "gemaalmeester"
 	t.check(EnemyData.ticks(g, "rad_treffer") == 18 and EnemyData.ticks(g, "rad_echo") == 5
 		and EnemyData.ticks(g, "kant_treffers") == 2 and EnemyData.ticks(g, "kant_ticks") == 480
 		and EnemyData.ticks(g, "rad_tril") == 20 and EnemyData.ticks(g, "rad_draai") == 60
-		and EnemyData.value(g, "rad_offset") == 34.0 and EnemyData.value(g, "coop_schaal") == 1.5
+		and EnemyData.value(g, "rad_offset") == 34.0 and EnemyData.value(g, "coop_schaal") == 1.0
 		and EnemyData.value(g, "rad_coop_muur") == 94.0,
-		"rad-waarden in slice.csv (§3.5, v0.1.3: 18, 2, 480, 20, 60, 34, 1,5, 94)")
+		"rad-waarden in slice.csv (§3.5, v0.1.3: 18, 2, 480, 20, 60, 34, 1,0, 94)")
 	for d: int in ALL_D:
 		var w := await _phase2_manual(t, d)
 		var boss: Gemaalmeester = w["boss"]
@@ -153,7 +153,7 @@ func test_b8_damage_and_turning(t) -> void:
 	await t.cleanup()
 
 
-## §3.8 (v0.1.3, B-13): in co-op deelt `coop_schaal` = 1,5 de radschade (18 → 12 SE, P1 en P2);
+## §3.8 (v0.1.3 na PR #219, B-13): in co-op deelt `coop_schaal` = 1,0 de radschade (18 SE, P1 en P2);
 ## Wankel op 300 SE (GMB-13) klemt de laatste radtreffer en maakt het rad niet raakbaar. P2 komt
 ## erbij in fase 2 bij D = 60: de co-op-plek (94) is de solo-plek, dus het rad blijft hangen.
 func test_b8_coop_scale_and_wankel(t) -> void:
@@ -170,9 +170,9 @@ func test_b8_coop_scale_and_wankel(t) -> void:
 		"drop-in bij D = 60: rad %s → %s, draaien %s (blijft hangen)" % [before, boss.rad.position.x, turns])
 	var at := boss.rad.global_position - Vector2(18, 0)
 	sim.combat.attack(sim.tick, "p2", Layers.SHADOW, at, 1)
-	t.check(boss.se == 888, "P2 in co-op: %d SE (888: 12)" % boss.se)
+	t.check(boss.se == 882, "P2 in co-op: %d SE (882: 18)" % boss.se)
 	sim.combat.attack(sim.tick, "p1", Layers.LIGHT, at, 1)
-	t.check(boss.se == 876, "P1 in co-op: %d SE (876: 12)" % boss.se)
+	t.check(boss.se == 864, "P1 in co-op: %d SE (864: 18)" % boss.se)
 	# Twee treffers: het rad draait weg; wachten tot het aan de andere kant hangt.
 	await t.run_ticks(sim, 1)
 	await _runs._run_until(t, sim, func() -> bool: return boss.is_rad_hittable(), 200, 1)

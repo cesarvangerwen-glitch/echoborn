@@ -125,7 +125,8 @@ func _measure(run: Dictionary) -> Dictionary:
 	var m := {"at": at, "rad": rad, "turns": turns, "first_break": first_break, "mp1": rep.longest_still,
 		"mp1_p2": rep.longest_still_p2, "hits": run["hits"].size(), "breaks": run["breaks"],
 		"defeated": run["boss"].is_defeated(), "health": run["p1"].health,
-		"respawns": run["log"].count("RESPAWN"), "waits": run["bot"].waits, "jl": run["bot"].jl}
+		"respawns": run["log"].count("RESPAWN"), "waits": run["bot"].waits, "jl": run["bot"].jl,
+		"closed": run["bot"].closed}
 	if at.has("start") and at.has("verslagen"):
 		m["total"] = int(at["verslagen"]) - int(at["start"])
 	# Treffers op P1 per deel (de bot ontwijkt alleen de pompslag van fase 1).
@@ -175,6 +176,7 @@ func _waits_text(m: Dictionary) -> String:
 		var j := jl.map(func(r: Array) -> int: return r[0])
 		var l := jl.map(func(r: Array) -> int: return r[1])
 		text += " · J − T %d–%d, L − T %d–%d" % [j.min(), j.max(), l.min(), l.max()]
+	text += " · eerdere keertick gesloten door %s" % str(m["closed"])
 	return text
 
 
@@ -211,7 +213,8 @@ func _check_run(t, name: String, m: Dictionary) -> void:
 
 
 ## B-9b: co-op met 5 LP; bij D = 60 90–150 s; MP-7 (co-op ÷ solo bij dezelfde D) ≥ 0,5 bij 60 / 90 / 120,
-## bij 180 een note als het niet haalt.
+## bij 180 een note als het niet haalt. Co-op duurt niet langer dan solo (MP-7 ≤ 1,0; v0.1.3 §3.9
+## besluit 1, na PR #219), ook bij 60 / 90 / 120; bij 180 een note.
 func _coop(t, d: int) -> void:
 	var name := "co-op D = %d (2 slagen per bounce, met ontwijken, 5 LP)" % d
 	var run := _arena(t, d, true)
@@ -224,9 +227,9 @@ func _coop(t, d: int) -> void:
 		var s := float(m.get("total", 0)) / 60.0
 		t.check(s >= 90.0 and s <= 150.0, "%s: %.1f s (90–150, §3.9)" % [name, s])
 	if d <= 120:
-		t.check(mp7 >= 0.5, "%s: MP-7 %.2f (≥ 0,5; solo %d ticks)" % [name, mp7, solo])
-	elif mp7 < 0.5:
-		t.note("%s: MP-7 %.2f < 0,5 (D = 180, regressie, geen eis)" % [name, mp7])
+		t.check(mp7 >= 0.5 and mp7 <= 1.0, "%s: MP-7 %.2f (0,5 … 1,0; solo %d ticks)" % [name, mp7, solo])
+	elif mp7 < 0.5 or mp7 > 1.0:
+		t.note("%s: MP-7 %.2f buiten 0,5 … 1,0 (D = 180, regressie, geen eis)" % [name, mp7])
 	await t.cleanup()
 
 
