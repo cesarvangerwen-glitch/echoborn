@@ -26,12 +26,14 @@ const DASH := InputBits.DASH
 
 const JUMP_ON_ECHO_PX := 130.0
 const GIVE_UP_PX := 260.0
-## B4 (gespiegeld uit de flow-kamer): houding aan de rand, stap terug, springen.
-const B4_STANCE_X := Layout.B4_NEAR_EDGE - 2.0
-const B4_HOLD_TICKS := 32
-const B4_JUMP_AT_ECHO_PX := 24.0
-const B4_STEP_BACK_PX := 30.0
+## B4 achter een keerpunt (#217): bij een lange staart springt de bot op de echo
+## als die zo ver vóór hem is (hij landt erop vóór de houding begint).
+const B4_RIDE_JUMP_PX := 70.0
 const B4_GIVE_UP_TICKS := 300
+## B4, late bot (#217): zo veel ticks later op de echo springen, en zo veel
+## ticks na de top van de lancering dashen (0 = op de top, zoals de run).
+var b4_jump_delay := 0
+var b4_dash_delay := 0
 ## Gevecht: herhaaltijd van de slag (zoals K2).
 const ATTACK_EVERY := 21
 
@@ -65,6 +67,7 @@ var _from_tread := false
 var _off_ledge := false
 var _echo_now_x := NAN
 var _echo_last_x := NAN
+var _b4_waited := 0
 
 ## De route: [naam, soort, parameter].
 var _legs := [
@@ -354,10 +357,12 @@ func _leg_b3() -> int:
 			if p.move_events & Motor.EV_CATCH:
 				sub = "bounce"
 				_since = 0
+				_apex_tick = -1
 				return L
 			if _on_plank():
 				sub = "bounce"
 				_since = 0
+				_apex_tick = -1
 				return L | _tap(J)
 			if _on_level(Layout.S2_FLOOR):
 				sub = "slow"
@@ -374,8 +379,12 @@ func _leg_b3() -> int:
 			if _on_level(Layout.S2_FLOOR):
 				sub = "slow"
 				return 0
-			if _since == 14 and p.position.x > Layout.B3_GALLERY_TIP + 4.0:
-				return L | _tap(DASH)
+			# Dash op de top, zoals bij D = 60 (#217, besluit B3-galerij: het
+			# venster loopt van 14 tot ± 38 ticks na de bounce; op 14 bleef 2 px).
+			if p.motor.velocity.y >= 0.0 and _apex_tick < 0:
+				_apex_tick = _tick
+				if p.position.x > Layout.B3_GALLERY_TIP + 4.0:
+					return L | _tap(DASH)
 			return L
 		"slow":
 			return _slow_b3()
@@ -548,68 +557,95 @@ func _patrol(here: StringName) -> int:
 	return _walk(_patrol_dir)
 
 
-## B4 naar rechts (gdd §4.3, C-11; de flow-kamer gespiegeld): aan de rand
-## slaan en AANVAL vasthouden, een stap terug (dash), springen als de echo
-## bijna aan de rand is en over de kloof vliegen. Zonder echo, of gemist: de
-## langzame lijn (de kloof in, 160 px, twee treden op).
+## B4 naar rechts achter een keerpunt (#217; gdd §4.3, C-11): AANVAL slaan en
+## vasthouden terwijl je naar de bolder op de rand loopt, keren tegen de bolder,
+## en de echo komt je tegemoet in houding. Bij een korte staart (`hop`) spring
+## je meteen op de echo, word je gelanceerd en dash je na de top over de kloof;
+## bij een lange staart (`ride`) spring je op de echo vóór zijn houding begint
+## en draagt hij je naar de bolder, waar de lancering ingaat. Zonder echo, of
+## gemist: de langzame lijn (over de bolder de kloof in, twee treden op).
 func _leg_b4() -> int:
 	var p := _p1()
+	var flying := sub == "launched" or sub == "dashed"
+	if flying and _on_level(Layout.S4_FLOOR) and p.position.x > Layout.B4_FAR_EDGE - Layout.HALF_W \
+			and not landed_from_wall.has("S4-B4"):
+		landed_from_wall["S4-B4"] = p.position.x - Layout.B4_FAR_EDGE
 	if p.position.x > Layout.B4_FAR_EDGE + 20.0 and _on_level(Layout.S4_FLOOR):
-		_next_leg(sub == "launched")
+		_next_leg(flying)
 		return R
+	# Mis (te kort): in de kloof, dan de langzame lijn.
+	if flying and p.motor.on_floor and p.motor.support != Motor.Support.SHADOW_BODY \
+			and p.position.y > Layout.S4_FLOOR - Layout.HALF_H + 1.5:
+		sub = "slow"
+		return R
+	var hop := Layout.b4_hop(_d)
 	match sub:
 		"":
 			if not _room.echo_on or _room.echo == null:
 				sub = "slow"
 				return R
-			if p.position.x < B4_STANCE_X:
+			if p.position.x >= Layout.b4_strike_x(_d):
+				sub = "hold"
+				return R | _tap(A)
+			return R
+		"hold":
+			if _against_wall(Layout.S4_FLOOR):
+				turned["S4-B4"] = _tick
+				_turn_x = p.position.x
+				sub = "back"
+				_since = 0
+				return L
+			return R | A
+		"back":
+			if not _on_level(Layout.S4_FLOOR) or _since > B4_GIVE_UP_TICKS:
+				sub = "slow"
 				return R
-			sub = "stance"
-			_since = 0
-			return _tap(A)
-		"stance":
-			if _since < B4_HOLD_TICKS:
-				return A
-			sub = "wait"
-			_since = 0
-			return L | _tap(DASH)
-		"wait":
 			if _echo_ready():
-				var dx: float = B4_STANCE_X - _room.echo.position.x
-				if dx >= 0.0 and dx <= B4_JUMP_AT_ECHO_PX:
+				var e: Node2D = _room.echo
+				var ahead: float = p.position.x - e.position.x
+				var reach := JUMP_ON_ECHO_PX if hop else B4_RIDE_JUMP_PX
+				if absf(e.position.y - p.position.y) < 1.5 and ahead > 0.0 and ahead <= reach:
+					if _b4_waited < b4_jump_delay:
+						_b4_waited += 1
+						return L
 					sub = "air"
 					_since = 0
-					return _steer_b4() | _tap(J)
-			if p.motor.dash_left > 0:
-				return L
-			if p.position.x < B4_STANCE_X - B4_STEP_BACK_PX:
-				return R if _since % 2 == 0 else 0
-			if _since > B4_GIVE_UP_TICKS:
+					return L | _tap(J)
+			return L
+		"air":
+			if p.motor.launch_pending or p.motor.launch_left > 0:
+				bounce_from_wall["S4-B4"] = absf(Layout.B4_NEAR_EDGE - p.position.x)
+				sub = "launched"
+				_since = 0
+				return R
+			if _on_plank():
+				sub = "ride"
+				return 0
+			if _since > 2 and _on_level(Layout.S4_FLOOR):
+				sub = "slow"
+				return R
+			return _steer_to_echo(-1)
+		"ride":
+			if p.motor.launch_pending or p.motor.launch_left > 0:
+				bounce_from_wall["S4-B4"] = absf(Layout.B4_NEAR_EDGE - p.position.x)
+				sub = "launched"
+				_since = 0
+				return R
+			if not _on_plank():
 				sub = "slow"
 				return R
 			return 0
-		"air":
-			if p.motor.launch_pending or p.motor.launch_left > 0:
-				sub = "launched"
-				return R
-			if _since > 60 or (_since > 2 and _on_level(Layout.S4_FLOOR)):
-				sub = "slow"
-				return R
-			return _steer_b4()
 		"launched":
-			if _on_level(Layout.KLOOF_BOTTOM):
-				sub = "slow"
+			if hop and p.motor.launch_left == 0 and p.motor.velocity.y >= 0.0 and p.motor.dash_ready:
+				if _b4_waited < b4_jump_delay + b4_dash_delay:
+					_b4_waited += 1
+					return R
+				sub = "dashed"
+				return R | _tap(DASH)
+			return R
+		"dashed":
 			return R
 	return _slow_b4()
-
-
-func _steer_b4() -> int:
-	var x := _p1().position.x
-	if x > B4_STANCE_X + 2.0:
-		return L
-	if x < B4_STANCE_X - 2.0:
-		return R
-	return 0
 
 
 func _slow_b4() -> int:

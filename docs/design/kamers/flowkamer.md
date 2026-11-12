@@ -1,6 +1,6 @@
 # Kamers: de grijze flow-kamer (mijlpaal 1, F0; na F0)
 
-Versie 0.7 · Eigenaar: World & Level Designer (met Gameplay Programmer) · Taken T16b (`docs/productie/fase-2-kader.md` §2), T16d ([#176](https://github.com/cesarvangerwen-glitch/echoborn/issues/176)) en T16f ([#189](https://github.com/cesarvangerwen-glitch/echoborn/issues/189)) · Reviewer: Lead Game Designer
+Versie 0.7.1 · Eigenaar: World & Level Designer (met Gameplay Programmer) · Taken T16b (`docs/productie/fase-2-kader.md` §2), T16d ([#176](https://github.com/cesarvangerwen-glitch/echoborn/issues/176)) en T16f ([#189](https://github.com/cesarvangerwen-glitch/echoborn/issues/189)) · Reviewer: Lead Game Designer
 Bron: `docs/design/gdd.md` v0.8 §2.5a, §2.12, §4 (flow-kamer-spec, bouwstenen B1–B4, FK-1–FK-6, MP-1–MP-7), §4.7 (herontwerp na F0, W-1–W-7) en §4.8 (bijstellen na F0-2 en D = 60, W-8–W-11), `docs/qa/rapport-f0-2-flowtest.md` (§5.3, §8.3), `docs/concept/pitch.md` v0.4.
 Scène: `game/levels/flowkamer/flowkamer.tscn` (hoofdscène van het project). Code: `game/levels/flowkamer/` (kamer, maten, vijanden, meetlog, gescripte run, normberekening) en `game/scripts/light/` (lichtmeter, gemaal, pomprad). Tests: `game/tests/test_flowkamer.gd` (solo, met LM-04 in K3), `game/tests/test_flowkamer_na_f0.gd` (keerzone, paren, pompgang, keren per D), `game/tests/test_wachtbot.gd` (wachtbot, late bot en afzetvenster) en `game/tests/test_flowtest_duo.gd` (co-op, [#125](https://github.com/cesarvangerwen-glitch/echoborn/issues/125)).
 
@@ -178,7 +178,8 @@ Uit het meetlog berekend (`flow_report.gd`; co-op met de MP-7-code van `test_flo
 | MP-2 langste gat | **13,4 s** | 13,6 s | 13,9 s | 14,4 s | ≤ 40 s |
 | MP-3 landingen/min, zonder wachten | **6,7 / 100 % (7 van 7)** | 5,7 / 100 % | 5,5 / 83 % | 5,1 / 83 % | ≥ 75 % |
 | MP-3 per keerpunt (B3, B1, B2-0 … B2-3): echolijn zonder stilstand | **6 van 6** | 5 van 5 (B3: vang) | 5 van 5 | 5 van 5 | rapporteren (gdd §4.5) |
-| Keren tot het volgende niveau / langzame lijn vanaf de wand | **68 / 104–105 ticks (verschil 36–37, 1,53×)** | 80 / 104–105 | 95 / 104–105 | 125–133 / 104–105 | D = 60: verschil ≥ 30, ≤ 2× (W-8) |
+| Keren tot het volgende niveau / langzame lijn zonder dash vanaf de wand | **68 / 104–105 ticks (verschil 36–37, 1,53×)** | 80 / 104–105 | 95 / 104–105 | 125–133 / 104–105 | D = 60: verschil ≥ 30, ≤ 2× (W-8) |
+| Snelste langzame lijn met dash (W-12, tabel onder het afzetvenster) | **94–95 ticks (verschil 26–27, 1,38–1,40×)** | 94–95 (+14–15) | 94–95 (−1 … 0) | 94–95 (−30 … −39) | D = 60: verschil ≥ 20, ≤ 2× (gdd v0.8.2 §4.8.7) |
 | Landing na keren zonder dash, van de wand (rand op 98) | **120 px (22 px marge)** | 160 | 190 | 234–250 | ≥ 9 px marge (§8.3 punt 3) |
 | MP-4 echo Leeg | **2 %** | 2 % | 3 % | 4 % | ≤ 40 % |
 | MP-6 LP met de echo, pompslagen echo | **69 %, 4** | 69 %, 4 | 69 %, 4 | 66 %, 3 | ≥ 40 %, ≥ 1 |
@@ -252,6 +253,27 @@ De krapste landing in B1 en B2 bij D = 60 is de bounce 8 ticks te laat: 104 px, 
 | Weg omhoog (alle 5 keerpunten) | ja | ja | ja | ja | ja | ja | ja | ja | **nee** |
 
 Het venster is **21 ticks** (0–20; eis ≥ 10, gdd §4.3: "0–12 ticks"). Vanaf 14 ticks ligt de landing vóór Z + 8 = 98, maar met het lichaam (16 px breed) sta je nog op de rand op 90; vanaf 21 ticks is de echo al onder je door.
+
+**Langzame lijn met dash** (W-12, gdd v0.8.2 §4.8.7 en §4.6; `test_turns_slow_line_with_dash_d60` … `_d180` in `test_flowkamer_na_f0.gd`, met `tests/slow_dash_input.gd`). Echo uit; `flow_bot.gd` neemt de langzame lijn zoals in de tabel hierboven en dasht `n` ticks na de afzet van de trede op 60 (de sprong naar de weg omhoog). Ticks van het keren tegen de wand tot het volgende niveau; "mist" = terug op de vloer. Geen nieuwe geometrie; zonder echo is het bij elke D hetzelfde, alleen keren groeit mee.
+
+| Dash na de afzet | B1 | B2-0 … B2-3 |
+|---|---|---|
+| geen dash (de bot) | 105 | 104–105 |
+| 4 | mist | mist |
+| **8** | **95** | **94–95** |
+| 12 | 104 | 103 |
+| 16 | 111 | 110–111 |
+| 20 | 115 | 114–115 |
+| 24 | 119 | 118–119 |
+
+| | **D = 60** | D = 90 | D = 120 | D = 180 |
+|---|---|---|---|---|
+| Keren | **68** | 80 | 95 | 125–133 |
+| Snelste met dash − keren | **+26 … +27 (1,38–1,40×)**: eis ≥ 20 en ≤ 2× ✓ | +14 … +15 | −1 … 0 | −30 … −39 |
+
+Bij D = 60 (de kamer is erop gebouwd) haalt de dash-variant de eis van v0.8.2: keren blijft ≥ 20 ticks sneller. Bij 90, 120 en 180 rapporteert de test alleen, zoals de eis zonder dash (Z en de treden staan in deze kamer vast op de maten van D = 60, §12); in de slice staan ze per D in data en geldt de eis bij elke D (`kamers/kadewijk.md` §6: +23 … +26).
+
+**W-13** (K2 na de hoogtegrens van de basisvijand, G-9–G-11): wacht op de Gameplay Programmer (#218). Veranderen de cijfers van K2, dan werkt de WLD deze paragraaf bij; anders komt hier één regel "K2 ongewijzigd na de hoogtegrens".
 
 ## 10. Checklist levelregels (WLD; review LGD)
 
@@ -376,3 +398,4 @@ Besluiten (kader §5): **D = 60 als werkaanname, bereik 1–3 s, en fase 2 paral
 | 0.5 | Na F0, deel 1 (T16d, W-1–W-3 en W-7 voor K1/K2): B1 en B2 met keerzone, overhang en dicht stuk in één kolom; B3 weer met de ingang links; opstap en lagere startgang; K2 in 3 + 3 paren; §2–§4, §9 (metingen), §10, §11 (werkaannames 2, 12–15) en §12 (afwijkingen, bevinding paren, vragen aan de LGD) bijgewerkt; nieuwe test `test_flowkamer_na_f0.gd`. Lead-review: marges bounce–dicht stuk en overhang per D (§3), besluiten van de LGD (§12), L-13 (f) uitzondering tot T17-2 (§10), open punten W-5 en W-6. Rebase op #178 (G-1–G-5): LP na K1 + K2 121 / 121 / 111, §4 en §9 opnieuw gemeten. Tweede Lead-review en SM-review: §9 co-op 86 % (was 88 %), §10 L-13 (d) "naar de letter" met de toevoeging over de ketting, open punten erbij |
 | 0.6 | Na F0, deel 2 (T16d, W-4–W-7): K3 als pompgang (vier schoepen op 38 px, 80 px uit elkaar, 280 px kade boven de straat met `Diepwater`, wand van het gemaalhuis, trap oplopend naar links); de bot en het duo pompen in het voorbijlopen; wachtbot (`flow_wachtbot.gd`) en late bot (`bounce_delay`, `dash_delay`) met `test_wachtbot.gd`; LM-04 per D in `test_flowkamer.gd`, pompgang-geometrie in `test_flowkamer_na_f0.gd`; §2–§5, §8, §9 (opnieuw gemeten, wachtbot- en late-bot-tabel, vijanden tegelijk in K2), §10, §11 (werkaannames 4, 16–19) en §12 (afwijkingen deel 2, bevinding restgat vanaf 80 px) bijgewerkt; afbeelding van K3 |
 | 0.7 | **D = 60** (T16f, [#189](https://github.com/cesarvangerwen-glitch/echoborn/issues/189), gdd v0.8 §4.8.4 W-8–W-11): keerzone Z = 90, overhang weg, treden 30/60/90 (langzame lijn 104–105 ticks, keren 68), richels van B2 390 px; B3 zonder blok als keerpunt (de bot bounct met dash); B4 met een stap terug (dash); alle bots op D = 60 met 90/120/180 als regressie, afzetvenster en B3 in de late bot, wachtbot ook zonder dash; LP ≥ 100 ook als check in de duo-test; §3, §5, §8 (debugmenu F1/F2/F3/F7), §9 (alle tabellen opnieuw), §10, §11 (besluiten, punten 7, 13, 15, 19–24) en §12 (bovenste trede K3, bevindingen D = 180, wachtbot, duo) bijgewerkt; afbeelding K1 op D = 60 |
+| 0.7.1 | W-12 ([#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217), gdd v0.8.2 §4.8.7): de langzame lijn met dash als test (`test_flowkamer_na_f0.gd`) en de tabel in §9; de bestaande eis heet in de testtekst "langzame lijn zonder dash". Geen nieuwe geometrie. W-13 wacht op G-11 (#218) |
