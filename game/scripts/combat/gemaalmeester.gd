@@ -171,6 +171,33 @@ func rad_until() -> int:
 	return _rad_until
 
 
+## De maat van fase 2 vooruit (§3.5, B-9b: "de maat ligt vast"): de aanvallen die nog actief kunnen
+## worden, als [begin van de aanloop, soort] ("pomp" of "zwiep"), tot en met `until`. Tijdens de
+## fasewissel vanaf de eerste maat van fase 2; in fase 1 en bij Wankel leeg. Voor bots en tests.
+func phase2_beats(until: int) -> Array:
+	var out: Array = []
+	var maat := EnemyData.ticks(data_group, "maat_fase2")
+	var start := 0
+	var count := 0
+	if phase == Phase.SWITCH:
+		start = _switch_end
+	elif phase == Phase.TWO and state == State.FIGHT:
+		# De maat van nu telt mee: zijn actieve vlak kan nog komen.
+		start = _next_beat - maat
+		count = _phase2_beats - 1
+		if count < 0:
+			start = _next_beat
+			count = 0
+	else:
+		return out
+	var t := start
+	while t <= until:
+		out.append([t, "pomp" if count % 2 == 0 else "zwiep"])
+		t += maat
+		count += 1
+	return out
+
+
 func is_rad_hittable() -> bool:
 	return rad != null and rad.hittable
 

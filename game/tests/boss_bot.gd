@@ -1,6 +1,6 @@
 extends RefCounted
-## De gescripte geoefende boss-run tegen de Gemaalmeester (T8b B-9; slice-vijanden-en-boss.md v0.1.2
-## §3, §6), naar het voorbeeld van `levels/flowkamer/flow_bot.gd`.
+## De gescripte geoefende boss-run tegen de Gemaalmeester (T8b B-9, B-9b; slice-vijanden-en-boss.md
+## v0.1.3 §3, §6), naar het voorbeeld van `levels/flowkamer/flow_bot.gd`.
 ##
 ## Twee inputbronnen (`p1_source`, `p2_source`, elk met `sample(tick) -> int`) die per tick kijken
 ## waar P1, P2, de echo en de boss staan en daarop de knoppen kiezen. De bot leest alleen wat een
@@ -20,9 +20,19 @@ extends RefCounted
 ##   valt terug en wordt gevangen (C-13), slaat weer.
 ## - **Wankel** (§3.6): één slag op de merkplek; solo knalt de echo, in co-op slaat P2; P1 blijft
 ##   lopen tot de boss verslagen is.
-## Geen ontwijken in fase 2: een sprong onderweg verstoort de aanloop van de keer-run (de echo speelt
-## hem na) en de sprong op P2. De pompslag en de zwiep raken P1 dan soms; de run telt de treffers per
-## deel (bekende beperking, zie de PR).
+## - **Ontwijken in fase 2** (B-9b, §3.5 *Keren op de maat*): `_plan` kiest de vroegste keertick `T`
+##   waarvan (a) beide slagen in een venster van het rad vallen, (b) geen actieve zwiep-tick in
+##   `J + 1 … L + 6` of `L + 42 … L + 52` ligt (`J = T + max(0; (2D − 130)/4)`, `L = J + 33`; de bot
+##   rekent de maat vooruit met `Gemaalmeester.phase2_beats`, die ligt vast) en (c) elke pompslag in
+##   `T − 140 … L + 52` buiten `J + 6 … L + 43` te ontwijken is met een sprong `a − 16 … a + 24` die
+##   `L − D − 10 … L − D + 5` en `J` niet raakt. Op de vloer springt hij over elke pompslag die hem
+##   raakt (afzet `DODGE_LEAD` ticks vóór het actieve vlak, met de looprichting erbij); te vroeg = heen
+##   en weer in de aanloopstrook (`hold`). In co-op springt P1 pas op P2 als (b) geldt voor zijn
+##   opstap en val, en springt hij over de pompslag op de vloer; P2 blijft onder het rad.
+## - **Realistische speler** (`realistic`): geen dash in fase 2 en `HESITATE` ticks aarzeling (stil)
+##   vóór elke oversteek naar de andere muur.
+## - **Meten** (B-9b, rapport): per keer-run het lopend wachten in `hold` (`waits`) en de afzet en de
+##   landing op de echo ten opzichte van het keren (`jl`).
 
 const InputBits = preload("res://scripts/input/input_bits.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
@@ -58,6 +68,16 @@ const LAUNCH_BEFORE_RAD := 70.0
 const LAUNCH_HOLD := 32
 ## Co-op: P1 springt op P2 vanaf hooguit zo ver (een sprong haalt ± 66 px tot op 30 px hoogte).
 const COOP_JUMP_PX := 56.0
+## B-9b (§3.5): de landing op de echo (of P2) ligt zo veel ticks na de afzet `J`.
+const LAND_AFTER_J := 33
+## B-9b, co-op: de landing op P2 ligt zo veel ticks na de afzet (gemeten: 32).
+const LAND_ON_P2 := 32
+## B-9b: veiligheidsmarge in ticks op de vensters van (b) en (c).
+const PLAN_MARGIN := 2
+## B-9b: zo ver vooruit zoekt `_plan` een keertick.
+const PLAN_HORIZON := 900
+## B-9b, realistische speler: zo lang aarzelt hij (stil) vóór elke oversteek.
+const HESITATE := 40
 
 
 ## Eén stoel: geeft de bits van speler `index`.
@@ -85,8 +105,13 @@ var strikes_per_bounce := 2
 var use_launch := false
 ## C-16 (2): P2 slaat nooit.
 var p2_strikes := true
-## Fase 1: over de pompslag springen.
+## Fase 1 en 2: over de pompslag springen; fase 2 ook de keer-runs op de maat plannen (B-9b).
 var dodge := true
+## B-9b: realistische speler (geen dash in fase 2, `HESITATE` ticks aarzelen vóór elke oversteek).
+var realistic := false
+## B-9b, rapport: lopend wachten in `hold` per keer-run (ticks), en [J − T, L − T] per keer-run.
+var waits: Array[int] = []
+var jl: Array = []
 ## De bits per stoel, vanaf de eerste `sample`.
 var recorded := {1: PackedInt32Array(), 2: PackedInt32Array()}
 ## Huidige stap van P1 (debug, tests).
@@ -107,6 +132,10 @@ var _stance_x := 0.0
 var _wander := 1
 var _echo_last_x := NAN
 var _since := 0
+var _hold_ticks := 0
+var _turn_tick := -1
+var _jump_tick := -1
+var _hesitate_left := -1
 
 
 func _init(sim: Node, boss: Gemaalmeester) -> void:
@@ -303,16 +332,31 @@ func _wall_x(side: int) -> float:
 
 
 ## Fase 2 solo: keren tegen de muur, op de echo bouncen, slaan boven 100 px. Per keer plant P1 de
-## kant en het moment (`_plan`): de eerste keer-run waarvan de slag nog in een venster van het rad
-## valt (180 ticks per kant, ervan uitgaand dat het niet eerder wegdraait). Haalt hij de kant waar
-## het rad nu heen gaat niet meer, dan wacht hij aan de kant waar hij is tot het terugkomt.
+## kant en het moment (`_plan`, B-9b): de eerste keer-run waarvan de slagen in een venster van het rad
+## vallen en die de zwiep en de pompslag ontwijkt. Op de vloer springt hij over de pompslag.
 func _phase2_turn(p: CharacterBody2D) -> int:
+	var bits := _phase2_turn_move(p)
+	if dodge and _should_dodge(p) and sub in ["", "out", "hold", "in", "back", "hesitate"]:
+		bits |= _tap(1, J)
+	return bits
+
+
+func _phase2_turn_move(p: CharacterBody2D) -> int:
 	var x := _ax(p)
-	if sub == "":
+	if sub == "" or sub == "hesitate":
 		if not _on_floor(p):
 			return _steer(p, _boss.rad_x(_side if _side != 0 else _target_side()))
+		# Realistische speler: eerst aarzelen vóór een oversteek naar de andere muur.
+		if realistic and sub == "" and _crossing_ahead(p):
+			sub = "hesitate"
+			_hesitate_left = HESITATE
+		if sub == "hesitate":
+			_hesitate_left -= 1
+			if _hesitate_left > 0:
+				return 0
 		_plan(p)
 		sub = "out"
+		_hold_ticks = 0
 	var side := _side
 	var wall := _wall_x(side)
 	var inward := -side
@@ -325,12 +369,14 @@ func _phase2_turn(p: CharacterBody2D) -> int:
 				sub = "hold"
 			else:
 				return _walk(inward) | _dash_if(p, need - dist > 60.0)
-			return _phase2_turn(p)
+			return _phase2_turn_move(p)
 		"hold":
 			# Wachten tot het geplande moment, in beweging tussen `need` en `need + 30` px.
 			if _tick >= _turn_at - int((dist - 9.0) / 2.0):
 				sub = "in"
+				waits.append(_hold_ticks)
 				return _walk(side)
+			_hold_ticks += 1
 			if dist >= need + 30.0:
 				_wander = side
 			elif dist <= need + 2.0:
@@ -340,6 +386,7 @@ func _phase2_turn(p: CharacterBody2D) -> int:
 			if dist <= Tuning.body_size().x * 0.5 + 1.0 and _stuck >= 1:
 				sub = "back"
 				_since = 0
+				_turn_tick = _tick
 				return _walk(inward)
 			# Dashen mag alleen als er niet gewacht wordt, en tot de aanloop van `need` px begint.
 			return _walk(side) | _dash_if(p, _race and dist > need)
@@ -351,10 +398,13 @@ func _phase2_turn(p: CharacterBody2D) -> int:
 			if _echo_ready():
 				var e := _echo()
 				var ahead := (e.position.x - p.position.x) * inward
-				if absf(e.position.y - p.position.y) < 1.5 and ahead > 0.0 and ahead <= JUMP_ON_ECHO_PX:
+				# De echo mag nog in de lucht zijn (hij speelt een ontwijksprong na); `_plan` zorgt dat
+				# hij op de vloer loopt als P1 op hem landt (B-9b (c)).
+				if _on_floor(p) and e.position.y <= p.position.y + 1.5 and ahead > 0.0 and ahead <= JUMP_ON_ECHO_PX:
 					sub = "air"
 					_since = 0
 					_plank_ticks = 0
+					_jump_tick = _tick
 					return _walk(inward) | _tap(1, J)
 			return _walk(inward)
 		"air":
@@ -362,6 +412,8 @@ func _phase2_turn(p: CharacterBody2D) -> int:
 				if _plank_ticks < bounce_delay:
 					_plank_ticks += 1
 					return 0
+				if _plank_ticks == 0 and _turn_tick >= 0:
+					jl.append([_jump_tick - _turn_tick, _tick - _turn_tick])
 				_plank_ticks = 0
 				sub = "bounce"
 				_strikes_air = 0
@@ -388,37 +440,106 @@ func _phase2_turn(p: CharacterBody2D) -> int:
 	return 0
 
 
+## Realistische speler: gaat de volgende keer-run naar de andere muur (een oversteek)?
+func _crossing_ahead(p: CharacterBody2D) -> bool:
+	var here := -1 if _ax(p) < _boss.middle() else 1
+	return _target_side() != here
+
+
 var _turn_at := 0
 var _race := true
 
 
-## Kiest de kant (`_side`) en de keertick (`_turn_at`) voor de volgende keer-run: de vroegste slag
-## (`D/2 + 12` ticks na het keren) die in een venster van het rad valt.
+## Kiest de kant (`_side`) en de keertick (`_turn_at`) voor de volgende keer-run (B-9b): de vroegste
+## keertick `T` per kant waarvan de slagen (`D/2 + 12` ticks na het keren, om de 20 ticks) in een venster
+## van het rad vallen en die (b) en (c) van `_maat_ok` haalt; daarvan de vroegste slag.
 func _plan(p: CharacterBody2D) -> void:
 	var d := _d()
 	var need := 2.0 * d + 24.0
+	var speed := 2.0 if realistic else 3.0
+	var beats: Array = _boss.phase2_beats(_tick + PLAN_HORIZON + 400) if dodge else []
 	var best_side := _target_side()
 	var best_strike := 1 << 40
 	var best_turn := _tick
 	var best_race := true
 	for s: int in [_target_side(), -_target_side()]:
 		var dist := absf(_ax(p) - _wall_x(s))
-		var to_need := absf(need - dist) / 3.0
+		var to_need := absf(need - dist) / speed
 		var earliest_turn := _tick + int(to_need + (need - 9.0) / 2.0)
-		var earliest_strike := earliest_turn + d / 2 + 12
-		for w: Vector2i in _rad_windows(s):
-			var strike := maxi(earliest_strike, w.x + 2)
-			# Alle slagen van de bounce (om de 20 ticks) moeten in het venster vallen.
-			if strike + (strikes_per_bounce - 1) * ATTACK_COOLDOWN <= w.y - 4:
-				if strike < best_strike:
-					best_strike = strike
-					best_side = s
-					best_turn = strike - d / 2 - 12
-					best_race = best_turn <= earliest_turn + 4
+		var windows := _rad_windows(s)
+		for turn in range(earliest_turn, earliest_turn + PLAN_HORIZON):
+			var strike := turn + d / 2 + 12
+			if strike >= best_strike:
 				break
+			var in_window := false
+			for w: Vector2i in windows:
+				if strike >= w.x + 2 and strike + (strikes_per_bounce - 1) * ATTACK_COOLDOWN <= w.y - 4:
+					in_window = true
+					break
+			if not in_window or not _maat_ok(turn, beats, true):
+				continue
+			best_strike = strike
+			best_side = s
+			best_turn = turn
+			best_race = best_turn <= earliest_turn + 4
+			break
 	_side = best_side
 	_turn_at = best_turn
 	_race = best_race
+
+
+## B-9b (§3.5 *Keren op de maat*): past een keer-run met keertick `turn` in de maat? Met
+## `J = turn + max(0; (2D − 130)/4)` de afzet naar de echo (co-op: `turn` zelf, de afzet op P2) en
+## `L = J + 33` de landing (co-op `J + 32` op P2): (b) geen actieve zwiep-tick in `J + 1 … L + 6` of `L + 42 … L + 52`; (c) elke
+## pompslag in `turn − 140 … L + 52` ligt in `J + 6 … L + 43` (P1 is dan boven 24 px), of is te
+## ontwijken met een sprong `a − 16 … a + 24` die `J` niet raakt en (solo) niet in `L − D − 10 …
+## L − D + 5` valt (dan speelt de echo hem na als P1 op hem landt). Een pompslag die actief wordt in
+## de val na de bounce (`L + 44 … L + 60`) is niet te ontwijken. Co-op toetst alleen (b), en geen
+## afzet vlak vóór een actieve pompslag. Marge `PLAN_MARGIN` aan elke kant.
+func _maat_ok(turn: int, beats: Array, solo: bool) -> bool:
+	var d := _d()
+	var m := PLAN_MARGIN
+	var j := turn + (maxi(0, int(ceil((2.0 * d - 130.0) / 4.0))) if solo else 0)
+	var l := j + (LAND_AFTER_J if solo else LAND_ON_P2)
+	var g := _boss.data_group
+	var zwiep_len := EnemyData.ticks(g, "zwiep_actief")
+	var pomp_len := EnemyData.ticks(g, "pomp2_actief")
+	var zwiep_lead := EnemyData.ticks(g, "zwiep_aanloop")
+	var pomp_lead := EnemyData.ticks(g, "pomp2_aanloop")
+	for beat: Array in beats:
+		var start: int = beat[0]
+		if beat[1] == "zwiep":
+			var z0 := start + zwiep_lead
+			var z1 := z0 + zwiep_len - 1
+			if _overlap(z0, z1, j + 1 - m, l + 6 + m) or _overlap(z0, z1, l + 42 - m, l + 52 + m):
+				return false
+			continue
+		var a := start + pomp_lead
+		var a1 := a + pomp_len - 1
+		if not solo:
+			# Co-op (B-9b (3)): alleen (b); over de pompslag springt P1 op de vloer. Wel niet afzetten
+			# vlak vóór een actieve pompslag (P1 is pas na 6 ticks boven 24 px), en geen pompslag in
+			# de val na de bounce (als de kant klaar is, loopt P2 weg en valt P1 tot de vloer).
+			if _overlap(a, a1, j - m, j + 5 + m) or _overlap(a, a1, l + 44 - m, l + 60):
+				return false
+			continue
+		if a1 < turn - 140 or a > l + 60:
+			continue
+		if a >= j + 6 + m and a1 <= l + 43 - m:
+			continue
+		if _overlap(a, a1, l + 44 - m, l + 60):
+			return false
+		var j0 := a - DODGE_LEAD
+		var j1 := a + 24
+		if j0 <= j + m and j1 >= j - m:
+			return false
+		if solo and _overlap(j0, j1, l - d - 10 - m, l - d + 5 + m):
+			return false
+	return true
+
+
+func _overlap(a0: int, a1: int, b0: int, b1: int) -> bool:
+	return a0 <= b1 and b0 <= a1
 
 
 ## De volgende twee vensters [open, dicht) van het rad aan kant `side`, als het nergens eerder
@@ -444,6 +565,8 @@ func _rad_windows(side: int) -> Array[Vector2i]:
 
 ## Een dash (4 px/tick, 10 ticks) als `wanted` en hij kan: op de vloer, 20 ticks na de vorige.
 func _dash_if(p: CharacterBody2D, wanted: bool) -> int:
+	if realistic and _boss.phase == Gemaalmeester.Phase.TWO:
+		return 0
 	if not wanted or not _on_floor(p) or p.motor.dash_left > 0 or not p.motor.dash_ready:
 		return 0
 	if _tick - p.motor.last_dash_tick < int(Tuning.movement()["dash_ground_cooldown_ticks"]):
@@ -588,15 +711,30 @@ func _phase2_coop_p1(p: CharacterBody2D) -> int:
 	match sub:
 		"", "c_go":
 			sub = "c_go"
+			if _on_plank(p):
+				# Op P2 (na een ontwijksprong of een kant die klaar is): bouncen als het rad hangt en de
+				# maat het toelaat, anders van hem af stappen (op P2 staan is in de zwiep, §3.5).
+				if _coop_bounce_ok():
+					sub = "c_bounce"
+					_strikes_air = 0
+					return _tap(1, J)
+				return _walk(_off_p2_dir(p2))
 			if not _on_floor(p):
-				return _steer(p, x2)
-			if ready and absf(x - x2) <= COOP_JUMP_PX and absf(x - x2) >= 2.0:
+				# Draait het rad weg, dan niet op P2 landen (hij loopt naar de andere kant).
+				return _steer(p, x2) if _boss.is_rad_hittable() else 0
+			# B-9b: pas op P2 springen als de zwiep zijn opstap en val niet raakt en de pompslag te
+			# ontwijken is (`_maat_ok` met J = nu); over de pompslag op de vloer springen.
+			var jump_ok := not dodge or _maat_ok(_tick, _boss.phase2_beats(_tick + 200), false)
+			if ready and jump_ok and absf(x - x2) <= COOP_JUMP_PX and absf(x - x2) >= 2.0:
 				sub = "c_air"
 				_plank_ticks = 0
 				return _tap(1, J) | _steer(p, x2)
 			# Naast P2 gaan staan, aan de binnenkant (± 40 px), en daar heen en weer.
 			var spot := rad_cx + 40.0 * (1.0 if rad_cx < _boss.middle() else -1.0)
-			return _wander_bits(p, spot) if absf(x - spot) <= 30.0 else _steer(p, spot)
+			var walk := _wander_bits(p, spot) if absf(x - spot) <= 30.0 else _steer(p, spot) | _dash_if(p, absf(x - spot) > 60.0)
+			if dodge and _should_dodge(p):
+				walk |= _tap(1, J)
+			return walk
 		"c_air":
 			if _on_plank(p):
 				if _plank_ticks < bounce_delay:
@@ -614,12 +752,18 @@ func _phase2_coop_p1(p: CharacterBody2D) -> int:
 			if p.move_events & Motor.EV_CATCH:
 				_strikes_air = 0
 			if _on_plank(p):
+				if not _coop_bounce_ok():
+					sub = "c_go"
+					return _walk(_off_p2_dir(p2))
 				_strikes_air = 0
 				return _tap(1, J)
 			if _on_floor(p):
 				sub = "c_go"
 				return 0
 			# Boven P2 blijven (voor de vang); kijkt P1 van het rad weg, dan één tick ernaartoe.
+			# Is de kant klaar (het rad trilt of draait), dan naast P2 landen, niet op hem (B-9b).
+			if not _boss.is_rad_hittable():
+				return 0
 			var face: int = p.motor.facing
 			var box_x: float = x + face * 18.0
 			var bits := _steer(p, x2)
@@ -633,6 +777,23 @@ func _phase2_coop_p1(p: CharacterBody2D) -> int:
 				bits |= A
 			return bits
 	return 0
+
+
+## Co-op: van P2 af stappen tegen zijn looprichting in (staat hij stil: naar het midden).
+func _off_p2_dir(p2: CharacterBody2D) -> int:
+	if absf(p2.motor.velocity.x) > 0.1:
+		return -1 if p2.motor.velocity.x > 0.0 else 1
+	return 1 if _ax(p2) < _boss.middle() else -1
+
+
+## Co-op: nog een bounce op P2? Alleen als het rad hangt, de kant nog niet klaar is, en de maat de
+## opstap en val toelaat (B-9b (b), `_maat_ok` met J = nu).
+func _coop_bounce_ok() -> bool:
+	if not _boss.is_rad_hittable():
+		return false
+	if _boss.rad_side_hits >= EnemyData.ticks(_boss.data_group, "kant_treffers"):
+		return false
+	return not dodge or _maat_ok(_tick, _boss.phase2_beats(_tick + 200), false)
 
 
 # --- P2 --------------------------------------------------------------------------
