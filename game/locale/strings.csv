@@ -8,7 +8,7 @@ HUD_ECHO_OFF,off,uit,Echo-toestand: echo uitgezet (F4).
 HUD_ECHO_P2,P2 has joined,P2 doet mee,"Echo-toestand: P2 speelt mee, dus geen echo (C-01)."
 HUD_ECHO_ACTIVE,Active,Actief,Echo-toestand Actief (gdd E-03).
 HUD_ECHO_EMPTY,Empty,Leeg,Echo-toestand Leeg (gdd E-03).
-HUD_DEBUG_KEYS,F1/F2/F3 D 90/120/180 · F4 echo on/off · F5 measurement log %s · F6 restart,F1/F2/F3 D 90/120/180 · F4 echo aan/uit · F5 meetlog %s · F6 herstart,"Debugtoetsen van de flow-kamer. %s = COMMON_ON of COMMON_OFF."
+HUD_DEBUG_KEYS,%s · F4 echo on/off · F5 measurement log %s · F6 restart,%s · F4 echo aan/uit · F5 meetlog %s · F6 herstart,"Debugtoetsen van de flow-kamer. Eerste %s = de D-toetsen met hun waarden uit data, bv. F1/F2/F3/F7 D 60/90/120/180 (niet vertalen); tweede %s = COMMON_ON of COMMON_OFF."
 HUD_RUN_DONE,Run finished in %.1f s at D = %d (%.1f s). Did %s feel smooth/satisfying? Press 1–5.,Run klaar in %.1f s bij D = %d (%.1f s). Voelde %s vloeiend/satisfying? Druk 1–5.,"Scorescherm na de run (F0, gdd §4.7.4 G-5). %.1f = runtijd in s, %d = staartduur D in ticks, %.1f = D in s, %s = kamer K1–K3."
 HUD_THANKS,Thank you. Measurement log: %s,Bedankt. Meetlog: %s,%s = pad van het meetlog (CSV).
 MENU_NEW_GAME,New game,Nieuw spel,"Hoofdmenu zonder spelbestanden (start meteen in plaats 1) en de regel bij een lege plaats (hud-menus.md §4.7, MN-22)."

@@ -2,13 +2,15 @@ extends RefCounted
 ## Tests voor de regels en het placeholder-beeld na F0 (T16e, #177; gdd v0.7.3
 ## §4.7.4 G-1–G-5, §4.6): LM-03, LM-04, LM-06 (pompgang en sluis), L-13
 ## (start van golf 2 in K2), E-07d (plank-signaal), E-02t (doelstreep), E-14j
-## (bereikcirkel en kettinglijn) en de D op het scorescherm (G-5).
+## (bereikcirkel en kettinglijn) en de D op het scorescherm (G-5). Sinds T16g
+## (#188, gdd v0.8 §4.8.4 G-6) ook: de standaard-D 60 uit data, het debugmenu
+## 60 / 90 / 120 / 180 en het B3-blok `max(D − 60, 0)`.
 ##
 ## De pompgang staat hier in een eigen testwereld (vier schoepen, 80 px uit
 ## elkaar, sluis 280 px verder): de geometrie van K3 is van de World & Level
 ## Designer (W-4), en de LM-04-test met de gescripte run door K3 hoort bij
 ## W-4/W-5. Gevallen met "(alle D)" gebruiken de echte echo van P1 voor
-## D = 90, 120 en 180.
+## D = 60, 120 en 180 (en 90 als regressie).
 
 const Fx = preload("res://tests/echo_fixture.gd")
 const InputBits = preload("res://scripts/input/input_bits.gd")
@@ -24,12 +26,16 @@ const Pomprad = preload("res://scripts/light/pomprad.gd")
 const EchoHints = preload("res://scripts/echo/echo_hints.gd")
 const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
 const Layout = preload("res://levels/flowkamer/flow_layout.gd")
+const Tuning = preload("res://scripts/echo/tuning.gd")
+const Combat = preload("res://scripts/combat/combat.gd")
 
 const L := InputBits.LEFT
 const R := InputBits.RIGHT
 const J := InputBits.JUMP
 const A := InputBits.ATTACK
-const ALL_D := [90, 120, 180]
+## "(alle D)" (gdd v0.8 §4.6, G-8): D = 60, 120 en 180; D = 90 draait mee als
+## regressie (tot v0.8 was "(alle D)" 90 / 120 / 180).
+const ALL_D := [60, 120, 180, 90]
 const ENEMY := CombatTarget.Kind.ENEMY
 
 ## Pompgang (FK-5): vier schoepen, 80 px uit elkaar; de sluis 280 px na de
@@ -408,6 +414,10 @@ func test_l13_wave_2_on_marked_or_dead(t) -> void:
 ## plank-signaal gaat aan op de eerste tick waarop de echo nadert en ≤ 130 px
 ## van P1 is, en uit op de tick van de landing. Keert P1 vóór de landing weer
 ## om (de afstand groeit niet meer af): uit op die tick. Leeg: uit.
+## Bij D = 60 is de echo bij het keren al 120 px van P1 (gdd §4.8.2): wie dan
+## meteen tegemoet springt, is al voorbij de echo vóór hij landt. Daarom bij
+## D < 90 "stop en spring" (§4.8.2): P1 blijft staan en springt recht omhoog
+## zodra de echo ≤ 66 px nadert, en landt op de naderende echo.
 func test_e07d_plank_signal_all_d(t) -> void:
 	for d: int in ALL_D:
 		for again in [false, true]:
@@ -429,11 +439,19 @@ func test_e07d_plank_signal_all_d(t) -> void:
 			var jumped := false
 			for i in 120:
 				var bits := L
+				var gap_now := absf(echo.position.x - p1.position.x)
 				if on_at >= 0 and again and sim.tick >= on_at + 3:
 					bits = R
+				elif on_at >= 0 and not again and not jumped and d < 90:
+					bits = 0
+					if gap_now <= 66.0:
+						bits = J
+						jumped = true
 				elif on_at >= 0 and not again and not jumped:
 					bits = L | J
 					jumped = true
+				elif jumped and d < 90:
+					bits = 0
 				await _step(t, sim, p1, bits)
 				var tick: int = sim.tick - 1
 				var dx := absf(echo.position.x - p1.position.x)
@@ -673,6 +691,11 @@ func test_e14j_reach_and_chain(t) -> void:
 	var b := Fx.target(sim, ENEMY, 648.0)
 	var c := Fx.target(sim, ENEMY, 900.0)
 	var e := Fx.target(sim, ENEMY, 949.0)
+	# D vast op 120 (merk leeft 150 ticks): P1 zet vijf merken na elkaar
+	# (± 23 ticks per merk) en ze moeten er alle vijf nog zijn. Bij de
+	# standaard-D 60 (90 ticks) zou het eerste al gedoofd zijn; de levensduur
+	# zelf testen E-14b (alle D) en C-12e.
+	sim.combat.tail_ticks = 120
 	for target: CombatTarget in [center, a, b, c, e]:
 		p1.respawn_at(Vector2(target.position.x - 20.0, Fx.STAND_Y))
 		await t.run_ticks(sim, 1)
@@ -735,3 +758,51 @@ func test_g5_score_screen_shows_d(t) -> void:
 			"D = %d: scores niet gelogd (%d)" % [d, room.meetlog.count("SCORE")])
 		room.queue_free()
 		await t.tree.process_frame
+
+
+# --- G-6: D = 60 standaard, op één plek in data --------------------------------
+
+## G-6 (gdd v0.8 §4.8.4): D staat op één plek in data (`echo.tail_ticks` = 60)
+## en de build start daarop: een kamer zonder eigen D, de echo, Combat en een
+## nieuwe TailEcho volgen die waarde; de merken leven solo D + 30 = 90.
+func test_g6_build_starts_on_d60_from_data(t) -> void:
+	var d: int = int(Tuning.echo()["tail_ticks"])
+	t.check(d == 60, "standaard-D in data %d (60)" % d)
+	t.check(FlowRoom.chosen_tail == d, "debugmenu start op D = %d (data %d)" % [FlowRoom.chosen_tail, d])
+	var bare_echo := TailEcho.new()
+	t.check(Combat.new().tail_ticks == d and bare_echo.tail_ticks == d,
+		"Combat of TailEcho start niet op D uit data")
+	bare_echo.free()
+	var room = FlowRoom.new()
+	room.autosave = false
+	room.show_hud = true
+	room.input_override = Fx.ManualInput.new()
+	t.tree.root.add_child(room)
+	await t.tree.physics_frame
+	t.check(room.tail == 60 and room.echo != null and room.echo.tail_ticks == 60 and room.sim.combat.tail_ticks == 60,
+		"kamer zonder eigen D: tail %d, echo %d, combat %d (60)" % [room.tail,
+		room.echo.tail_ticks if room.echo else -1, room.sim.combat.tail_ticks])
+	t.check(room.get_node_or_null("Level/B3Blok") == null, "D = 60: er staat een B3-blok")
+	t.check(room.sim.combat.life_ticks() == 90, "solo-merk leeft %d ticks (D + 30 = 90)" % room.sim.combat.life_ticks())
+	room._update_hud()
+	t.check(room._hud_label.text.contains("D = 60") and room._hud_label.text.contains("F1/F2/F3/F7 D 60/90/120/180"),
+		"HUD '%s'" % room._hud_label.text)
+	room.queue_free()
+	await t.tree.process_frame
+
+
+## G-6: het debugmenu kent 60 / 90 / 120 / 180 op F1 / F2 / F3 / F7 (waarden
+## uit `echo.tail_options`), en het B3-blok volgt `max(D − 60, 0)`.
+func test_g6_debug_menu_and_b3_block(t) -> void:
+	var options: Array = Array(Tuning.echo()["tail_options"]).map(func(v: Variant) -> int: return int(v))
+	t.check(options == [60, 90, 120, 180], "tail_options %s (60, 90, 120, 180)" % str(options))
+	var got := []
+	for key: int in [KEY_F1, KEY_F2, KEY_F3, KEY_F7]:
+		got.append(FlowRoom.debug_tail(key))
+	t.check(got == [60, 90, 120, 180], "F1/F2/F3/F7 geven D %s (60/90/120/180)" % str(got))
+	t.check(FlowRoom.debug_tail_label() == "F1/F2/F3/F7 D 60/90/120/180", "label '%s'" % FlowRoom.debug_tail_label())
+	for pair: Array in [[60, 0.0], [90, 30.0], [120, 60.0], [180, 120.0]]:
+		var d: int = pair[0]
+		var names := Layout.blocks(d).map(func(spec: Array) -> String: return str(spec[0]))
+		t.check(is_equal_approx(Layout.b3_width(d), pair[1]) and (names.has("B3Blok") == (d > 60)),
+			"D = %d: B3-blok %.0f px, in de layout %s (verwacht %.0f)" % [d, Layout.b3_width(d), names.has("B3Blok"), pair[1]])

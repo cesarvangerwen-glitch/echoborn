@@ -31,7 +31,7 @@ const REPLAYED_EVENTS := GameEvents.ATTACK | GameEvents.INTERACT
 ## De speler van wie dit de echo is (P1).
 var source: PlayerActor
 ## D, de staartlengte in ticks (E-02). Wisselen via `set_tail_ticks`.
-var tail_ticks := 120
+var tail_ticks := int(Tuning.echo()["tail_ticks"])
 ## `geldig_vanaf` (E-03): frames van vóór deze tick worden nooit afgespeeld.
 ## De waarde hoort bij P1 (`PlayerActor.echo_valid_from`), niet bij deze node:
 ## zo zetten Loslaten en respawn hem ook in co-op, als er geen echo is, en

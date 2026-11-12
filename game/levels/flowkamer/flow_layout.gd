@@ -184,9 +184,10 @@ static func turn_points() -> Array:
 	return out
 
 
-## Breedte van de bovenkant van het B3-blok bij staart D (gdd §4.3: B = D − 60).
+## Breedte van de bovenkant van het B3-blok bij staart D (gdd §4.3, v0.8:
+## `max(D − 60, 0)`). Bij D = 60 is er geen blok: B3 is dan een keerpunt.
 static func b3_width(d: int) -> float:
-	return float(d - 60)
+	return float(maxi(d - 60, 0))
 
 
 ## Kamer waarin `at` ligt (E-04e: het middelpunt telt).
@@ -197,7 +198,8 @@ static func room_of(at: Vector2) -> String:
 
 
 ## Alle blokken als [naam, rect, eenrichting]. Het B3-blok en de wand erachter
-## hangen af van D (`b3_width`); de rest is vast.
+## hangen af van D (`b3_width`); de rest is vast. Bij `b3_width(d) == 0`
+## (D = 60) is er geen `B3Blok`, dus ook geen collision (G-6).
 static func blocks(d: int) -> Array:
 	var b := b3_width(d)
 	var out: Array = []
@@ -217,7 +219,8 @@ static func blocks(d: int) -> Array:
 	# --- K1, omkeren en B3 (kom op FLOOR, boven de startgang) ---
 	out.append(["Opstap", OPSTAP, true])
 	out.append(["B3Kom", Rect2(B3_ENTRANCE, FLOOR, B3_BLOCK_LEFT - B3_ENTRANCE, TREAD_T), false])
-	out.append(["B3Blok", Rect2(B3_BLOCK_LEFT, FLOOR - 45, b, 45), false])
+	if b > 0.0:
+		out.append(["B3Blok", Rect2(B3_BLOCK_LEFT, FLOOR - 45, b, 45), false])
 	out.append(["B3Wand", Rect2(B3_BLOCK_LEFT + b, SHAFT_BOTTOM, B3_WALL_RIGHT - B3_BLOCK_LEFT - b, FLOOR - SHAFT_BOTTOM), false])
 	out.append(["B3Trede", Rect2(B3_GALLERY_TIP, FLOOR - 35, TREAD_W, TREAD_T), true])
 	# --- K1, B1: gang op 540 (= B3-galerij) tot de linkerwand ---

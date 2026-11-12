@@ -12,9 +12,11 @@ extends Node2D
 ## vasthouden laat P2 stoppen. Zolang P2 meedoet, is er geen echo (C-01). De
 ## echte drop-in/drop-out en de co-op-acties (C-03–C-13) komen in T16c (#78).
 ##
-## Debugmenu (§4.1): F1/F2/F3 = D 90/120/180 (zet ook het B3-blok; start een
-## nieuwe run), F4 = echo aan/uit (nieuwe run), F5 = meetlog aan/uit,
-## F6 = herstart. Na de run: 1–5 = score per kamer.
+## Debugmenu (§4.1): F1/F2/F3/F7 = D 60/90/120/180 (de waarden staan in
+## `data/echo_v04.json`, `echo.tail_options`; zet ook het B3-blok en start
+## een nieuwe run), F4 = echo aan/uit (nieuwe run), F5 = meetlog aan/uit,
+## F6 = herstart. Na de run: 1–5 = score per kamer. De build start op de
+## standaard-D uit data (`echo.tail_ticks`, D = 60; G-6).
 
 signal run_finished(tick: int)
 
@@ -38,11 +40,13 @@ const P2_COLOR := Color(0.5, 0.85, 1.0)
 const ECHO_COLOR := Color(0.42, 0.36, 0.7, 0.85)
 const BLOCK_COLOR := Color(0.35, 0.35, 0.4)
 const ONE_WAY_COLOR := Color(0.55, 0.55, 0.6)
-const DEBUG_TAIL_KEYS := {KEY_F1: 90, KEY_F2: 120, KEY_F3: 180}
+## Toets -> plek in `echo.tail_options` (F1/F2/F3/F7 = 60/90/120/180, G-6).
+## F7, omdat F4–F6 al bezet zijn.
+const DEBUG_TAIL_KEYS := {KEY_F1: 0, KEY_F2: 1, KEY_F3: 2, KEY_F7: 3}
 const SCORE_KEYS := {KEY_1: 1, KEY_2: 2, KEY_3: 3, KEY_4: 4, KEY_5: 5}
 
 ## Keuzes van het debugmenu; blijven staan bij een herstart van de scène.
-static var chosen_tail := 120
+static var chosen_tail := int(Tuning.echo()["tail_ticks"])
 static var chosen_echo_on := true
 static var chosen_log_on := true
 
@@ -487,7 +491,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if scores_pending() and (DEBUG_TAIL_KEYS.has(key) or key == KEY_F4 or key == KEY_F6):
 		return
 	if DEBUG_TAIL_KEYS.has(key):
-		chosen_tail = DEBUG_TAIL_KEYS[key]
+		chosen_tail = debug_tail(key)
 		_restart()
 	elif key == KEY_F4:
 		chosen_echo_on = not chosen_echo_on
@@ -503,6 +507,22 @@ func _unhandled_input(event: InputEvent) -> void:
 		meetlog.add_score(sim.tick, room_name, SCORE_KEYS[key])
 		if _scores.size() == 3 and autosave:
 			save_log()
+
+
+## De D van debugtoets `key` (F1/F2/F3/F7), uit `echo.tail_options` in data.
+static func debug_tail(key: int) -> int:
+	var options: Array = Tuning.echo()["tail_options"]
+	return int(options[DEBUG_TAIL_KEYS[key]])
+
+
+## De debugtoetsen met hun D, voor de HUD: "F1/F2/F3/F7 D 60/90/120/180".
+static func debug_tail_label() -> String:
+	var keys := PackedStringArray()
+	var ds := PackedStringArray()
+	for key: int in DEBUG_TAIL_KEYS:
+		keys.append(OS.get_keycode_string(key))
+		ds.append(str(debug_tail(key)))
+	return "%s D %s" % ["/".join(keys), "/".join(ds)]
 
 
 ## Wacht de run nog op scores (na RUN_EIND, niet alle drie de kamers)?
@@ -605,7 +625,7 @@ func _update_hud() -> void:
 	var lines := PackedStringArray([
 		tr("HUD_STATUS") % [meter.value, gemaal.fill, p1.health],
 		tr("HUD_ROOM") % [room, tail, echo_state, run_ticks() / 60.0],
-		tr("HUD_DEBUG_KEYS") % (tr("COMMON_ON") if autosave else tr("COMMON_OFF")),
+		tr("HUD_DEBUG_KEYS") % [debug_tail_label(), tr("COMMON_ON") if autosave else tr("COMMON_OFF")],
 	])
 	_hud_label.text = "\n".join(lines)
 	var score := score_text()

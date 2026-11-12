@@ -27,7 +27,8 @@ class Mark:
 	## "p1" of "p2": wie het merk zette (E-14a, C-12).
 	var setter: String
 	var born: int
-	## Eerste tick waarop het merk er niet meer is (E-14b: born + D + 30).
+	## Eerste tick waarop het merk er niet meer is: solo born + D + 30 (E-14b),
+	## in co-op born + 150, los van D (C-12e). Ligt vast op de tick van zetten.
 	var expires: int
 	var alive := true
 
@@ -41,6 +42,9 @@ class Mark:
 
 ## D, de staartlengte van de sessie (E-14b, C-12e). De echo zet hem.
 var tail_ticks := int(Tuning.echo()["tail_ticks"])
+## Doet P2 mee (co-op)? De Sim zet dit bij elke speler die erbij komt of
+## weggaat. Bepaalt de levensduur van een nieuw merk (C-12e).
+var coop := false
 var targets: Array[CombatTarget] = []
 var marks: Array[Mark] = []
 
@@ -154,6 +158,16 @@ func after_events(tick: int) -> void:
 			_explode(tick, mark, entry[1])
 
 
+## Levensduur van een merk dat nu gezet wordt: solo D + 30 (E-14b), in
+## co-op vast 150 ticks (C-12e). Een merk houdt zijn levensduur, ook als P2
+## daarna meedoet of stopt (C-05: "leeft zijn 150 ticks uit").
+func life_ticks() -> int:
+	var c: Dictionary = Tuning.combat()
+	if coop:
+		return int(c["mark_coop_life_ticks"])
+	return tail_ticks + int(c["mark_extra_life_ticks"])
+
+
 func _set_mark(tick: int, target: CombatTarget, setter: String) -> void:
 	var mark := Mark.new()
 	mark.id = _next_id
@@ -161,7 +175,7 @@ func _set_mark(tick: int, target: CombatTarget, setter: String) -> void:
 	mark.target = target
 	mark.setter = setter
 	mark.born = tick
-	mark.expires = tick + tail_ticks + int(Tuning.combat()["mark_extra_life_ticks"])
+	mark.expires = tick + life_ticks()
 	marks.append(mark)
 	mark_set.emit(tick, mark)
 
