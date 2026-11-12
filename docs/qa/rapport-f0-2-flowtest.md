@@ -1,13 +1,13 @@
 # Rapport F0-2: tweede flow-test op de herontworpen flow-kamer (T17-2)
 
-Versie 0.1.1 · 2026-11-12 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
+Versie 0.1.2 · 2026-11-12 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
 
 Plan: `docs/qa/testplan-f0-2.md` (v0.1.3). Kaart: `docs/qa/ceo-kaart-f0-2.md`. Antwoorden van de CEO: [comment in #80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80#issuecomment-6822384564). Meetlogs: `docs/qa/f0-2-meetlogs/` (commit 16a3582). Besluit na de sessie: echo-staart **1 s (D = 60)**, bereik 1–3 s, zonder aparte check (`docs/beslissingen.md`, 2026-11-12). Build van de sessie: `8be9910`.
 
 ## 1. Samenvatting
 
 - **Sessie korter dan gepland**: 2 oefenruns en **3 van de 6** getelde runs (D = 180, 90, 120: één run per D in plaats van twee). Eén run brak af (12:11). Volgens de keuzeregel (W12) doet daardoor **geen enkele D mee aan de keuze**. Die keuze heeft de CEO daarna zelf gemaakt: D = 60.
-- **Norm (3), MP-5: bij geen enkele D ≥ 4,0, maar wel hoger dan in F0.** Run-gemiddelde D = 180: 2,3 (3/2/2) · D = 90: **3,3** (4/3/3) · D = 120: 2,3 (3/2/2). In F0 was dat 1,0–2,0. Per kamer over de drie runs: K1 3,3 (F0 2,0), K2 2,3 (1,3), K3 2,3 (1,0). Alleen D = 90 heeft geen kamer onder 3,0.
+- **Norm (3), MP-5: bij geen enkele D ≥ 4,0, maar wel hoger dan in F0.** Run-gemiddelde D = 180: 2,3 (3/2/2) · D = 90: **3,3** (4/3/3) · D = 120: 2,3 (3/2/2). In F0 was dat 1,0–2,0. Over de drie getelde runs gemiddeld 2,7, tegen 1,4 over de drie geldige runs van F0 (met de oefenruns erbij nu 2,8). Per kamer over de drie runs: K1 3,3 (F0 2,0), K2 2,3 (1,3), K3 2,3 (1,0). Alleen D = 90 heeft geen kamer onder 3,0.
 - **Norm (2), MP-2: alleen gehaald bij D = 120.** In de runs op D = 180 en D = 90 staat in K1 **geen enkele echo-actie**: 0 springplank-landingen, langste gat 48 en 46 s (norm ≤ 40 s). De CEO nam bij alle 5 keerpunten de langzame lijn zonder te wachten (§4.2). De echo werkt daar wel (de bot doet 9,9–10,7 per minuut in K1); de CEO gebruikte hem in die runs gewoon niet.
 - **R-V12, MP-3: 0 %.** Alleen de run op D = 120 heeft springplank-landingen in K1 (4). Vóór alle vier stond de CEO 83–113 ticks stil, op **182–249 px van de keerwand**: onder de weg omhoog (restgat), niet bij de wand. Per keerpunt over de 15 getelde keerpunten: **A 0 · B 4 · C 0 · D 11**. Hij liep zijn echo dus nooit tegemoet (A).
 - **Gehaald bij elke D**: MP-1 (250 / 76 / 113 ticks; F0: tot 366), MP-4 (2–4 % Leeg) en MP-6 (49–63 % van de LP met de echo, 5–6 pompslagen van de echo).
@@ -174,7 +174,7 @@ In de oefenruns ging het anders. Oefenrun 1: met 80 LP en een lege meter terug d
 
 | Vraag | Antwoord | Wat QA ermee doet |
 |---|---|---|
-| **MP-5** (norm 3) | 180: 3/2/2 · 90: 4/3/3 · 120: 3/2/2 · oefen: 3/3/3, 3/3/3 | Niet gehaald bij elke D. Wel duidelijk hoger dan F0 (gemiddeld 2,7 tegen 1,4) |
+| **MP-5** (norm 3) | 180: 3/2/2 · 90: 4/3/3 · 120: 3/2/2 · oefen: 3/3/3, 3/3/3 | Niet gehaald bij elke D. Wel duidelijk hoger dan F0: gemiddeld 2,7 over de drie getelde runs, tegen 1,4 over de drie geldige runs van F0 (met de twee oefenruns erbij 2,8) |
 | V1 "wist je waar je echo zou zijn?" | 180: 1–2 · 90: 4–5 · 120: 3 (banden, meerkeuze) | Bevinding (testplan §6). Alleen D = 90 haalt in de bovenste band 4. Dezelfde volgorde als de scores |
 | H Echo: hulp of last? | 4–5 (band) | Hulp. In F0 3,5 |
 | M1 Waar deed het merk je aan denken? | "nergens aan" | *Nine Sols* niet genoemd: zwak signaal negatief. Check uitgesteld naar F4b(c) (kader §3 F0, W8). **Kanttekening**: als meerkeuze gevraagd, niet open (W18). Of *Nine Sols* een keuze was, staat niet in het antwoord |
@@ -210,7 +210,7 @@ Welke rij van testplan §6 geldt:
 - "MP-2 niet gehaald bij elke D" geldt **niet**: bij D = 120 is MP-2 gehaald. De kaderregel "haalt de tweede test norm (2) niet → `ceo-beslissing` R-V12" gaat dus volgens de letter niet af. Wel is het een signaal: in twee van de drie runs liet de CEO de echo in K1 links liggen.
 - "De beste D ligt buiten 90–180" → `ceo-beslissing`: die is er al. De CEO koos D = 60 (besluit 2026-11-12).
 
-**Advies na het besluit van de CEO.** De vraag "welke D" is beantwoord. De vraag "haalt de kamer F0" staat nog open, en kan op deze data niet meer op 90–180 beantwoord worden: niemand speelt die staarten nog. Geen go F0 en geen `ceo-beslissing` nu. Zoals het besluit zelf zegt, lopen we eerst de maten op D = 60 na, en moeten de bots op D = 60 groen zijn (§8). Daarna meet MT1 F0 op D = 60, met dezelfde normen (MP-1–MP-6, MP-5 ≥ 4,0, MP-3 ≥ 75 %). Halen MP-2 of MP-3 het dan nog niet, dan bereidt de LGD de `ceo-beslissing` R-V12 voor (gdd §4.7.3). Dat is ook geen extra speeltest voor de CEO: het past in "de CEO test alleen bij mijlpalen".
+**Advies na het besluit van de CEO.** De vraag "welke D" is beantwoord. De vraag "haalt de kamer F0" staat nog open, en kan op deze data niet meer op 90–180 beantwoord worden: niemand speelt die staarten nog. Geen go F0 en geen `ceo-beslissing` nu. Zoals het besluit zelf zegt, lopen we eerst de maten op D = 60 na, en moeten de bots op D = 60 groen zijn (§8). Daarna meet MT1 F0 op D = 60, met dezelfde normen (MP-1–MP-6, MP-5 ≥ 4,0, MP-3 ≥ 75 %). Halen MP-2 of MP-3 het dan nog niet, dan bereidt de LGD de `ceo-beslissing` R-V12 voor (gdd §4.7.3). Dat is open punt **O-23 (vaart)** van gdd §4.8: na MT1, eigenaar LGD. Dat is ook geen extra speeltest voor de CEO: het past in "de CEO test alleen bij mijlpalen".
 
 **Hoeveel dit rapport draagt.** Eén speler, één run per D, drie getelde runs. Oefening en D vallen samen (de laatste run is de enige met de echo in K1). De objectieve maten (MP-2 in K1, MP-3, de stilstand bij het pantserdoel en de laatste schoep) staan los van de scores en zijn het stevigste deel. MP-5 is gestegen, maar het verschil tussen de D's rust op één run per D.
 
@@ -257,8 +257,8 @@ Eigenaar: zie gdd §4.8.4 (T16g, T16f; LGD voor de maten, WLD voor de bouw). QA 
 Dezelfde lat als vóór F0-2 (testplan F0-2 §2), nu op D = 60, in de gewone suite (`run_tests.gd`), na de aanpassing van §8.2:
 
 1. **Gescripte run D = 60 vanaf `RUN_START`**: `RUN_EIND`. MP-1 ≤ 300, MP-2 ≥ 3,0 (ook K1 en K2 apart, geen gat > 40 s), MP-4 ≤ 40 %, MP-6 ≥ 40 % met ≥ 1 pompslag van de echo. LP ≥ 100 na K1 + K2.
-2. **K1, keren bij elk keerpunt** (`test_flowkamer_na_f0.gd`): 5 van 5 via de echo zonder stilstand van 20 ticks (MP-3 per keerpunt). Keren sneller dan de langzame lijn, en de langzame lijn ≤ 2× keren (FK-2). `test_keerzone_geometry` voor D = 60.
-3. **Late bot D = 60**: de weg omhoog met de bounce 4 en 8 ticks te laat, met marge tot de rand van de weg omhoog, met en zonder dash (de overhang vervalt, gdd §4.8.3 punt 1).
+2. **K1, keren bij elk keerpunt** (`test_flowkamer_na_f0.gd`): 5 van 5 via de echo zonder stilstand van 20 ticks (MP-3 per keerpunt). Per keerpunt, gemeten vanaf de wand: **snelste langzame lijn van de bot − keren ≥ 30 ticks**, en de langzame lijn ≤ 2× keren (FK-2; bij D = 60 dus ± 95–128 ticks, gdd §4.8.2, W-8). `test_keerzone_geometry` op Z = D + 30 = 90 px.
+3. **Late bot D = 60**: de weg omhoog met de bounce 4 en 8 ticks te laat en met de dash 0 / 4 / 8 ticks na de top. Marge tot de rand van de weg omhoog **> 0 px** in elke variant, met en zonder dash. De geoefende run zonder dash heeft **≥ 9 px marge** (de ondergrens van 9–32 px uit gdd §4.8.2) en een afzetvenster van **≥ 10 ticks** (§4.8.2). De overhang vervalt (gdd §4.8.3 punt 1).
 4. **Wachtbot D = 60**: de tabel in `flowkamer.md` §9 voor D = 60 (tegen de wand → trede; waar het restgat begint).
 5. **B3 en B4 op D = 60**: de echolijn van B3 bestaat en de bot haalt hem; de solo-lancering in B4.
 6. **K3, LM-04 op D = 60**: elke schoep één slag, `GEMAAL_VOL` vóór P1 bij de sluis is, geen stilstand > 30 in K3.
@@ -285,7 +285,8 @@ DoD van #80: "Plan + rapport: normen (1)–(3) solo; staart 1,5 / 2 / 3 s; echo 
 | Wie | Wat | Waarom |
 |---|---|---|
 | **Lead Game Designer** (met de WLD), gdd §4.8.4 (T16g, T16f) | De maten van §8.2 voor D = 60: keerzone en overhang (bounce op ± 54 px, landing 128 px = 0 marge), het B3-blok (D − 60 = 0), FK-2. Daarbij de input van F0-2: de langzame lijn bij elk keerpunt in > 50 % van de runs (trede verder van de wand), de wachtafstanden van 182–249 px (geen 80–119), de bovenste trede in K3, het wachten bij het pantserdoel en bij de laatste schoep | Besluit 2026-11-12; §4.2, §5, §8 |
-| **World & Level Designer / Gameplay Programmer** | Na de nieuwe maten: de bots en tests per D uitbreiden met D = 60 (§8.3 punt 1–8), D = 60 in het debugmenu | §8.3 |
+| **Gameplay Programmer** (T16g, eerst) | Het eerste werk: D = 60 standaard in data, met het debugmenu 60 / 90 / 120 / 180 en de D op het scorescherm (G-6, §8.3 punt 8); daarna G-7 en G-8 | gdd §4.8.4 |
+| **World & Level Designer** (T16f, na G-6) | B1–B3 op D = 60 en de bots en tests per D uitbreiden met D = 60 (W-8–W-11, §8.3 punt 1–7) | gdd §4.8.4, §8.3 |
 | **QA Lead** | Op de groene suite met D = 60: `rekenen.gd` op de bot-logs (W15 aangepast), daarna testplan en kaart voor MT1 op D = 60 (± 3–4 runs, besluit "CEO test bij mijlpalen"; geen D = 90 als tweede staart). M1, M2, O1 en O2 **open** vragen, niet als meerkeuze (W18) | §6, §8.3 |
 | **Executive Producer** | De DoD van #80 bijwerken (#80 blijft open tot MT1) | §9 |
 | **LGD, Gameplay Programmer** (E-02t, E-14j) | M2 is twee keer "niet begrepen", ook met de cirkel (gezien, hielp). Overwegen hoe de merksprong laat zien *waarom* hij knalt; ook voor T10 (UX Designer, Art Director) | §6 |
@@ -314,3 +315,4 @@ DoD van #80: "Plan + rapport: normen (1)–(3) solo; staart 1,5 / 2 / 3 s; echo 
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie (#80, T17-2 deel 2): 3 van de 6 getelde runs, normen per D, MP-3 per keerpunt, stilstand per kamer met plek, de regels uit `flowkamer.md` §12, verklaring van geen SPRINGPLANK in K1 en van K3 → K2 → K3, advies na het besluit D = 60 (maten, bot-bewijs, T17). Rekenscript `rekenen.gd` en `botlogs.gd` in `docs/qa/f0-2-meetlogs/` |
 | 0.1.1 | 2026-11-12 | Na Lead-review EP: #80 blijft open tot MT1, dit rapport sluit T17-2 (§1, §9, §10); geen D = 90 als tweede staart in MT1, alleen als regressie in de bots (§8.3); de volgende sessie heet MT1; eigenaar van §8.2 volgens gdd §4.8.4 (T16g, T16f); §8.3 punt 3 marge tot de rand van de weg omhoog, met en zonder dash |
+| 0.1.2 | 2026-11-12 | Na SM-review: drempels als getal in §8.3 punt 2 en 3 (keren ≥ 30 ticks sneller dan de snelste langzame lijn; marge > 0 px, ≥ 9 px zonder dash, afzetvenster ≥ 10 ticks; gdd §4.8.2, W-8); bij MP-5 staat erbij welke runs gemiddeld zijn (§1, §6); volgorde T16g en dan T16f in §10; O-23 (vaart) bij het advies in §7 |
