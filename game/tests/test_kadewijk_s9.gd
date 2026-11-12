@@ -29,7 +29,7 @@ const Progress = preload("res://scripts/save/progress.gd")
 const FlowReport = preload("res://levels/flowkamer/flow_report.gd")
 const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
 const EnemyData = preload("res://scripts/combat/enemy_data.gd")
-const Luik = preload("res://levels/kadewijk/kadewijk_luik.gd")
+const Luik = preload("res://scripts/objects/luik.gd")
 const ScriptedInput = preload("res://scripts/input/scripted_input.gd")
 const SlowDash = preload("res://tests/slow_dash_input.gd")
 const InputBits = preload("res://scripts/input/input_bits.gd")
@@ -43,6 +43,7 @@ const MAX_FRAMES := {
 	"test_s9_run_d120": 9000,
 	"test_s9_zonder_echo_d120": 9000,
 	"test_s9_run_d180": 9000,
+	"test_s9_run_d90": 9000,
 	"test_s9_zonder_echo_d180": 9000,
 	"test_s9_met_dash_d60": 20000,
 }
@@ -243,9 +244,13 @@ func _s9_run(t, d: int, echo_on: bool) -> Array:
 	var parts := _wijk(t, d, echo_on)
 	var wijk = parts[0]
 	var bot = parts[1]
+	var breaks: Array = []
+	if wijk.echo != null:
+		wijk.echo.broke.connect(func(tick: int, at: Vector2) -> void: breaks.append([tick, at]))
 	await t.tree.physics_frame
 	var opened := _open_hoogwater(wijk)
 	await _run(t, wijk)
+	var luik = wijk.loader.kamers[&"S9"].inhoud_node.get_node("Luik")
 	var rows: Array = wijk.meetlog.rows
 	var rep = FlowReport.from_rows(rows, echo_on)
 	var label := "D=%d echo %s" % [d, "aan" if echo_on else "uit"]
@@ -261,6 +266,14 @@ func _s9_run(t, d: int, echo_on: bool) -> Array:
 	t.check(wijk.start_errors.is_empty(), "start: %s" % [wijk.start_errors])
 	t.check(_count(rows, "SLICE_EIND") == 1, "%s: %d keer SLICE_EIND" % [label, _count(rows, "SLICE_EIND")])
 	t.check(_count(rows, "LUIK") == 1 and bot.lines.get("S9-luik", false), "%s: luik niet open met een neerslag (%d)" % [label, _count(rows, "LUIK")])
+	# V-01d (#227): met echo breekt de echo nergens in S9, ook niet op het luik;
+	# hij speelt de neerslag af op de schaduwklep. Zonder echo geen schaduwklep.
+	t.check(breaks.is_empty(), "%s: de echo brak %d× (%s)" % [label, breaks.size(), breaks])
+	if echo_on:
+		t.check(luik.schaduwklep_weg_by == "echo" and luik.schaduwklep_weg_tick == luik.opened_tick + d,
+			"%s: schaduwklep weg op %d door %s (verwacht breuk %d + D door de echo)" % [label, luik.schaduwklep_weg_tick, luik.schaduwklep_weg_by, luik.opened_tick])
+	else:
+		t.check(luik.schaduwklep_weg_tick < 0, "%s: schaduwklep zonder echo (weg op %d)" % [label, luik.schaduwklep_weg_tick])
 	t.check(wijk.logblad_3_tick > 0, "%s: logbladzijde 3 niet gehaald" % label)
 	t.check(_count(rows, "RESPAWN") == 0 and wijk.p1.health > 0, "%s: P1 stierf (%d respawns)" % [label, _count(rows, "RESPAWN")])
 	t.check(wijk.most_at_once <= 5, "%s: %d vijanden tegelijk (L-13 f)" % [label, wijk.most_at_once])
@@ -271,6 +284,8 @@ func _s9_run(t, d: int, echo_on: bool) -> Array:
 	t.note("%s: S9 → gang S1 %d ticks (%.1f s; %s), MP-1 %s, LP %d, logbladzijde 3 tick %d, keerpunten %s, treffers P1 %d, lijnen %s" % [
 		label, wijk.run_ticks(), wijk.run_ticks() / 60.0, rep.room_time, still, rep.lp_total, wijk.logblad_3_tick, keer,
 		5 - wijk.p1.health, bot.lines])
+	t.note("%s: luik open op %d, schaduwklep weg op %d (%s), echo-breuken %d" % [label, luik.opened_tick, luik.schaduwklep_weg_tick,
+		luik.schaduwklep_weg_by if luik.schaduwklep_weg_by != "" else "geen", breaks.size()])
 	return [parts, rep]
 
 
@@ -330,6 +345,13 @@ func test_s9_zonder_echo_d60(t) -> void:
 func test_s9_run_d120(t) -> void:
 	var out := await _s9_run(t, 120, true)
 	_check_echo_run(t, 120, out)
+	await _free(t, out[0])
+
+
+## D = 90 (met echo): de echo breekt 0× in S9 (V-01d, #227).
+func test_s9_run_d90(t) -> void:
+	var out := await _s9_run(t, 90, true)
+	_check_echo_run(t, 90, out)
 	await _free(t, out[0])
 
 

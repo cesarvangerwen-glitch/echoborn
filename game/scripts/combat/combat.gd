@@ -45,6 +45,10 @@ var tail_ticks := int(Tuning.echo()["tail_ticks"])
 ## Doet P2 mee (co-op)? De Sim zet dit bij elke speler die erbij komt of
 ## weggaat. Bepaalt de levensduur van een nieuw merk (C-12e).
 var coop := false
+## Staat de echo aan (solo, er is een staart-echo, ook als die nu Leeg is)?
+## De Sim zet dit vóór stap (4), na de resets van P1 (E-07b). Voor de
+## schaduwklep van een luik (V-01d, #227).
+var echo_on := false
 ## C-14e: loopt er een finisher? Dan zet een treffer geen merk en vallen vijanden niet aan. De boss
 ## zet dit (`Boss`).
 var finisher_running := false
