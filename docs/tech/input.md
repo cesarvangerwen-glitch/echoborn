@@ -14,7 +14,7 @@ Dit document beschrijft de `InputRouter`: welk apparaat bij welke speler hoort, 
 | W4 | Een plaats waarvan het apparaat weg is, **wacht**. Komt dezelfde GUID terug, dan krijgt die pad de plaats terug zonder knop. Een **ander** apparaat mag een wachtende plaats overnemen (lege batterij, andere pad gepakt): elke knop voor plaats 1, meedoen voor plaats 2. Plaats 1 wacht onbeperkt (pauze is UX/gameplay). | eigen aanname |
 | W5 | De knop die liet meedoen, doet in het spel niets tot hij is losgelaten (Enter is ook springen). | eigen aanname |
 | W6 | De router geeft de volledige bitset uit gdd §2.5 (`input_bits.gd`): LEFT, RIGHT, JUMP, ATTACK, INTERACT, ECHO, DASH. Elk apparaat geeft alle bits, ook ECHO op een P2-apparaat: de router weet niet welke rol een plaats speelt, gameplay negeert wat niet telt. Een nieuwe besturing is één regel in `KEYS`, `PAD_BUTTONS` en `BUTTON_BITS` (`input_setup.gd`). | gdd §2.5 |
-| W7 | Knoppen die de gdd niet noemt (§2a, *cursief*) zijn een voorstel van Engine & Platform; het rebindscherm is van de UX Designer. Toetsen zijn **fysiek** (positie), dus op AZERTY ligt "Q" op de plek van de A. D-pad omhoog/omlaag en W/S blijven vrij voor UP/DOWN (bit 6 en 7, Combat Designer). | gdd §2.5 |
+| W7 | Knoppen die de gdd niet noemt (§2a, *cursief*) zijn een voorstel van Engine & Platform; het rebindscherm is van de UX Designer. Toetsen zijn **fysiek** (positie), dus op AZERTY ligt "Q" op de plek van de A. Bit 7 (`DOWN`) is de **Neerslag** (V-01): S, ↓ en d-pad omlaag (TD-besluit PR #201; linkerstick omlaag volgt via Engine & Platform); d-pad omhoog en W blijven vrij voor UP (bit 6). | gdd §2.5 |
 
 ## 2. Model
 
@@ -44,6 +44,7 @@ Dit document beschrijft de `InputRouter`: welk apparaat bij welke speler hoort, 
 | Interactie | INTERACT | *F* | */ (naast rechter Shift)* | *Y / △* |
 | Echo-knop | ECHO | Q | *. (punt)* | linker schouderknop |
 | Dash | DASH | linker Shift | rechter Shift | rechter schouderknop |
+| Omlaag (Neerslag, V-01) | DOWN | S | ↓ | d-pad omlaag |
 | Meedoen (geen bit) | — | — | Enter | Start/Menu |
 | Stoppen (geen bit) | — | — | Backspace | Select/View |
 
@@ -95,8 +96,8 @@ De resultaten van een hardwarerun komen in deze sectie, met datum, modus en de g
 | `test_autoload_exists_and_viewport_events_reach_router` | Het autoload staat in `project.godot`; echte events via de viewport komen aan |
 | `test_pause_and_focus_loss_leave_no_stuck_controls` | Loslaten tijdens een pauze komt aan; de stopknop telt niet door tijdens de pauze; focusverlies zet alle knoppen los |
 | `test_debug_scene_shows_both_slots` | Het controlescherm van §4 laadt zonder fouten |
-| `test_attack_interact_echo_dash_bits_for_both_slots` | §2a: elke knop van ATTACK, INTERACT, ECHO en DASH geeft op `kb1`/`kb2` en op twee pads het juiste bit aan de juiste plaats, laat niets hangen, en de bits tellen op; de alias ACTION is weg |
-| `test_join_press_is_swallowed_and_dpad_up_down_give_no_bits` | W5 ook voor een schouderknop; d-pad omhoog/omlaag geeft geen bit (W7) |
+| `test_attack_interact_echo_dash_bits_for_both_slots` | §2a: elke knop van ATTACK, INTERACT, ECHO, DASH en DOWN geeft op `kb1`/`kb2` en op twee pads het juiste bit aan de juiste plaats, laat niets hangen, en de bits tellen op; de alias ACTION is weg |
+| `test_join_press_is_swallowed_and_dpad_up_down_give_no_bits` | W5 ook voor een schouderknop; d-pad omhoog geeft geen bit, d-pad omlaag geeft DOWN (W7) |
 
 In `test_input.gd`: `test_dash_shift_is_split_per_keyboard_half` (linker Shift = P1, rechter = P2) en `test_every_control_has_key_pad_and_bit_for_both_players` (elke besturing heeft voor P1 en P2 een toets, een joypad-event en een bit; geen gedeelde toets tussen de helften).
 

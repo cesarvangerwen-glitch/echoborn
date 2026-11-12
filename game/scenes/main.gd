@@ -12,7 +12,7 @@ extends Node2D
 ## §2a); zolang P2 meedoet, is er geen echo
 ## (C-01). De echte drop-in en drop-out (C-03, C-05) komen in T16c; de
 ## flow-kamer in T16b. Vijanden van de slice (T8b, placeholder): een Kadeloper en een
-## Schotdrager als E-paar en een Dwaallicht; de Neerslag (V-01, DOWN) heeft nog geen toets.
+## Schotdrager als E-paar en een Dwaallicht; Neerslag (V-01) = S + E in de lucht (P2: ↓).
 
 const Sim = preload("res://scripts/sim.gd")
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
