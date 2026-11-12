@@ -1,6 +1,6 @@
 # Testplan F0-2: tweede flow-test op de herontworpen flow-kamer (T17-2)
 
-Versie 0.1.3 · 2026-11-11 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
+Versie 0.1.4 · 2026-11-12 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
 
 Basis: gdd v0.7.3 §4.5 (MP-1–MP-7, keuzeregel), §4.7.1–§4.7.3 en **§4.7.5** (wat het herontwerp nodig heeft), §5 (playtestvragen); `docs/design/kamers/flowkamer.md` (§3 keerpunten, §9 gemeten, §12 antwoord 1 van de LGD); rapport F0 v0.3.1 (`docs/qa/rapport-f0-flowtest.md`, §5–§8, open punten 8–11); het testplan van de eerste flow-test (`docs/qa/testplan-f0.md` v0.3.1, normen §1, W1–W10); fasekader §3 F0; besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (1B: de CEO speelt alleen solo) en #51 (staart bereik 1,5–3 s).
 
@@ -33,7 +33,7 @@ Checklist van QA (afgelopen op `8be9910`, 2026-11-11, headless op Linux met Godo
 - [x] De tabel van de wachtbot staat in `flowkamer.md` §9 (W-6) en komt overeen met de uitvoer van `test_wachtbot.gd`: 0–40 px trede, 60 px vloer (overhang), 80–240 px omhoog (B1 tot 300), in B2 vanaf 260 px van het niveau af; stilstand steeds D ticks. QA gebruikt die als referentie voor het restgat (§4.2).
 - [~] De D-toetsen geven de D uit de tabel hierboven: in de code ja (`DEBUG_TAIL_KEYS`), maar een toetsdruk in een venster kan QA headless niet doen. Controle in de sessie: de CEO noteert de D van het scorescherm, en de eerste `ECHO_LEEG_EIND` van elk log ligt op tick D (rapport F0 §5.1).
 - [x] Het scorescherm noemt de D na `RUN_EIND`, en F6 doet niets tot er drie scores zijn (`test_g5_score_screen_shows_d`, per D). F1–F4 gaan door dezelfde blokkering in `flow_room.gd` (code gelezen; niet apart getest).
-- [ ] Het rekenscript van QA (`docs/qa/f0-2-meetlogs/rekenen.gd`, uitbreiding van het F0-script met §4.2–§4.3) geeft op de logs van de gescripte run per D 5 van 5 keerpunten "echolijn zonder stilstand" (zoals `test_flowkamer_na_f0.gd`), en op een log van de wachtbot de wachtplek die de bot koos. **Niet nodig vóór de sessie** (het rekent de CSV's achteraf): volgt vóór het rapport.
+- [x] Het rekenscript van QA (`docs/qa/f0-2-meetlogs/rekenen.gd`, uitbreiding van het F0-script met §4.2–§4.3) geeft op de logs van de gescripte run per D 5 van 5 keerpunten "echolijn zonder stilstand" (zoals `test_flowkamer_na_f0.gd`), en op een log van de wachtbot de wachtplek die de bot koos. **Niet nodig vóór de sessie** (het rekent de CSV's achteraf): gedaan na de sessie, op logs van `docs/qa/f0-2-meetlogs/botlogs.gd` (rapport F0-2 §2).
 
 ## 3. Normen en keuzeregel (ongewijzigd, solo)
 
@@ -169,7 +169,7 @@ W1, W2, W7, W8, W9 en W10 uit `docs/qa/testplan-f0.md` §6 blijven gelden (W3–
 | # | Wat | Wie |
 |---|---|---|
 | 1 | ~~Build-commit, D-toetsen en K3-coördinaten invullen~~ gedaan (v0.1.2). Wat van de checklist van §2 niet headless kan (D-toetsen en scorescherm met de hand), staat in §2 (D-toetsen: controle in de sessie) | qa-lead |
-| 2 | Rekenscript `docs/qa/f0-2-meetlogs/rekenen.gd` met §4.2–§4.3, getoetst op de gescripte run en de wachtbot; na de sessie, vóór het rapport | qa-lead |
+| 2 | ~~Rekenscript `docs/qa/f0-2-meetlogs/rekenen.gd` met §4.2–§4.3, getoetst op de gescripte run en de wachtbot~~ gedaan (v0.1.4, rapport F0-2 §2) | qa-lead |
 | 3 | Eerste knop op de pijltjeskant maakt speler 1 (rapport F0 open punt 10): de kaart werkt eromheen | ux-designer, gameplay-programmer |
 
 ## Wijzigingen
@@ -180,3 +180,4 @@ W1, W2, W7, W8, W9 en W10 uit `docs/qa/testplan-f0.md` §6 blijven gelden (W3–
 | 0.1.1 | 2026-11-11 | Na Lead-review EP: PR #181 bij naam (§2, §8); V1 alleen bevinding, niet in het oordeel (§6) |
 | 0.1.2 | 2026-11-11 | Build `8be9910` (na PR #181), D-toetsen en K3-coördinaten ingevuld (§2, W17); wachtafstand per keerpunt met de banden van de wachtbot (restgat vanaf 80 px), landing op de bovenste trede en stilstand bij de sluis per D (§4.2, §4.3; `flowkamer.md` §12) |
 | 0.1.3 | 2026-11-11 | Na SM-review: §2-formulering bij de [~]/[ ]-regels; het rapport noteert de duur van de sessie (§6) |
+| 0.1.4 | 2026-11-12 | Na de sessie: rekenscript getoetst en afgevinkt (§2, open punt 2); rapport in `docs/qa/rapport-f0-2-flowtest.md` |
