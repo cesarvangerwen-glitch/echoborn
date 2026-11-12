@@ -1,6 +1,6 @@
 # Kamers: de Kadewijk (wijk 1.3, de slice), deel 1: S1–S4
 
-Versie 0.1 · Eigenaar: World & Level Designer · Issue [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD) · Review: Lead Game Designer
+Versie 0.1.1 · Eigenaar: World & Level Designer · Issue [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD) · Review: Lead Game Designer
 
 Bronnen: `docs/design/wereld.md` v0.2 §2 (kamerlijst §2.2, SL-regels §2.3, vijandtypes §2.4, T8a §2.5, acceptatie §2.6), `docs/design/gdd.md` v0.8.1 (§4.3 bouwstenen met D in formules, L-08–L-14, §4.5 normen, §4.8.5 vaste basis), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.2 (§2.6 plaatsing, VJ-01–VJ-08), `docs/productie/fase-2-kader.md` v0.4 §4, `docs/tech/ontwerp.md` v0.3 (§3a, §7, §12 "naar T8a").
 
@@ -105,6 +105,21 @@ Solo, P1 alleen. Ticks bij 60 Hz. "Keren" en "langzame lijn" vanaf de keerwand t
 
 De run is deterministisch: dezelfde bits als `ScriptedInput` geven hetzelfde meetlog (test).
 
+**Langzame lijn met dash** (Lead-review #208, klein punt 1; afwijking §8 punt 1). Gemeten in S1-B1 zonder echo: P1 klimt als de bot naar de trede op 60, loopt naar de buitenrand (x wand + 31) en springt van de wand af, met een dash `n` ticks na de afzet. In ticks vanaf het keren tegen de wand; "weg omhoog" = voorbij Z (op de galerij, of over de trede op 90 doorlopen tot Z, 2 px/tick). S2-B1 heeft dezelfde maten.
+
+| Dash na de afzet | Landing (px van de wand, hoogte 90) | D = 60 (Z 90) | D = 90 (Z 120) | D = 120 (Z 150) |
+|---|---|---|---|---|
+| geen | 106 op 105 | **105** (galerij) | 112 (trede, +7 lopen) | 127 (trede, +22 lopen) |
+| 4 | mist (valt terug op de vloer) | — | — | — |
+| 8 | 106 op 95 | **95** (galerij) | **± 102** (trede, +7 lopen) | ± 117 (trede, +22 lopen) |
+| 12 | 124 op 104 | 104 | **104** (galerij) | ± 117 (trede, +13 lopen) |
+| 16 | 138 op 111 | 111 | 111 | ± 117 (trede, +6) |
+| 20 | 146 op 115 | 115 | 115 | ± 117 (rand van de trede, +2) |
+| 24 | 154 op 119 | 119 | 119 | 119 (galerij) |
+| **Snelste met dash / keren** | | **95 / 68: +27 (1,40×)** | **± 102 / 80: ± +22 (1,28×)** | **± 117 / 95: ± +22 (1,23×)** |
+
+**Uitkomst:** met een dash ± 8 ticks na de afzet is de langzame lijn bij elke gemeten D **minder dan 30 ticks** trager dan keren (+27 bij 60, ± +22 bij 90 en 120). Dat geldt dus ook bij D = 60, met de maten van de flow-kamer (W-8); de flow-kamer en de tests hier meten de langzame lijn zonder dash (104–105 bij D = 60). ≤ 2× haalt de dash-variant wel. De dash geeft geen hoogte, maar wel snelheid op de korte sprong naar de weg omhoog. Open punt voor de LGD (§9): of de eis "≥ 30 ticks trager" voor de snelste langzame lijn *met* dash geldt; zo ja, dan moet de trede op 60 verder van de weg omhoog (of de trede op 90 korter), in de flow-kamer en hier.
+
 ## 7. Checklist (wereld.md §2.6, voor S1–S4)
 
 | Punt | Stand |
@@ -117,14 +132,29 @@ De run is deterministisch: dezelfde bits als `ScriptedInput` geven hetzelfde mee
 | Lampglas en logbladzijde 3 op een echolijn | S5 / S9: deel 2 |
 | MP-1 in elke kamer, solo en co-op | Solo ✓ bij 60, 120, 180. Co-op: open (§9) |
 
-## 8. Afwijkingen (voor de review van de LGD)
+## 8. Afwijkingen en besluiten van de LGD
 
-1. **Trede op 90 groeit met D** (`Z − 14` bij D > 60), zodat de eis bij keren bij elke D geldt (§3). Gemeten zonder dash. Met de dash kan een mens van de trede op 60 bij D = 90–120 misschien direct naar de galerij; dat is niet gemeten.
-2. **Golf 2 wacht ook op ≤ 5 tegelijk** (§4, regel 2).
-3. **Wekken** als level-regel (§4, regel 1).
-4. **B4 is met de echo niet sneller dan de langzame lijn** (S4 met echo 305 ticks tot de overkant, zonder 283): de 39 ticks wachten op de echo plus de houding kosten meer dan de kloof door. Zo is het ook in de flow-kamer. De lancering loont in licht (+LP) en gevoel, niet in tijd. Geen slot, geen norm geraakt; vraag aan de LGD of dat zo mag blijven.
-5. **S3 is eenrichting**: van de markt kom je niet terug naar de bovenroute (190 px hoog). Vooruit kan altijd; terug naar S1 gaat later via de lus (S9). Geen vastlopen.
-6. **Geen tegels** van de AD: grijze blokken (opdracht: alleen als import als dat klein blijft).
+Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvangerwen-glitch/echoborn/pull/208#issuecomment-6830106858)).
+
+| # | Afwijking | Besluit LGD |
+|---|---|---|
+| 1 | **Trede op 90 groeit met D** (`Z − 14` bij D > 60), zodat de eis bij keren bij elke D geldt (§3). De variant met dash staat in §6 | **Akkoord**: de uitwerking van v0.8.1 (Z en treden per D in data, de eis bij elke D). De dash-meting (§6) is nieuw na de review: open punt §9 |
+| 2 | **Golf 2 wacht ook op ≤ 5 tegelijk** (§4, regel 2) | **Akkoord** (L-13 f strikt in de slice; het wachten is kort, een merk knalt na D + 3) |
+| 3 | **Wekken** als level-regel (§4, regel 1): 320 px, op de vloer ± 40 px | **Akkoord als werkaanname WLD**; gaat later naar `SliceEnemy` (GP, §9) |
+| 4 | **B4 is met de echo niet sneller dan de langzame lijn** (S4: 305 tegen 283 ticks tot de overkant), zoals in de flow-kamer | **Mag blijven**: FK-2 is alleen een bovengrens; de lancering loont in licht en is optioneel op de route (7A); MT2 meet de keuze |
+| 5 | **S3 alleen vooruit**: van de markt niet terug naar de bovenroute; terug via de lus (S9) | **Akkoord**: geen vastlopen (L-10 gaat over missen) |
+| 6 | **Geen tegels** van de AD: grijze blokken | — (opdracht) |
+
+Verder van de LGD: de echo is genoeg nodig (FK-2 vraagt geen tijdwinst; licht 88 tegen 48 LP, MP-2 13,2/min, keren 36 ticks sneller); geen eis voor tijdwinst over de run. **SL-01:** wat tot 100 LP ontbreekt, komt in S5/S6, niet in S1–S4.
+
+**Maatvast per kamer** (fasekader §4 regel 3: bots groen op D = 60 + `Visie-review: past` van de CD + geen open herontwerp). Nog geen kamer is maatvast: de visie-review van de CD ontbreekt.
+
+| Kamer | Stand |
+|---|---|
+| S1 | **Kandidaat**: maatvast zodra de CD `past` geeft |
+| S2 | **Niet maatvast**: de B3-landing heeft bij D ≥ 90 2 px marge; de galerij verder laten uitsteken is een open herontwerp (§9). Eerst beslissen (of bij D = 60 de marge geven en de galerij laten), dan kandidaat |
+| S3 | **Kandidaat** (na de CD) |
+| S4 | **Kandidaat** (na de CD) |
 
 ## 9. Open punten
 
@@ -140,10 +170,12 @@ De run is deterministisch: dezelfde bits als `ScriptedInput` geven hetzelfde mee
 **Volgende WLD-run (deel 2):**
 - **S5–S9** met de lus terug naar S1 (S9, het luik, SL-04), het lampglas (S5) en de logbladzijden, S6 met de pompgang (4 schoepen, 80 px, FK-5, L-14 b) en het checkpoint, S7 (Neerslag, kanaal van 160 met 2 Dwaallichten), de layout van S8 (arena), en de bot erdoor.
 - **SL-01**: na S4 staat de meter op 88 LP (met echo) en 48 zonder. S5 heeft geen gevecht en S6 2 Kadelopers (± +12–15 LP met merk): dat haalt 100 waarschijnlijk net. Zo niet, dan een golf of een bouwsteen erbij (SL-01, review LGD).
-- **B3-landing bij D ≥ 90**: 2 px voorbij de tip van de galerij (bij 60: 26). Haalt het, maar krap; de galerij 10–20 px verder de kom in laten steken als dat de langzame lijn niet raakt.
+- **B3-landing bij D ≥ 90** (houdt S2 uit maatvast, §8): 2 px voorbij de tip van de galerij (bij 60: 26). Beslissen: de galerij 10–20 px verder de kom in laten steken (als dat de langzame lijn niet raakt), of bij D = 60 de marge geven en de galerij laten.
 - Co-op door alle kamers (C-15 d, MP-7).
 
-**Lead Game Designer:** de afwijkingen van §8 (vooral 1 en 4).
+**Lead Game Designer:** of de eis "keren ≥ 30 ticks sneller" ook geldt voor de langzame lijn met dash (§6: +27 bij D = 60, ± +22 bij 90 en 120; ook de flow-kamer).
+
+**Creative Director:** visie-review van S1, S3 en S4 (maatvast, §8).
 
 ## 10. Spelen en testen
 
@@ -163,3 +195,4 @@ Besluiten: D = 60 als werkaanname, bereik 1–3 s, en fase 2 parallel, ook bouwe
 | Versie | Datum | Wat |
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie: S1–S4 als grijze kamers, bot en tests bij D = 60 (120/180 regressie) |
+| 0.1.1 | 2026-11-12 | Lead-review #208: langzame lijn met dash gemeten bij 60/90/120 (§6), besluiten van de LGD per afwijking en maatvast-stand per kamer (§8), open punten bijgewerkt (§9) |
