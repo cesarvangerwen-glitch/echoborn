@@ -10,9 +10,9 @@ extends RefCounted
 ##   dasht op de top (`flow_wachtbot.gd`). Tegen de wand (`x` = 0) ook zonder
 ##   dash, en bij D = 60 de hele rij "op weg naar binnen" ook zonder dash. De
 ##   test schrijft per `x` de uitkomst en de stilstand (`note`, tabel in
-##   `flowkamer.md` §9). Enige voorwaarde: wie tegen de wand wacht en niet
-##   dasht, haalt de weg omhoog niet (keerzone, gdd v0.8 §4.3 *Restgat*: bij
-##   deze keerzone kom je tegen de wand alleen met de dash omhoog).
+##   `flowkamer.md` §9). Voorwaarden: wie tegen de wand wacht en niet dasht,
+##   haalt de weg omhoog niet (keerzone); wie er wacht en dasht, komt bij elke
+##   D omhoog (vastgelegd patroon met Z vast op 90, `flowkamer.md` §12).
 ## - **Late bot** (L-08 (b)): de gescripte geoefende run met de bounce 4 en 8
 ##   ticks te laat haalt bij elke D in B1 en elke verdieping van B2 de weg
 ##   omhoog, zonder dash. Daarnaast de dash 0, 4 en 8 ticks na de top van de
@@ -65,6 +65,7 @@ func _free_all(t, viewports: Array) -> void:
 
 func _wachtbot(t, d: int) -> void:
 	var lines: Array = []
+	var wall_dash: Array = []
 	for tp: Dictionary in Layout.turn_points():
 		var jobs: Array = []
 		var x := 0.0
@@ -105,11 +106,19 @@ func _wachtbot(t, d: int) -> void:
 			t.check(b.done, "D=%d %s %s x=%d: wachtbot niet klaar" % [d, tp["name"], b.mode, int(b.x)])
 			if b.x == 0.0 and not b.use_dash:
 				t.check(b.result != "omhoog", "D=%d %s %s: tegen de wand gewacht zonder dash en toch de weg omhoog (keerzone)" % [d, tp["name"], b.mode])
+			if b.x == 0.0 and b.use_dash:
+				# Vastgelegd patroon (T16f, flowkamer.md §9 en §12): met Z vast
+				# op 90 komt wie tegen de wand wacht en dasht bij elke D omhoog
+				# (gdd §4.8.2 bij D = 60; bij D ≥ 90 omdat Z niet meegroeit).
+				# Verandert dat, dan is de keerzone veranderd: tabel en §12 bijwerken.
+				t.check(b.result == "omhoog", "D=%d %s %s: tegen de wand met dash nu '%s' (vastgelegd: omhoog)" % [d, tp["name"], b.mode, b.result])
+				wall_dash.append("%s %s %s" % [tp["name"], b.mode, b.result])
 			cells[b.mode].append("%d%s %s %d" % [int(b.x), "" if b.use_dash else " zonder dash", b.result, b.waited])
 		lines.append("D=%d %s wachtbot in: %s | uit: %s" % [d, tp["name"], ", ".join(cells["in"]), ", ".join(cells["uit"])])
 		await _free_all(t, vps)
 	for line: String in lines:
 		t.note(line)
+	t.note("D=%d tegen de wand met dash (vastgelegd patroon): %s" % [d, ", ".join(wall_dash)])
 
 
 func test_wachtbot_d60(t) -> void:

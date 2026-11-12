@@ -16,8 +16,9 @@ extends RefCounted
 ##   langer vóór de landing (MP-3 per keerpunt). Bij D = 60 (W-8): de landing
 ##   ≥ 9 px voorbij de rand, en de snelste langzame lijn van dezelfde bot met
 ##   echo uit is ≥ 30 ticks trager dan keren en ≤ 2× (FK-2). Bij 90 en 120
-##   (regressie) is keren sneller en de langzame lijn ≤ 2×; bij 180 alleen
-##   ≤ 2× (de kamer is op D = 60 gebouwd: zie de note en `flowkamer.md` §12).
+##   (regressie) is keren sneller en de langzame lijn ≤ 2×; bij 180 ≤ 2× en
+##   een ondergrens: de langzame lijn hooguit 32 ticks sneller dan keren en
+##   ≥ 100 ticks (de kamer is op D = 60 gebouwd: `flowkamer.md` §12).
 ##
 ## - **K3 pompgang** (W-4; gdd §4.2, FK-5): vier schoepen, 80 px, 15–40 px
 ##   boven de vloer, ≥ 280 px droge vloer naar de sluis, de trap terug naar K2.
@@ -412,16 +413,24 @@ func _turns_without_echo(t, d: int) -> void:
 			# Regressie: bij 90 en 120 blijft keren sneller.
 			t.check(times[leg_name] > echo_t, "D=%d: %s langzame lijn %d ticks, keren %d (keren moet sneller)" % [
 				d, leg_name, times[leg_name], echo_t])
-		elif times[leg_name] <= echo_t:
+		else:
 			# D = 180: keren duurt D/2 + 34 ≈ 124 ticks, en de langzame lijn van
-			# de kamer op D = 60 hooguit 2 × 64 = 128 (W-8). Beide eisen samen
+			# de kamer op D = 60 hooguit 2 × 68 = 136 (W-8). Beide eisen samen
 			# kunnen bij 180 niet; dat staat als bevinding in flowkamer.md §12.
-			slower_at_180.append("%s %d ≤ %d" % [leg_name, times[leg_name], echo_t])
+			# Gemeten (T16f): langzame lijn 104–105, keren 125–133, dus de
+			# langzame lijn is 20–29 ticks sneller. Ondergrens: hooguit 32 ticks
+			# sneller, en de langzame lijn zelf ≥ 100 ticks; een verslechtering
+			# (sneller treden of trager keren) faalt dan.
+			t.check(echo_t - times[leg_name] <= 32, "D=%d: %s langzame lijn %d ticks, keren %d: langzame lijn %d ticks sneller (grens 32, gemeten 20–29)" % [
+				d, leg_name, times[leg_name], echo_t, echo_t - times[leg_name]])
+			t.check(times[leg_name] >= 100, "D=%d: %s langzame lijn %d ticks (≥ 100; gemeten 104–105)" % [d, leg_name, times[leg_name]])
+			if times[leg_name] <= echo_t:
+				slower_at_180.append("%s %d ≤ %d" % [leg_name, times[leg_name], echo_t])
 		t.check(times[leg_name] <= 2 * maxi(echo_t, 1), "D=%d: %s langzame lijn %d ticks > 2× keren %d (FK-2)" % [
 			d, leg_name, times[leg_name], echo_t])
 	t.note("D=%d langzame lijn vanaf de keerwand (ticks): %s" % [d, times])
 	if not slower_at_180.is_empty():
-		t.note("D=%d: langzame lijn niet trager dan keren (kamer op D = 60; geen norm bij deze D): %s" % [d, ", ".join(slower_at_180)])
+		t.note("D=%d: langzame lijn niet trager dan keren (kamer op D = 60; ondergrens: hooguit 32 ticks sneller): %s" % [d, ", ".join(slower_at_180)])
 	room.queue_free()
 	await t.tree.process_frame
 
