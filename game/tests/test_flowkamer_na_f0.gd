@@ -14,8 +14,10 @@ extends RefCounted
 ## - **Keren** (L-08 (c), headless per D): de gescripte geoefende run haalt bij
 ##   elk keerpunt de weg omhoog via de echo, zonder stilstand van 20 ticks of
 ##   langer vóór de landing (MP-3 per keerpunt). Bij D = 60 (W-8): de landing
-##   ≥ 9 px voorbij de rand, en de snelste langzame lijn van dezelfde bot met
-##   echo uit is ≥ 30 ticks trager dan keren en ≤ 2× (FK-2). Bij 90 en 120
+##   ≥ 9 px voorbij de rand, en de snelste langzame lijn zonder dash van
+##   dezelfde bot met echo uit is ≥ 30 ticks trager dan keren en ≤ 2× (FK-2);
+##   met een dash op 4 … 24 ticks na de afzet ≥ 20 ticks trager en ≤ 2× (W-12,
+##   gdd v0.8.2 §4.8.7; bij 90, 120 en 180 rapporteren). Bij 90 en 120
 ##   (regressie) is keren sneller en de langzame lijn ≤ 2×; bij 180 ≤ 2× en
 ##   een ondergrens: de langzame lijn hooguit 32 ticks sneller dan keren en
 ##   ≥ 100 ticks (de kamer is op D = 60 gebouwd: `flowkamer.md` §12).
@@ -31,6 +33,7 @@ const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
 const FlowBot = preload("res://levels/flowkamer/flow_bot.gd")
 const FlowReport = preload("res://levels/flowkamer/flow_report.gd")
 const Layout = preload("res://levels/flowkamer/flow_layout.gd")
+const SlowDash = preload("res://tests/slow_dash_input.gd")
 
 const TICK_CAP := 7000
 const DS := [60, 90, 120, 180]
@@ -39,6 +42,15 @@ const DS := [60, 90, 120, 180]
 const BUILT_D := 60
 ## Tijd van keren tot het volgende niveau per keerpunt, met echo, per D.
 static var _turn_ticks := {}
+## W-12: dash `n` ticks na de afzet van de sprong naar de weg omhoog (gdd §4.6).
+const DASH_NS := [4, 8, 12, 16, 20, 24]
+## W-12: zeven runs (zonder dash en zes dash-momenten) tot na B2-3, echo uit.
+const MAX_FRAMES := {
+	"test_turns_slow_line_with_dash_d60": 30000,
+	"test_turns_slow_line_with_dash_d90": 30000,
+	"test_turns_slow_line_with_dash_d120": 30000,
+	"test_turns_slow_line_with_dash_d180": 30000,
+}
 
 
 # --- Geometrie --------------------------------------------------------------
@@ -440,8 +452,9 @@ func _turns_without_echo(t, d: int) -> void:
 		t.check(echo_t > 0, "D=%d: %s zonder keertijd met echo" % [d, leg_name])
 		if d == BUILT_D:
 			# W-8 (gdd v0.8 §4.3, §4.8.4): keren ≥ 30 ticks sneller dan de
-			# snelste langzame lijn, vanaf de wand.
-			t.check(times[leg_name] - echo_t >= 30, "D=%d: %s langzame lijn %d ticks, keren %d: verschil %d (W-8: ≥ 30)" % [
+			# snelste langzame lijn zonder dash, vanaf de wand (v0.8.2; met dash:
+			# `_slow_line_with_dash`, W-12).
+			t.check(times[leg_name] - echo_t >= 30, "D=%d: %s langzame lijn zonder dash %d ticks, keren %d: verschil %d (W-8: ≥ 30)" % [
 				d, leg_name, times[leg_name], echo_t, times[leg_name] - echo_t])
 		elif d <= 120:
 			# Regressie: bij 90 en 120 blijft keren sneller.
@@ -462,7 +475,7 @@ func _turns_without_echo(t, d: int) -> void:
 				slower_at_180.append("%s %d ≤ %d" % [leg_name, times[leg_name], echo_t])
 		t.check(times[leg_name] <= 2 * maxi(echo_t, 1), "D=%d: %s langzame lijn %d ticks > 2× keren %d (FK-2)" % [
 			d, leg_name, times[leg_name], echo_t])
-	t.note("D=%d langzame lijn vanaf de keerwand (ticks): %s" % [d, times])
+	t.note("D=%d langzame lijn zonder dash vanaf de keerwand (ticks): %s" % [d, times])
 	if not slower_at_180.is_empty():
 		t.note("D=%d: langzame lijn niet trager dan keren (kamer op D = 60; ondergrens: hooguit 32 ticks sneller): %s" % [d, ", ".join(slower_at_180)])
 	room.queue_free()
@@ -499,3 +512,75 @@ func test_turns_without_echo_d120(t) -> void:
 
 func test_turns_without_echo_d180(t) -> void:
 	await _turns_without_echo(t, 180)
+
+
+# --- W-12: de langzame lijn met dash (gdd v0.8.2 §4.8.7, §4.6) -----------------
+
+## Echo uit, tot de bot B2-3 heeft afgerond: per keerpunt de tijd van de
+## keerwand tot het volgende niveau en of de dash-sprong miste.
+func _dash_run(t, d: int, dash_n: int) -> Dictionary:
+	var room = FlowRoom.new()
+	room.tail = d
+	room.echo_on = false
+	room.autosave = false
+	room.show_hud = false
+	var bot = FlowBot.new(room)
+	var source := SlowDash.new(bot, room, Layout.turn_points(), dash_n)
+	room.input_override = source
+	t.tree.root.add_child(room)
+	while not bot.leg_done.has(TURNS[-1]) and room.sim.tick < TICK_CAP:
+		await t.tree.physics_frame
+	var out := {}
+	for leg_name: String in TURNS:
+		var turn: int = bot.turned.get(leg_name, -1)
+		var done: int = bot.leg_done.get(leg_name, -1)
+		out[leg_name] = "mist" if source.missed.get(leg_name, false) or turn < 0 or done < 0 else done - turn
+	room.queue_free()
+	await t.tree.process_frame
+	return out
+
+
+## Per keerpunt zonder echo de langzame lijn met een dash op `n` = 4 … 24 ticks
+## na de afzet van de trede op 60 (dezelfde bot). Bij D = 60 (de kamer is op
+## D = 60 gebouwd) is de snelste die de weg omhoog haalt ≥ 20 ticks trager dan
+## keren en ≤ 2× keren (gdd v0.8.2 §4.3, §4.8.7); bij 90, 120 en 180
+## rapporteren (regressie, zoals de eis zonder dash).
+func _slow_line_with_dash(t, d: int) -> void:
+	var with_echo: Dictionary = _turn_ticks.get(d, {})
+	t.check(not with_echo.is_empty(), "D=%d: geen run met echo om mee te vergelijken" % d)
+	var plain := await _dash_run(t, d, -1)
+	var per_n := {}
+	for n: int in DASH_NS:
+		per_n[n] = await _dash_run(t, d, n)
+	var rows := PackedStringArray()
+	for leg_name: String in TURNS:
+		var keer: int = with_echo.get(leg_name, 0)
+		var fastest := -1
+		var line := {}
+		for n: int in DASH_NS:
+			var v = per_n[n][leg_name]
+			line[n] = v
+			if typeof(v) == TYPE_INT and (fastest < 0 or v < fastest):
+				fastest = v
+		if d == BUILT_D:
+			t.check(fastest > 0, "D=%d: %s geen dash-variant haalt de weg omhoog (%s)" % [d, leg_name, line])
+			t.check(fastest - keer >= 20 and fastest <= 2 * maxi(keer, 1),
+				"D=%d: %s keren %d, snelste van de zes dash-momenten (n = 4 … 24) %d ticks (gdd §4.8.7: ≥ 20 trager, ≤ 2×)" % [d, leg_name, keer, fastest])
+		rows.append("%s keren %d, zonder dash %s, met dash %s, snelste %d (%+d)" % [leg_name, keer, plain[leg_name], line, fastest, fastest - keer])
+	t.note("D=%d langzame lijn met dash (ticks vanaf de keerwand): %s" % [d, "; ".join(rows)])
+
+
+func test_turns_slow_line_with_dash_d60(t) -> void:
+	await _slow_line_with_dash(t, 60)
+
+
+func test_turns_slow_line_with_dash_d90(t) -> void:
+	await _slow_line_with_dash(t, 90)
+
+
+func test_turns_slow_line_with_dash_d120(t) -> void:
+	await _slow_line_with_dash(t, 120)
+
+
+func test_turns_slow_line_with_dash_d180(t) -> void:
+	await _slow_line_with_dash(t, 180)

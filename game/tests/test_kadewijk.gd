@@ -10,7 +10,12 @@ extends RefCounted
 ##   van S4, neemt elke echolijn en haalt per kamer MP-1 en de normen MP-2,
 ##   MP-4 en MP-6 (gdd §4.5); met echo uit haalt hij het ook, hooguit 2× zo lang
 ##   (C-15, FK-2), en bij elk keerpunt is keren ≥ 30 ticks sneller dan de
-##   langzame lijn en die ≤ 2× keren (gdd §4.3: in de slice bij elke D).
+##   langzame lijn zonder dash en die ≤ 2× keren (gdd §4.3: in de slice bij
+##   elke D); met een dash op 4 … 24 ticks na de afzet is de snelste langzame
+##   lijn ≥ 20 ticks trager dan keren en ≤ 2× (W-12, gdd v0.8.2 §4.8.7).
+## - S4 (#217): B4 achter een keerpunt (de bolder op de rand): geen stilstand
+##   vóór de lancering, bij D = 60 sneller dan de langzame lijn, late bot, en
+##   zonder lancering niet over te steken.
 ## - 120 en 180 draaien als regressie (de eis bij keren ook), elk als eigen test
 ##   (een run duurt ± 3000–3900 ticks; de runner geeft een test 7200 frames).
 ## - S3: golf 2 pas na golf 1 (merk of op) en nooit meer dan 5 vijanden (L-13).
@@ -28,8 +33,22 @@ const ScriptedInput = preload("res://scripts/input/scripted_input.gd")
 const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
 const EnemyData = preload("res://scripts/combat/enemy_data.gd")
 const Zone = preload("res://scripts/objects/zone.gd")
+const SlowDash = preload("res://tests/slow_dash_input.gd")
+const InputBits = preload("res://scripts/input/input_bits.gd")
 
 const TICK_CAP := 7000
+## W-12: dash `n` ticks na de afzet van de sprong naar de weg omhoog (gdd §4.6).
+const DASH_NS := [4, 8, 12, 16, 20, 24]
+## Per keerpunt 8 runs tot dat keerpunt (S2 met het paar ervoor): ruim boven 7200.
+const MAX_FRAMES := {
+	"test_kadewijk_langzame_lijn_met_dash_d60": 20000,
+	"test_kadewijk_langzame_lijn_met_dash_d90": 20000,
+	"test_kadewijk_langzame_lijn_met_dash_d120": 20000,
+	"test_kadewijk_langzame_lijn_met_dash_d180": 20000,
+	"test_kadewijk_b4_keerpunt": 12000,
+	"test_kadewijk_b4_late_bot": 12000,
+	"test_kadewijk_b3_late_bot": 12000,
+}
 ## Per D (echo aan / uit): duur van de run, per kamer, en per keerpunt
 ## (keren of langzame lijn, vanaf de wand), voor C-15 en de eis bij keren.
 static var _runs := {}
@@ -168,6 +187,16 @@ func test_kadewijk_maten_per_d(t) -> void:
 		and Layout.B4_NEAR_EDGE - Layout.ROOMS[&"S4"].position.x >= 40.0 and Layout.S4_FLOOR >= 180.0,
 		"B4: kloof %.0f × %.0f, aanloop %.0f, vrij %.0f" % [Layout.B4_FAR_EDGE - Layout.B4_NEAR_EDGE,
 		Layout.KLOOF_BOTTOM - Layout.S4_FLOOR, Layout.B4_NEAR_EDGE - Layout.ROOMS[&"S4"].position.x, Layout.S4_FLOOR])
+	# B4 achter een keerpunt (#217): de bolder op de rand is de keerwand; ≤ 12 px
+	# hoog, zodat een sprong + dash vanaf de bolder de overkant niet haalt
+	# (gemeten: 8 px → 3046, 16 px → 3050, 20 px → over; test hieronder).
+	var s4 := _wijk(t, 60, true, &"S4")
+	await t.tree.physics_frame
+	var bolder := _block(s4[0], &"S4", "Bolder")
+	t.check(is_equal_approx(bolder.end.x, Layout.B4_NEAR_EDGE) and is_equal_approx(bolder.end.y, Layout.S4_FLOOR)
+		and bolder.size.y > 0.0 and bolder.size.y <= 12.0 and bolder.position.x - Layout.ROOMS[&"S4"].position.x >= 40.0,
+		"B4: bolder %s (op de rand, 0 < hoogte ≤ 12, ≥ 40 px vlak ervoor)" % bolder)
+	await _free(t, s4)
 	var markt := Layout.ROOMS[&"S3"].end.x - Layout.S3_LEFT
 	t.check(markt >= Layout.aanloop(180), "S3: vlakke markt %.0f px (L-13 b: ≥ D + 24)" % markt)
 
@@ -262,6 +291,17 @@ func _check_echo_run(t, d: int, parts: Array, rep) -> void:
 	if d == 60:
 		t.check(rep.landings > 0 and rep.landings_without_still >= 0.75,
 			"D=60: %.0f %% van %d landingen zonder stilstand (MP-3 ≥ 75 %%)" % [rep.landings_without_still * 100.0, rep.landings])
+	else:
+		# SM-review PR #208: MP-3 is een norm op de gekozen D (60); bij 120 en 180
+		# rapport. Vóór #217 67–75 %: bij B4 wachtte de bot aan de rand op de
+		# echo, dus die landing kwam na stilstand. Met de bolder als keerpunt
+		# draagt de echo je naar de rand, zonder stilstand van 20 ticks.
+		t.note("D=%d: MP-3 %.0f %% van %d landingen zonder stilstand (rapport; norm getoetst bij D = 60)" % [
+			d, rep.landings_without_still * 100.0, rep.landings])
+	# Besluit B3-galerij (#217, kamerdoc §8): de landing na de bounce ligt bij
+	# elke D ≥ 9 px voorbij de tip (dash op de top; bij D = 60 een keerpunt).
+	var b3: float = bot.landed_from_wall.get("S2-B3", -INF)
+	t.check(b3 >= 9.0, "D=%d S2-B3: landing %.0f px voorbij de tip van de galerij (≥ 9)" % [d, b3])
 	t.check(rep.echo_empty_share <= 0.4, "D=%d: echo %.0f %% Leeg (MP-4 ≤ 40 %%)" % [d, rep.echo_empty_share * 100.0])
 	t.check(rep.lp_echo_share >= 0.4, "D=%d: %.0f %% LP met de echo (MP-6 ≥ 40 %%)" % [d, rep.lp_echo_share * 100.0])
 	t.note("D=%d: MP-2 %.1f/min %s, langste gat %d, MP-3 %.0f %% van %d landingen, MP-4 %.0f %%, MP-6 %.0f %%, LP S1–S4 %d, B-marges bounce %s landing %s" % [
@@ -269,8 +309,9 @@ func _check_echo_run(t, d: int, parts: Array, rep) -> void:
 		rep.echo_empty_share * 100.0, rep.lp_echo_share * 100.0, rep.lp_total, bot.bounce_from_wall, bot.landed_from_wall])
 
 
-## C-15, FK-2 en de eis bij keren (gdd §4.3: in de slice bij elke D): als
-## beide runs van deze D er zijn.
+## C-15, FK-2 en de eis bij keren voor de langzame lijn zonder dash (gdd §4.3,
+## v0.8.2: in de slice bij elke D): als beide runs van deze D er zijn. De
+## variant met dash: `_slow_with_dash` (W-12).
 func _check_slow_lines(t, d: int) -> void:
 	var on: Dictionary = _runs.get("%d_aan" % d, {})
 	var off: Dictionary = _runs.get("%d_uit" % d, {})
@@ -286,8 +327,8 @@ func _check_slow_lines(t, d: int) -> void:
 		var keer := int(on["keer"].get(n, -1))
 		var slow := int(off["keer"].get(n, -1))
 		t.check(keer > 0 and slow - keer >= 30 and slow <= 2 * keer,
-			"D=%d %s: keren %d, langzame lijn %d ticks vanaf de wand (gdd §4.3: ≥ 30 sneller, ≤ 2×)" % [d, n, keer, slow])
-		t.note("D=%d %s: keren %d, langzame lijn %d (+%d, %.2f×)" % [d, n, keer, slow, slow - keer, float(slow) / maxf(keer, 1)])
+			"D=%d %s: keren %d, langzame lijn zonder dash %d ticks vanaf de wand (gdd §4.3: ≥ 30 sneller, ≤ 2×)" % [d, n, keer, slow])
+		t.note("D=%d %s: keren %d, langzame lijn zonder dash %d (+%d, %.2f×)" % [d, n, keer, slow, slow - keer, float(slow) / maxf(keer, 1)])
 
 
 func test_kadewijk_run_d60(t) -> void:
@@ -432,3 +473,212 @@ func test_kadewijk_respawn_s1(t) -> void:
 	var after := _respawns(wijk.meetlog.rows) - before
 	t.check(after == 1, "%d RESPAWN-regels na de dood (verwacht 1)" % after)
 	await _free(t, parts)
+
+
+# --- W-12: de langzame lijn met dash (gdd v0.8.2 §4.8.7, §4.6) -----------------
+
+## Speelt vanaf het begin van kamer `start` tot de bot keerpunt `leg` heeft
+## afgerond. Geeft [ticks van de keerwand tot voorbij Z (of -1), mist].
+func _keer_run(t, d: int, echo_on: bool, start: StringName, leg: String, dash_n: int) -> Array:
+	var parts := _wijk(t, d, echo_on, start)
+	var wijk = parts[0]
+	var bot = parts[1]
+	var source := SlowDash.new(bot, wijk, Layout.turn_points(d), dash_n)
+	wijk.input_override = source
+	wijk.p1.input_source = source
+	while not bot.leg_done.has(leg) and wijk.sim.tick < TICK_CAP:
+		await t.tree.physics_frame
+	var ticks := -1
+	if bot.leg_done.has(leg) and bot.turned.has(leg):
+		ticks = int(bot.leg_done[leg]) - int(bot.turned[leg])
+	var missed: bool = source.missed.get(leg, false)
+	var line: bool = bot.lines.get(leg, false)
+	await _free(t, parts)
+	if echo_on and not line:
+		return [-1, true]
+	return [ticks, missed]
+
+
+## Per keerpunt van B1 (S1-B1, S2-B1), echo uit: de langzame lijn met een dash
+## op `n` = 4 … 24 ticks na de afzet van de trede op 60. De snelste die de weg
+## omhoog haalt, is ≥ 20 ticks trager dan keren en ≤ 2× keren (in de slice bij
+## elke D). Keren = dezelfde bot met echo, vanaf de keerwand.
+func _slow_with_dash(t, d: int) -> void:
+	for spec: Array in [[&"S1", "S1-B1"], [&"S2", "S2-B1"]]:
+		var keer: Array = await _keer_run(t, d, true, spec[0], spec[1], -1)
+		var plain: Array = await _keer_run(t, d, false, spec[0], spec[1], -1)
+		t.check(keer[0] > 0, "D=%d %s: keren niet gemeten" % [d, spec[1]])
+		var per := {}
+		var fastest := -1
+		for n: int in DASH_NS:
+			var r: Array = await _keer_run(t, d, false, spec[0], spec[1], n)
+			per[n] = "mist" if r[1] or r[0] < 0 else r[0]
+			if not r[1] and r[0] > 0 and (fastest < 0 or r[0] < fastest):
+				fastest = r[0]
+		t.check(fastest > 0, "D=%d %s: geen dash-variant haalt de weg omhoog (%s)" % [d, spec[1], per])
+		t.check(fastest - keer[0] >= 20 and fastest <= 2 * keer[0],
+			"D=%d %s: keren %d, snelste van de zes dash-momenten (n = 4 … 24) %d ticks vanaf de wand (gdd §4.8.7: ≥ 20 trager, ≤ 2×)" % [d, spec[1], keer[0], fastest])
+		t.note("D=%d %s: keren %d, langzame lijn zonder dash %d, met dash na n ticks %s: snelste %d (+%d, %.2f×)" % [
+			d, spec[1], keer[0], plain[0], per, fastest, fastest - keer[0], float(fastest) / maxf(keer[0], 1)])
+
+
+func test_kadewijk_langzame_lijn_met_dash_d60(t) -> void:
+	await _slow_with_dash(t, 60)
+
+
+func test_kadewijk_langzame_lijn_met_dash_d90(t) -> void:
+	await _slow_with_dash(t, 90)
+
+
+func test_kadewijk_langzame_lijn_met_dash_d120(t) -> void:
+	await _slow_with_dash(t, 120)
+
+
+func test_kadewijk_langzame_lijn_met_dash_d180(t) -> void:
+	await _slow_with_dash(t, 180)
+
+
+# --- S4: B4 achter een keerpunt (#217) ------------------------------------------
+
+## Speelt S4 vanaf zijn begin tot het einde van deel 1. Geeft [wijk-delen, bot].
+func _s4_run(t, d: int, echo_on: bool, jump_delay := 0, dash_delay := 0) -> Array:
+	var parts := _wijk(t, d, echo_on, &"S4")
+	parts[1].b4_jump_delay = jump_delay
+	parts[1].b4_dash_delay = dash_delay
+	await _run(t, parts[0])
+	return parts
+
+
+## Visie-review CD (#212): bij B4 niet aan de rand wachten. Per D: de bot keert
+## tegen de bolder, de echo komt hem tegemoet en hij wordt gelanceerd (echolijn);
+## vóór de lancering geen stilstand in S4 (bij D = 60 geen enkele MP-1-tick,
+## bij een langere D geen stilstand van 20 ticks of langer, zoals MP-3). Bij
+## D = 60 is de echolijn sneller dan de langzame lijn (vanaf het begin van S4
+## tot voorbij de overkant), en de langzame lijn ≤ 2× (FK-2).
+func test_kadewijk_b4_keerpunt(t) -> void:
+	var slow_parts := await _s4_run(t, 60, false)
+	var slow: int = slow_parts[1].leg_done.get("S4-B4", -1)
+	t.check(slow > 0 and not slow_parts[1].lines.get("S4-B4", true) and slow_parts[0].run_over,
+		"S4 zonder echo: langzame lijn niet gehaald (%d)" % slow)
+	await _free(t, slow_parts)
+	for d in [60, 90, 120, 180]:
+		var parts := await _s4_run(t, d, true)
+		var wijk = parts[0]
+		var bot = parts[1]
+		var echo: int = bot.leg_done.get("S4-B4", -1)
+		t.check(wijk.run_over and bot.lines.get("S4-B4", false), "D=%d S4: B4 niet via de lancering (stap %s, P1 %s)" % [d, bot.leg_name(), wijk.p1.position])
+		var launch := -1
+		for row in wijk.meetlog.rows:
+			if row[2] == "LANCERING":
+				launch = int(row[0])
+				break
+		t.check(launch > 0, "D=%d S4: geen LANCERING" % d)
+		var stills := []
+		for row in wijk.meetlog.rows:
+			if row[2] == "STIL_EIND" and row[4] == "p1" and int(row[0]) - int(row[3]) < launch:
+				stills.append(int(row[3]))
+		if d == 60:
+			t.check(stills.is_empty(), "D=60 S4: stilstand vóór de lancering %s (visie-review: niet wachten)" % [stills])
+			t.check(echo > 0 and echo < slow, "D=60 S4: echolijn %d ticks, langzame lijn %d (echolijn moet sneller)" % [echo, slow])
+		else:
+			t.check(stills.all(func(n: int) -> bool: return n < 20), "D=%d S4: stilstand vóór de lancering %s (< 20)" % [d, stills])
+		t.check(slow <= 2 * echo, "D=%d S4: langzame lijn %d > 2× echolijn %d (FK-2)" % [d, slow, echo])
+		t.note("D=%d S4-B4: %s, echolijn %d ticks, langzame lijn %d (%+d), keren tick %d, lancering tick %d op %.0f px van de rand, landing %.0f px voorbij de overkant, stilstand vóór de lancering %s" % [
+			d, "op de echo springen + dash" if Layout.b4_hop(d) else "op de echo naar de bolder", echo, slow, echo - slow,
+			bot.turned.get("S4-B4", -1), launch, bot.bounce_from_wall.get("S4-B4", -1.0), bot.landed_from_wall.get("S4-B4", -INF), stills])
+		await _free(t, parts)
+
+
+## Late bot bij D = 60 (zoals L-08 (b)): 4 en 8 ticks later op de echo springen,
+## 8 en 16 ticks na de top dashen: altijd over (lancering). Zonder dash haalt de
+## lancering van de ontmoeting de overkant niet: dan de kloof in en de langzame
+## lijn, zonder vast te lopen.
+func test_kadewijk_b4_late_bot(t) -> void:
+	var margins := {}
+	for jd in [0, 4, 8]:
+		for dd in [0, 8, 16]:
+			var parts := await _s4_run(t, 60, true, jd, dd)
+			var bot = parts[1]
+			t.check(parts[0].run_over and bot.lines.get("S4-B4", false),
+				"D=60 S4: sprong +%d, dash +%d: niet over met de lancering" % [jd, dd])
+			margins["+%d/+%d" % [jd, dd]] = "%.0f" % bot.landed_from_wall.get("S4-B4", -INF)
+			await _free(t, parts)
+	var nodash := await _s4_run(t, 60, true, 0, 100000)
+	t.check(nodash[0].run_over and not nodash[1].lines.get("S4-B4", true),
+		"D=60 S4 zonder dash: verwacht de kloof in en de langzame lijn (lijn %s, P1 %s)" % [nodash[1].lines.get("S4-B4"), nodash[0].p1.position])
+	t.note("D=60 S4-B4 landing voorbij de overkant (px) per sprong/dash later: %s; zonder dash: de kloof in, langzame lijn, einde op tick %d" % [margins, nodash[0].run_ticks()])
+	await _free(t, nodash)
+
+
+## Een sprong met dash van de bolder of van het keerpunt ervoor, echo uit, met
+## de dash op elk moment (0 … 40 ticks na de afzet): nooit op de overkant
+## (gdd §4.3 B4: zonder lancering niet over te steken).
+class JumpDash extends RefCounted:
+	var wijk
+	var dash_n := 0
+	var _tick0 := -1
+	func sample(tick: int) -> int:
+		if _tick0 < 0:
+			_tick0 = tick
+		var k := tick - _tick0
+		if k == 0:
+			return InputBits.RIGHT | InputBits.JUMP
+		if k == dash_n + 1:
+			return InputBits.RIGHT | InputBits.DASH
+		return InputBits.RIGHT
+
+
+func test_kadewijk_b4_niet_over_zonder_lancering(t) -> void:
+	var best := -INF
+	var starts := {
+		"bolder": Vector2(Layout.B4_NEAR_EDGE + Layout.HALF_W - 2.0, Layout.S4_FLOOR - Layout.B4_BOLDER_H - Layout.HALF_H),
+		"keerpunt": Vector2(Layout.B4_TURN_X, Layout.S4_FLOOR - Layout.HALF_H),
+	}
+	for key: String in starts:
+		for n in range(0, 42, 2):
+			var input := JumpDash.new()
+			input.dash_n = n
+			var progress := Progress.new()
+			t.tree.root.add_child(progress)
+			var wijk = Scene.instantiate()
+			wijk.tail = 60
+			wijk.echo_on = false
+			wijk.show_hud = false
+			wijk.progress = progress
+			wijk.start_at = starts[key]
+			wijk.input_override = input
+			t.tree.root.add_child(wijk)
+			await t.tree.physics_frame
+			var over := false
+			for i in 150:
+				await t.tree.physics_frame
+				var p = wijk.p1
+				if p.position.y + Layout.HALF_H <= Layout.S4_FLOOR + 0.01:
+					best = maxf(best, p.position.x)
+				if p.motor.on_floor and absf(p.position.y - (Layout.S4_FLOOR - Layout.HALF_H)) < 1.5 \
+						and p.position.x > Layout.B4_FAR_EDGE - Layout.HALF_W:
+					over = true
+					break
+			t.check(not over, "B4: sprong + dash (+%d) van %s haalt de overkant zonder lancering" % [n, key])
+			await _free(t, [wijk, null, progress])
+	t.note("B4 zonder lancering: verste middelpunt op vloerhoogte %.0f (overkant vanaf %.0f)" % [best, Layout.B4_FAR_EDGE - Layout.HALF_W])
+
+
+## Late bot voor S2-B3 bij D ≥ 90 (SM-review PR #220): de bot dasht op de top
+## (landing ≥ 9 px, check in de runs). Hier de randen van het venster, dash 14
+## en 38 ticks na de bounce, zodat de krapste marge zichtbaar blijft. Rapport
+## (note), geen eis.
+func test_kadewijk_b3_late_bot(t) -> void:
+	var rows := PackedStringArray()
+	for d in [90, 120, 180]:
+		for n in [14, 38]:
+			var parts := _wijk(t, d, true, &"S2")
+			var bot = parts[1]
+			bot.b3_dash_after = n
+			while not bot.leg_done.has("S2-B3") and parts[0].sim.tick < TICK_CAP:
+				await t.tree.physics_frame
+			var line: bool = bot.lines.get("S2-B3", false)
+			t.check(bot.leg_done.has("S2-B3"), "D=%d S2-B3: dash %d ticks na de bounce, stap niet afgerond" % [d, n])
+			rows.append("D=%d dash +%d: %s" % [d, n, ("landing %.0f px voorbij de tip" % bot.landed_from_wall.get("S2-B3", -INF)) if line else "mist (langzame lijn)"])
+			await _free(t, parts)
+	t.note("S2-B3 late bot (dash na de bounce): %s" % ", ".join(rows))

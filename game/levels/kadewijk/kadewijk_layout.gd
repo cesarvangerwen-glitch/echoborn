@@ -8,7 +8,7 @@ extends RefCounted
 ##   y=70   |          | ===galerij B1==>------------>+            |                  |
 ##   y=160  |          | <==B3-galerij== gang B1  |    |            |                  |
 ##   y=230  | =galerij=>  ---> kom B3 | wand      |    v arena      |  aanloop  kloof  overkant
-##   y=260  |          |                          |  ============== ======     ====== ====
+##   y=260  |          |                          |  ============== =====b     ====== ====
 ##   y=320  | <-- gang B1 (start)                 |                  |      bodem       |
 ##   y=360  +----------+-------------------------+------------------+------------------+
 ##
@@ -16,8 +16,9 @@ extends RefCounted
 ## naar de galerij op 230; S2 over de kade naar de kom van B3 (bij D = 60 een
 ## keerpunt), bouncen naar de galerij op 160 (terug naar links), daar het
 ## E-paar, B1 tegen de brugpijler (x 700) en naar de bovenroute op 70; S3 de
-## merk-arena op 260 (twee golven, sluit niet af); S4 de lanceerkloof (B4) en
-## de Kadeloper aan de overkant. Alles wereldpixels, y naar beneden; een vloer
+## merk-arena op 260 (twee golven, sluit niet af); S4 de lanceerkloof (B4)
+## achter een keerpunt (`b`, de bolder op de rand; #217) en de Kadeloper aan de
+## overkant. Alles wereldpixels, y naar beneden; een vloer
 ## is de bovenkant van een blok. De maten komen uit gdd §4.3; wat van D
 ## afhangt (keerzone Z, de trede op 90, het B3-blok) is een formule hieronder
 ## (fasekader v0.4 §4, regel 2), en de kamerscènes bouwen hun blokken hieruit
@@ -29,6 +30,7 @@ extends RefCounted
 
 ## Lichaam 16 × 30: het middelpunt staat 15 px boven de vloer.
 const HALF_H := 15.0
+const HALF_W := 8.0
 const ONE_WAY_T := 6.0
 const TREAD_T := 4.0
 const TREAD_W := 40.0
@@ -77,6 +79,11 @@ const S4_FLOOR := 260.0
 const B4_NEAR_EDGE := 2900.0
 const B4_FAR_EDGE := 3060.0
 const KLOOF_BOTTOM := 350.0      ## 90 px lager
+## Keerpunt vóór B4 (#217, kamerdoc §3a): een bolder op de rand, de keerwand
+## van de lancering. ≤ 12 hoog: dan haalt een sprong + dash van de bolder de
+## overkant niet (gemeten: 8 → 3046, 16 → 3050, 20 → over; overkant vanaf 3052).
+const B4_BOLDER_W := 8.0
+const B4_BOLDER_H := 8.0
 const S4_END_WALL := 3500.0
 ## Einde van deel 1: wie hier is, haalde S1–S4 (RUN_EIND in het meetlog).
 const END_X := 3440.0
@@ -116,6 +123,32 @@ static func b3_width(d: int) -> float:
 ## Werkaanname WLD, gemeten in `test_kadewijk.gd` (kamerdoc §3).
 static func tread_90_width(d: int) -> float:
 	return TREAD_W if d <= 60 else keerzone(d) - 14.0
+
+
+## B4 achter een keerpunt (#217): P1 keert tegen de bolder met zijn middelpunt
+## hier; de echo komt hem tegemoet en ontmoet hem ± `D − 6` px ervoor (zoals bij
+## B1 gemeten).
+const B4_TURN_X := B4_NEAR_EDGE - B4_BOLDER_W - HALF_W
+## Tot zo ver van de rand haalt een lancering met een dash na de top de overkant.
+const B4_HOP_MAX := 80.0
+
+
+static func b4_meet(d: int) -> float:
+	return float(d) - 6.0
+
+
+## Korte staart: op de echo springen waar hij je tegemoetkomt (lancering + dash).
+static func b4_hop(d: int) -> bool:
+	return b4_meet(d) + (B4_NEAR_EDGE - B4_TURN_X) <= B4_HOP_MAX
+
+
+## Waar je AANVAL slaat (en vasthoudt tot de bolder): bij `hop` ruim vóór de
+## ontmoeting, anders 14 ticks vóór de bolder, zodat de houding pas aan de
+## bolder begint en de echo je erheen draagt.
+static func b4_strike_x(d: int) -> float:
+	if b4_hop(d):
+		return B4_TURN_X - b4_meet(d) - 40.0
+	return B4_TURN_X - 28.0
 
 
 ## De keerpunten van deel 1 (B1 en B3), voor de bot en de tests.
@@ -170,6 +203,7 @@ static func blocks(id: StringName, d: int) -> Array:
 				out.append(["Kraam%d" % (i + 1), S3_PLATFORMS[i], true])
 		&"S4":
 			out.append(["Aanloop", Rect2(r.position.x, S4_FLOOR, B4_NEAR_EDGE - r.position.x, ROOM_H - S4_FLOOR), false])
+			out.append(["Bolder", Rect2(B4_NEAR_EDGE - B4_BOLDER_W, S4_FLOOR - B4_BOLDER_H, B4_BOLDER_W, B4_BOLDER_H), false])
 			out.append(["KloofBodem", Rect2(B4_NEAR_EDGE, KLOOF_BOTTOM, B4_FAR_EDGE - B4_NEAR_EDGE, ROOM_H - KLOOF_BOTTOM + 20), false])
 			# Langzame lijn: twee treden van 45 tegen de overkant (gdd §4.3 B4; "via de kademuur").
 			out.append(["KloofTrede", Rect2(B4_FAR_EDGE - TREAD_W, KLOOF_BOTTOM - 45, TREAD_W, 45), false])
