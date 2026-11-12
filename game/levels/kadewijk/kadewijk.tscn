@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk.gd" id="1_wijk"]
 [ext_resource type="Script" path="res://scripts/world/kamer.gd" id="2_kamer"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://levels/kadewijk/s6_gemaalplein.tscn" id="8_s6"]
 [ext_resource type="PackedScene" path="res://levels/kadewijk/s7_sluiskelder.tscn" id="9_s7"]
 [ext_resource type="PackedScene" path="res://levels/kadewijk/s8_machinehal.tscn" id="10_s8"]
+[ext_resource type="PackedScene" path="res://levels/kadewijk/s9_lage_kade.tscn" id="11_s9"]
 
 [sub_resource type="RectangleShape2D" id="Rect_s1"]
 size = Vector2(640, 360)
@@ -35,6 +36,9 @@ size = Vector2(960, 360)
 [sub_resource type="RectangleShape2D" id="Rect_s8"]
 size = Vector2(640, 360)
 
+[sub_resource type="RectangleShape2D" id="Rect_s9"]
+size = Vector2(4160, 360)
+
 [node name="Kadewijk" type="Node2D"]
 script = ExtResource("1_wijk")
 
@@ -47,7 +51,7 @@ polygon = PackedVector2Array(0, -220, 5760, -220, 5760, 740, 0, 740)
 position = Vector2(320, 180)
 script = ExtResource("2_kamer")
 kamer_id = &"S1"
-buren = PackedStringArray("S2")
+buren = PackedStringArray("S2", "S9")
 inhoud = ExtResource("3_s1")
 wijk_gemaal = &"S6/Gemaal"
 
@@ -91,7 +95,7 @@ shape = SubResource("Rect_s4")
 position = Vector2(3840, 80)
 script = ExtResource("2_kamer")
 kamer_id = &"S5"
-buren = PackedStringArray("S4", "S6")
+buren = PackedStringArray("S4", "S6", "S9")
 inhoud = ExtResource("7_s5")
 wijk_gemaal = &"S6/Gemaal"
 
@@ -124,9 +128,20 @@ shape = SubResource("Rect_s7")
 position = Vector2(4480, 540)
 script = ExtResource("2_kamer")
 kamer_id = &"S8"
-buren = PackedStringArray("S7")
+buren = PackedStringArray("S7", "S9")
 inhoud = ExtResource("10_s8")
 wijk_gemaal = &"S6/Gemaal"
 
 [node name="Vlak" type="CollisionShape2D" parent="S8"]
 shape = SubResource("Rect_s8")
+
+[node name="S9" type="Area2D" parent="."]
+position = Vector2(2080, 540)
+script = ExtResource("2_kamer")
+kamer_id = &"S9"
+buren = PackedStringArray("S8", "S5", "S1")
+inhoud = ExtResource("11_s9")
+wijk_gemaal = &"S6/Gemaal"
+
+[node name="Vlak" type="CollisionShape2D" parent="S9"]
+shape = SubResource("Rect_s9")

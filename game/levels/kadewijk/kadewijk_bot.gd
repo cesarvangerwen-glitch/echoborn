@@ -1,6 +1,7 @@
 extends RefCounted
-## De gescripte geoefende run door de Kadewijk (S1–S8; gdd §4.5, L-08,
-## FK-2, C-15; T8a #83; deel 2: S5 B2, S6 pompgang, S7 luik en kanaal).
+## De gescripte geoefende run door de Kadewijk (S1–S9; gdd §4.5, L-08,
+## FK-2, C-15; T8a #83; deel 2: S5 B2, S6 pompgang, S7 luik en kanaal;
+## deel 3: S9 de lage kade, het luik, B1 met logbladzijde 3, de schacht naar S1).
 ##
 ## Een inputbron (`sample(tick) -> int`) die per tick kijkt waar P1, zijn echo
 ## en de vijanden staan en daarop de knoppen kiest, zoals `flow_bot.gd` van de
@@ -85,6 +86,8 @@ var s6_returns := 0
 var stuits := 0
 ## S7, test van de langzame lijn: geen neerslag boven het kanaal (het kanaal in).
 var kanaal_no_stuit := false
+## S9, de trap naar het plein: de x waar de bot heen stuurt in de lucht.
+var _trap_x := NAN
 
 ## De route: [naam, soort, parameter].
 var _legs := [
@@ -106,11 +109,26 @@ var _legs := [
 	["S6-brug", "land", null],
 	["S6-paar", "fight", null],
 	["S6-gemaal", "gemaal", null],
-	["S7-luik", "luik", null],
+	["S7-luik", "luik", 0],
 	["S7-kanaal", "kanaal", null],
 	["S7-deur", "west", &"S8"],
 	["S8-eind", "end", null],
+	# Deel 3: S9 vanaf zijn begin (bij de deur van de arena; de boss en de deur
+	# zijn van de GP), met het hoogwater open (`s = 2`, placeholder).
+	["S9-kade", "kade9", null],
+	["S9-B2a", "turn", 9],
+	["S9-B2b", "turn", 10],
+	["S9-pijler", "pijler9", null],
+	["S9-paar", "fight", null],
+	["S9-luik", "luik", 1],
+	["S9-B1", "turn", 8],
+	["S9-schacht", "schacht", null],
+	["S9-eind", "end", null],
+	# Niet in de run: de trap naar het plein en terug (de test zet `leg` hierop).
+	["S9-trap", "trap9", null],
+	["S9-trap-af", "trap9_af", null],
 	# Niet in de run (S8-eind wacht op het einde): de arena-test zet `leg` hierop.
+	# Blijft de laatste stap.
 	["S8-rad", "turn", 7],
 ]
 
@@ -228,7 +246,22 @@ func _decide() -> int:
 		"gemaal":
 			return _leg_gemaal()
 		"luik":
-			return _leg_luik()
+			if spec[2] == 1:
+				return _leg_luik(Layout.S9_LUIK, Layout.S9_KADE, Layout.S9_LAAG)
+			return _leg_luik(Layout.LUIK, Layout.S7_UP, Layout.S7_LOW)
+		"kade9":
+			return _leg_kade9()
+		"pijler9":
+			# Van richel 2 over de pijler naar links, de kade weer op.
+			if _on_level(Layout.S9_KADE) and _p1().position.x < Layout.S9_PIJLER.position.x:
+				_next_leg(false)
+			return L
+		"schacht":
+			return _leg_schacht()
+		"trap9":
+			return _leg_trap9()
+		"trap9_af":
+			return _leg_trap9_af()
 		"kanaal":
 			return _leg_kanaal()
 		"b3":
@@ -527,7 +560,7 @@ func _leg_fight(arena: bool) -> int:
 		_next_leg(false)
 		return R
 	if not p.motor.on_floor:
-		return _walk(_patrol_dir) if sub == "patrol" else (L if here == &"S2" else R)
+		return _walk(_patrol_dir) if sub == "patrol" else (L if here == &"S2" or here == &"S9" else R)
 	var target := _target(here)
 	# Op de route (niet de arena) loopt P1 door zodra elke vijand een merk heeft
 	# of op is: de echo laat de merken achter hem knallen (E-02m).
@@ -598,6 +631,8 @@ func _bounds(here: StringName) -> Vector2:
 			return Vector2(Layout.B4_FAR_EDGE + 10.0, Layout.S4_END_WALL - 10.0)
 		&"S6":
 			return Vector2(Layout.ROOMS[&"S6"].position.x + 10.0, (Layout.PUMP_VANES[0] as Vector2).x - 20.0)
+		&"S9":
+			return Vector2(Layout.S9_PLAAT_END + 10.0, Layout.S9_PIJLER.position.x - 10.0)
 	return Vector2(-INF, INF)
 
 
@@ -829,16 +864,17 @@ func _climb_s6() -> int:
 	return _tap(J)
 
 
-## S7, het luik (V-01, SL-04): door de kelder naar het luik (langs de sokkel),
-## springen en meteen een neerslag (in de lucht AANVAL met omlaag): het luik
-## gaat open, P1 stuit en valt erdoor naar de benedenvloer.
-func _leg_luik() -> int:
+## S7 en S9, het luik (V-01, SL-04): naar het luik (in S7 langs de sokkel, in
+## S9 over de lage kade tot de kadewand), springen en meteen een neerslag (in
+## de lucht AANVAL met omlaag): het luik gaat open, P1 stuit en valt erdoor
+## naar de vloer eronder (`low`).
+func _leg_luik(luik: Rect2, up: float, low: float) -> int:
 	var p := _p1()
-	if _on_level(Layout.S7_LOW):
+	if _on_level(low):
 		_next_leg(true)
 		return L
-	var cx := Layout.LUIK.get_center().x
-	if p.motor.on_floor and _on_level(Layout.S7_UP):
+	var cx := luik.get_center().x
+	if p.motor.on_floor and _on_level(up):
 		if absf(p.position.x - cx) <= 3.0:
 			sub = "jump"
 			return _tap(J)
@@ -918,4 +954,90 @@ func _slow_kanaal() -> int:
 		if p.position.x <= Layout.KANAAL_LEFT + Layout.TREAD_W + 8.0 + 2.0:
 			return L | _tap(J)
 		return L
+	return L
+
+
+# --- Deel 3 (#83): S9 de lage kade ----------------------------------------------
+
+## Van de deur van de arena naar links, de kademuur van 45 op (springen 16 px
+## ervoor, zoals een speler: wie tegen een muur aan loopt, verliest de vloer en
+## springt pas weer na loslaten, kamerdoc §9) en de lage kade op. Het hoogwater
+## moet open zijn (`s = 2`).
+func _leg_kade9() -> int:
+	var p := _p1()
+	if _on_level(Layout.S9_KADE):
+		_next_leg(false)
+		return L
+	if _on_level(Layout.S9_DOOR_FLOOR) and p.position.x - Layout.S9_STEP_X <= Layout.HALF_W + 16.0:
+		return L | _tap(J)
+	return L
+
+
+## Van de galerij van B1 naar de schacht (x 460–500) en de treden recht omhoog
+## door het snelluik de gang van S1 in (`SLICE_EIND`).
+func _leg_schacht() -> int:
+	var p := _p1()
+	if _room.slice_end_tick >= 0:
+		_next_leg(true)
+		return 0
+	var cx := (Layout.S9_SHAFT_LEFT + Layout.S9_SHAFT_RIGHT) * 0.5
+	if not p.motor.on_floor:
+		if p.position.x < cx - 2.0:
+			return R
+		if p.position.x > cx + 2.0:
+			return L
+		return 0
+	if _on_level(Layout.S9_UP):
+		if p.position.x >= Layout.S9_SHAFT_LEFT - 14.0:
+			return R | _tap(J)
+		return R
+	if absf(p.position.x - cx) > 2.0:
+		return _walk(1 if cx > p.position.x else -1)
+	return _tap(J)
+
+
+## De trap van S9 naar het plein (voor trap 2, SL-02): van de vloer bij de deur
+## onder de eerste trede, dan schuin omhoog naar de volgende (om en om links en
+## rechts) en van de bovenste naar rechts het plein op. Klaar op het plein.
+func _leg_trap9() -> int:
+	var p := _p1()
+	if _room.room == &"S6" and _on_level(Layout.S6_FLOOR):
+		_next_leg(false)
+		return 0
+	var treads := Layout.s9_trap_treads()
+	if not p.motor.on_floor:
+		if is_nan(_trap_x):
+			return 0
+		if p.position.x < _trap_x - 2.0:
+			return R
+		if p.position.x > _trap_x + 2.0:
+			return L
+		return 0
+	if _on_level(Layout.S9_DOOR_FLOOR):
+		_trap_x = float(treads[0][1]) + Layout.S9_TRAP_W * 0.5
+		if absf(p.position.x - _trap_x) <= 2.0:
+			return _tap(J)
+		return _walk(1 if _trap_x > p.position.x else -1)
+	for i in treads.size():
+		if _on_level(float(treads[i][0])):
+			if i + 1 < treads.size():
+				_trap_x = float(treads[i + 1][1]) + Layout.S9_TRAP_W * 0.5
+			else:
+				_trap_x = Layout.ROOMS[&"S6"].position.x + 16.0
+			return _tap(J)
+	return 0
+
+
+## En terug: van het plein naar links de schacht in, en van elke trede aan de
+## open kant eraf, tot de vloer bij de deur (S9).
+func _leg_trap9_af() -> int:
+	var p := _p1()
+	if _room.room == &"S9" and _on_level(Layout.S9_DOOR_FLOOR):
+		_next_leg(false)
+		return 0
+	if not p.motor.on_floor:
+		return 0
+	for tr: Array in Layout.s9_trap_treads():
+		if _on_level(float(tr[0])):
+			return R if float(tr[1]) <= Layout.S9_TRAP_LEFT else L
 	return L

@@ -96,6 +96,8 @@ var progress: Node = null
 ## anders de kamer waar P1 binnenkomt (bv. &"S7": door de kelderingang, dus
 ## na het gemaal; &"S8": de arena).
 var run_end: StringName = &"S4"
+## `run_end` voor de lus (deel 3): `RUN_EIND` op `SLICE_EIND` (door S9 terug in S1).
+const RUN_END_LUS := &"SLICE_EIND"
 
 ## --- Toestand ---
 var sim: Sim
@@ -112,6 +114,11 @@ var run_over := false
 var end_tick := -1
 ## Fouten van `AreaLoader.start` en `Progress.bind_area_loader` (leeg = goed).
 var start_errors := PackedStringArray()
+## S9 (deel 3): tick waarop P1 logbladzijde 3 haalde, of -1 (placeholder, WS-08).
+var logblad_3_tick := -1
+## Tick van `SLICE_EIND`: P1 kwam door het snelluik van S9 en staat in de gang
+## van S1 (de lus is rond, L-14 f), of -1.
+var slice_end_tick := -1
 ## S3: 0 = nog niet begonnen, 1, 2.
 var wave := 0
 var wave_2_tick := -1
@@ -279,6 +286,13 @@ func _on_loaded_changed(_tick: int, id: StringName, geladen: bool) -> void:
 				meetlog.add_row(t, "POMP", str(amount), who, gemaal.last_vane.position))
 			gemaal.full.connect(func(t: int) -> void:
 				meetlog.add_row(t, "GEMAAL_VOL", "", "", gemaal.last_vane.position))
+		&"S9":
+			# De lage kade (deel 3): het E-paar (verlicht, VJ-06: `lit` in de
+			# scène tot de waterstand het zet, GP) en het luik (SL-04).
+			_pair(inhoud, ^"Paar1A", ^"Paar1B", "paar_e")
+			var luik_9: Luik = inhoud.get_node(^"Luik")
+			luik_9.opened.connect(func(t: int, by: String) -> void:
+				meetlog.add_row(t, "LUIK", "", by, luik_9.global_position))
 		&"S7":
 			# Dwaallichten: banen van 32 px op 1/3 en 2/3 van het kanaal, 40 px
 			# boven de vloer (§2.6), in de scène (`lane_from`, `lane_to`,
@@ -374,6 +388,7 @@ func set_door(id: StringName, block_name: String, closed: bool) -> bool:
 
 func _on_tick(tick: int) -> void:
 	_wake(tick)
+	_pick_up(tick)
 	if room == &"S3":
 		if wave == 0:
 			wave = 1
@@ -424,6 +439,23 @@ func _wake(tick: int) -> void:
 				_awake[enemy] = tick
 		if not _awake.has(enemy):
 			enemy.hold_until(tick + 2)
+
+
+## S9 (deel 3): logbladzijde 3 (placeholder, WS-08: P1 binnen 12 px van de
+## plek) en `SLICE_EIND` (placeholder voor de GP, T8a): P1 kwam van S9 S1 in en
+## staat op de vloer van de gang. Met `run_end` = `RUN_END_LUS` eindigt de run daar.
+func _pick_up(tick: int) -> void:
+	if logblad_3_tick < 0 and room == &"S9" and p1.position.distance_to(Layout.LOGBLAD_3) <= 12.0:
+		logblad_3_tick = tick
+		meetlog.add_row(tick, "LOGBLAD", "3", "p1", p1.position)
+	if slice_end_tick >= 0 or room != &"S1" or room_changes.is_empty() or room_changes[-1][1] != &"S9":
+		return
+	if not p1.motor.on_floor or absf(p1.position.y - (Layout.S1_FLOOR - Layout.HALF_H)) > 1.5:
+		return
+	slice_end_tick = tick
+	meetlog.add_row(tick, "SLICE_EIND", "", "", p1.position)
+	if run_end == RUN_END_LUS and not run_over:
+		_end_run(tick)
 
 
 func _wave_1_marked_or_dead() -> bool:

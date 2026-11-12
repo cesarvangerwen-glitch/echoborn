@@ -18,6 +18,8 @@ const SpikeWorld = preload("res://scripts/world/spike_world.gd")
 const BLOCK_COLOR := Color(0.35, 0.35, 0.4)
 const ONE_WAY_COLOR := Color(0.55, 0.55, 0.6)
 const TREAD_COLOR := Color(0.42, 0.5, 0.42)
+## Placeholder voor water dat een weg dichthoudt (S9 `Hoogwater`, tot `s = 2`).
+const WATER_COLOR := Color(0.25, 0.4, 0.6, 0.8)
 
 ## D van de sessie; de gebiedsscène zet hem vóór het laden van de eerste kamer.
 static var tail := 60
@@ -36,6 +38,8 @@ func _ready() -> void:
 		var color := BLOCK_COLOR
 		if spec[2]:
 			color = TREAD_COLOR if str(spec[0]).contains("Trede") else ONE_WAY_COLOR
+		elif str(spec[0]).begins_with("Hoogwater"):
+			color = WATER_COLOR
 		for child in body.get_children():
 			if child is Polygon2D:
 				(child as Polygon2D).color = color

@@ -1,6 +1,7 @@
 extends RefCounted
-## Geometrie van de Kadewijk: S1–S8 als grijze blokken (T8a, #83; deel 1
-## S1–S4 hieronder getekend, deel 2 S5–S8 vanaf "S5 Sluiswachtershuis";
+## Geometrie van de Kadewijk: S1–S9 als grijze blokken (T8a, #83; deel 1
+## S1–S4 hieronder getekend, deel 2 S5–S8 vanaf "S5 Sluiswachtershuis",
+## deel 3 S9 (de lage kade, de lus terug naar S1) vanaf "S9 Lage kade";
 ## `docs/design/wereld.md` §2.2, gdd v0.8.2 §4.3 en §4.8.5;
 ## `docs/design/kamers/kadewijk.md`, §2 en §3b–§3e).
 ##
@@ -50,21 +51,26 @@ const ROOMS := {
 	&"S6": Rect2(4160, -200, 960, 560),
 	&"S7": Rect2(4800, 360, 960, 360),
 	&"S8": Rect2(4160, 360, 640, 360),
+	# Deel 3 (#83): de lage kade onder S1–S5, van de arena terug naar S1.
+	&"S9": Rect2(0, 360, 4160, 360),
 }
 ## Buren (E-04a): de doorgangen. S4–S5 op de kade, S5–S6 over de zolder en de
 ## loopbrug, S6–S7 door de kelderingang (de sluis), S7–S8 de deur van de
-## machinehal. S8–S9 en S9–S1 (de lage kade, de lus, L-14f) komen later (§9).
+## machinehal. Deel 3: S8–S9 de deur links van de arena, S5–S9 de trap terug
+## naar het plein (die door de hoek van S5 loopt), S9–S1 de snelkoppeling (het
+## snelluik in de gang van S1; de lus, L-14 f).
 const NEIGHBOURS := {
-	&"S1": [&"S2"],
+	&"S1": [&"S2", &"S9"],
 	&"S2": [&"S1", &"S3"],
 	&"S3": [&"S2", &"S4"],
 	&"S4": [&"S3", &"S5"],
-	&"S5": [&"S4", &"S6"],
+	&"S5": [&"S4", &"S6", &"S9"],
 	&"S6": [&"S5", &"S7"],
 	&"S7": [&"S6", &"S8"],
-	&"S8": [&"S7"],
+	&"S8": [&"S7", &"S9"],
+	&"S9": [&"S8", &"S5", &"S1"],
 }
-const ORDER := [&"S1", &"S2", &"S3", &"S4", &"S5", &"S6", &"S7", &"S8"]
+const ORDER := [&"S1", &"S2", &"S3", &"S4", &"S5", &"S6", &"S7", &"S8", &"S9"]
 ## Deel 1 (S1–S4, PR #208/#220): de runs tot `END_X` en hun normen per kamer.
 const DEEL_1 := [&"S1", &"S2", &"S3", &"S4"]
 const AREA_RIGHT := 5760.0
@@ -76,6 +82,10 @@ const S1_WALL := 20.0
 const S1_FLOOR := 320.0
 const S1_UP := 230.0             ## galerij op 90 = de kade naar S2
 const S1_QUAY_LEFT := 500.0      ## 480 px van de wand: einde van de galerij, begin van de kademuur
+## Het snelluik (deel 3): een eenrichtingsluik in de gang, achter het begin en
+## buiten de aanloop van B1; de schacht van S9 komt hier uit (de lus, L-14 f).
+## Van boven loop je eroverheen, van onder spring je erdoor.
+const SNELLUIK := Rect2(460, S1_FLOOR, 40, ONE_WAY_T)
 
 ## --- S2 Kadegang: kade op 230, B3 (lus/keerpunt), gang op 160, B1, bovenroute op 70 ---
 const S2_FLOOR := 230.0
@@ -193,6 +203,75 @@ const ARENA_DOOR_L := Rect2(4160, 360, 20, 360)
 ## Gameplay Programmer sluit ze bij `BOSS_START` (`Kadewijk.set_door`).
 const START_OPEN := ["DeurRechts"]
 
+## --- S9 Lage kade: de lus terug naar S1 (deel 3; wereld.md §2.2, L-14 d–f) ---
+## Van de deur links van de arena (vloer 680) naar links: de trap terug naar
+## het plein (voor trap 2, SL-02), het hoogwater (tot `s = 2` dicht), de lage
+## kade op 635 met het E-paar (verlicht, VJ-06), het luik in de kade (SL-04:
+## de enige vaardigheidspoort van de slice; zonder V-01 een doodlopende kade),
+## de benedenkade op 700, **B1** tegen de grachtwand onder S1 met
+## logbladzijde 3 op de galerij (L-12), en de schacht naar het snelluik in de
+## gang van S1 (`SLICE_EIND`). Onderweg de brugpijler (B2, twee verdiepingen).
+const S9_DOOR_FLOOR := 680.0       ## = `ARENA_FLOOR`: je loopt de arena uit
+const S9_KADE := 635.0             ## de lage kade: 45 boven de vloer bij de deur (FK-6)
+const S9_LAAG := 700.0             ## de benedenkade, onder het luik
+const S9_STEP_X := 3980.0          ## de kademuur van de lage kade (45 hoog)
+## Placeholder voor de waterstand (LM-10, SL-02): tot `s = 2` staat de lage
+## kade onder water. Een blok dat de Gameplay Programmer opent met
+## `Kadewijk.set_door(&"S9", "Hoogwater", false)` als trap 2 vol is.
+const S9_HOOGWATER := Rect2(3920, 360, 60, S9_KADE - 360.0)
+## De brugpijler onder S4 (B2 met twee verdiepingen, zoals S5): de lage kade
+## loopt tegen de pijler; keren en bouncen naar richel 1 (tegen de pijlerwand
+## rechts), daar keren en bouncen naar richel 2, die over de pijler gaat; dan
+## naar links eraf, terug op de kade. Een schacht van 480 px, dus de maten van
+## B2 (`b2_keerzone`, `b2_ledge`). Langzame lijn: de treden 30/60/90.
+const S9_PIJLER := Rect2(2520, 455, 60, S9_KADE - 455.0)
+const S9_B2_LEFT := 2580.0
+const S9_B2_RIGHT := 3060.0
+const S9_B2_LEVELS := [S9_KADE, S9_KADE - 90.0, S9_KADE - 180.0]
+## Het luik in de kade (V-01, SL-04; `kadewijk_luik.gd`, zoals in S7), vlak
+## vóór de kadewand: de lage kade loopt dood.
+const S9_LUIK := Rect2(560, S9_KADE, 40, 16)
+const S9_KADEWAND := Rect2(520, 360, 20, S9_KADE + 16.0 - 360.0)
+## Rechts van het luik ligt de kadevloer als plaat (16 dik) tot hier; daaronder
+## loopt de benedenkade naar links, de B1-hal in.
+const S9_PLAAT_END := 700.0
+## B1 tegen de grachtwand: dezelfde maten als in S1, één verdieping lager.
+const S9_WALL := 20.0
+const S9_UP := S9_LAAG - 90.0      ## galerij op 90 (610)
+const S9_SHAFT_LEFT := 460.0       ## einde van de galerij = de schacht (onder het snelluik)
+const S9_SHAFT_RIGHT := 500.0
+## De schacht: eenrichtingstreden recht boven elkaar, ≤ 45 px (FK-6), van de
+## galerij (610) tot het snelluik (320).
+const S9_SHAFT := [569.0, 528.0, 486.0, 445.0, 403.0, 362.0]
+## Logbladzijde 3 (WS-08, placeholder) op de galerij: 105 px boven de
+## benedenkade, dus in één beweging alleen met de bounce (L-12; zoals het
+## lampglas). Langzame lijn: de treden van B1.
+const LOGBLAD_3 := Vector2(300, S9_UP - HALF_H)
+## De trap terug naar het plein (voor trap 2; SL-02, GM-10): een schacht van
+## 50 px (x 4100–4150) in de hoek bij de deur, door de hoek van S5 omhoog naar
+## de linkerrand van het plein (260). Treden van 30 px om en om tegen de linker-
+## en de rechterwand, 42 px boven elkaar: omhoog spring je schuin naar de
+## volgende, omlaag stap je eraf en vang je de volgende. Het plein is zo ook de
+## weg terug naar de lage kade. De bovenste twee liggen in S5.
+const S9_TRAP_LEFT := 4100.0
+const S9_TRAP_RIGHT := 4150.0
+const S9_TRAP_W := 30.0
+const S9_TRAP := [638.0, 596.0, 554.0, 512.0, 470.0, 428.0, 386.0, 344.0, 302.0]
+## Onderkant van de trapwanden: de doorgang van de deur (680) blijft vrij.
+const S9_TRAP_WALL_BOTTOM := 640.0
+## Waar de echolijn van S9 begint en eindigt (de tests).
+const S9_END := Vector2(480, S1_FLOOR - HALF_H)
+
+
+## Treden van de trap terug naar het plein: [y, x0], om en om links en rechts.
+static func s9_trap_treads() -> Array:
+	var out: Array = []
+	for i in S9_TRAP.size():
+		var x0 := S9_TRAP_LEFT if i % 2 == 0 else S9_TRAP_RIGHT - S9_TRAP_W
+		out.append([S9_TRAP[i], x0])
+	return out
+
+
 ## Begin van elke kamer (LM-05, LM-08: vaste, veilige plek; ook het debugmenu).
 const ROOM_START := {
 	&"S1": Vector2(440, S1_FLOOR - HALF_H),
@@ -203,6 +282,7 @@ const ROOM_START := {
 	&"S6": Vector2(4180, S5_ZOLDER - HALF_H),
 	&"S7": Vector2(5030, S7_UP - HALF_H),
 	&"S8": Vector2(4790, S7_LOW - HALF_H),
+	&"S9": Vector2(4060, S9_DOOR_FLOOR - HALF_H),
 }
 const RUN_START := Vector2(440, S1_FLOOR - HALF_H)
 
@@ -276,6 +356,11 @@ static func turn_points(d: int) -> Array:
 		# het rad). Geen weg omhoog (GM-01: geen richels), dus de stap rondt nooit
 		# af; alleen voor de arena-test.
 		{"name": "S8-rad", "wall": ARENA_WALL_L, "floor": ARENA_FLOOR, "side": -1, "up": ARENA_FLOOR - 400.0},
+		# Index 8: S9, B1 tegen de grachtwand naar de galerij met logbladzijde 3.
+		{"name": "S9-B1", "wall": S9_WALL, "floor": S9_LAAG, "side": -1, "up": S9_UP},
+		# Index 9–10: S9, B2 over de brugpijler (van onder naar boven).
+		{"name": "S9-B2a", "wall": S9_B2_LEFT, "floor": S9_B2_LEVELS[0], "side": -1, "up": S9_B2_LEVELS[1], "z": b2_keerzone(d)},
+		{"name": "S9-B2b", "wall": S9_B2_RIGHT, "floor": S9_B2_LEVELS[1], "side": 1, "up": S9_B2_LEVELS[2], "z": b2_keerzone(d)},
 	]
 
 
@@ -317,13 +402,15 @@ static func room_of(at: Vector2) -> StringName:
 static func blocks(id: StringName, d: int) -> Array:
 	var out: Array = []
 	var r: Rect2 = ROOMS[id]
-	if id != &"S7":
+	if id != &"S7" and id != &"S9":
 		out.append(["Plafond", Rect2(r.position.x, r.position.y - 20, r.size.x, 20), false])
 	match id:
 		&"S1":
 			var z := keerzone(d)
 			out.append(["WandLinks", Rect2(0, 0, S1_WALL, ROOM_H), false])
-			out.append(["Gang", Rect2(S1_WALL, S1_FLOOR, S1_QUAY_LEFT - S1_WALL, ROOM_H - S1_FLOOR), false])
+			# De gang tot het snelluik (deel 3); het luik is een eenrichtingsvloer.
+			out.append(["Gang", Rect2(S1_WALL, S1_FLOOR, SNELLUIK.position.x - S1_WALL, ROOM_H - S1_FLOOR), false])
+			out.append(["Snelluik", SNELLUIK, true])
 			out.append(["Kademuur", Rect2(S1_QUAY_LEFT, S1_UP, r.end.x - S1_QUAY_LEFT, ROOM_H - S1_UP), false])
 			out.append(["Galerij", Rect2(S1_WALL + z, S1_UP, S1_QUAY_LEFT - S1_WALL - z, ONE_WAY_T), true])
 			out.append_array(_treads("B1", S1_WALL, 1.0, S1_FLOOR, d))
@@ -360,7 +447,13 @@ static func blocks(id: StringName, d: int) -> Array:
 			# Linkerwand van de schacht; de gang van S4 loopt eronder door (84 px hoog).
 			out.append(["WandLinks", Rect2(r.position.x, r.position.y, B2_LEFT - r.position.x, B2_LEVELS[1] + ONE_WAY_T - r.position.y), false])
 			# Rechterwand; zijn bovenkant is de zolder, die doorloopt naar S6.
-			out.append(["WandRechts", Rect2(B2_RIGHT, S5_ZOLDER, r.end.x - B2_RIGHT, ROOM_H - S5_ZOLDER), false])
+			# Deel 3: onderin de hoek loopt de trap van S9 naar het plein, achter
+			# een wand van 20 px (geen weg van het huis naar het plein).
+			out.append(["WandRechts", Rect2(B2_RIGHT, S5_ZOLDER, S9_TRAP_LEFT - B2_RIGHT, ROOM_H - S5_ZOLDER), false])
+			out.append(["WandRechts2", Rect2(S9_TRAP_LEFT, S5_ZOLDER, r.end.x - S9_TRAP_LEFT, S6_FLOOR - 60.0 - S5_ZOLDER), false])
+			for tr: Array in s9_trap_treads():
+				if tr[0] < r.end.y:
+					out.append(["Trap9_%d" % int(tr[0]), Rect2(tr[1], tr[0], S9_TRAP_W, ONE_WAY_T), true])
 			for i in range(1, B2_LEVELS.size()):
 				var y: float = B2_LEVELS[i]
 				var x0 := B2_LEFT if i % 2 == 1 else B2_RIGHT - w
@@ -395,6 +488,43 @@ static func blocks(id: StringName, d: int) -> Array:
 			out.append(["MuurRechts", Rect2(ARENA_WALL_R, S7_LOW, r.end.x - ARENA_WALL_R, r.end.y - S7_LOW), false])
 			out.append(["DeurLinks", ARENA_DOOR_L, false])
 			out.append(["DeurRechts", ARENA_DOOR_R, false])
+		&"S9":
+			var z := keerzone(d)
+			# Plafond met twee gaten: de schacht naar het snelluik en de trap.
+			out.append(["Plafond", Rect2(0, r.position.y - 20, S9_SHAFT_LEFT, 20), false])
+			out.append(["Plafond2", Rect2(S9_SHAFT_RIGHT, r.position.y - 20, S9_TRAP_LEFT - S9_SHAFT_RIGHT, 20), false])
+			out.append(["WandLinks", Rect2(0, r.position.y, S9_WALL, ROOM_H), false])
+			# De deur: de vloer van de arena loopt door tot onder de kademuur
+			# (40 px eronder, zodat de hoek geen naad heeft).
+			out.append(["Deurvloer", Rect2(S9_STEP_X - 40.0, S9_DOOR_FLOOR, r.end.x - S9_STEP_X + 40.0, r.end.y - S9_DOOR_FLOOR), false])
+			out.append(["TrapWandLinks", Rect2(S9_TRAP_LEFT - 10.0, r.position.y, 10, S9_TRAP_WALL_BOTTOM - r.position.y), false])
+			out.append(["TrapWandRechts", Rect2(S9_TRAP_RIGHT, r.position.y, r.end.x - S9_TRAP_RIGHT, S9_TRAP_WALL_BOTTOM - r.position.y), false])
+			for tr: Array in s9_trap_treads():
+				if tr[0] >= r.position.y:
+					out.append(["Trap9_%d" % int(tr[0]), Rect2(tr[1], tr[0], S9_TRAP_W, ONE_WAY_T), true])
+			out.append(["Hoogwater", S9_HOOGWATER, false])
+			# De lage kade (635) van de kademuur tot de plaat, de plaat met het
+			# luik tot de kadewand, en daaronder de benedenkade (700).
+			out.append(["Kade", Rect2(S9_PLAAT_END, S9_KADE, S9_STEP_X - S9_PLAAT_END, r.end.y - S9_KADE), false])
+			out.append(["Plaat", Rect2(S9_LUIK.end.x, S9_KADE, S9_PLAAT_END - S9_LUIK.end.x, 16), false])
+			out.append(["Plaat2", Rect2(S9_KADEWAND.end.x, S9_KADE, S9_LUIK.position.x - S9_KADEWAND.end.x, 16), false])
+			out.append(["Kadewand", S9_KADEWAND, false])
+			# De brugpijler (B2): de pijler, de wand rechts (je loopt eronder door
+			# de schacht in), richel 1 tegen de wand, richel 2 tegen de pijler.
+			var w := b2_ledge(d)
+			out.append(["Pijler", S9_PIJLER, false])
+			out.append(["PijlerWand", Rect2(S9_B2_RIGHT, r.position.y, 20, S9_B2_LEVELS[1] + ONE_WAY_T - r.position.y), false])
+			out.append(["PijlerRichel1", Rect2(S9_B2_RIGHT - w, S9_B2_LEVELS[1], w, ONE_WAY_T), true])
+			out.append(["PijlerRichel2", Rect2(S9_B2_LEFT, S9_B2_LEVELS[2], w, ONE_WAY_T), true])
+			for tp: Dictionary in turn_points(d).slice(9, 11):
+				var prefix: String = String(tp["name"]).trim_prefix("S9-")
+				out.append_array(_treads(prefix, tp["wall"], -float(tp["side"]), tp["floor"], d))
+			out.append(["Benedenkade", Rect2(S9_WALL, S9_LAAG, S9_PLAAT_END - S9_WALL, r.end.y - S9_LAAG), false])
+			# B1 tegen de grachtwand en de galerij tot de schacht.
+			out.append(["Galerij", Rect2(S9_WALL + z, S9_UP, S9_SHAFT_LEFT - S9_WALL - z, ONE_WAY_T), true])
+			out.append_array(_treads("B1", S9_WALL, 1.0, S9_LAAG, d))
+			for y: float in S9_SHAFT:
+				out.append(["Schacht%d" % int(y), Rect2(S9_SHAFT_LEFT, y, S9_SHAFT_RIGHT - S9_SHAFT_LEFT, ONE_WAY_T), true])
 	return out
 
 
