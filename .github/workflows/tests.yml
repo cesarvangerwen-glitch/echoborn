@@ -30,10 +30,15 @@ env:
 
 jobs:
   tests:
-    name: tests (${{ matrix.os }})
+    # #233 (TD): per OS twee jobs naast elkaar. `kort` = alle testscripts
+    # behalve LANG_SCRIPTS (run_tests.gd) plus de meta-run; `lang` = de lange
+    # scripted runs. Samen draaien ze precies TEST_SCRIPTS.
+    name: tests (${{ matrix.os }}, ${{ matrix.groep }})
     strategy:
       fail-fast: false
       matrix:
+        os: [linux, windows]
+        groep: [kort, lang]
         include:
           - os: linux
             runner: ubuntu-24.04
@@ -110,11 +115,18 @@ jobs:
           # Besluit TD (c): elk .import- en .uid-bestand staat in git.
           NEW=$(git status --porcelain --untracked-files=all -- game | grep '^??' || true); [ -z "$NEW" ] || { echo "$NEW"; echo "::error::.import/.uid niet gecommit"; exit 1; }
 
-      - name: Tests (headless)
+      - name: Tests (headless, groep ${{ matrix.groep }})
         run: |
-          "$GODOT" --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd 2>&1 | tee tests.log
+          "$GODOT" --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd -- --groep=${{ matrix.groep }} 2>&1 | tee tests.log
+          # #233: een lek bij het afsluiten (een RefCounted-kring, een node die
+          # niet vrijkomt) maakt de job rood. Details: dezelfde run met --verbose.
+          if grep -E 'resources still in use at exit|ObjectDB instances leaked at exit' tests.log; then
+            echo "::error::lek bij afsluiten (draai lokaal met --verbose voor de bron)"
+            exit 1
+          fi
 
       - name: Meta-run (kapotte tests moeten de suite rood maken)
+        if: matrix.groep == 'kort'
         # ontwerp.md §9 en R18: bewijst dat de runner een scriptfout, een test
         # met 0 checks en (#82) een parse-fout in een script waar een test van
         # afhangt als FAIL telt en exitcode 1 geeft. Die laatste moet de
@@ -122,16 +134,15 @@ jobs:
         # Verwacht 5 FAIL's: 2 in de scriptcontrole (meta_broken_dep.gd en
         # test_meta_broken_dep.gd), 2 tests in test_meta_broken.gd, en
         # test_meta_broken_dep.gd dat in de testlus niet laadt.
+        # #233: de testlus draait alleen de twee meta-scripts (`--scripts=`);
+        # de scriptcontrole laadt nog steeds elk script.
         run: |
           META="test_meta_broken.gd meta_broken_dep.gd test_meta_broken_dep.gd"
           for f in $META; do cp ".github/ci/$f" game/tests/; done
-          sed -i 's|^const TEST_SCRIPTS := \[|&"res://tests/test_meta_broken.gd", "res://tests/test_meta_broken_dep.gd", |' game/tests/run_tests.gd
-          grep -q 'res://tests/test_meta_broken_dep.gd' game/tests/run_tests.gd || { echo "::error::meta-tests niet in TEST_SCRIPTS gezet"; exit 1; }
           set +e
-          "$GODOT" --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd > meta.log 2>&1
+          "$GODOT" --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd -- --scripts=res://tests/test_meta_broken.gd,res://tests/test_meta_broken_dep.gd > meta.log 2>&1
           CODE=$?
           set -e
-          git checkout -- game/tests/run_tests.gd
           for f in $META; do rm "game/tests/$f"; done
           grep -E 'FAIL (test_meta_|res://tests/(test_)?meta_|script laadt niet)|Resultaat' meta.log
           [ "$CODE" -eq 1 ] || { echo "::error::meta-run gaf exitcode $CODE, verwacht 1"; exit 1; }
@@ -140,6 +151,7 @@ jobs:
           # Alles vóór de kop van het eerste testscript is de scriptcontrole.
           awk '/^res:\/\/tests\//{exit} {print}' meta.log > meta_voor_tests.log
           grep -q 'FAIL res://tests/meta_broken_dep.gd laadt niet' meta_voor_tests.log || { echo "::error::parse-fout in een afhankelijk script niet vóór de eerste test als FAIL gemeld"; exit 1; }
+          grep -q 'groep --scripts: 2 van' meta.log || { echo "::error::meta-run draaide niet precies de 2 meta-scripts"; exit 1; }
           grep -q ' 5 mislukt' meta.log || { echo "::error::verwacht precies 5 mislukte tests"; exit 1; }
           echo "Meta-run OK: runner geeft FAIL en exitcode 1"
 
@@ -147,7 +159,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: testuitvoer-${{ matrix.os }}
+          name: testuitvoer-${{ matrix.os }}-${{ matrix.groep }}
           path: |
             import.log
             tests.log
