@@ -1,0 +1,246 @@
+{
+ "versie": "0.2",
+ "eigenaar": "Art Director",
+ "issue": 85,
+ "d_render": 60,
+ "gemaal_werkaanname": [
+  4960.0,
+  150.0
+ ],
+ "kamers": {
+  "s1_kade_ingang": {
+   "wereld_rect": [
+    0,
+    0,
+    640,
+    360
+   ],
+   "lagen": [
+    {
+     "naam": "achter",
+     "z_index": -30,
+     "bestanden": {
+      "grijs": "s1_kade_ingang_achter_grijs.png",
+      "half": "s1_kade_ingang_achter_half.png",
+      "kleur": "s1_kade_ingang_achter_kleur.png",
+      "index": "s1_kade_ingang_achter_index.png"
+     }
+    },
+    {
+     "naam": "midden",
+     "z_index": -20,
+     "bestanden": {
+      "grijs": "s1_kade_ingang_midden_grijs.png",
+      "half": "s1_kade_ingang_midden_half.png",
+      "kleur": "s1_kade_ingang_midden_kleur.png",
+      "index": "s1_kade_ingang_midden_index.png"
+     }
+    },
+    {
+     "naam": "speelvlak",
+     "z_index": -10,
+     "bestanden": {
+      "grijs": "s1_kade_ingang_speelvlak_grijs.png",
+      "half": "s1_kade_ingang_speelvlak_half.png",
+      "kleur": "s1_kade_ingang_speelvlak_kleur.png",
+      "index": "s1_kade_ingang_speelvlak_index.png"
+     }
+    },
+    {
+     "naam": "licht",
+     "z_index": -5,
+     "bestanden": {
+      "grijs": "s1_kade_ingang_licht_grijs.png",
+      "half": "s1_kade_ingang_licht_half.png",
+      "kleur": "s1_kade_ingang_licht_kleur.png"
+     }
+    },
+    {
+     "naam": "voor",
+     "z_index": 20,
+     "bestanden": {
+      "grijs": "s1_kade_ingang_voor_grijs.png",
+      "half": "s1_kade_ingang_voor_half.png",
+      "kleur": "s1_kade_ingang_voor_kleur.png",
+      "index": "s1_kade_ingang_voor_index.png"
+     }
+    }
+   ],
+   "lampen": [
+    {
+     "x": 620,
+     "y": 190,
+     "straal_band1": 80,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 392,
+     "y": 262,
+     "straal_band1": 84,
+     "aan_in": [
+      "grijs",
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 208,
+     "y": 262,
+     "straal_band1": 76,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    }
+   ],
+   "ramen": 70
+  },
+  "s3_vismarkt": {
+   "wereld_rect": [
+    1600,
+    0,
+    960,
+    360
+   ],
+   "lagen": [
+    {
+     "naam": "achter",
+     "z_index": -30,
+     "bestanden": {
+      "grijs": "s3_vismarkt_achter_grijs.png",
+      "half": "s3_vismarkt_achter_half.png",
+      "kleur": "s3_vismarkt_achter_kleur.png",
+      "index": "s3_vismarkt_achter_index.png"
+     }
+    },
+    {
+     "naam": "midden",
+     "z_index": -20,
+     "bestanden": {
+      "grijs": "s3_vismarkt_midden_grijs.png",
+      "half": "s3_vismarkt_midden_half.png",
+      "kleur": "s3_vismarkt_midden_kleur.png",
+      "index": "s3_vismarkt_midden_index.png"
+     }
+    },
+    {
+     "naam": "speelvlak",
+     "z_index": -10,
+     "bestanden": {
+      "grijs": "s3_vismarkt_speelvlak_grijs.png",
+      "half": "s3_vismarkt_speelvlak_half.png",
+      "kleur": "s3_vismarkt_speelvlak_kleur.png",
+      "index": "s3_vismarkt_speelvlak_index.png"
+     }
+    },
+    {
+     "naam": "licht",
+     "z_index": -5,
+     "bestanden": {
+      "grijs": "s3_vismarkt_licht_grijs.png",
+      "half": "s3_vismarkt_licht_half.png",
+      "kleur": "s3_vismarkt_licht_kleur.png"
+     }
+    },
+    {
+     "naam": "voor",
+     "z_index": 20,
+     "bestanden": {
+      "grijs": "s3_vismarkt_voor_grijs.png",
+      "half": "s3_vismarkt_voor_half.png",
+      "kleur": "s3_vismarkt_voor_kleur.png",
+      "index": "s3_vismarkt_voor_index.png"
+     }
+    }
+   ],
+   "lampen": [
+    {
+     "x": 1688,
+     "y": 214,
+     "straal_band1": 72,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 1894,
+     "y": 210,
+     "straal_band1": 68,
+     "aan_in": [
+      "grijs",
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 2070,
+     "y": 220,
+     "straal_band1": 80,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 2460,
+     "y": 220,
+     "straal_band1": 80,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    }
+   ],
+   "ramen": 137
+  }
+ },
+ "eenrichting": {
+  "atlas": {
+   "grijs": "kadewijk_eenrichting_grijs.png",
+   "half": "kadewijk_eenrichting_half.png",
+   "kleur": "kadewijk_eenrichting_kleur.png",
+   "index": "kadewijk_eenrichting_index.png"
+  },
+  "stukken": {
+   "galerij": {
+    "region": [
+     0,
+     0,
+     48,
+     16
+    ],
+    "marge_links": 16,
+    "marge_rechts": 16,
+    "herhaal": "tile"
+   },
+   "trede": {
+    "region": [
+     0,
+     16,
+     48,
+     16
+    ],
+    "marge_links": 16,
+    "marge_rechts": 16,
+    "herhaal": "tile"
+   }
+  },
+  "blokken": {
+   "S1/Galerij": "galerij",
+   "S1/B1Trede30": "trede",
+   "S1/B1Trede60": "trede",
+   "S1/B1Trede90": "trede"
+  },
+  "plaatsing": "NinePatchRect op Rect2(blok.position, Vector2(blok.size.x, 16)); loopvlak = bovenrand van het blok"
+ },
+ "import": {
+  "map": "res://art/wereld/kadewijk/",
+  "texture": "Lossless, mipmaps uit, filter Nearest op het CanvasItem (texture_filter = NEAREST), repeat uit",
+  "positie": "Sprite2D, centered = false, global_position = wereld_rect.position (linksboven van de kamer)",
+  "toestanden": "grijs / half / kleur; index = R materiaal-id, G tint*32+16, B 255 = raam, A 255"
+ }
+}
