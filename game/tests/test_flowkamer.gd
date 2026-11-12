@@ -6,10 +6,11 @@ extends RefCounted
 ## CSV en is deterministisch, en met echo uit is het gemaal vol te krijgen
 ## (FK-2). De run haalt ook LM-04 in de pompgang van K3 (W-4): elke schoep één
 ## slag, `GEMAAL_VOL` vóór P1 bij de sluis is, geen stilstand > 30 ticks in K3.
-## Elke run duurt ± 3800–5800 ticks; de runner geeft een test 7200 frames,
-## daarom is elke run een eigen test (ook FK-2 per D). De run van D = 90 wordt
-## in een volgende test afgespeeld met een ScriptedInput (zelfde bits, zelfde
-## log).
+## Elke run duurt ± 3700–5900 ticks; de runner geeft een test 7200 frames,
+## daarom is elke run een eigen test (ook FK-2 per D). D = 60 is de standaard
+## (CEO-besluit 2026-11-12, gdd v0.8 §4.8.4 W-10); 90, 120 en 180 draaien als
+## regressie op dezelfde kamer. De run van D = 60 wordt in een volgende test
+## afgespeeld met een ScriptedInput (zelfde bits, zelfde log).
 
 const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
 const FlowBot = preload("res://levels/flowkamer/flow_bot.gd")
@@ -21,9 +22,9 @@ const LightMeter = preload("res://scripts/light/light_meter.gd")
 const Gemaal = preload("res://scripts/light/gemaal.gd")
 const Meetlog = preload("res://scripts/events/meetlog.gd")
 
-## Run van test_scripted_run_d90, voor de replay-test.
-static var _d90_bits := PackedInt32Array()
-static var _d90_csv := ""
+## Run van test_scripted_run_d60, voor de replay-test.
+static var _d60_bits := PackedInt32Array()
+static var _d60_csv := ""
 ## Duur van de run met echo per D, voor FK-2.
 static var _echo_ticks := {}
 
@@ -175,40 +176,54 @@ func _check_run(t, room, bot, d: int) -> FlowReport:
 	return rep
 
 
-func test_scripted_run_d90(t) -> void:
-	var pair := _room(t, 90, true)
+## D = 60, de standaard (CEO-besluit 2026-11-12; gdd v0.8 §4.8.4 W-10): de
+## gescripte run vanaf RUN_START haalt RUN_EIND, de normen, LP ≥ 100 na K1 + K2
+## en LM-04 (rapport F0-2 §8.3 punt 1, 5 en 6), en schrijft de CSV als
+## `…_D60_p1.csv` (punt 8).
+func test_scripted_run_d60(t) -> void:
+	var pair := _room(t, 60, true)
 	var room = pair[0]
 	var bot = pair[1]
 	await _run(t, room)
-	_check_run(t, room, bot, 90)
+	_check_run(t, room, bot, 60)
 	# Het meetlog schrijft de CSV (gdd §4.5).
-	var path := "user://meetlog_test_solo_D90_p1.csv"
+	var path := "user://meetlog_test_solo_D60_p1.csv"
 	t.check(room.meetlog.save(path) == OK, "CSV niet opgeslagen")
 	var text := FileAccess.get_file_as_string(path)
 	t.check(text.begins_with(Meetlog.HEADER) and text.count("\n") == room.meetlog.rows.size() + 1,
 		"CSV klopt niet met het log")
-	t.check(room.log_file_name().begins_with("meetlog_") and room.log_file_name().ends_with("_solo_D90_p1.csv"),
+	t.check(room.log_file_name().begins_with("meetlog_") and room.log_file_name().ends_with("_solo_D60_p1.csv"),
 		"bestandsnaam %s" % room.log_file_name())
-	_echo_ticks[90] = room.run_ticks()
-	_d90_bits = bot.recorded
-	_d90_csv = room.meetlog.to_csv()
+	_echo_ticks[60] = room.run_ticks()
+	_d60_bits = bot.recorded
+	_d60_csv = room.meetlog.to_csv()
 	await _free(t, room)
 
 
 ## Dezelfde bits als ScriptedInput: hetzelfde log (gdd §4.5, determinisme).
-func test_replay_d90_gives_same_log(t) -> void:
-	t.check(not _d90_bits.is_empty(), "geen run van D = 90 om af te spelen")
+func test_replay_d60_gives_same_log(t) -> void:
+	t.check(not _d60_bits.is_empty(), "geen run van D = 60 om af te spelen")
 	var segments: Array = []
-	for bits in _d90_bits:
+	for bits in _d60_bits:
 		if not segments.is_empty() and segments[-1][1] == bits:
 			segments[-1][0] += 1
 		else:
 			segments.append([1, bits])
-	var pair := _room(t, 90, true, ScriptedInput.new(segments))
+	var pair := _room(t, 60, true, ScriptedInput.new(segments))
 	var room = pair[0]
 	await _run(t, room)
 	t.check(room.run_over, "replay haalt RUN_EIND niet")
-	t.check(room.meetlog.to_csv() == _d90_csv, "replay gaf een ander meetlog")
+	t.check(room.meetlog.to_csv() == _d60_csv, "replay gaf een ander meetlog")
+	await _free(t, room)
+
+
+## Regressie: D = 90, 120 en 180 op de kamer van D = 60.
+func test_scripted_run_d90(t) -> void:
+	var pair := _room(t, 90, true)
+	var room = pair[0]
+	await _run(t, room)
+	_check_run(t, room, pair[1], 90)
+	_echo_ticks[90] = room.run_ticks()
 	await _free(t, room)
 
 
@@ -246,6 +261,10 @@ func _fk2_echo_off(t, d: int) -> void:
 	t.note("echo uit, D=%d: %d ticks (%.2f× de run met echo), %d terugkeren in K2" % [
 		d, room.run_ticks(), float(room.run_ticks()) / maxi(with_echo, 1), room.k2_returns])
 	await _free(t, room)
+
+
+func test_fk2_echo_off_d60(t) -> void:
+	await _fk2_echo_off(t, 60)
 
 
 func test_fk2_echo_off_d90(t) -> void:

@@ -1,6 +1,8 @@
 extends RefCounted
 ## Flow-test T17 (#80), deel 1: de scripted runs van de QA Lead in de grijze
-## flow-kamer, solo en co-op, per staart D = 90 / 120 / 180 (1,5 / 2 / 3 s).
+## flow-kamer, solo en co-op, per staart D = 60 / 90 / 120 / 180 (1 / 1,5 / 2 /
+## 3 s; D = 60 is de standaard sinds het CEO-besluit van 2026-11-12, de andere
+## draaien als regressie, gdd v0.8 §4.8.4 W-10).
 ## Plan en rapport: `docs/qa/testplan-f0.md`, `docs/qa/rapport-f0-flowtest.md`.
 ##
 ## Deze tests **meten**; ze toetsen de normen niet. Een norm die niet
@@ -37,6 +39,7 @@ const COOP_LP := ["springplank", "bounce", "vang", "lancering", "ontploffing"]
 static var _solo_ticks := {}
 ## Meetlog-CSV van de schaduwpartner-run D = 120, voor de determinismetest.
 static var _coop120_csv := ""
+static var _coop60_csv := ""
 
 
 # --- Inputbronnen en proxy ---------------------------------------------------
@@ -164,6 +167,10 @@ class _CoopView:
 		get: return r.sim
 	var wave: int:
 		get: return r.wave
+	## De staart van de kamer: de bot kiest in B3 de lijn bij `b3_width(D)`
+	## (bij D = 60 geen blok, gdd v0.8 §4.3).
+	var tail: int:
+		get: return r.tail
 
 	func sync() -> void:
 		if r.p2 != null and is_instance_valid(r.p2):
@@ -433,6 +440,10 @@ func _coop(t, d: int, mode: String) -> String:
 
 # --- Tests (één run per test: de runner geeft 7200 frames) ---------------------
 
+func test_t17_solo_d60(t) -> void:
+	await _solo(t, 60)
+
+
 func test_t17_solo_d90(t) -> void:
 	await _solo(t, 90)
 
@@ -443,6 +454,17 @@ func test_t17_solo_d120(t) -> void:
 
 func test_t17_solo_d180(t) -> void:
 	await _solo(t, 180)
+
+
+func test_t17_coop_shadow_d60(t) -> void:
+	_coop60_csv = await _coop(t, 60, "schaduw")
+
+
+## Dezelfde run nog eens: hetzelfde meetlog (de meting is herhaalbaar).
+func test_t17_coop_shadow_d60_deterministic(t) -> void:
+	t.check(_coop60_csv != "", "geen eerste co-op-run D=60")
+	var again: String = await _coop(t, 60, "schaduw")
+	t.check(again == _coop60_csv, "co-op-run D=60 gaf de tweede keer een ander meetlog")
 
 
 func test_t17_coop_shadow_d90(t) -> void:
@@ -462,6 +484,10 @@ func test_t17_coop_shadow_d120_deterministic(t) -> void:
 	t.check(_coop120_csv != "", "geen eerste co-op-run D=120")
 	var again: String = await _coop(t, 120, "schaduw")
 	t.check(again == _coop120_csv, "co-op-run D=120 gaf de tweede keer een ander meetlog")
+
+
+func test_t17_coop_follower_d60(t) -> void:
+	await _coop(t, 60, "meeloper")
 
 
 func test_t17_coop_follower_d90(t) -> void:
