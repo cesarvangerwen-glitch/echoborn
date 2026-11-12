@@ -1,6 +1,6 @@
 # Kamers: de Kadewijk (wijk 1.3, de slice): S1–S8
 
-Versie 0.3 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
+Versie 0.3.1 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
 
 Bronnen: `docs/design/wereld.md` v0.2 §2 (kamerlijst §2.2, SL-regels §2.3, vijandtypes §2.4, T8a §2.5, acceptatie §2.6), `docs/design/gdd.md` v0.8.2 (§4.3 bouwstenen met D in formules, L-08–L-14, §4.5 normen, §4.8.5 vaste basis, §4.8.7 de langzame lijn met dash), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.3 (§2.6 plaatsing, VJ-01–VJ-08, §3.2 arena), `docs/design/gemaalmeester.md` v0.2.1 (GM-01, GM-07, GM-11), `docs/productie/fase-2-kader.md` v0.4 §4, `docs/tech/ontwerp.md` v0.3 (§3a, §7, §12 "naar T8a"), de visie-review van de CD ([comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), `docs/concept/visie-review/kadewijk/`).
 
@@ -272,35 +272,35 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 | 4 | ~~B4 is met de echo niet sneller dan de langzame lijn (305 tegen 283)~~ | Was "mag blijven"; **vervangen door 7** (visie-review CD: past niet) |
 | 5 | **S3 alleen vooruit**: van de markt niet terug naar de bovenroute; terug via de lus (S9) | **Akkoord**: geen vastlopen (L-10 gaat over missen) |
 | 6 | **Geen tegels** van de AD: grijze blokken | — (opdracht) |
-| 7 | **B4 achter een keerpunt** (#217, §3a): een bolder van 8 × 8 op de rand als keerwand; de echo komt je in houding tegemoet. Wijkt af van de solo-werkwijze in gdd §4.3 B4 (aan de rand slaan, `T + D − 21 … T + D − 3` springen): bij **D = 60** spring je op de echo 62 px van de rand en heb je **na de lancering een dash nodig** (gdd: drager ≤ 8 px van de rand, 14 px marge zonder dash); zonder dash de kloof in en de langzame lijn. Bij D ≥ 90 draagt de echo je naar de bolder (16 px van de rand, zonder dash), maar is de echolijn trager dan de langzame lijn (309–399 tegen 287) | **Open** (Lead-review #217) |
+| 7 | **B4 achter een keerpunt** (#217, §3a): een bolder van 8 × 8 op de rand als keerwand; de echo komt je in houding tegemoet. Wijkt af van de solo-werkwijze in gdd §4.3 B4 (aan de rand slaan, `T + D − 21 … T + D − 3` springen): bij **D = 60** spring je op de echo 62 px van de rand en heb je **na de lancering een dash nodig** (gdd: drager ≤ 8 px van de rand, 14 px marge zonder dash); zonder dash de kloof in en de langzame lijn. Bij D ≥ 90 draagt de echo je naar de bolder (16 px van de rand, zonder dash), maar is de echolijn trager dan de langzame lijn (309–399 tegen 287) | **Akkoord** ([Lead-review #220](https://github.com/cesarvangerwen-glitch/echoborn/pull/220)) |
 | 8 | **Besluit B3-galerij S2** (SM-review #208, besluit WLD): **de galerij blijft zoals ze is.** De 2 px bij D ≥ 90 kwam van de bot: hij dashte 14 ticks na de bounce, het vroegste moment waarop de dash de galerij nog haalt. Het venster loopt van 14 tot ± 38 ticks (2 … 42 px); op de top dashen, zoals bij D = 60, geeft **30 px**. De bot dasht nu op de top, en de test eist ≥ 9 px bij elke D. De randen van het venster (dash 14 en 38 ticks na de bounce) draaien bij D ≥ 90 als late bot (`test_kadewijk_b3_late_bot`, rapport), zodat de krapste marge zichtbaar blijft: dash + 14 → 2 px, + 38 → 40 px, bij 90, 120 en 180 gelijk. Verder de kom in laten steken kan niet zonder het gat onder 150 px te brengen (FK-6, test) | WLD (binnen de maten); ter info |
 
 **Nieuw in deel 2** (Lead-review van de PR van #83 deel 2):
 
 | # | Afwijking | Besluit LGD |
 |---|---|---|
-| 9 | **B2: `Z = D + 40` als de loop over de richel korter is dan D** (alleen D > 130, dus D = 180; §3b). De richel wordt dan `480 − Z` = 260 in plaats van `450 − D` = 270. Zonder: bij de verdiepingen tegen de linkerwand keren 133 en de langzame lijn met dash 151 (+18, < 20). Gdd §4.3 staat Z tot D + 40 toe | Open |
-| 10 | **S6 zonder echo per kamer 8,5×** (4294 tegen 503 ticks bij D = 60): zonder echo komt P1 er met 48 LP aan in plaats van 88 en moet hij 4× terug voor licht (de trap, S5 in en uit, het paar staat er weer). De run houdt LM-09c en FK-2 (1,90×, 4 terugkeren); met hetzelfde licht bij binnenkomst is S6 zonder echo 1,45× (C-15). Ik toets C-15 voor S6 dus met gelijk licht, en het tekort aan licht met FK-2/LM-09c. Klopt dat met de bedoeling van C-15 per kamer? Zo niet: meer licht in S6 zonder echo (een tweede paar) | Open |
-| 11 | **Trap terug van het plein naar de loopbrug** (S6, §3c): nieuw, niet in de kamerlijst; nodig voor FK-2 (licht halen zonder echo) en L-10 | Open |
-| 12 | **S7: de langzame lijn door het kanaal is maar 19 ticks trager dan de stuitlijn** (449 tegen 430, 1,04×). Dat mag (FK-2: ≤ 2×; de stuitlijn is een V-01-lijn, geen echolijn), maar het stuiten loont in tijd weinig; de beloning is de ketting van merken (2 ontploffingen) en dat je boven blijft. Een dieper kanaal (twee treden) maakt de langzame lijn ± 35 ticks trager. Keuze LGD/CD | Open |
+| 9 | **B2: `Z = D + 40` als de loop over de richel korter is dan D** (alleen D > 130, dus D = 180; §3b). De richel wordt dan `480 − Z` = 260 in plaats van `450 − D` = 270. Zonder: bij de verdiepingen tegen de linkerwand keren 133 en de langzame lijn met dash 151 (+18, < 20). Gdd §4.3 staat Z tot D + 40 toe | **Akkoord** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): Z tot D + 40 mag (gdd §4.3), alleen bij D > 130; de LGD zet `480 − Z` in gdd §4.3 B2 |
+| 10 | **S6 zonder echo per kamer 8,5×** (4294 tegen 503 ticks bij D = 60): zonder echo komt P1 er met 48 LP aan in plaats van 88 en moet hij 4× terug voor licht (de trap, S5 in en uit, het paar staat er weer). De run houdt LM-09c en FK-2 (1,90×, 4 terugkeren); met hetzelfde licht bij binnenkomst is S6 zonder echo 1,45× (C-15). Ik toets C-15 voor S6 dus met gelijk licht, en het tekort aan licht met FK-2/LM-09c. Klopt dat met de bedoeling van C-15 per kamer? Zo niet: meer licht in S6 zonder echo (een tweede paar) | **Bedoeld** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): C-15 per kamer met gelijk licht bij binnenkomst; het tekort aan licht toetsen LM-09c en FK-2 op de run. De run zit op de grens (1,90×, 4 terugkeren), de tests bewaken dat; valt hij erover, dan meer licht in S6 (een tweede paar), geen ruimere norm |
+| 11 | **Trap terug van het plein naar de loopbrug** (S6, §3c): nieuw, niet in de kamerlijst; nodig voor FK-2 (licht halen zonder echo) en L-10 | **Akkoord** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): eenrichting, buiten de val van de loopbrug |
+| 12 | **S7: de langzame lijn door het kanaal is maar 19 ticks trager dan de stuitlijn** (449 tegen 430, 1,04×). Dat mag (FK-2: ≤ 2×; de stuitlijn is een V-01-lijn, geen echolijn), maar het stuiten loont in tijd weinig; de beloning is de ketting van merken (2 ontploffingen) en dat je boven blijft. Een dieper kanaal (twee treden) maakt de langzame lijn ± 35 ticks trager. Keuze LGD/CD | **Mag blijven** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): geen dieper kanaal (marge SL-03); MT2 meet of spelers stuiten |
 | 13 | **Placeholders van de WLD**: het luik (`kadewijk_luik.gd`, een `CombatTarget` met een klep; alleen een neerslag raakt het), het lampglas, de sokkel en de logbladzijden zijn markeringen zonder spelregel (behalve het luik). Het eindobject (WS-08, de pick-up van V-01, L-03-beeld) is van de GP | — (ter info) |
 
 **Visie-review per kamer** (CD, [comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212#issuecomment-6831045448) op D = 60; één regel per kamer):
 
 - **S1 Kade-ingang: Visie-review: past** (CD, #212): keren tegen de grachtwand, de echo loopt je tegemoet, bounce naar de galerij (68 tegen 104 ticks).
-- **S2 Kadegang: nog geen visie-review** (niet in de doorloop van #212).
+- **S2 Kadegang: Visie-review: past** (CD, [#212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), doorloop PR #221): drie echo-momenten in ± 5 s zonder stilstand (B3, het E-paar, B1 tegen de pijler). Punt van de CD, geen blokkade: ± 5 s kade aan het begin en ± 6,5 s bovenroute aan het eind, de echo alleen als spoor (langste gat 11,9 s, ≤ 40); mee naar deel 2 en de art.
 - **S3 Vismarkt: Visie-review: past** (CD, #212): de echo is je tweede slag (46 van 88 LP). Punt van de CD, geen blokkade: na golf 2 ± 5 s leeg lopen naar de uitgang (§9).
-- **S4 Brugkloof: Visie-review: past niet** (CD, #212: wachten aan de rand, trager dan de langzame lijn) → **herontworpen in #217** (B4 achter een keerpunt, §3a); **opnieuw naar de CD**.
+- **S4 Brugkloof: Visie-review: past** (CD, [#212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), na het herontwerp van #217, doorloop PR #221; eerst "past niet"): keren tegen de bolder, de echo tegemoet, lancering en dash over de kloof, 19 ticks sneller dan de langzame lijn. Kanttekeningen van de CD: ± 10 ticks in de lucht boven de naderende echo (MT1: leest het als wachten?), en bij D ≥ 90 is de echolijn trager (stijgt D, dan terug naar de CD).
 
 **Maatvast per kamer** (fasekader §4 regel 3: bots groen op D = 60 + `Visie-review: past` van de CD + geen open herontwerp):
 
 | Kamer | Stand |
 |---|---|
 | S1 | **Maatvast** na de merge van #217 (LGD bevestigt): bots groen, `past`, en het dash-punt dat de CD noemde is besloten (gdd v0.8.2 §4.8.7) en getest (W-12) |
-| S2 | **Kandidaat**: het B3-punt is besloten (8); de visie-review van de CD ontbreekt |
+| S2 | **Maatvast** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): bots groen, `Visie-review: past` (#212), het B3-punt besloten (8) |
 | S3 | **Maatvast** na de merge van #217 (LGD bevestigt): bots groen, `past`; het lege stuk na golf 2 is een punt, geen herontwerp |
-| S4 | **Niet maatvast**: herontworpen (#217). Pas **maatvast na een nieuwe `Visie-review: past` van de CD** (en de Lead-review van afwijking 7); tot dan geen eindkwaliteit-art |
-| S5, S6, S7 | **Kandidaat**: bots groen op D = 60 (§6b); visie-review van de CD en de Lead-review van afwijking 9–12 ontbreken |
+| S4 | **Maatvast** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): bots groen, `Visie-review: past` (#212), afwijking 7 akkoord (#220) |
+| S5, S6, S7 | **Kandidaat**: bots groen op D = 60 (§6b), afwijking 9–12 besloten (#223); de visie-review van de CD ontbreekt |
 | S8 | **Kandidaat voor de maten**: de arena volgt GM-01 en §3.2; maatvast pas met de boss erin (GP, B-9 in de arena) |
 
 ## 9. Open punten
@@ -327,13 +327,13 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 - **S3, punt van de CD**: zie §6b (gemeten 9,0 s tussen de laatste ontploffing en de lancering). Voorstel: de Kadeloper van S4 naar het begin van de aanloop (Combat Designer), of de aanloop van S4 korter (± 55 ticks).
 
 **Lead Game Designer:**
-- **Afwijking 7 (B4 achter een keerpunt)**: akkoord met de bolder en met de dash na de lancering bij D = 60? En bij D ≥ 90 een echolijn die trager is dan de langzame lijn (de echo draagt je naar de rand; de prijs van een lange staart, binnen MP-1)?
+- ~~**Afwijking 7 (B4 achter een keerpunt)**~~ **Akkoord** (Lead-review #220; §8).
 - **Bevinding B4 (geldt al zonder bolder)**: gdd §4.3 zegt "bounce + dash haalt tot op de vloer ± 145 px", dus niet over de kloof. Dat klopt met de dash op de top. Wie aan de rand op zijn echo wacht, bounct en pas laat in de val dasht (de dash zet `v.y` op 0), komt wél over: middelpunt tot x 3076 (de overkant begint op 3052), met of zonder bolder. Het blijft een echolijn (een bounce op de echo), maar geen lancering. Zonder echo kom je niet over (test, ook van de bolder af: 3046).
 - **Flow-kamer B4** heeft nog de oude werkwijze (stap terug, 15 ticks stilstand bij D = 60, `flowkamer.md` §9). Geen nieuwe geometrie in de flow-kamer zolang MT1 erop speelt; de bolder kan daar na MT1, als de LGD dat wil.
 
-**Creative Director:** nieuwe visie-review van S4 (§3a; in de bot-doorloop op D = 60 is S4 tick ± 2505–2963, de lancering ± 185 ticks na het begin van S4), een eerste van S2, en van S5–S7 (§3b–§3d; in de run van deel 2 bij D = 60: S5 tick ± 3005–4310, S6 ± 4310–4810).
+**Creative Director:** visie-review van S5–S7 (§3b–§3d; in de run van deel 2 bij D = 60: S5 tick ± 3005–4310, S6 ± 4310–4810). S2 en S4: "past" (#212, gedaan).
 
-**Lead Game Designer (deel 2):** afwijking 9–12 (§8), en of de lege loop na golf 2 (§6b) een punt voor de Combat Designer is (de Kadeloper van S4).
+**Lead Game Designer (deel 2):** ~~afwijking 9–12~~ besloten (Lead-review #223, §8). De lege loop na golf 2 (§6b): binnen MP-2 en L-11, geen ombouw nu; de Kadeloper van S4 verplaatsen is een punt voor de CD na MT2.
 
 **W-13** (`flowkamer.md` §9, K2-cijfers na de hoogtegrens) wacht op G-11 van de Gameplay Programmer (#218).
 
@@ -356,5 +356,6 @@ Besluiten: D = 60 als werkaanname, bereik 1–3 s, en fase 2 parallel, ook bouwe
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie: S1–S4 als grijze kamers, bot en tests bij D = 60 (120/180 regressie) |
 | 0.1.1 | 2026-11-12 | Lead-review #208: langzame lijn met dash gemeten bij 60/90/120 (§6), besluiten van de LGD per afwijking en maatvast-stand per kamer (§8), open punten bijgewerkt (§9) |
+| 0.3.1 | 2026-11-12 | Lead-review #223: besluiten bij afwijking 7 en 9–12 (§8), visie-review per kamer (S2 en S4 "past", #212), S2 en S4 maatvast |
 | 0.3 | 2026-11-12 | [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) deel 2: **S5–S8** grijs en speelbaar (§2, §3b–§3e): S5 B2 naar de zolder met het lampglas, S6 de pompgang, het gemaal (`wijk_gemaal` = `S6/Gemaal` voor elke kamer), het checkpoint en de trap terug, S7 het luik en het kanaal met twee Dwaallichten, S8 de lege arena (GM-01). Bot en `test_kadewijk_deel2.gd` (§6b): **SL-01 112 LP** bij D = 60, B2 bij elke D met en zonder dash, gemaal → arena-deur 9,2 s, de bounce haalt het rad. Afwijkingen 9–13 (§8), de lege loop na golf 2 gemeten (§6b), open punten (§9) |
 | 0.2 | 2026-11-12 | [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217): **S4 herontworpen**, B4 achter een keerpunt (bolder 8 × 8 op de rand; §2, §3, §3a); bot en tests (geen stilstand vóór de lancering, bij D = 60 sneller dan de langzame lijn, late bot, zonder lancering niet over). **W-12**: de langzame lijn met dash als test bij elke D (§6). SM-punten #208: noot MP-3 bij 120/180, besluit B3-galerij (galerij blijft, bot dasht op de top: 30 px; §8 punt 8). Visie-review per kamer en maatvast-stand (§8), open punten (§9); §6 opnieuw gemeten |
