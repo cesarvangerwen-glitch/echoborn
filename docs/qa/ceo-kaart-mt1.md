@@ -1,6 +1,6 @@
 # CEO-kaart MT1: de flow-kamer op 1 s spelen en scoren
 
-Versie 0.1 · 2026-11-12 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA: `docs/qa/testplan-mt1.md` (lees je pas na het spelen)
+Versie 0.1.1 · 2026-11-12 · Eigenaar: QA Lead · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Achtergrond voor QA: `docs/qa/testplan-mt1.md` (lees je pas na het spelen)
 
 **Tijd: ± 12–15 min.** Solo. Je speelt **4 korte runs** (1 oefenrun + 3 die tellen), allemaal op de staart van **1 s (D = 60)**. Na elke run geef je in het spel drie cijfers. Daarna typ je zeven korte antwoorden in de Claude-chat en sleep je de meetlogs erbij. Geen kladje nodig.
 
@@ -70,7 +70,7 @@ Dat was het. De agent in de chat zet je antwoorden en de logs in de repo; QA sch
 
 - **Je cijfers** komen uit het meetlog. Norm (3) is gehaald als het gemiddelde over run 2–4 **≥ 4,0** is en geen kamer gemiddeld onder 3,0 zit. Dat is het laatste stuk van de eerste mijlpaal (F0).
 - **Uit de logs**: nergens > 5 s stil, de echo als plank of merk-afmaker ≥ 3× per minuut (ook in K1 en K2 apart), echo Leeg ≤ 40 %, de echo bij het gemaal. En per keerpunt in K1 of je **omdraaide en op je echo sprong zonder te wachten**, eerst op hem wachtte (en waar), of de treden nam. Daarom zei de kaart vooraf niets over hoe je omhoog moest: O1 en het log laten zien wat je uit jezelf deed.
-- **Haal je dat springen zonder wachten niet** (≥ 75 % van de landingen), of gebruik je de echo in K1 te weinig, dan legt de Lead Game Designer je één vraag voor over hoe de echo op je reageert (open punt O-23). Een nieuwe speelsessie volgt dan pas bij de volgende mijlpaal.
+- **Haal je dat springen zonder wachten niet** (≥ 75 % van de landingen), of gebruik je de echo in K1 te weinig, dan past de Lead Game Designer eerst de kamer aan en test het team dat met de bots, zonder jou. Alleen als de regel voor hoe de echo op je reageert moet veranderen, krijg je daar één vraag over (open punt O-23). Een nieuwe speelsessie volgt pas bij de volgende mijlpaal.
 - **R** is de vraag van de Creative Director: voelt de echo bij 1 s als een tweede lichaam of als een nabeeld? Samen met H (≥ 4) is dat een signaal, geen slaag-of-zakvraag. Leest hij als een spoor, dan kijkt eerst de Art Director naar hoe de echo eruitziet.
 - **M1** is het zwakke *Nine Sols*-signaal; **M2** telt als begrepen bij "de echo kwam (niet) langs" of "het merk was te ver / gedoofd". Deze keer allemaal open vragen, zonder keuzes.
 - Een vraag aan jou volgt alleen als het rapport dat nodig maakt.
@@ -80,3 +80,4 @@ Dat was het. De agent in de chat zet je antwoorden en de logs in de repo; QA sch
 | Versie | Datum | Wijziging |
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie (#80, T17 MT1): D = 60 standaard bij het starten, F1 alleen als herstel (F1/F2/F3/F7 = 60/90/120/180); 1 oefenrun + 3 getelde runs, alle op D = 60, volgende run met F6; scores alleen in het spel; zeven korte open antwoorden (R van de CD vóór H) en de meetlogs via de Claude-chat; HUD-check en "na F5 eerst A, D of spatie" behouden |
+| 0.1.1 | 2026-11-12 | Na Lead-review EP: §5, bij springen met wachten eerst een herontwerp met de bots, een vraag aan de CEO alleen als de echo-regel moet veranderen (O-23) |

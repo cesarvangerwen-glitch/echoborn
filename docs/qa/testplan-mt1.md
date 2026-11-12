@@ -1,6 +1,6 @@
 # Testplan MT1: mijlpaaltest flow-kamer op D = 60 (T17, F0 norm 3)
 
-Versie 0.1 · 2026-11-12 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
+Versie 0.1.1 · 2026-11-12 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#80](https://github.com/cesarvangerwen-glitch/echoborn/issues/80) · Lead-review: Executive Producer
 
 Basis: fasekader v0.4 (`docs/productie/fase-2-kader.md`: §3 F0, §4 mijlpaaltest MT1, T17); besluiten van 2026-11-12 in `docs/beslissingen.md` (echo-staart **1 s, D = 60**, bereik 1–3 s, zonder aparte check; fase 2 parallel; **de CEO test alleen bij mijlpalen**, kaart ± 10–15 min, ± 3–4 runs); besluit [#124](https://github.com/cesarvangerwen-glitch/echoborn/issues/124) (F0 solo); gdd v0.8 §4.5 (MP-1–MP-6), **§4.8** (D = 60 doorgerekend, §4.8.3 punt 6 en 11, §4.8.4 W-8–W-11) en O-23; pitch v0.5 §10 R-V1; rapport F0-2 v0.1.2 (`docs/qa/rapport-f0-2-flowtest.md`, §7, **§8.3** de negen bot-punten, §11); testplan F0-2 v0.1.4 (W11–W21).
 
@@ -108,7 +108,7 @@ Vervolgregels (gdd §4.8.2, §4.8.3 punt 1, 11 en 13; `flowkamer.md` §12):
 
 - **Wachtafstand per keerpunt** in px (ook bij C). Bij D = 60 kost wachten hooguit ± 60 ticks; wie springt zodra het plank-signaal aangaat, staat < 20 ticks stil en telt als A (gdd §4.8.2). Wie blijft staan tot de echo onder hem staat, is B.
 - Kiest hij bij een keerpunt in meer dan de helft van de getelde runs C + D, dan is de **langzame lijn** daar nog de gewoonte: bevinding voor de WLD en LGD (gdd §4.8.3 punt 13, het verplichte verschil ≥ 30 ticks).
-- Haalt MP-3 de 75 % niet of MP-2 in K1 de 3,0 niet: **O-23** (§6). QA levert dan de tabel A–D per keerpunt en de wachtafstanden als invoer voor de LGD.
+- Haalt MP-3 de 75 % niet of MP-2 in K1 de 3,0 niet: eerst een herontwerp met de bots; alleen een wijziging van hoe de echo reageert is **O-23** (§6). QA levert dan de tabel A–D per keerpunt en de wachtafstanden als invoer voor de LGD.
 
 ### 4.3 Stilstand per kamer, met plek
 
@@ -157,8 +157,8 @@ Het rapport noemt bij elk oordeel hoeveel het draagt: één speler, drie getelde
 | Uitkomst | QA-advies en gevolg |
 |---|---|
 | MP-1, MP-2 (ook K1 en K2), MP-4, MP-6 gehaald, **MP-5 ≥ 4,0** en geen kamer < 3,0, **MP-3 ≥ 75 %**, en geen spontane *Nine Sols* | **Go F0** (norm (3) solo geleverd; *Nine Sols*-check uitgesteld naar F4b(c)). Daarna `Visie-review` van de CD op P1 en P3; QA sluit T17 met het rapport (#80 dicht na merge). De flow-kamer en de regels van gdd §4.8.5 zijn dan bevestigd voor de slice |
-| **MP-3 < 75 %, of MP-2 in K1 < 3,0** (of een gat > 40 s in K1), wat de rest ook doet | **O-23 (vaart)**, gdd §4.8 en O-23: de LGD bereidt een `ceo-beslissing` voor over hoe de echo op de speler reageert (R-V12), met MP-3 per keerpunt (§4.2) en de wachtafstanden. Geen go F0. Geen nieuwe CEO-speeltest vóór die beslissing; daarna test het team met de bots en speelt de CEO pas in de volgende mijlpaaltest (fasekader §3 F0, *Mislukt*) |
-| MP-2 over de hele run < 3,0 | Valt onder de rij hierboven (O-23); dit is ook de kaderregel "norm (2) niet gehaald → `ceo-beslissing` R-V12" |
+| **MP-3 < 75 %, of MP-2 in K1 < 3,0** (of een gat > 40 s in K1), wat de rest ook doet | **Geen go F0.** Eerst een **herontwerp door de LGD, getest met de bots, zonder CEO** (fasekader §3 F0, *Mislukt*), met MP-3 per keerpunt (§4.2) en de wachtafstanden als invoer. Kan de LGD het oplossen zonder de echo-regel te wijzigen (geometrie, maten), dan blijft het bij dat herontwerp; de CEO speelt het pas in de volgende mijlpaaltest. Alleen een wijziging van hoe de echo op de speler reageert (**O-23**, kandidaat 1 uit gdd §4.7.3) is een `ceo-beslissing`, voorbereid door de LGD (R-V12). Haalt het herontwerp norm (2) met de bots niet, dan ook een `ceo-beslissing` (kader §3 F0) |
+| MP-2 over de hele run < 3,0 | Zoals de rij hierboven: eerst een herontwerp met de bots, zonder CEO |
 | Objectieve normen gehaald (incl. MP-3), maar **MP-5 < 4,0** of een kamer < 3,0 | **Geen go.** De LGD stelt per kamer een aanpassing voor (oorzaak uit §4.2–§4.3 en de open antwoorden), getest met de bots. De CEO speelt het pas in de volgende mijlpaaltest (MT2, of één kaart als MT1-bis en MT2 op dezelfde build vallen, fasekader §4). Raakt het de echo of een kernregel: stopregel voor slicewerk (fasekader §4). Of er een extra mijlpaaltest komt of een `ceo-beslissing` (scope), beslist de EP |
 | MP-1, MP-4 of MP-6 niet gehaald | Geen go. Bevinding met plek (§4.3) voor de LGD/WLD, aanpassing met de bots; verder zoals de rij hierboven |
 | De CEO noemt het merk spontaan als *Nine Sols* (M1) | Terug naar afwijkpunt 2 (gdd §2.13); LGD en Combat Designer |
@@ -197,3 +197,4 @@ Uit `testplan-f0.md` §6 blijven W1, W2, W7 (in de vorm van W25), W8, W9 en W10;
 | Versie | Datum | Wijziging |
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie (#80, T17 MT1): voorwaarden met de negen bot-punten (in te vullen), normen op D = 60, MP-3 per keerpunt met B3, open vragen (R voor R-V1, M1, O1, M2, H, V1, X), 1 oefenrun + 3 getelde runs, oordeel met O-23, W25–W30 |
+| 0.1.1 | 2026-11-12 | Na Lead-review EP: §4.2 en §6, bij MP-3 of MP-2 (K1) niet gehaald eerst een herontwerp door de LGD met de bots, zonder CEO; alleen een wijziging van hoe de echo reageert (O-23) is een `ceo-beslissing`; "kaderregel" geschrapt |
