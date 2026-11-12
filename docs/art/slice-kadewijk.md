@@ -1,6 +1,6 @@
 # Slice-art Kadewijk, deel 1: kleurscript, lichtovergang, tileset, stijlregels vijanden
 
-Versie 0.1 · Eigenaar: Art Director · Issue [#85](https://github.com/cesarvangerwen-glitch/echoborn/issues/85) (T8c, deel 1) · Hoort bij `docs/art/bible.md` v0 en `docs/art/assetlijst.md`
+Versie 0.1.1 · Eigenaar: Art Director · Issue [#85](https://github.com/cesarvangerwen-glitch/echoborn/issues/85) (T8c, deel 1) · Hoort bij `docs/art/bible.md` v0 en `docs/art/assetlijst.md`
 Bronnen: `docs/design/wereld.md` v0.2 §2 (slice Kadewijk), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.1 (§2, §3, §9), `docs/narrative/verhaal-v2.md` §4.3 en §6, `docs/art/ui-stijlgids.md` (merk, klokring, `#ff475c`), fasekader fase 2 v0.4 §2 (T8c) en §4.
 
 ## 0. Werkaanname (kader §5)
@@ -24,7 +24,7 @@ Bronnen: `docs/design/wereld.md` v0.2 §2 (slice Kadewijk), `docs/design/combat/
 
 | Beat | Toestand | Wat kleur heeft | Chroma |
 |---|---|---|---:|
-| S1 Kade-ingang | grijs, `s = 0` | alleen de lichtpoel van de lantaarn (licht = kleur), de amber sjaal van P1 | 6 |
+| S1 Kade-ingang | grijs, `s = 0` | alleen de lichtpoel van de lantaarn (licht = kleur), de amber sjaal van P1. Het grote donkere vlak rechts met de zwarte cirkel is **het gemaal in de verte, nog uit**: een donker boograam in baksteen. Het is het doel van de wijk, en het is hier bewust de donkerste vorm in beeld. | 6 |
 | S2 Kadegang | grijs | niets in de omgeving; de bovenranden en kernen van de vijanden zijn het enige rood | 3 |
 | S3 Vismarkt | grijs | één kraamlamp, de rode vijanden in de arena | 7 |
 | S4 Brugkloof | grijs | koude bundels door de kloof | 3 |
@@ -34,6 +34,8 @@ Bronnen: `docs/design/wereld.md` v0.2 §2 (slice Kadewijk), `docs/design/combat/
 | S8 Machinehal | grijs, `s = 1` | **alleen rood** (kern, bovenranden, de ketel als het schot breekt) en de merkkleuren. Er staat geen warm licht in de arena: dat is de spanning vóór de beloning. | 3 |
 | **S9 Lage kade, trap 2** | `s = 1 → 2`, **kleur** | de kleurgolf (§2), de wijk warm, de getijdenrand zichtbaar | 20 |
 | S1 terug | kleur | stadsgloed, het sluiswachtershuis verlicht | 20 |
+
+**S1 en "S1 terug" zijn hetzelfde beeld in twee toestanden**: dezelfde plek, dezelfde lantaarn en hetzelfde gemaal, eerst grijs met hoog water (`s = 0`), dan in kleur met laag water (`s = 2`) en het gemaal aan. Zo zie je wat het oppompen met één plek doet, net als in de R5-scène.
 
 **Regels die het kleurscript vastlegt:**
 1. **Tot trap 2 blijft de wijk grijs** (gemiddelde chroma ≤ ± 12). Kleur komt alleen uit lichtbronnen. Zo blijft S9 de grote stap (± ×2 tegenover S6, ± ×6 tegenover S2).
@@ -178,7 +180,7 @@ Bladen: `concept_vijanden_x4_placeholder.png` (per type: silhouet, idle, aanloop
 | Punt | Wie | Wanneer |
 |---|---|---|
 | Eindkwaliteit per kamer (tegels gebruiken, achtergrondlagen, interieurs S5, S7, S8) | Art Director met Environment Artist | Deel 2, per kamer zodra de LGD haar maatvast verklaart |
-| Regels van §4.2 (bovenrand 2 px, tell-taal, amber/cyaan alleen als merk-overlay) en de drie nieuwe ramps opnemen in bible v1 §3 en §6 | Art Director | Bible v1 |
+| Regels van §4.2 (bovenrand 2 px, tell-taal, amber/cyaan alleen als merk-overlay) en de drie nieuwe ramps opnemen in bible v1 §3 en §6, met de drempels: **bovenrand ΔL\* ≥ 50** tegen de directe achtergrond (ring van 2–6 px), in grijs én kleur (gemeten 50–75); de bestaande eis van **ΔL\* ≥ 40** op vulling of contour wordt voor vijanden "op bovenrand of kern" (het lijf haalt 2,6–37); kleurafstanden **ΔE76 ≥ 30, en ≥ 25 bij deuteranopie**, anders ΔL\* ≥ 20 of vorm (bible §7.1); en uit het kleurscript (§1) een **gemiddelde chroma ≤ ± 12 tot trap 2** (gemeten 3–12), en de beat na trap 2 minstens ± 1,5× de hoogste grijze beat (gemeten 20 tegen 12) | Art Director | Bible v1 |
 | De LUT-shader en de kleurgolf in Godot 4.6, met de kost tegen het lichtbudget (≤ 20 LE) | Technical Artist | Vóór de eerste maatvaste kamer |
 | Tegels naar `game/art/wereld/kadewijk/` met de importconventie (dan SM-review, code in `game/`) | Technical Artist | Met de LUT-shader |
 | Is de Dwaallicht-sluier op Deck-grootte leesbaar als "zwevend"? | Art Director | Ware Deck-test (T7) |
@@ -191,4 +193,5 @@ Alles in `docs/art/slice/` wordt gemaakt door `bron/genereer_slice_deel1.py` (de
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.1.1 | 2026-11-12 | Na de SM-review (PR #195): het gemaal in S1 benoemd, S1 en "S1 terug" als één plek in twee toestanden (§1), drempels voor ΔL\* en chroma in §6. |
 | 0.1 | 2026-11-12 | Deel 1 van T8c (#85): kleurscript, lichtovergang, tileset-opzet met 46 tegels en 8 props in 3 toestanden plus index-atlas, 3 nieuwe ramps, concept-sheets voor 3 vijandtypes en de Gemaalmeester, metingen. |
