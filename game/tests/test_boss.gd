@@ -2,12 +2,12 @@ extends RefCounted
 ## Tests voor de boss-basis en de Gemaalmeester (T8b-bouw deel 2a, #190): B-5 (`Boss`, de C-14- en
 ## C-16-test van gdd §4.6 op de testboss en op de Gemaalmeester, arena, reset bij respawn), B-6
 ## (maat en aanvallen) en B-7 (fase 1: schot, kern, drempels, adds). Bron:
-## `docs/design/combat/slice-vijanden-en-boss.md` v0.1.1 §3, §6, §7 en `gemaalmeester.md` v0.2.
+## `docs/design/combat/slice-vijanden-en-boss.md` v0.1.2 §3, §6, §7 en `gemaalmeester.md` v0.2.
 ##
 ## Gevallen "(alle D)" draaien op D = 60, 120 en 180, met 90 als regressie. Alle getallen komen uit
 ## `slice.csv` en `echo_v04.json`; de vaste verwachtingen zijn de waarden uit het ontwerp, zodat een
-## typefout in data hier rood wordt. Fase 2 (het rad, B-8) en de scripted runs (B-9) volgen in deel
-## 2b; tot dan is de Gemaalmeester alleen via het debugcommando `set_health` Wankel te krijgen.
+## typefout in data hier rood wordt. Fase 2 (het rad, B-8) en de scripted runs (B-9, B-10) staan in
+## `test_boss_rad.gd` en `test_boss_runs.gd` (deel 2b).
 
 const Fx = preload("res://tests/echo_fixture.gd")
 const InputBits = preload("res://scripts/input/input_bits.gd")
@@ -817,10 +817,10 @@ func test_b7_coop_p2_never_hits_never_breaks(t) -> void:
 	await t.cleanup()
 
 
-## B-7 / C-12e: in co-op leeft een merk 150 ticks, los van D: P2 slaat het merk van P1 op `+140` en
+## B-7 / C-12e (D = 60, 120 en 180): in co-op leeft een merk 150 ticks, los van D: P2 slaat het merk van P1 op `+140` en
 ## breekt het schot; op `+150` is het gedoofd en breekt een slag van P2 niets.
 func test_b7_coop_mark_lives_150(t) -> void:
-	for d: int in [60, 180]:
+	for d: int in [60, 120, 180]:
 		for late: int in [140, 150]:
 			var w := _world(t, KETEL_P1_X)
 			var sim = w["sim"]
@@ -979,11 +979,11 @@ func test_b7_phase_switch(t) -> void:
 		await t.cleanup()
 
 
-## B-7 / GMB-11 (D = 60 en 180): een run die elke opening tot de drempel slaat (P1 slaat om de 20
+## B-7 / GMB-11 (D = 60, 120 en 180): een run die elke opening tot de drempel slaat (P1 slaat om de 20
 ## ticks bij de kern, de echo herhaalt): precies 4 openingen, 3 keer "drempel", dan de fasewissel;
 ## de SE staat na elke opening precies op zijn drempel; adds pas na opening 1.
 func test_b7_four_openings(t) -> void:
-	for d: int in [60, 180]:
+	for d: int in [60, 120, 180]:
 		var sim = Fx.world(t)
 		var p1 := _rhythm_player(sim, 1, KETEL_P1_X, 2)
 		p1.health = 1000
@@ -1006,3 +1006,44 @@ func test_b7_four_openings(t) -> void:
 		t.check(not spawned.is_empty() and spawned[0] > broke[0], "D = %d: adds %s vóór opening 1 (%s)" % [d, spawned, broke])
 		t.note("D = %d: openingen op %s, fasewissel op %s" % [d, broke, log["phase"]])
 		await t.cleanup()
+
+
+## SM-review PR #207: gaat de boss midden in een finisher uit de scène (arena verlaten, laden), dan
+## staat `Combat.finisher_running` weer uit (`_exit_tree`), zodat merken weer kunnen.
+func test_b5_exit_tree_clears_finisher_running(t) -> void:
+	var w := _world(t, 100.0)
+	var sim = w["sim"]
+	var boss := _testboss(sim)
+	await t.run_ticks(sim, 2)
+	boss.set_health(sim.tick, 20)
+	boss.receive(sim.tick, 20, "ontploffing", boss.core)
+	t.check(boss.is_finisher_running() and sim.combat.finisher_running, "geen finisher")
+	# Zoals een kamer die ontlaadt: eerst uit de Sim, dan uit de scène.
+	for part in boss.parts:
+		sim.remove_object(part)
+	sim.remove_object(boss)
+	boss.get_parent().remove_child(boss)
+	t.check(not sim.combat.finisher_running, "finisher_running bleef aan na _exit_tree")
+	boss.free()
+	await t.run_ticks(sim, 2)
+	await t.cleanup()
+
+
+## TD-review PR #207: twee adds op dezelfde tick krijgen elk een vaste naam met hun spuigat
+## (`Add<tick>_links`, `Add<tick>_rechts`), geen naam die Godot hernoemt.
+func test_b7_add_names_with_spout(t) -> void:
+	var w := _world(t, 30.0)
+	var sim = w["sim"]
+	w["p1"].health = 1000
+	var boss := _gemaalmeester(sim)
+	var spawned := []
+	boss.add_spawned.connect(func(tick: int, add: Node2D) -> void: spawned.append([tick, add]))
+	await t.run_ticks(sim, 2)
+	boss.ketel.break_armor(sim.tick)
+	await t.run_ticks(sim, 340)
+	t.check(spawned.size() == 2 and spawned[0][0] == spawned[1][0], "adds %s" % [spawned])
+	if spawned.size() == 2:
+		var tick: int = spawned[0][0]
+		t.check(String(spawned[0][1].name) == "Add%d_links" % tick and String(spawned[1][1].name) == "Add%d_rechts" % tick,
+			"namen %s, %s" % [spawned[0][1].name, spawned[1][1].name])
+	await t.cleanup()

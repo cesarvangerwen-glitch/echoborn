@@ -3,6 +3,12 @@ extends RefCounted
 ## MP-6 en de LP-stand. Voor de tests van de kamer en als hulp voor T17; het
 ## rapport zelf is van de QA Lead (T17). Werkt op de regels van het meetlog
 ## (`tick, kamer, event, waarde, bron, x, y`), dus ook op een CSV.
+##
+## O-24 (gdd v0.8.1 §4.5, `kamers/flowkamer.md` §12 antwoord 6 en 7): één contact = één actie:
+## `SPRINGPLANK` en `LANCERING`/`VANGEN` van dezelfde springer op dezelfde tick tellen in MP-2 als
+## één actie; in MP-3 is een landing één contact met een plank (`SPRINGPLANK` of `VANGEN`; een
+## lancering volgt altijd op zo'n contact). MP-3 meet de stilstand van de **springer**: solo P1,
+## in co-op het lichaam dat landt (bron = de drager: `p1` → springer P2, anders P1).
 
 const MINUTE := 3600.0
 const MP2_WINDOW := 2400   ## 40 s
@@ -39,6 +45,8 @@ var gemaal_full_tick := -1
 var breaks := 0
 var room_time := {}
 var still_runs: Array = []  ## [begin, eind] inclusief
+## Stilstanden van P2 (co-op), voor MP-3 als P2 de springer is.
+var still_runs_p2: Array = []
 
 
 static func from_rows(rows: Array, has_echo: bool = true):
@@ -54,6 +62,7 @@ func _compute(rows: Array, has_echo: bool) -> void:
 	var empty_total := 0
 	var seen_k3 := false
 	var echo_rows_seen := false
+	var contacts := {}
 	for row in rows:
 		var tick := int(row[0])
 		var event: String = row[2]
@@ -77,12 +86,17 @@ func _compute(rows: Array, has_echo: bool) -> void:
 				# Bron `p2` is MP-7 (b); P1 (bron `p1`) blijft MP-1 en MP-3.
 				if row[4] == "p2":
 					longest_still_p2 = maxi(longest_still_p2, n)
+					still_runs_p2.append([tick - n, tick - 1])
 				else:
 					longest_still = maxi(longest_still, n)
 					still_runs.append([tick - n, tick - 1])
 			"SPRINGPLANK", "LANCERING", "VANGEN":
-				actions.append([tick, row[1]])
-				if event == "SPRINGPLANK":
+				# Eén contact = één actie (antwoord 6): dezelfde springer (bron = drager) op dezelfde tick.
+				var contact := "%d|%s" % [tick, row[4]]
+				if not contacts.has(contact):
+					contacts[contact] = true
+					actions.append([tick, row[1]])
+				if event != "LANCERING":
 					landings += 1
 			"ONTPLOFFING":
 				# Een ketting telt als één actie: alleen de eerste schakel.
@@ -131,11 +145,13 @@ func _compute(rows: Array, has_echo: bool) -> void:
 	landings_per_min = landings * MINUTE / duration
 	var clean := 0
 	for row in rows:
-		if row[2] != "SPRINGPLANK":
+		if row[2] != "SPRINGPLANK" and row[2] != "VANGEN":
 			continue
 		var t := int(row[0])
 		var waited := false
-		for run: Array in still_runs:
+		# De springer (antwoord 7): bron `p1` = P1 droeg, dus P2 landde.
+		var runs: Array = still_runs_p2 if row[4] == "p1" else still_runs
+		for run: Array in runs:
 			var lo := maxi(int(run[0]), t - MP3_LOOKBACK)
 			var hi := mini(int(run[1]), t)
 			if hi - lo + 1 >= MP3_STILL:

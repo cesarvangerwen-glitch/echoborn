@@ -54,10 +54,16 @@ const TEST_SCRIPTS := [
 	"res://tests/test_respawn.gd",
 	"res://tests/test_vijanden.gd",
 	"res://tests/test_boss.gd",
+	"res://tests/test_boss_rad.gd",
+	"res://tests/test_boss_runs.gd",
 ]
 
 ## 2 minuten speltijd bij 60 Hz. De langste test duurt ±3000 ticks (C-01).
 const MAX_FRAMES_PER_TEST := 7200
+## Een testscript mag voor een test die langer duurt (een scripted boss-run, T8b B-9) een eigen
+## grens zetten: `const MAX_FRAMES := {"test_naam": frames}`. Nooit boven deze bovengrens
+## (10 minuten speltijd); een test die zijn grens haalt, is FAIL zoals hierboven.
+const MAX_FRAMES_CAP := 36000
 
 var _errors := ErrorLog.new()
 ## test_context.gd, pas geladen als de logger aan staat.
@@ -103,7 +109,7 @@ func _run() -> void:
 				continue
 			tests_in_script += 1
 			_check_errors_outside_tests("vóór %s" % method_name)
-			var reasons: PackedStringArray = await _run_one(script, method_name)
+			var reasons: PackedStringArray = await _run_one(script, method_name, _frame_limit(script, method_name))
 			if reasons.is_empty():
 				_passed += 1
 			else:
@@ -188,14 +194,23 @@ func _check_errors_outside_tests(where: String) -> void:
 		print("       - %s" % error)
 
 
+## De framegrens van een test: `MAX_FRAMES[naam]` uit het script (hooguit MAX_FRAMES_CAP), anders
+## MAX_FRAMES_PER_TEST.
+func _frame_limit(script: GDScript, method_name: String) -> int:
+	var limits: Variant = script.get_script_constant_map().get("MAX_FRAMES", {})
+	if limits is Dictionary and (limits as Dictionary).has(method_name):
+		return clampi(int(limits[method_name]), 1, MAX_FRAMES_CAP)
+	return MAX_FRAMES_PER_TEST
+
+
 ## Draait één test en print het resultaat. Geeft de redenen voor FAIL terug.
-func _run_one(script: GDScript, method_name: String) -> PackedStringArray:
+func _run_one(script: GDScript, method_name: String, max_frames := MAX_FRAMES_PER_TEST) -> PackedStringArray:
 	var suite: Object = script.new()
 	var ctx: RefCounted = _context_script.new(self)
 	var state := {"done": false}
 	_call_test(suite, method_name, ctx, state)
 	var frames := 0
-	while not state["done"] and frames < MAX_FRAMES_PER_TEST:
+	while not state["done"] and frames < max_frames:
 		await process_frame
 		frames += 1
 	await ctx.cleanup()

@@ -16,6 +16,13 @@ extends RefCounted
 ## tellen niet mee (een open stilstand sluit bij `P2_OPGELOST` en bij een
 ## drop-out) en na `P2_TERUG` gelden 60 ticks niet, zoals na een respawn.
 ## Lezers die alleen P1 willen, filteren op bron `p1`.
+##
+## `STUIT` (V-01b): een neerslag van P1 of P2 raakte iets (bron `p1`/`p2`). Een boss meldt zich met
+## `watch_boss` (T8b B-10): `BOSS_START`, `BOSS_FASE` (waarde 1, wissel, 2, wankel), `SCHOT_BREUK`,
+## `KERN_DICHT` (waarde drempel/tijd), `RAD_TREFFER` (waarde de actie: bounce, lancering, vang,
+## stuit, sprong of echo; bron wie sloeg), `RAD_DRAAI` (waarde treffers/tijd; bron de kant waar het
+## heen draait: links/rechts), `BOSS_AANVAL` (waarde soort_helft, bron raak/mis), `FINISHER_START`,
+## `FINISHERSLAG` (bron wie), `BOSS_VERSLAGEN` (waarde het aantal finisherslagen).
 
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
@@ -65,6 +72,9 @@ func _init(sim: Node, p1: PlayerActor, echo: Node2D) -> void:
 		sim.partner_returned.connect(func(tick: int, _at: Vector2) -> void:
 			_p2_grace_until = tick + RESPAWN_GRACE
 			_p2_positions.clear())
+	if sim.has_signal("stuit"):
+		sim.stuit.connect(func(tick: int, player: Node2D) -> void:
+			_add(tick, "STUIT", "", "p%d" % player.player_index, player.position))
 	var combat: RefCounted = sim.combat
 	combat.mark_set.connect(func(tick: int, mark: RefCounted) -> void:
 		_add(tick, "MERK_GEZET", "", str(mark.id), mark.center()))
@@ -78,6 +88,33 @@ func _init(sim: Node, p1: PlayerActor, echo: Node2D) -> void:
 			_add(tick, "BREEK", "", "echo", at))
 		echo.merksprong_started.connect(func(tick: int, mark_id: int) -> void:
 			_add(tick, "MERKSPRONG", "", str(mark_id), echo.recorded_position))
+
+
+## B-10: de events van een boss (`Boss`; de Gemaalmeester geeft ook schot, kern en rad).
+func watch_boss(boss: Node) -> void:
+	var at := func() -> Vector2: return _p1.position if is_instance_valid(_p1) else Vector2.ZERO
+	boss.boss_started.connect(func(tick: int) -> void: _add(tick, "BOSS_START", "", "", at.call()))
+	boss.phase_changed.connect(func(tick: int, phase: String) -> void:
+		_add(tick, "BOSS_FASE", phase, "", at.call()))
+	boss.attack_ended.connect(func(tick: int, kind: String, side: int, hit: bool) -> void:
+		var half := "links" if side < 0 else ("rechts" if side > 0 else "midden")
+		_add(tick, "BOSS_AANVAL", "%s_%s" % [kind, half], "raak" if hit else "mis", at.call()))
+	boss.finisher_started.connect(func(tick: int) -> void: _add(tick, "FINISHER_START", "", "", at.call()))
+	boss.finisher_strike.connect(func(tick: int, who: String) -> void:
+		_add(tick, "FINISHERSLAG", "", who, at.call()))
+	boss.boss_defeated.connect(func(tick: int) -> void:
+		_add(tick, "BOSS_VERSLAGEN", str(boss.finisher_count), "", at.call()))
+	if boss.has_signal("shot_broken"):
+		boss.shot_broken.connect(func(tick: int) -> void: _add(tick, "SCHOT_BREUK", "", "", at.call()))
+	if boss.has_signal("core_closed"):
+		boss.core_closed.connect(func(tick: int, reason: String) -> void:
+			_add(tick, "KERN_DICHT", reason, "", at.call()))
+	if boss.has_signal("rad_hit"):
+		boss.rad_hit.connect(func(tick: int, source: String, action: String, _amount: int) -> void:
+			_add(tick, "RAD_TREFFER", action, source, at.call()))
+	if boss.has_signal("rad_turning"):
+		boss.rad_turning.connect(func(tick: int, reason: String, to_side: int) -> void:
+			_add(tick, "RAD_DRAAI", reason, "links" if to_side < 0 else "rechts", at.call()))
 
 
 ## Sluit het log af (RUN_EIND en een open stilstand).

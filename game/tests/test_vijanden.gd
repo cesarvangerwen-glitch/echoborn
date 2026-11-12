@@ -1,7 +1,8 @@
 extends RefCounted
 ## Tests voor de vijanden van de slice (T8b-bouw deel 1, #190): B-1 gedeelde regels, B-2
 ## Kadeloper, B-3 Schotdrager, B-4 Dwaallicht en B-11 (`slice.csv` en de vlaggen van het
-## placeholder-beeld). Bron: `docs/design/combat/slice-vijanden-en-boss.md` v0.1.1 §2, §6, §7.
+## placeholder-beeld), en B-12 uit deel 2b (VJ-08 hoogtegrens van de aanloop, VJ-02 onkwetsbaar na een
+## respawn). Bron: `docs/design/combat/slice-vijanden-en-boss.md` v0.1.2 §2, §6, §7.
 ##
 ## Gevallen "(alle D)" draaien op D = 60, 120 en 180, met 90 als regressie (zoals test_combat).
 ## Alle getallen komen uit `slice.csv` en `echo_v04.json`; de vaste verwachtingen hieronder zijn
@@ -18,6 +19,7 @@ const EnemyData = preload("res://scripts/combat/enemy_data.gd")
 const LightMeter = preload("res://scripts/light/light_meter.gd")
 const Layers = preload("res://scripts/world/layers.gd")
 const Tuning = preload("res://scripts/echo/tuning.gd")
+const Respawn = preload("res://scripts/save/respawn.gd")
 
 const L := InputBits.LEFT
 const R := InputBits.RIGHT
@@ -367,7 +369,8 @@ func test_b2_kadeloper_attacks_only_within_16(t) -> void:
 	await t.cleanup()
 
 
-## B-2 / §2.2: P1 op de plank van de echo (30 px) wordt niet geraakt; het vlak reikt tot 20 px.
+## B-2 / §2.2, VJ-08: P1 op de plank van de echo (30 px) wordt niet geraakt; het vlak reikt tot 20 px,
+## en sinds v0.1.2 (B-12) begint de Kadeloper daar ook geen aanloop.
 func test_b2_kadeloper_misses_p1_on_echo_plank(t) -> void:
 	var sim = Fx.world(t)
 	var ghost := Fx.ghost(t)
@@ -385,7 +388,8 @@ func test_b2_kadeloper_misses_p1_on_echo_plank(t) -> void:
 	await t.run_ticks(sim, 200)
 	t.check(p1.motor.on_floor and absf(p1.position.y - Fx.ON_ECHO_Y) < 0.6,
 		"P1 staat niet op de echo: %s" % p1.position)
-	t.check(active["n"] >= 6, "Kadeloper viel niet aan (%d actieve ticks)" % active["n"])
+	# VJ-08 (v0.1.2, B-12): op de plank (voeten 30 px boven zijn vloer) begint hij zelfs geen aanloop.
+	t.check(active["n"] == 0 and not enemy.is_telling(), "Kadeloper liep aan op P1 op de plank (%d actieve ticks)" % active["n"])
 	t.check(hits.is_empty() and p1.health == 5, "P1 op de plank geraakt: %s, %d LP" % [hits, p1.health])
 	await t.cleanup()
 
@@ -671,3 +675,119 @@ func test_b4_s7_crossing_with_two_stuits(t) -> void:
 			"D = %d: P1 zakte in het kanaal (y %.1f)" % [d, lowest["y"]])
 		t.check(echo != null, "D = %d: geen echo" % d)
 		await t.cleanup()
+
+
+# --- B-12: antwoorden #190 (VJ-08, VJ-02) ---------------------------------------------
+
+## Een Kadeloper of Schotdrager op `x` en P1 met handmatige input op `p1_at`; telt aanlopen en treffers.
+func _vj08_case(t, type: int, p1_at: Vector2, n: int, blocks: Array = [], enemy_floor := Fx.FLOOR_TOP,
+		jump_at := -1) -> Dictionary:
+	var sim = Fx.world(t)
+	for r: Rect2 in blocks:
+		Fx.block(t, "Blok%d" % blocks.find(r), r, Layers.WORLD)
+	var p1 := Fx.manual_player(sim, 1, p1_at)
+	sim.set_tail_ticks(60)
+	var enemy := SliceEnemy.new()
+	enemy.setup_enemy(type, 300.0, enemy_floor)
+	sim.add_object(enemy)
+	var seen := {"windups": [], "hits": [], "active": 0, "feet": []}
+	enemy.attack_started.connect(func(tick: int) -> void:
+		seen["windups"].append(tick)
+		seen["feet"].append(snappedf(enemy_floor - (p1.position.y + 15.0), 0.01)))
+	enemy.hit_player.connect(func(tick: int, _p: Node2D) -> void: seen["hits"].append(tick))
+	sim.tick_finished.connect(func(tick: int) -> void:
+		if enemy.is_attack_active():
+			seen["active"] += 1
+		if tick == jump_at:
+			p1.input_source.bits = J
+		elif tick == jump_at + 1:
+			p1.input_source.bits = 0)
+	await t.run_ticks(sim, n)
+	await t.cleanup()
+	return seen
+
+
+## B-12 / VJ-08: een Kadeloper en een Schotdrager beginnen hun aanloop alleen als P1 binnen 32 px
+## is (middelpunten) én de voeten van P1 tussen −20 en +20 px van hun vloer zijn
+## (`aanloop_hoogte_min` / `_max` in slice.csv). P1 recht boven hem op 30 px (plank) of in de lucht:
+## geen aanloop; P1 30 px lager, binnen 32 px: geen aanloop; P1 op de vloer binnen 32 px: aanloop;
+## P1 op 20 px: aanloop, op 22 px: niet.
+func test_b12_vj08_windup_only_in_height(t) -> void:
+	for g: String in ["kadeloper", "schotdrager"]:
+		t.check(EnemyData.value(g, "aanloop_hoogte_min") == -20.0 and EnemyData.value(g, "aanloop_hoogte_max") == 20.0,
+			"%s: hoogtegrenzen %s … %s (−20 … 20)" % [g, EnemyData.value(g, "aanloop_hoogte_min"), EnemyData.value(g, "aanloop_hoogte_max")])
+	for type: int in [KADELOPER, SCHOTDRAGER]:
+		var name := "Kadeloper" if type == KADELOPER else "Schotdrager"
+		# Op de vloer, 20 px ernaast: aanloop (controle).
+		var floor_case := await _vj08_case(t, type, Vector2(320, Fx.STAND_Y), 40)
+		t.check(not floor_case["windups"].is_empty(), "%s: geen aanloop op P1 op de vloer" % name)
+		# Recht boven hem op een plank op 30 px (een blok, zoals de plank van de echo).
+		var plank := await _vj08_case(t, type, Vector2(300, Fx.FLOOR_TOP - 30 - 15), 120,
+			[Rect2(290, Fx.FLOOR_TOP - 30, 20, 4)])
+		t.check(plank["windups"].is_empty(), "%s: aanloop op P1 recht boven hem op 30 px %s" % [name, plank["feet"]])
+		# In de lucht recht boven hem: P1 valt van 60 px; na 15 ticks zijn zijn voeten nog op ± 32 px.
+		var air := await _vj08_case(t, type, Vector2(300, Fx.STAND_Y - 60), 15)
+		t.check(air["windups"].is_empty(), "%s: aanloop op P1 in de lucht %s" % [name, air["feet"]])
+		# P1 30 px lager: de vijand op een verhoging (rand op 320), P1 ernaast op de vloer, 18 px verder.
+		var low := await _vj08_case(t, type, Vector2(318, Fx.STAND_Y), 120,
+			[Rect2(200, Fx.FLOOR_TOP - 30, 108, 30)], Fx.FLOOR_TOP - 30)
+		t.check(low["windups"].is_empty(), "%s: aanloop op P1 30 px lager %s" % [name, low["feet"]])
+		# Grens: voeten op 20 px (aanloop) en op 22 px (geen).
+		var at20 := await _vj08_case(t, type, Vector2(322, Fx.FLOOR_TOP - 20 - 15), 40,
+			[Rect2(312, Fx.FLOOR_TOP - 20, 30, 20)])
+		var at22 := await _vj08_case(t, type, Vector2(322, Fx.FLOOR_TOP - 22 - 15), 40,
+			[Rect2(312, Fx.FLOOR_TOP - 22, 30, 22)])
+		t.check(not at20["windups"].is_empty() and at22["windups"].is_empty(),
+			"%s: op 20 px %s, op 22 px %s" % [name, at20["feet"], at22["feet"]])
+
+
+## B-12 / VJ-08: springt P1 tijdens de aanloop, dan loopt de aanloop door (het vlak komt; springen
+## blijft een ontwijking: hij wordt niet geraakt).
+func test_b12_vj08_windup_continues_when_p1_jumps(t) -> void:
+	for type: int in [KADELOPER, SCHOTDRAGER]:
+		# P1 20 px naast hem: aanloop op tick 0, P1 springt op 10 (voeten > 20 px op het vlak, 30–35).
+		var seen := await _vj08_case(t, type, Vector2(320, Fx.STAND_Y), 50, [], Fx.FLOOR_TOP, 10)
+		t.check(seen["windups"].size() == 1 and seen["windups"][0] <= 1 and seen["active"] == 6,
+			"aanloop %s, actieve ticks %d (6)" % [seen["windups"], seen["active"]])
+		t.check(seen["hits"].is_empty(), "P1 in de sprong geraakt: %s" % [seen["hits"]])
+
+
+## B-12 / VJ-02, LM-05 (gdd v0.8.1): de dodelijke treffer geeft geen onkwetsbaarheid; na de respawn is
+## P1 45 ticks onkwetsbaar (`onkwetsbaar_respawn`, `r … r + 44`): een Kadeloper die op het respawnpunt
+## al in zijn aanloop zat, raakt P1 niet; zijn volgende aanval (na r + 45) wel.
+func test_b12_vj02_invulnerable_after_respawn(t) -> void:
+	t.check(EnemyData.ticks("gedeeld", "onkwetsbaar_respawn") == 45, "onkwetsbaar_respawn %d (45)"
+		% EnemyData.ticks("gedeeld", "onkwetsbaar_respawn"))
+	var w := _world(t, 400.0)
+	var sim = w["sim"]
+	var p1: PlayerActor = w["p1"]
+	var respawn := Respawn.new(p1, func() -> Vector2: return Vector2(400, Fx.STAND_Y))
+	var enemy := _enemy(sim, KADELOPER, 420.0)
+	var windups := []
+	enemy.attack_started.connect(func(tick: int) -> void: windups.append(tick))
+	var attempts := []
+	enemy.hit_player.connect(func(tick: int, _p: Node2D) -> void: attempts.append(tick))
+	await _run_to(t, sim, 1)
+	t.check(windups == [0], "aanloop %s (op 0)" % [windups])
+	# Midden in de aanloop sterft P1 (laatste levenspunt, een andere bron): geen onkwetsbaarheid.
+	await _run_to(t, sim, 10)
+	p1.health = 1
+	p1.take_hit(9)
+	t.check(p1.health == 0 and p1.invulnerable_until < 10, "dodelijke treffer: %d LP, onkwetsbaar tot %d" % [p1.health, p1.invulnerable_until])
+	await t.run_ticks(sim, 1)
+	var r: int = sim.tick - 1
+	t.check(p1.died and p1.health == 5 and p1.invulnerable_until == r + 45, "respawn op %d: died %s, %d LP, tot %d"
+		% [r, p1.died, p1.health, p1.invulnerable_until])
+	await _run_to(t, sim, 40)
+	t.check(attempts.size() == 1 and attempts[0] >= r and attempts[0] < r + 45 and p1.health == 5,
+		"de aanloop van vóór de respawn raakte op %s (respawn %d), %d LP" % [attempts, r, p1.health])
+	await _run_to(t, sim, r + 100)
+	t.check(attempts.size() == 2 and attempts[1] >= r + 45 and p1.health == 4,
+		"volgende aanval op %s, %d LP (4)" % [attempts, p1.health])
+	t.check(respawn != null, "respawn")
+	await t.cleanup()
+
+
+func _run_to(t, sim: Node, tick: int) -> void:
+	if tick > sim.tick:
+		await t.run_ticks(sim, tick - sim.tick)

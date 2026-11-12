@@ -1,12 +1,17 @@
 extends "res://scripts/combat/boss.gd"
-## De Gemaalmeester, de boss van de slice (T8b B-5–B-7; slice-vijanden-en-boss.md v0.1.1 §3,
+## De Gemaalmeester, de boss van de slice (T8b B-5–B-8; slice-vijanden-en-boss.md v0.1.2 §3,
 ## gemaalmeester.md v0.2). Alle waarden uit `slice.csv`, groep `gemaalmeester`.
 ##
 ## Fase 1, het schot (GMB-02, GMB-11, §3.4): de ketel is een `Pantserdoel` op de merkplek (300, 36);
 ## alleen een merk-ontploffing breekt het schot. Dan ligt de kern open tot de drempel van de opening
 ## (1350 / 1200 / 1050 / 900 SE, de boss klemt erop) of 300 ticks; daarna sluit het schot weer en
 ## komen er uit de spuigaten max. 2 Kadelopers (30 ticks gloeien, 30 ticks inactief). Na de laatste
-## drempel de fasewissel (60 ticks, GMB-12), dan fase 2 (het rad volgt in B-8, deel 2b).
+## drempel de fasewissel (60 ticks, GMB-12), dan fase 2.
+## Fase 2, het grote rad (GMB-04, §3.5, B-8): een tweede deel (96 × 40 op y 100–140, middelpunt
+## `x_rad = D + rad_offset` van de muur aan zijn kant; volgt D, ook bij een wissel van D in het
+## debugmenu, SL-05). Niet `Merkbaar`; P1/P2 doen 15 SE, de echo 5. Na `kant_treffers` treffers van
+## P1 en P2 samen (de echo telt niet) of `kant_ticks` ticks trilt het `rad_tril` ticks en draait het
+## in `rad_draai` ticks naar de andere muur; dan niet raakbaar.
 ## Maat en aanvallen (B-6, GM-04): fase 1 elke 120 ticks een pompslag op de helft van P1 (eerste
 ## aanloop 60), fase 2 elke 90 ticks om en om een pompslag op de x van P1 en een schoepenzwiep.
 ## Wankel op 300 SE (GMB-13): de merkplek op de ketel; de finisher regelt `Boss`.
@@ -19,12 +24,21 @@ signal shot_broken(tick: int)
 signal core_closed(tick: int, reason: String)
 ## Een add stapt uit een spuigat (§3.4).
 signal add_spawned(tick: int, add: Node2D)
-## Schermschok (B-11): `ticks` lang `px` (schotbreuk 6 / 2).
+## Schermschok (B-11): `ticks` lang `px` (schotbreuk 6 / 2, radtreffer 3 / 1).
 signal screen_shake(tick: int, ticks: int, px: float)
+## RAD_TREFFER (B-10): `source` "p1", "p2" of "echo"; `action` hoe de aanvaller daar kwam:
+## "bounce", "lancering", "vang", "stuit" (na een neerslag-stuit), "sprong", of "echo".
+signal rad_hit(tick: int, source: String, action: String, amount: int)
+## RAD_DRAAI (B-10): de kant is klaar (`reason` "treffers" of "tijd"); het rad trilt en draait
+## daarna naar `to_side` (−1 links, +1 rechts).
+signal rad_turning(tick: int, reason: String, to_side: int)
 
 const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
+const Motor = preload("res://scripts/echo/motor.gd")
 
 enum Phase { ONE, SWITCH, TWO }
+## Het rad (§3.5): weg (fase 1), hangt (raakbaar), trilt, draait naar de andere muur.
+enum RadState { HIDDEN, HANGING, SHAKING, TURNING }
 
 ## Placeholder-kleuren (§9: leesbaar in silhouet; Animator en Art vervangen ze).
 const BODY_COLOR := Color(0.32, 0.33, 0.36)
@@ -37,6 +51,9 @@ const SPOUT_COLOR := Color(1.0, 0.6, 0.3)
 const ACTIVE_COLOR := Color(1.0, 0.4, 0.3, 0.8)
 const TINK_COLOR := Color(1.0, 1.0, 0.9)
 const TINK_TICKS := 4
+const RAD_COLOR := Color(0.45, 0.5, 0.58)
+const RAD_SHAKE_COLOR := Color(0.75, 0.7, 0.6)
+const FLOOR_MARK_COLOR := Color(1.0, 0.85, 0.45, 0.35)
 
 var phase: Phase = Phase.ONE
 ## De ketel: schot (intact pantser), kern (gebroken) en bij Wankel de merkplek (GMB-02, GMB-05).
@@ -52,7 +69,15 @@ var spout_glowing := false
 ## De levende en inactieve adds (Kadelopers uit de spuigaten).
 var adds: Array = []
 ## GMB-12: de kant waar het rad heen draait bij de fasewissel (−1 links, +1 rechts): waar P1 niet is.
+## In fase 2 de kant waar het rad nu hangt (tijdens het draaien al de nieuwe kant).
 var rad_side := 0
+## Het grote rad (GMB-04), een `BossPart`; raakbaar alleen als het hangt.
+var rad: BossPart
+var rad_state: RadState = RadState.HIDDEN
+## Treffers van P1 en P2 samen op deze kant (`kant_treffers`, de echo telt niet).
+var rad_side_hits := 0
+## Hoe vaak het rad wegdraaide (aantal kanten dat klaar is).
+var rad_turns := 0
 ## B-11: schermschok tot deze tick, met `shake_px`.
 var shake_until := -1
 var shake_px := 0.0
@@ -64,6 +89,12 @@ var _beat_number := 0
 var _phase2_beats := 0
 var _glow_from := -1
 var _glow_until := -1
+var _rad_since := -1
+var _rad_until := -1
+var _rad_from_x := 0.0
+## Hoe kwam P1/P2 in de lucht (RAD_TREFFER, B-10): {"p1": actie, "p2": actie}.
+var _air_action := {}
+var _noted_tick := -1
 
 
 ## De boss op `origin`: de linkermuur van de arena, op de bovenkant van de vloer.
@@ -77,8 +108,53 @@ func setup_gemaalmeester(origin: Vector2) -> void:
 	var size := Vector2(EnemyData.value(g, "schot_x2") - EnemyData.value(g, "schot_x1"),
 		EnemyData.value(g, "schot_y2") - EnemyData.value(g, "schot_y1"))
 	ketel = add_part("Ketel", size, Vector2(EnemyData.value(g, "merkplek_x"), EnemyData.value(g, "merkplek_y")))
+	var y1 := EnemyData.value(g, "rad_y1")
+	var y2 := EnemyData.value(g, "rad_y2")
+	rad = add_part("Rad", Vector2(EnemyData.value(g, "rad_breedte"), y2 - y1), Vector2(rad_x(-1), (y1 + y2) * 0.5))
 	_build_visual()
 	on_reset(0)
+
+
+## Luistert ook naar de stuit (V-01b) voor RAD_TREFFER.
+func attach(p_sim: Node) -> void:
+	super.attach(p_sim)
+	if sim.has_signal(&"stuit"):
+		sim.stuit.connect(_on_stuit)
+
+
+## D van de sessie (`Combat.tail_ticks`; zonder Sim de standaard uit `echo_v04.json`).
+func tail_ticks() -> int:
+	if combat != null and "tail_ticks" in combat:
+		return int(combat.tail_ticks)
+	return EnemyData.default_tail()
+
+
+## GMB-04: arena-x van het middelpunt van het rad aan kant `side`: `D + rad_offset` van die muur.
+func rad_x(side: int) -> float:
+	var from_wall := float(tail_ticks()) + EnemyData.value(data_group, "rad_offset")
+	return from_wall if side < 0 else arena_width - from_wall
+
+
+## GMB-04: het vloerteken onder het rad aan kant `side`, van `D` tot `D + 68` px van de muur
+## (arena-x, van – tot). Alleen beeld.
+func floor_mark(side: int) -> Vector2:
+	var d := float(tail_ticks())
+	var w := EnemyData.value(data_group, "vloerteken_breedte")
+	return Vector2(d, d + w) if side < 0 else Vector2(arena_width - d - w, arena_width - d)
+
+
+## Sinds wanneer het rad in zijn stand van nu is, en tot wanneer (trillen en draaien; -1 als het
+## hangt). Voor bots, HUD en tests: wat een speler aan de tell ziet.
+func rad_since() -> int:
+	return _rad_since
+
+
+func rad_until() -> int:
+	return _rad_until
+
+
+func is_rad_hittable() -> bool:
+	return rad != null and rad.hittable
 
 
 func middle() -> float:
@@ -112,6 +188,16 @@ func on_reset(tick: int) -> void:
 	spout_glowing = false
 	rad_side = 0
 	shake_until = -1
+	rad_state = RadState.HIDDEN
+	rad_side_hits = 0
+	rad_turns = 0
+	_rad_since = -1
+	_rad_until = -1
+	_air_action.clear()
+	if rad != null:
+		rad.hittable = false
+		rad.markable = false
+		rad.position.x = rad_x(-1)
 	_set_ketel(true, true, true)
 	if combat != null:
 		combat.fade_marks_on(parts, tick)
@@ -119,10 +205,28 @@ func on_reset(tick: int) -> void:
 
 
 ## GMB-11: in een opening klemt de boss op de drempel van die opening; dicht doet niets af.
-func damage_floor(_part: BossPart) -> int:
+## Fase 2: het rad neemt schade tot Wankel (GMB-13; `Boss` klemt op `wankel_se`).
+func damage_floor(part: BossPart) -> int:
 	if phase == Phase.ONE and core_open and opening_index < thresholds.size():
 		return thresholds[opening_index]
+	if phase == Phase.TWO and part == rad and rad.hittable:
+		return 0
 	return se
+
+
+## §3.5: op het rad doen P1 en P2 `rad_treffer` (15), de echo `rad_echo` (5). In co-op deelt
+## `coop_schaal` de schade (×1,25 = 600 → 750 SE in fase 2, §3.8; start 1,0).
+func damage_for(part: BossPart, amount: int, source: String) -> int:
+	if part != rad:
+		return amount
+	var g := data_group
+	var key := "rad_echo" if source == "echo" else "rad_treffer"
+	var base := EnemyData.ticks(g, key)
+	if combat != null and "coop" in combat and combat.coop:
+		var scale := EnemyData.value(g, "coop_schaal")
+		if scale > 0.0:
+			base = int(round(float(base) / scale))
+	return base
 
 
 func on_armor_broken(tick: int, part: BossPart) -> void:
@@ -137,7 +241,18 @@ func on_armor_broken(tick: int, part: BossPart) -> void:
 	screen_shake.emit(tick, EnemyData.ticks(data_group, "schok_breuk_ticks"), shake_px)
 
 
-func on_damage(tick: int, _done: int, _source: String, _part: BossPart) -> void:
+func on_damage(tick: int, done: int, source: String, part: BossPart) -> void:
+	if part == rad and done > 0:
+		_note_actions(tick)
+		if source == "p1" or source == "p2":
+			rad_side_hits += 1
+		var g := data_group
+		shake_until = tick + EnemyData.ticks(g, "schok_rad_ticks")
+		shake_px = EnemyData.value(g, "schok_rad_px")
+		screen_shake.emit(tick, EnemyData.ticks(g, "schok_rad_ticks"), shake_px)
+		var action := "echo" if source == "echo" else String(_air_action.get(source, "sprong"))
+		rad_hit.emit(tick, source, action, done)
+		return
 	if phase == Phase.ONE and core_open and opening_index < thresholds.size() \
 			and se <= thresholds[opening_index]:
 		_reach_threshold(tick)
@@ -162,6 +277,8 @@ func on_health_set(tick: int) -> void:
 
 ## GMB-13 en GMB-05: geen aanvallen; de merkplek op de ketel gaat open (raakbaar, `Merkbaar`, 0 SE).
 func on_wankel(_tick: int) -> void:
+	if rad != null:
+		rad.hittable = false
 	core_open = false
 	_glow_until = -1
 	spout_glowing = false
@@ -180,9 +297,14 @@ func fight_update(tick: int, p1: Node2D) -> void:
 			if tick >= _switch_end:
 				phase = Phase.TWO
 				_next_beat = tick
+				_rad_hang(tick)
 				phase_changed.emit(tick, "2")
 				_beat(tick, p1)
+			else:
+				_update_rad(tick)
 		Phase.TWO:
+			_note_actions(tick)
+			_update_rad(tick)
 			if tick >= _next_beat:
 				_beat(tick, p1)
 
@@ -268,7 +390,91 @@ func _begin_switch(tick: int) -> void:
 	var p1: Node2D = sim.get_player(1) if sim != null else null
 	var px := arena_x(p1.global_position) if p1 != null else 0.0
 	rad_side = 1 if px < middle() else -1
+	# Het rad hijst zich uit de ketel en draait naar zijn kant; raakbaar pas in fase 2.
+	rad_state = RadState.TURNING
+	_rad_from_x = middle()
+	_rad_since = tick
+	_rad_until = _switch_end
 	phase_changed.emit(tick, "wissel")
+
+
+# --- fase 2: het rad (B-8) ---------------------------------------------------------
+
+## Het rad hangt aan kant `rad_side`: raakbaar, de kant begint (`kant_ticks`, `kant_treffers`).
+func _rad_hang(tick: int) -> void:
+	rad_state = RadState.HANGING
+	rad.position.x = rad_x(rad_side)
+	rad.hittable = true
+	rad.markable = false
+	rad_side_hits = 0
+	_rad_since = tick
+	_rad_until = -1
+
+
+## §3.5: na `kant_treffers` of `kant_ticks` trilt het rad `rad_tril` ticks en draait het in
+## `rad_draai` ticks naar de andere muur. Tijdens trillen en draaien is het niet raakbaar.
+func _update_rad(tick: int) -> void:
+	var g := data_group
+	match rad_state:
+		RadState.HANGING:
+			rad.position.x = rad_x(rad_side)  # volgt D (SL-05)
+			var reason := ""
+			if rad_side_hits >= EnemyData.ticks(g, "kant_treffers"):
+				reason = "treffers"
+			elif tick - _rad_since >= EnemyData.ticks(g, "kant_ticks"):
+				reason = "tijd"
+			if reason != "":
+				rad_state = RadState.SHAKING
+				rad.hittable = false
+				_rad_since = tick
+				_rad_until = tick + EnemyData.ticks(g, "rad_tril")
+				rad_turns += 1
+				rad_turning.emit(tick, reason, -rad_side)
+		RadState.SHAKING:
+			if tick >= _rad_until:
+				rad_state = RadState.TURNING
+				_rad_from_x = rad.position.x
+				rad_side = -rad_side
+				_rad_since = tick
+				_rad_until = tick + EnemyData.ticks(g, "rad_draai")
+		RadState.TURNING:
+			if tick >= _rad_until:
+				if phase == Phase.TWO:
+					_rad_hang(tick)
+			else:
+				var k := float(tick - _rad_since) / float(maxi(_rad_until - _rad_since, 1))
+				rad.position.x = lerpf(_rad_from_x, rad_x(rad_side), k)
+
+
+## RAD_TREFFER: hoe kwam P1/P2 in de lucht? Uit de bewegingsevents van deze tick (stap 1/2 is
+## al geweest), één keer per tick; op de vloer begint het opnieuw.
+func _note_actions(tick: int) -> void:
+	if tick == _noted_tick or sim == null:
+		return
+	_noted_tick = tick
+	for index: int in [1, 2]:
+		var player: PlayerActor = sim.get_player(index)
+		if player == null:
+			continue
+		var key := "p%d" % index
+		var ev := player.move_events
+		if ev & Motor.EV_LAUNCH:
+			_air_action[key] = "lancering"
+		elif ev & Motor.EV_CATCH:
+			_air_action[key] = "vang"
+		elif ev & Motor.EV_BOUNCE:
+			_air_action[key] = "bounce"
+		elif ev & Motor.EV_JUMP:
+			_air_action[key] = "sprong"
+		elif player.motor.on_floor and player.motor.support != Motor.Support.SHADOW_BODY:
+			_air_action[key] = "sprong"
+
+
+## V-01b: na een neerslag-stuit is de volgende treffer een "stuit".
+func _on_stuit(tick: int, player: Node2D) -> void:
+	_note_actions(tick)
+	if player is PlayerActor:
+		_air_action["p%d" % (player as PlayerActor).player_index] = "stuit"
 
 
 ## §3.4: uit elk spuigat één Kadeloper, zolang er minder dan `adds_max` leven.
@@ -280,7 +486,8 @@ func _spawn_adds(tick: int) -> void:
 		var add := SliceEnemy.new()
 		var at := arena_point(EnemyData.value(g, key), 0.0)
 		add.setup_enemy(SliceEnemy.Type.KADELOPER, at.x, at.y)
-		add.name = "Add%d" % tick
+		# Vaste, unieke naam: tick en spuigat (twee adds op dezelfde tick, TD-review PR #207).
+		add.name = "Add%d_%s" % [tick, key.get_slice("_", 1)]
 		# Ze doen de eerste `add_inactief` ticks niets (uit de stoom stappen); eerste tick: tick + 1.
 		add.hold_until(tick + 1 + EnemyData.ticks(g, "add_inactief"))
 		adds.append(add)
@@ -327,6 +534,10 @@ func _build_visual() -> void:
 	for key: String in ["spuigat_links", "spuigat_rechts"]:
 		var x := EnemyData.value(g, key)
 		_add_rect("Spuigat_" + key.get_slice("_", 1), Rect2(x - 8.0, -6.0, 16.0, 6.0), SPOUT_COLOR)
+	var rad_w := EnemyData.value(g, "rad_breedte")
+	var rad_h := EnemyData.value(g, "rad_y2") - EnemyData.value(g, "rad_y1")
+	_add_rect("RadBeeld", Rect2(-rad_w * 0.5, -rad_h * 0.5, rad_w, rad_h), RAD_COLOR)
+	_add_rect("Vloerteken", Rect2(0.0, -3.0, 1.0, 3.0), FLOOR_MARK_COLOR)
 	var tell := Polygon2D.new()
 	tell.name = "Tell"
 	tell.visible = false
@@ -355,6 +566,19 @@ func update_visual(tick: int) -> void:
 	(get_node(^"Merkplek") as CanvasItem).visible = state == State.WANKEL
 	(get_node(^"Spuigat_links") as CanvasItem).visible = spout_glowing
 	(get_node(^"Spuigat_rechts") as CanvasItem).visible = spout_glowing
+	# Het rad (GMB-04): hangt, trilt (flikkert) of draait; het vloerteken onder de hangende kant.
+	var rad_visual := get_node(^"RadBeeld") as Polygon2D
+	rad_visual.visible = shown and rad_state != RadState.HIDDEN
+	var jitter := 1.0 if rad_state == RadState.SHAKING and tick % 4 < 2 else 0.0
+	rad_visual.position = rad.position + Vector2(jitter, 0.0)
+	rad_visual.color = RAD_SHAKE_COLOR if rad_state == RadState.SHAKING else RAD_COLOR
+	var mark := get_node(^"Vloerteken") as Polygon2D
+	mark.visible = shown and phase == Phase.TWO and rad_state == RadState.HANGING \
+		and state == State.FIGHT
+	if mark.visible:
+		var span := floor_mark(rad_side)
+		mark.polygon = PackedVector2Array([Vector2(span.x, -3.0), Vector2(span.y, -3.0), Vector2(span.y, 0.0),
+			Vector2(span.x, 0.0)])
 	var tell := get_node(^"Tell") as Polygon2D
 	tell.visible = is_telling() or is_attack_active()
 	if tell.visible:

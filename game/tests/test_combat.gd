@@ -504,11 +504,13 @@ func test_e02m_10_walking_enemy_all_d(t) -> void:
 		await t.run_ticks(sim, d + 20)
 		var limit := 36.0 + 0.25 * (d - 30) + 3.0
 		# Bij D ≥ 90 is de vijand op x + D al weggelopen (> 36 px). Bij D = 60
-		# staat hij dan nog op zijn plek (32,6 px: stil na de treffer en zijn
-		# aanloop duren langer dan 60 ticks); de grens geldt ook dan.
-		var walked: bool = gap["at"] > 36.0 or d < 90
-		t.check(jumps == [10 + d] and gap["at"] <= limit and walked,
-			"D = %d: merksprong %s op %.1f px (≤ %.1f)" % [d, str(jumps), gap["at"], limit])
+		# staat hij dan nog op zijn plek (stil na de treffer en zijn aanloop duren
+		# langer dan 60 ticks): verwacht een merk op ≤ 36 px (gdd v0.8.1 §4.6, een
+		# verwachting, geen vrijstelling). De grens `limit` geldt bij elke D.
+		var expected: bool = gap["at"] > 36.0 if d >= 90 else (gap["at"] >= 0.0 and gap["at"] <= 36.0)
+		t.check(jumps == [10 + d] and gap["at"] <= limit and expected,
+			"D = %d: merksprong %s op %.1f px (≤ %.1f; %s 36 px)" % [d, str(jumps), gap["at"], limit,
+				"> " if d >= 90 else "≤ "])
 		t.check(damage.size() == 2 and damage[1] == [10 + d + 3, 20], "D = %d: schade %s" % [d, str(damage)])
 		await t.cleanup()
 

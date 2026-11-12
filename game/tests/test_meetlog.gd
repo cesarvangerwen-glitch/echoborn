@@ -233,3 +233,31 @@ func test_report_reads_old_and_new_logs(t) -> void:
 	t.check(a.longest_still == 80 and a.longest_still_p2 == 0, "oud log: P1 %d, P2 %d" % [a.longest_still, a.longest_still_p2])
 	t.check(b.longest_still == 80 and b.longest_still_p2 == 400 and b.still_runs == a.still_runs,
 		"nieuw log: P1 %d, P2 %d, runs %s" % [b.longest_still, b.longest_still_p2, str(b.still_runs)])
+
+
+## O-24 (gdd v0.8.1 §4.5; `kamers/flowkamer.md` §12 antwoord 6 en 7): MP-3 in co-op meet de
+## stilstand van de springer (bron = de drager: `p1` → P2 sprong, anders P1); één contact = één
+## actie: SPRINGPLANK + LANCERING van dezelfde springer op dezelfde tick tellen in MP-2 één keer, en
+## een VANGEN is in MP-3 een landing.
+func test_o24_mp3_springer_and_one_contact(t) -> void:
+	var rows := [["0", "K1", "RUN_START", "", "", "0", "0"],
+		# P1 (de drager) staat 40 ticks stil vóór de landing van P2 op hem: telt niet voor P2.
+		["100", "K1", "STIL_START", "", "p1", "0", "0"],
+		["140", "K1", "STIL_EIND", "40", "p1", "0", "0"],
+		["150", "K1", "SPRINGPLANK", "1", "p1", "0", "0"],
+		# P2 (de drager) wacht niet, P1 landt op hem en wordt gelanceerd op dezelfde tick.
+		["300", "K1", "SPRINGPLANK", "1", "p2", "0", "0"],
+		["300", "K1", "LANCERING", "1", "p2", "0", "0"],
+		# P2 staat 30 ticks stil en landt dan op P1 (springer P2 wachtte).
+		["400", "K1", "STIL_START", "", "p2", "0", "0"],
+		["430", "K1", "STIL_EIND", "30", "p2", "0", "0"],
+		["440", "K1", "SPRINGPLANK", "2", "p1", "0", "0"],
+		# Een vang van P1 op P2: een contact zonder SPRINGPLANK.
+		["500", "K1", "VANGEN", "3", "p2", "0", "0"],
+		["600", "K1", "RUN_EIND", "", "", "0", "0"]]
+	var rep = FlowReport.from_rows(rows, false)
+	t.check(rep.landings == 4, "landingen %d (4: drie SPRINGPLANK en een VANGEN)" % rep.landings)
+	t.check(is_equal_approx(rep.landings_without_still, 0.75),
+		"zonder wachten %.2f (0,75: alleen de landing van P2 na zijn eigen stilstand telt als wachten)" % rep.landings_without_still)
+	t.check(rep.actions.size() == 4, "acties %s (4: SPRINGPLANK + LANCERING op 300 is één)" % [rep.actions])
+	t.check(rep.still_runs_p2 == [[400, 429]] and rep.longest_still == 40, "runs P2 %s, MP-1 %d" % [rep.still_runs_p2, rep.longest_still])

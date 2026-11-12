@@ -152,6 +152,16 @@ func is_attack_active() -> bool:
 
 
 ## Hoe ver de aanloop is (0 … 1), voor een tell die feller wordt (§3.4).
+## Eerste actieve tick van de aanval van nu (einde van de aanloop), voor bots en tests.
+func windup_end_tick() -> int:
+	return _windup_end
+
+
+## Eerste tick na het actieve vlak van de aanval van nu.
+func active_end_tick() -> int:
+	return _active_end
+
+
 func windup_progress(tick: int) -> float:
 	if attack_phase != AttackPhase.WINDUP:
 		return 1.0
@@ -196,6 +206,7 @@ func set_health(tick: int, value: int) -> void:
 
 ## Stap (4): schade van `amount` SE op `part` van `source`. Geeft de toegepaste schade terug.
 func receive(tick: int, amount: int, source: String, part: BossPart) -> int:
+	amount = damage_for(part, amount, source)
 	if state == State.WANKEL:
 		# C-14 a/b: 0 SE; de eerste merk-ontploffing (elke schakel) start de finisher.
 		if source == "ontploffing":
@@ -260,6 +271,11 @@ func reset(tick: int) -> void:
 
 # --- voor de soorten boss -------------------------------------------------------
 
+## De schade die `part` van `source` krijgt; standaard die van `Combat` (het rad: 15 / 5, §3.5).
+func damage_for(_part: BossPart, amount: int, _source: String) -> int:
+	return amount
+
+
 ## Onder deze SE kan `part` nu niet komen (bv. de drempel van een opening, GMB-11).
 func damage_floor(_part: BossPart) -> int:
 	return 0
@@ -321,6 +337,13 @@ func abort_attack(tick: int) -> void:
 		return
 	attack_phase = AttackPhase.IDLE
 	attack_ended.emit(tick, attack_kind, attack_side, _attack_hit)
+
+
+## Gaat de boss midden in een finisher uit de scène (arena verlaten, laden), dan blokkeert
+## `Combat.finisher_running` de merken niet blijvend (SM-review PR #207).
+func _exit_tree() -> void:
+	if state == State.FINISHER and combat != null and "finisher_running" in combat:
+		combat.finisher_running = false
 
 
 # --- intern --------------------------------------------------------------------
