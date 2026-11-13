@@ -6,7 +6,8 @@ extends Sprite2D
 ##
 ## Staat als zus van het luik in de kamerscène (`luik = ../Luik`), niet als
 ## kind: het luik zet zichzelf onzichtbaar zodra het breekt.
-## - `opened` met `luik.schaduwklep`: frame 0 (vol), linksboven op de
+## - `opened` met `luik.schaduwklep`: frame 0 (de hele afdruk, nog niet aan het
+##   oplossen), linksboven op de
 ##   rechthoek van de klep (40 × 16).
 ## - `schaduwklep_weg`: frame 1 en 2 (oplossen, Bayer 50 % en 25 %) op
 ##   `fps` uit het manifest, daarna weg.
@@ -19,8 +20,14 @@ const Luik = preload("res://scripts/objects/luik.gd")
 ## Het luik waar deze schaduwklep bij hoort.
 @export var luik: NodePath = ^"../Luik"
 
+## De node van het luik staat zoveel px onder de bovenkant van de klep
+## (`luik.gd`: het middelpunt van de hurtbox van 8 px hoog; `_klep.position.y
+## = size.y * 0.5 - 4`). Verandert dat in `luik.gd`, dan hier ook;
+## `test_kadewijk_art.gd` meet tegen de echte `Klep` van het luik en wordt dan rood.
+const KLEP_BOVEN := 4.0
+
 var staat := "grijs"
-## Frame dat nu getoond wordt (0 vol, 1–2 oplossen), of -1 als hij weg is.
+## Frame dat nu getoond wordt (0 hele afdruk, 1–2 oplossen), of -1 als hij weg is.
 var frame_nu := -1
 var _frames: Array = []
 var _frametijd := 1.0 / 12.0
@@ -83,7 +90,7 @@ func _toon(n: int) -> void:
 		return
 	var f: Array = _frames[n]
 	region_rect = Rect2(f[0], f[1], f[2], f[3])
-	# Linksboven op de rechthoek van de klep (het luik staat 4 px onder de bovenkant).
+	# Linksboven op de rechthoek van de klep (het luik staat `KLEP_BOVEN` onder de bovenkant).
 	if _luik != null:
 		var size: Vector2 = _luik.size
-		global_position = _luik.global_position + Vector2(-size.x * 0.5, -4.0)
+		global_position = _luik.global_position + Vector2(-size.x * 0.5, -KLEP_BOVEN)

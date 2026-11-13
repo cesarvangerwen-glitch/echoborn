@@ -371,7 +371,10 @@ func test_kadewijk_art_schaduwklep(t) -> void:
 				t.check(not klep.visible, "%s: schaduwklep zichtbaar zonder schaduwklep" % tag)
 				houder.queue_free()
 				continue
-			var hoek: Vector2 = luik.global_position + Vector2(-luik.size.x * 0.5, -4.0)
+			# Linksboven op de echte klep van het luik (body + vorm uit `luik.gd`), niet op `KLEP_BOVEN`.
+			var klep_body: StaticBody2D = luik.klep()
+			var klep_maat: Vector2 = (klep_body.get_child(0).shape as RectangleShape2D).size
+			var hoek: Vector2 = klep_body.global_position - klep_maat * 0.5
 			t.check(klep.visible and klep.frame_nu == 0 and klep.region_rect == Rect2(frames[0][0], frames[0][1], frames[0][2], frames[0][3]),
 				"%s: na de breuk frame %d zichtbaar %s" % [tag, klep.frame_nu, klep.visible])
 			t.check(klep.global_position.is_equal_approx(hoek) and is_equal_approx(klep.region_rect.size.x, luik.size.x),
