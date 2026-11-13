@@ -106,7 +106,7 @@ shape = SubResource("Rect_s5")
 position = Vector2(4640, 80)
 script = ExtResource("2_kamer")
 kamer_id = &"S6"
-buren = PackedStringArray("S5", "S7")
+buren = PackedStringArray("S5", "S7", "S9")
 inhoud = ExtResource("8_s6")
 wijk_gemaal = &"S6/Gemaal"
 
@@ -139,7 +139,7 @@ shape = SubResource("Rect_s8")
 position = Vector2(2080, 540)
 script = ExtResource("2_kamer")
 kamer_id = &"S9"
-buren = PackedStringArray("S8", "S5", "S1")
+buren = PackedStringArray("S8", "S5", "S1", "S6")
 inhoud = ExtResource("11_s9")
 wijk_gemaal = &"S6/Gemaal"
 

@@ -65,10 +65,12 @@ const NEIGHBOURS := {
 	&"S3": [&"S2", &"S4"],
 	&"S4": [&"S3", &"S5"],
 	&"S5": [&"S4", &"S6", &"S9"],
-	&"S6": [&"S5", &"S7"],
+	&"S6": [&"S5", &"S7", &"S9"],
 	&"S7": [&"S6", &"S8"],
 	&"S8": [&"S7", &"S9"],
-	&"S9": [&"S8", &"S5", &"S1"],
+	# S6–S9 (#252): de trap tussen het plein en S9 loopt door de hoek van S5;
+	# zo blijft het plein geladen zolang de echo er op de trap terug nog loopt.
+	&"S9": [&"S8", &"S5", &"S1", &"S6"],
 }
 const ORDER := [&"S1", &"S2", &"S3", &"S4", &"S5", &"S6", &"S7", &"S8", &"S9"]
 ## Deel 1 (S1–S4, PR #208/#220): de runs tot `END_X` en hun normen per kamer.

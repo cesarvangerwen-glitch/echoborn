@@ -303,13 +303,10 @@ func is_arena_camera() -> bool:
 	return boss != null and is_instance_valid(boss) and boss.state != Gemaalmeester.State.IDLE and not boss.is_defeated()
 
 
-## De arena als beeld: van de linkermuur tot de rechtermuur (`ARENA_ORIGIN`, `ARENA_W` en de muren
-## van 20 px), van het plafond (S8) tot de onderkant: 640 × 360, precies één scherm (GM-01).
+## De arena als beeld: de rechthoek van S8 uit de layout (de arena met zijn muren, 640 × 360, precies
+## één scherm, GM-01).
 static func arena_view() -> Rect2:
-	var wall := 20.0
-	var left := Layout.ARENA_ORIGIN.x - wall
-	var top: float = Layout.ROOMS[&"S8"].position.y
-	return Rect2(left, top, Layout.ARENA_W + 2.0 * wall, Layout.ROOMS[&"S8"].size.y)
+	return Layout.ROOMS[&"S8"]
 
 
 func run_ticks() -> int:

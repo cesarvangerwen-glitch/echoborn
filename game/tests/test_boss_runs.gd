@@ -7,7 +7,7 @@ extends RefCounted
 ## `p1_health` = 5 LP, zonder genezing van buiten het spel. Elke run: verslagen zonder dood (geen
 ## RESPAWN, ≤ 4 treffers op P1 in de hele run; doel 0 in fase 2), MP-1 ≤ 300. Solo en co-op bij D = 60
 ## 95–150 s (v0.1.5, #247, LGD: doel ± 100 s), fase 1 ≥ 24 s en fase 2 ≤ 65 s, ook de realistische speler
-## (duur); co-op bij D = 60 ≤ 150 s; MP-7 (co-op ÷ solo) 0,5 … 1,0 bij 60 / 90 / 120 (180 als note);
+## (duur); co-op bij D = 60 75–150 s (LGD, PR #253); MP-7 (co-op ÷ solo) 0,5 … 1,0 bij 60 / 90 / 120 (180 als note);
 ## `RAD_DRAAI` reden `tijd` hooguit 1 per solo-run bij D ≤ 120. Rapport: lopend wachten per keer-run en
 ## de beginner-run met 1 slag per bounce.
 ##
@@ -46,6 +46,8 @@ const TOTAL_MIN_S := 95.0
 const TOTAL_MAX_S := 150.0
 const PHASE1_MIN_S := 24.0
 const PHASE2_MAX_S := 65.0
+## Co-op bij D = 60 (besluit LGD in PR #253).
+const COOP_MIN_S := 75.0
 
 
 # --- arena en run -------------------------------------------------------------
@@ -228,7 +230,7 @@ func _check_run(t, name: String, m: Dictionary) -> void:
 	t.check(int(m["first_break"]) >= 0, "%s: geen SCHOT_BREUK" % name)
 
 
-## B-9b: co-op met 5 LP; bij D = 60 hooguit 150 s; MP-7 (co-op ÷ solo bij dezelfde D) ≥ 0,5 bij 60 / 90 / 120,
+## B-9b: co-op met 5 LP; bij D = 60 75–150 s; MP-7 (co-op ÷ solo bij dezelfde D) ≥ 0,5 bij 60 / 90 / 120,
 ## bij 180 een note als het niet haalt. Co-op duurt niet langer dan solo (MP-7 ≤ 1,0; v0.1.3 §3.9
 ## besluit 1, na PR #219), ook bij 60 / 90 / 120; bij 180 een note.
 func _coop(t, d: int) -> void:
@@ -240,11 +242,10 @@ func _coop(t, d: int) -> void:
 	t.note(_table_row(name, m) + " · MP-7 %.2f (solo %d ticks)" % [mp7, solo])
 	_check_run(t, name, m)
 	if d == 60:
-		# v0.1.5 (#247): de ondergrens van 90 s geldt niet meer voor co-op; die zit nu in MP-7 ≥ 0,5
-		# en co-op ≤ solo (≤ 1,0). Beide samen (co-op ≥ 90 s en ≤ solo bij D = 90) passen niet met de
-		# solo-normen van de LGD (fase 2 ≤ 65 s): solo bij D = 90 duurt ± 89 s. Vraag aan de LGD in de PR.
+		# v0.1.5 (besluit LGD in PR #253): co-op bij D = 60 duurt 75–150 s; de oude ondergrens van 90 s
+		# vervalt (die paste niet met co-op ≤ solo bij D = 90 en fase 2 ≤ 65 s solo).
 		var s := float(m.get("total", 0)) / 60.0
-		t.check(s <= TOTAL_MAX_S, "%s: %.1f s (≤ %.0f)" % [name, s, TOTAL_MAX_S])
+		t.check(s >= COOP_MIN_S and s <= TOTAL_MAX_S, "%s: %.1f s (%.0f–%.0f)" % [name, s, COOP_MIN_S, TOTAL_MAX_S])
 	if d <= 120:
 		t.check(mp7 >= 0.5 and mp7 <= 1.0, "%s: MP-7 %.2f (0,5 … 1,0; solo %d ticks)" % [name, mp7, solo])
 	elif mp7 < 0.5 or mp7 > 1.0:
