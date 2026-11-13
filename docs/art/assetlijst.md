@@ -65,6 +65,7 @@ Doel: de flownormen van pillar 1 meten (sprongketen, merk-arena, één gemaal). 
 | S-04/S-05/S-06/S-07 voor **S2 Kadegang en S4 Brugkloof**, het snelluik van S1 en de vaste stukken per D (B3-wand, B3-blok) | `game/art/wereld/kadewijk/`, `slice-kadewijk.md` §10 | **Eindkwaliteit** (deel 3 van #85); koppeling S2/S4 volgt (TA) |
 | Schaduwklep (V-01d), 3 frames | `game/art/wereld/kadewijk/kadewijk_objecten_*.png` | **Eindkwaliteit** (deel 3 van #85); koppeling TA met GP |
 | S-04/S-05/S-07/S-11 voor **S5, S6 en S7** (interieur sluiswachtershuis, gemaal met rad en pompgang, sluiskelder), laag `gemaal_aan` (trap 1), objecten: breekbaar luik (S7, S9), holle schaduwklep, pompschoep, pompslag, sluisklep, sokkel, gemaalrad 8f | `game/art/wereld/kadewijk/`, `slice-kadewijk.md` §11 | **Eindkwaliteit** (deel 4 van #85); koppeling TA met GP |
+| S-04/S-05/S-07 voor **S8 Machinehal en S9 Lage kade** (hal met tegenlicht en de balk van het rad; verlichte wijk, getijdenrand, gezakt water, brug, kelder), deuren en hoogwater als vaste stukken | `game/art/wereld/kadewijk/`, `slice-kadewijk.md` §12 | **Eindkwaliteit** (deel 5 van #85); koppeling TA met GP |
 
 ## 4. Open punten
 
