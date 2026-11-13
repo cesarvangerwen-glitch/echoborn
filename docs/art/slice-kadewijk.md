@@ -182,7 +182,7 @@ Bladen: `concept_vijanden_x4_placeholder.png` (per type: silhouet, idle, aanloop
 |---|---|---|
 | Eindkwaliteit S1 en S3 | Art Director | **Gedaan in deel 2 (§9)** |
 | Eindkwaliteit S2 en S4, snelluik S1, schaduwklep | Art Director | **Gedaan in deel 3 (§10)** |
-| Eindkwaliteit S5–S9 (interieurs S5, S7, S8) | Art Director met Environment Artist | S5/S6 na de merge van #228 (wacht op de CEO), S7–S9 na hun visie-review |
+| Eindkwaliteit S5–S9 (interieurs S5, S7, S8) | Art Director met Environment Artist | S5/S6 maatvast (#228 gemerged); eindkwaliteit S5/S6 volgt na de regel van de WLD in kadewijk.md §8. S7–S9 na hun visie-review |
 | Koppeling van S1/S3 aan de kamerscènes | Technical Artist | **Gedaan in #230** |
 | Koppeling van S2/S4, de vaste stukken van S2 en de schaduwklep (§10.4) | Technical Artist (schaduwklep met de GP) | Volgende stap; SM-review (code in `game/`) |
 | Regels van §4.2 (bovenrand 2 px, tell-taal, amber/cyaan alleen als merk-overlay) en de drie nieuwe ramps opnemen in bible v1 §3 en §6, met de drempels: **bovenrand ΔL\* ≥ 50** tegen de directe achtergrond (ring van 2–6 px), in grijs én kleur (gemeten 50–75); de bestaande eis van **ΔL\* ≥ 40** op vulling of contour wordt voor vijanden "op bovenrand of kern" (het lijf haalt 2,6–37); kleurafstanden **ΔE76 ≥ 30, en ≥ 25 bij deuteranopie**, anders ΔL\* ≥ 20 of vorm (bible §7.1); en uit het kleurscript (§1) een **gemiddelde chroma ≤ ± 12 tot trap 2** (gemeten 3–12), en de beat na trap 2 minstens ± 1,5× de hoogste grijze beat (gemeten 20 tegen 12) | Art Director | Bible v1 |
@@ -294,7 +294,7 @@ De generator gebruikt deel 1 (palet, tegels, props, vijanden) en de R5-figuren. 
 
 ## 10. Deel 3: S2 Kadegang, S4 Brugkloof, het snelluik en de schaduwklep
 
-**Werkaanname (kader §5):** S2 en S4 zijn maatvast. De CD gaf `past` in #212, PR #221 is gemerged en de LGD bevestigde in #223. De art volgt `kadewijk_layout.gd` op `origin/main` (met S9 en het snelluik uit #231, en de schaduwklep uit #232) bij D = 60. S5 en S6 worden pas maatvast na de merge van #228, en die wacht op de CEO, dus daar maak ik nog niets. Het gemaal voor de kleurgolf staat nog steeds op de werkaanname (4960, 150) uit §9.
+**Werkaanname (kader §5):** S2 en S4 zijn maatvast. De CD gaf `past` in #212, PR #221 is gemerged en de LGD bevestigde in #223. De art volgt `kadewijk_layout.gd` op `origin/main` (met S9 en het snelluik uit #231, en de schaduwklep uit #232) bij D = 60. S5/S6 maatvast (#228 gemerged); eindkwaliteit S5/S6 volgt na de regel van de WLD in kadewijk.md §8. Het gemaal voor de kleurgolf staat nog steeds op de werkaanname (4960, 150) uit §9.
 
 ### 10.1 Wat de kamers laten zien
 
@@ -338,6 +338,6 @@ De loopvlakken zijn alle blokken waar je op kunt staan, ook de pijlerkop, de bol
 ### 10.5 Wat openstaat
 
 - Koppeling S2/S4, de vaste stukken en de schaduwklep (§10.4): TA (met GP), daarna een SM-review.
-- **S5/S6** na de merge van #228 (CEO). S7–S9 na hun visie-review.
+- **S5/S6 maatvast (#228 gemerged); eindkwaliteit S5/S6 volgt na de regel van de WLD in kadewijk.md §8.** S7–S9 na hun visie-review.
 - De breekbare luiken (V-01) in S7/S9 op eindkwaliteit, 40 × 16 met scheur en gebroken toestand. Dat gebeurt met hun kamers, want de luiktegels van deel 1 zijn nog 32 × 16 placeholder.
 - Bij D ≥ 90 overlapt het wand-stuk een deel van de pakhuismuur. De hijsdeuren staan daarom rechts van x 1506 (wereld). Dit geldt alleen voor de regressie, het spel draait op D = 60.
