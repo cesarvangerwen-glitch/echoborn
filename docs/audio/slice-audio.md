@@ -16,7 +16,7 @@ Deel 1 (§1–§4) is alles wat **niet** van de staart D afhangt; **deel 2** (§
 | Fasekader v0.4 §4, regel tegen weggooiwerk | Eerst placeholder: alles hier heet `_placeholder` (`WERKWIJZE.md` §9) en staat in `docs/audio/`, niet in `game/`. Alle tijden komen uit één bron (het script, met tickwaarden uit `slice-vijanden-en-boss.md`), zodat een andere aanloop één getal is. |
 | `slice-vijanden-en-boss.md` §0 | Alle tick-tijden zijn **startwaarden** van de Combat Designer (gezet met B-9). Verandert een aanloop, dan render ik het bestand opnieuw met het nieuwe getal (± 10 s). |
 | Bible v0.5, kop | 60 Hz-tick, € 0 extern, eigen synthese; speler 1 altijd "in kleur"; D = 60, merk solo D + 30 = 90 ticks, co-op 150, knal op D + 3 = 63. |
-| Deel 2 (§8) | Rekent met **D = 60** en de maat **120 / 90 ticks** (`slice-vijanden-en-boss.md` §7: niet van D afhankelijk). Verandert D, dan is het één getal in het script (`D`, `VOOR_TICKS`) en ± 25 s rekenen. |
+| Deel 2 (§7) | Rekent met **D = 60** en de maat **120 / 90 ticks** (`slice-vijanden-en-boss.md` §7: niet van D afhankelijk). Verandert D, dan is het één getal in het script (`D`, `VOOR_TICKS`) en ± 25 s rekenen. |
 
 ---
 
@@ -247,7 +247,7 @@ Waarom 120 BPM: een **aanloop van 30 ticks is precies één tel**. De zwiep en d
 |---|---|
 | **Audio Director** | (1) Lead-review van deze set en van het muziekplan. (2) Bible naar D = 60 (kop, §6.1, §9 en §10 staan nog op D = 120) en een besluit over voorstel §5 punt 1. (3) Wanneer gaat de set naar `game/audio/sfx/` (bible §11)? Dan ook de import-instellingen en de lus-punten van de drie `_lus`-bestanden. |
 | **Combat Designer** | Beantwoord in `slice-vijanden-en-boss.md` §9.3: de aanloop van de pompslag in fase 1 **blijft 40**; de dreun is een accent tussen de tellen. De stems (§7.3) volgen dat: in fase 1 valt de dreun 10 ticks na tel 2, en daar staat in het ritme niets (tel 2 is een ijzertik, de volgende achtste pas op tick 45). |
-| **Audio Director** (deel 2) | (6) Lead-review van deel 2 (§7). (7) Niveau van de echo: de keten geeft −7 / −8 dB gain (bible §4), maar zonder lijf meet de echo **−10,7 LU** (slag) tot **−15,3 LU** (landing) onder het levende geluid (§7.2). Goed zo, of de gain per geluid bijstellen? (8) De aanloop van 12 ticks vraagt dat de code het echo-geluid 12 ticks vóór de event-tick start (of met `play(0.2)` op de tick zelf, zonder aanloop); dat is koppeling (§7.2). (9) De stems staan op −27 LUFS elk (samen −24); dat is een startpunt voor de mixpass, niet de mix. |
+| **Audio Director** (deel 2) | Beantwoord in de [Lead-review van PR #274](https://github.com/cesarvangerwen-glitch/echoborn/pull/274#issuecomment-6849135352): (6) akkoord op deel 2. (7) Het echo-niveau blijft zo (dezelfde keten als F2, "jij, maar hol"); geen gain per geluid; in de mixpass kijkt de Audio Director of de echo-slag hoorbaar blijft in een druk gevecht. (8) Lichaamsgeluiden starten op event-tick − 12 uit de opname, de rad-treffer met `play(0.2)` op de treffer-tick (§7.2). (9) −27 per stem is het startpunt; in de mix zet `volume_db` per laag het niveau, de bestanden blijven op −27. Open bij de Audio Director: bible §10 naar v0.6 (bus Echo 0 dB, de voorstartregel). |
 | **Gameplay Programmer** (deel 2) | Bij de koppeling: `MerkAudio` met de bestanden van §7.1 (de controle in `deel2/` is het doel om tegen te luisteren en te meten), de bots/het log laten de ticks van de aftelslagen en de voorslag zien (§5 punt 1), en de import van de nieuwe bestanden in Godot draaien (§7.5). |
 | **Gameplay Programmer** | Voor de aansluiting later: B-6 levert per aanval een vlag `aanloop`/`actief` en B-10 de events; het geluid hoort op de eerste tick van de aanloop te starten (niet op het actieve vlak), zie §2. Voor de doelstreep: `doelstreep_strength` op de tick van `doelstreep_on` bepaalt wachttijd en beginpunt in het bestand (§3), en de aftelling volgt §3.1. |
 | **Audio Director** (#243) | (4) en (5) beantwoord in de [Lead-review van PR #260](https://github.com/cesarvangerwen-glitch/echoborn/pull/260#issuecomment-6845641252): (4) op dezelfde tick waarschijnlijk één vollere slag, vanaf 1 tick verschil twee slagen; akkoord, MT2 en de opname van S6 bevestigen het; terugvaloptie is een tweede variant uit dezelfde set. +3,7 dB samen blijft (HardLimiter op de Master; nameten in de mixpass). (5) `compress/mode` 2 (QOA) is goed voor de placeholder; instellingen bij eindkwaliteit in de assetlijst. |
@@ -299,7 +299,12 @@ De niveaus volgen de verhoudingen van de levensduurreeks in F2 (−6 / −4,5 / 
 | `echo_landing` (stereo) | `speler/p1_landing` | 33 t | −37,3 | −15,3 LU | 92,2 % |
 | `echo_gm_rad_treffer_1` (mono, `AudioStreamPlayer2D` op het rad) | `gm_rad_treffer_1` uit deel 1 | 78 t | −25,4 | −8,4 LU | 99,5 % |
 
-**Aansluiten:** de treffer zit in het echo-bestand **12 ticks later** dan in het levende bestand. De echo speelt een opgenomen event af, dus de code weet het D ticks vooruit: start het echo-geluid 12 ticks vóór de event-tick van de afspeling. Kan dat niet, dan op de event-tick met `play(0.2)` (zonder aanloop). Geen echo-variant voor de pompslag, de luiken en de ontploffing (bible §4.1), en nooit voor `gm_rad_treffer_2`. P2 heeft geen echo-variant: in co-op is er geen echo.
+**Niveau:** de −7 dB (slag) en −8 dB (beweging) van bible §4 **zitten al in het bestand**. Zet er geen −7 dB van de bus Echo (bible §10) bovenop, anders komt de echo −17,7 tot −22,3 LU onder het levende geluid (Lead-review PR #274; bible §10 gaat naar bus Echo 0 dB in v0.6).
+
+**Aansluiten:** de treffer zit in het echo-bestand **12 ticks later** dan in het levende bestand.
+- **Lichaamsgeluiden** (`echo_slag`, `echo_sprong`, `echo_landing`): die liggen vast in de opname, dus de code weet ze D ticks vooruit. Start het echo-geluid op **event-tick − 12** van de afspeling.
+- **`echo_gm_rad_treffer_1`: altijd `play(0.2)` op de treffer-tick** (zonder aanloop). Of de echo het rad raakt, weet de code pas op die tick (de boss beweegt); een aanloop vooraf zou een treffer beloven die misschien niet komt (bible §4.1).
+- **Breekt de echo of raakt hij Leeg** tijdens een lopende aanloop: in 30 ms uitfaden, net als bij de voorslag (§3). Geen echo-variant voor de pompslag, de luiken en de ontploffing (bible §4.1), en nooit voor `gm_rad_treffer_2`. P2 heeft geen echo-variant: in co-op is er geen echo.
 
 De levende bronnen staan in `game/audio/sfx/speler/`: `p1_slag` (30 t, −17,6 LUFS, door de true-peak-grens van −1,5 dBTP 1,6 dB onder het doel van −16), `p1_sprong` (18 t, −24), `p1_landing` (21 t, −22; 7,4 % boven 250 Hz, zoals in F2: het lijf is de landing, de spatbelletjes geven het hoge deel).
 
@@ -309,15 +314,15 @@ De levende bronnen staan in `game/audio/sfx/speler/`: `p1_slag` (30 t, −17,6 L
 
 | Bestand | Maat | Duur | Wat | LUFS (geïntegreerd) | True peak na decoderen | Boven 250 Hz |
 |---|---|---|---|---|---|---|
-| `boss_fase1_harmonium` | 4/4, 120 t | 32,0 s = 1920 t | Bourdon D2–A2 (lege kwint, geen terts) + **M2** (D–C♯–B–A) in het laag (D3…A2), één noot per maat; maat 9–16 met een herhaling op tel 4 | −27,0 | −15,3 dBTP | 43,1 % |
+| `boss_fase1_harmonium` | 4/4, 120 t | 32,0 s = 1920 t | Bourdon D2–A2 (lege kwint, geen terts) + **M2** (D–C♯–B–A) in het laag (D3…A2), één noot per maat; maat 9–16 met een herhaling op tel 4 | −27,0 | −15,7 dBTP | 39,9 % |
 | `boss_fase1_ritme` | 4/4 | 32,0 s | Gemaal: plof + ijzertik op tel 1, ijzertik op tel 2 en 4, houtklop op tel 3, zachte houtklop op de achtsten, 50 Hz-brom | −27,0 | −12,3 | 47,0 % |
-| `boss_fase2_harmonium` | 3/4, 90 t | 24,0 s = 1440 t | Bourdon + **M2 een octaaf hoger** (D4…A3) | −27,0 | −16,4 | 79,7 % |
+| `boss_fase2_harmonium` | 3/4, 90 t | 24,0 s = 1440 t | Bourdon + **M2 een octaaf hoger** (D4…A3) | −27,0 | −16,4 | 80,4 % |
 | `boss_fase2_ritme` | 3/4 | 24,0 s | Plof + ijzertik op tel 1, **water van de schoepen op tel 2 en 3**, achtsten | −27,1 | −12,5 | 34,5 % |
-| Samen fase 1 / fase 2 | | | | −24,0 / −24,0 | −10,5 / −11,6 | |
+| Samen fase 1 / fase 2 | | | | −24,0 / −24,0 | −9,4 / −11,1 | |
 
 - **Tells eerst** (bible §8): op tel 1 speelt de muziek geen klok; de carillon-tel van het SFX (`gm_maat_tel`, D4) blijft vrij. De dreun van de pompslag in fase 1 (40 ticks, 10 ticks na tel 2) valt op een plek zonder slag in het ritme.
 - **Lengte na decoderen:** precies 1 536 000 en 1 152 000 samples (gelijk aan de bron).
-- **Lusnaad** (na decoderen): de 250 ms rond de naad tegenover de 250 ms rond de maatgrens halverwege (zelfde muzikale plek) verschillen **−0,9 tot +1,2 dB**; de sprong van het laatste naar het eerste sample is kleiner dan de gewone sprong tussen twee samples (99e percentiel), in alle stems. Geen klik te meten.
+- **Lusnaad** (na decoderen): de 250 ms rond de naad tegenover de 250 ms rond de maatgrens halverwege (zelfde muzikale plek) verschillen **−0,5 tot +1,2 dB**; de sprong van het laatste naar het eerste sample is kleiner dan de gewone sprong tussen twee samples (99e percentiel), in alle stems. Geen klik te meten.
 - **Luisterbestand:** `docs/audio/t8d-slice/deel2/boss_stems_samen_placeholder.ogg` (112 s): fase 1 twee keer rond, dan fase 2 twee keer rond; naden op 32, 64 (wissel) en 88 s.
 - **Niet gemaakt:** de overgangen (fasewissel, Wankel = muziek weg, na de boss stilte, §4.4) zijn regels voor `AudioStreamInteractive`, dus koppeling; de verkenlagen (75 BPM, 51,2 s) zijn de tweede muziektaak van §4.5.
 
@@ -340,7 +345,7 @@ Godot draait niet in deze omgeving en CI start nu geen jobs. De `.import`-bestan
 
 | Versie | Wat |
 |---|---|
-| 0.2 | **Deel 2** (§7): merk-aftelling op D = 60 gerenderd en gezet (§7.1) met een controle van de vier situaties van §3.1 (aanzet binnen 0,03 tick, voorslag eindigt op t 63, knal 62,97); echo-varianten met een aanloop van 12 ticks (§7.2); vier boss-stems als lus (§7.3); speler geraakt en de slag van P2 (§7.4); 23 WAV's en 4 OGG's in `game/audio/` met `.import` (§7.5). §0 en §5 bijgewerkt; open punt van de Combat Designer gesloten (aanloop fase 1 blijft 40); nieuwe open punten (6)–(9) voor de Audio Director. |
+| 0.2 | **Deel 2** (§7): merk-aftelling op D = 60 gerenderd en gezet (§7.1) met een controle van de vier situaties van §3.1 (aanzet binnen 0,03 tick, voorslag eindigt op t 63, knal 62,97); echo-varianten met een aanloop van 12 ticks (§7.2); vier boss-stems als lus (§7.3); speler geraakt en de slag van P2 (§7.4); 23 WAV's en 4 OGG's in `game/audio/` met `.import` (§7.5). §0 en §5 bijgewerkt; open punt van de Combat Designer gesloten (aanloop fase 1 blijft 40); nieuwe open punten (6)–(9) voor de Audio Director. Na de Lead-review (PR #274): rad-treffer van de echo met `play(0.2)` op de treffer-tick en 30 ms uitfaden (§7.2), de −7/−8 dB zit in het bestand (§7.2), §0 verwijst naar §7, true peaks en aandeel boven 250 Hz in §7.3 gelijk aan de JSON, antwoorden (6)–(9) in §6. |
 | 0.1.2 | Luisterfragment voor de luistercheck in MT2 (§1.1, V-10 van `docs/qa/testplan-mt2.md`): v2 ongewijzigd op 0,0 s plus de stukken per vraag naast elkaar, 66,6 s, −18,0 LUFS, −1,5 dBTP na decoderen. Sample `pompslag_schoep_placeholder.wav` in `game/audio/sfx/omgeving/` (§1.2, #243): 28 ticks, −17,0 LUFS momentaan, −1,8 dBTP, 44,8 % boven 250 Hz, met de controle P1 + echo (−1 halve toon) op dezelfde tick. Na de Lead-review (PR #260): kop naar bible v0.5 en #243, open punten (4) en (5) verwijzen naar die review. |
 | 0.1.1 | Lead-review Audio Director (PR #193, klein): timing van de doelstreep-voorslag gecorrigeerd (streep aan op t 30, voorslag t 33 → knal t 63; wachttijd en beginpunt in §3); besluit over de aftelling naast de doelstreep opgenomen (§3.1, §5 punt 1); zin over het aandeel boven 250 Hz klopt nu voor de maat-tel (§2); `schotdrager_aanloop` met de piek in de laatste 3 ticks (§2.1). |
 | 0.1 | Eerste versie (T8d deel 1, #86): 72 placeholder-SFX (vijanden, Gemaalmeester, finisher, ketting, signalen) met tabel en metingen, luisterreeks, signalen voor plank en doelstreep, muziekplan grijs → licht met de motieven M1/M2, en wat pas na de vaste timing kan. |
