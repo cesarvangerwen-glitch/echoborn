@@ -28,6 +28,7 @@ extends RefCounted
 const Scene := preload("res://levels/kadewijk/kadewijk.tscn")
 const Bot = preload("res://levels/kadewijk/kadewijk_bot.gd")
 const Layout = preload("res://levels/kadewijk/kadewijk_layout.gd")
+const Kadewijk = preload("res://levels/kadewijk/kadewijk.gd")
 const Progress = preload("res://scripts/save/progress.gd")
 const FlowReport = preload("res://levels/flowkamer/flow_report.gd")
 const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
@@ -60,6 +61,9 @@ func _wijk(t, d: int, echo_on: bool, start: StringName = &"S9", run_end: StringN
 	var progress := Progress.new()
 	progress.name = "TestProgress"
 	t.tree.root.add_child(progress)
+	# V-01 (besluit LGD #252): wie voorbij de sokkel (S7) begint, heeft de Neerslag al.
+	if start == &"S8" or start == &"S9":
+		Kadewijk.give_neerslag(progress.state)
 	var wijk = Scene.instantiate()
 	wijk.tail = d
 	wijk.echo_on = echo_on

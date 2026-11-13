@@ -15,7 +15,8 @@ extends RefCounted
 ##   slagen per bounce, met ontwijken, 5 LP), solo bij D = 60, 90, 120 en 180, in de echte arena: P1
 ##   komt door de deur rechts binnen. Normen: verslagen zonder dood (≤ 4 treffers, geen RESPAWN),
 ##   MP-1 ≤ 300 (GM-09), de echo breekt niet, het schot breekt (GM-06), het rad wordt met een bounce
-##   geraakt (GM-07), `RAD_DRAAI` reden `tijd` ≤ 1 bij D ≤ 120, bij D = 60 90–150 s (§7, §3.9); na
+##   geraakt (GM-07), `RAD_DRAAI` reden `tijd` ≤ 1 bij D ≤ 120, bij D = 60 95–150 s met fase 1 ≥ 24 s en
+##   fase 2 ≤ 65 s (§7, §3.9 v0.1.5, #247); na
 ##   `BOSS_VERSLAGEN` 100 LP (GM-10) en de deur links open; P1 blijft het hele gevecht in de arena.
 ## - De baan van het Dwaallicht (S7) staat als `@export` in de scène (`lane_from`, `lane_to`, `floor_top`).
 ##
@@ -67,6 +68,9 @@ func _wijk(t, d: int, start: StringName, run_end: StringName, input: RefCounted)
 	var progress := Progress.new()
 	progress.name = "TestProgress"
 	t.tree.root.add_child(progress)
+	# V-01 (besluit LGD #252): wie voorbij de sokkel (S7) begint, heeft de Neerslag al.
+	if start == &"S8" or start == &"S9":
+		Kadewijk.give_neerslag(progress.state)
 	var wijk = Scene.instantiate()
 	wijk.tail = d
 	wijk.echo_on = true
@@ -207,6 +211,7 @@ func test_kadewijk_boss_respawn_op_gemaal(t) -> void:
 	var old: Gemaalmeester = wijk.boss
 	t.check(old != null and old.state == Gemaalmeester.State.FIGHT and _door_closed(wijk, "DeurRechts"),
 		"geen gevecht in S8 (boss %s, P1 %s)" % [old, wijk.p1.position])
+	t.check(wijk.is_arena_camera() and wijk.camera_view() == Kadewijk.arena_view(), "geen vaste arena-camera in het gevecht")
 	if old == null:
 		await _free(t, parts)
 		return
@@ -228,6 +233,7 @@ func test_kadewijk_boss_respawn_op_gemaal(t) -> void:
 		"respawn in %s op %s (verwacht het checkpoint van het gemaal %s)" % [wijk.room, wijk.p1.position, spawn])
 	t.check(wijk.meetlog.count("RESPAWN") - respawns_before == 1, "%d keer RESPAWN (verwacht 1)" % (wijk.meetlog.count("RESPAWN") - respawns_before))
 	t.check(not wijk.loader.is_loaded(&"S8") and wijk.boss == null, "S8 nog geladen of de boss nog gezet")
+	t.check(not wijk.is_arena_camera() and wijk.camera_view() != Kadewijk.arena_view(), "na de respawn staat de camera nog op de arena")
 	# De oude boss is vrijgegeven met de inhoud van S8; bij de Sim staat niets meer van hem.
 	var left := 0
 	for object in wijk.sim.objects:
@@ -242,6 +248,13 @@ func test_kadewijk_boss_respawn_op_gemaal(t) -> void:
 			if target == null or not is_instance_valid(target) or target is Gemaalmeester:
 				listeners += 1
 	t.check(listeners == 0, "%d verbindingen van de Sim naar de oude boss" % listeners)
+	# Een nieuwe poging (besluit LGD #247): bij de nieuwe BOSS_START staat de camera weer vast op de arena.
+	input.stop_x = 4560.0
+	wijk.p1.respawn_at(Layout.ROOM_START[&"S8"])
+	await _ticks(t, wijk, 120)
+	t.check(wijk.boss != null and wijk.boss != old and wijk.boss.state == Gemaalmeester.State.FIGHT
+		and wijk.is_arena_camera() and wijk.camera_view() == Kadewijk.arena_view(),
+		"na de respawn en een nieuwe BOSS_START: boss %s, arena-camera %s" % [wijk.boss, wijk.is_arena_camera()])
 	await _free(t, parts)
 	# Terug naar de arena, zoals een nieuwe poging (`test_kadewijk_deel2.gd`, gemaal → arena-deur).
 	var progress2 := Progress.new()
@@ -303,6 +316,14 @@ func _solo(t, d: int) -> void:
 	boss.arena_changed.connect(func(_tick: int, closed: bool) -> void:
 		if closed:
 			door["start_closed"] = _door_closed(wijk, "DeurRechts"))
+	# GM-01 (besluit LGD #247): de camera vast op de arena van BOSS_START tot BOSS_VERSLAGEN, anders niet.
+	var cam := {"vast": 0, "fout": 0, "voor": 0}
+	wijk.sim.tick_finished.connect(func(_tick: int) -> void:
+		var fighting: bool = boss.state != Gemaalmeester.State.IDLE and not boss.is_defeated()
+		if fighting and wijk.camera_view() == Kadewijk.arena_view():
+			cam["vast"] += 1
+		elif fighting or wijk.is_arena_camera():
+			cam["fout"] += 1)
 	wijk.sim.tick_finished.connect(func(_tick: int) -> void:
 		if boss.state != Gemaalmeester.State.IDLE and not boss.is_defeated():
 			var x: float = wijk.p1.position.x
@@ -356,13 +377,21 @@ func _solo(t, d: int) -> void:
 	if d <= 120:
 		t.check(int(turns.get("tijd", 0)) <= 1, "%s: %d keer RAD_DRAAI reden tijd (≤ 1)" % [name, turns.get("tijd", 0)])
 	if d == 60:
+		# v0.1.5 (#247, LGD): 95–150 s, fase 1 ≥ 24 s, fase 2 ≤ 65 s.
 		var s := total / 60.0
-		t.check(s >= 90.0 and s <= 150.0, "%s: %.1f s (90–150, §3.9)" % [name, s])
+		t.check(s >= 95.0 and s <= 150.0, "%s: %.1f s (95–150, §3.9 v0.1.5)" % [name, s])
+		var f1 := float(int(at.get("wissel", -1)) - int(at.get("start", 0))) / 60.0 if at.has("wissel") else -1.0
+		var f2 := float(int(at.get("wankel", -1)) - int(at.get("2", 0))) / 60.0 if at.has("wankel") and at.has("2") else INF
+		t.check(f1 >= 24.0 and f2 <= 65.0, "%s: fase 1 %.1f s (≥ 24), fase 2 %.1f s (≤ 65)" % [name, f1, f2])
 	# Kadewijk: deuren, licht, binnen de arena.
 	t.check(door["start_closed"], "%s: DeurRechts ging niet dicht bij BOSS_START" % name)
 	t.check(not _door_closed(wijk, "DeurLinks") and wijk.boss_defeated_tick >= 0, "%s: DeurLinks niet open na BOSS_VERSLAGEN" % name)
 	t.check(wijk.meter.value == LightMeter.MAX, "%s: %d LP na BOSS_VERSLAGEN (GM-10: %d)" % [name, wijk.meter.value, LightMeter.MAX])
 	t.check(outside["n"] == 0, "%s: P1 %d ticks buiten de arena tijdens het gevecht" % [name, outside["n"]])
+	t.check(int(cam["vast"]) > 0 and int(cam["fout"]) == 0 and not wijk.is_arena_camera(),
+		"%s: camera %d ticks vast op de arena, %d ticks fout, na BOSS_VERSLAGEN vast %s" % [name, cam["vast"], cam["fout"], wijk.is_arena_camera()])
+	t.check(Kadewijk.arena_view() == Layout.ROOMS[&"S8"] and Kadewijk.arena_view().size == Vector2(640, 360),
+		"arena-camera %s (verwacht S8, 640 × 360)" % Kadewijk.arena_view())
 	await _free(t, parts)
 
 
