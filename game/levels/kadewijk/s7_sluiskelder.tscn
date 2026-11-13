@@ -1,14 +1,56 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
 [ext_resource type="Script" path="res://scripts/combat/slice_enemy.gd" id="2_enemy"]
 [ext_resource type="Script" path="res://scripts/objects/luik.gd" id="3_luik"]
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_schaduwklep.gd" id="20_schaduwklep"]
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_art.gd" id="10_art"]
+[ext_resource type="Texture2D" uid="uid://b47xj28cu1e3a" path="res://art/wereld/kadewijk/s7_sluiskelder_achter_grijs.png" id="11_achter"]
+[ext_resource type="Texture2D" uid="uid://cjoww1aq7h2vi" path="res://art/wereld/kadewijk/s7_sluiskelder_midden_grijs.png" id="12_midden"]
+[ext_resource type="Texture2D" uid="uid://drtw0i3a3cahr" path="res://art/wereld/kadewijk/s7_sluiskelder_speelvlak_grijs.png" id="13_speelvlak"]
+[ext_resource type="Texture2D" uid="uid://c8wsbj8phc2wv" path="res://art/wereld/kadewijk/s7_sluiskelder_licht_grijs.png" id="14_licht"]
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_objecten.gd" id="16_objecten"]
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_luikbeeld.gd" id="21_luikbeeld"]
 
 [node name="S7Inhoud" type="Node2D"]
 position = Vector2(-5280, -540)
 script = ExtResource("1_inhoud")
 kamer_id = &"S7"
+
+[node name="Art" type="Node2D" parent="."]
+texture_filter = 1
+script = ExtResource("10_art")
+kamer_id = &"S7"
+naam = "s7_sluiskelder"
+verberg = Array[NodePath]([NodePath("../Sokkel")])
+
+[node name="Achter" type="Sprite2D" parent="Art"]
+z_index = -30
+position = Vector2(4800, 360)
+texture = ExtResource("11_achter")
+centered = false
+
+[node name="Midden" type="Sprite2D" parent="Art"]
+z_index = -20
+position = Vector2(4800, 360)
+texture = ExtResource("12_midden")
+centered = false
+
+[node name="Speelvlak" type="Sprite2D" parent="Art"]
+z_index = -10
+position = Vector2(4800, 360)
+texture = ExtResource("13_speelvlak")
+centered = false
+
+[node name="Licht" type="Sprite2D" parent="Art"]
+z_index = -5
+position = Vector2(4800, 360)
+texture = ExtResource("14_licht")
+centered = false
+
+[node name="Objecten" type="Node2D" parent="Art"]
+script = ExtResource("16_objecten")
+sokkel = true
 
 [node name="Sokkel" type="Polygon2D" parent="."]
 position = Vector2(5150, 440)
@@ -18,6 +60,9 @@ polygon = PackedVector2Array(-8, -14, 8, -14, 8, 0, -8, 0)
 [node name="Luik" type="Node2D" parent="."]
 position = Vector2(5280, 444)
 script = ExtResource("3_luik")
+
+[node name="Luikbeeld" type="Sprite2D" parent="."]
+script = ExtResource("21_luikbeeld")
 
 [node name="Schaduwklep" type="Sprite2D" parent="."]
 script = ExtResource("20_schaduwklep")

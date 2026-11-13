@@ -32,8 +32,10 @@ extends "res://scripts/combat/combat_target.gd"
 ## laag 5 en is geen afspeler; het luik breekt in één keer. Komt P2 erbij
 ## terwijl de schaduwklep er nog ligt, dan kan hij er hooguit `D + G` ticks
 ## op staan (TD, Lead-review #232; kamerdoc §9).
-## De schaduwklep is onzichtbaar (beeld: Art Director); voor P1 is het luik
-## open vanaf de breuk (`is_open`, `opened`).
+## Voor P1 is het luik open vanaf de breuk (`is_open`, `opened`). Het beeld
+## (luik en schaduwklep) staat niet hier maar in zus-nodes die naar deze
+## signalen luisteren: `levels/kadewijk/kadewijk_luikbeeld.gd` en
+## `kadewijk_schaduwklep.gd` (TA, #226; art: Art Director).
 ##
 ## Niet `Merkbaar` (soort `DUMMY`), geeft geen licht. Open = `verslagen` in de
 ## save (LM-13 b), en het komt nooit terug (`terugkerend` NEE). Een bewaard

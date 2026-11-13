@@ -1,11 +1,46 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_art.gd" id="10_art"]
+[ext_resource type="Texture2D" uid="uid://cwujklr8pn4ft" path="res://art/wereld/kadewijk/s5_sluiswachtershuis_achter_grijs.png" id="11_achter"]
+[ext_resource type="Texture2D" uid="uid://dnp2e8jpw7jpm" path="res://art/wereld/kadewijk/s5_sluiswachtershuis_midden_grijs.png" id="12_midden"]
+[ext_resource type="Texture2D" uid="uid://cugmoi0sthhvq" path="res://art/wereld/kadewijk/s5_sluiswachtershuis_speelvlak_grijs.png" id="13_speelvlak"]
+[ext_resource type="Texture2D" uid="uid://o8cwf6fxweh1" path="res://art/wereld/kadewijk/s5_sluiswachtershuis_licht_grijs.png" id="14_licht"]
 
 [node name="S5Inhoud" type="Node2D"]
 position = Vector2(-3840, -80)
 script = ExtResource("1_inhoud")
 kamer_id = &"S5"
+
+[node name="Art" type="Node2D" parent="."]
+texture_filter = 1
+script = ExtResource("10_art")
+kamer_id = &"S5"
+naam = "s5_sluiswachtershuis"
+
+[node name="Achter" type="Sprite2D" parent="Art"]
+z_index = -30
+position = Vector2(3520, -200)
+texture = ExtResource("11_achter")
+centered = false
+
+[node name="Midden" type="Sprite2D" parent="Art"]
+z_index = -20
+position = Vector2(3520, -200)
+texture = ExtResource("12_midden")
+centered = false
+
+[node name="Speelvlak" type="Sprite2D" parent="Art"]
+z_index = -10
+position = Vector2(3520, -200)
+texture = ExtResource("13_speelvlak")
+centered = false
+
+[node name="Licht" type="Sprite2D" parent="Art"]
+z_index = -5
+position = Vector2(3520, -200)
+texture = ExtResource("14_licht")
+centered = false
 
 [node name="Logbladzijde1" type="Polygon2D" parent="."]
 position = Vector2(3700, 248)
