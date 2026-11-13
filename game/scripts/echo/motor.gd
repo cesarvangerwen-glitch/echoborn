@@ -236,6 +236,17 @@ static func _floor_collider(body: CharacterBody2D, s: State) -> CollisionObject2
 		var same_kind := (_support_of(collider) == Support.SHADOW_BODY) == (s.support == Support.SHADOW_BODY)
 		if s.on_floor and same_kind:
 			return collider
+	if first == null and body.is_on_wall():
+		# Tegen een muur (#231): `move_and_slide` botst eerst op de muur en zet
+		# het lichaam daarna met de floor snap terug op de vloer. Dan is
+		# `is_on_floor()` waar, maar staat de vloer niet bij de botsingen van
+		# de stap. Zonder deze vraag (alleen testen, niets verschuift) verloor
+		# P1 de vloer zolang hij tegen de muur liep en kon hij na de
+		# coyote-tijd niet meer springen. Alleen tegen een muur: in de lucht
+		# boven een plank die net uitging (E-02m) blijft het zoals het was.
+		var below := body.move_and_collide(Vector2(0.0, body.floor_snap_length), true, body.safe_margin, true)
+		if below != null and below.get_normal().dot(body.up_direction) > 0.7:
+			first = below.get_collider() as CollisionObject2D
 	return first
 
 

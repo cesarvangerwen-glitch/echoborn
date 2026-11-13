@@ -167,6 +167,43 @@ func test_coyote_on_world_floor_and_no_double_jump(t) -> void:
 	t.note("vloer verlaten op tick %d" % leave)
 
 
+## #231 (WLD, kamerdoc §9): wie tegen een muur aan loopt, houdt de vloer. Eerst
+## bleef het lichaam 0,05 px boven de vloer hangen met `on_floor` onwaar, en
+## na de coyote-tijd werkte springen niet meer tot je de richting losliet. Nu:
+## de hele tijd tegen de muur op de vloer, en springen met de richting
+## ingedrukt werkt 40 ticks later nog (ver na de coyote-tijd), ook naar links.
+## Tegen een kademuur van 45 px (S9, FK-6) kom je zo met één sprong op de muur.
+func test_against_wall_keeps_floor_and_jumps(t) -> void:
+	for dir in [R, L]:
+		var sim = Fx.world(t)
+		var wall_x := 260.0 if dir == R else 120.0
+		Fx.block(t, "Wall", Rect2(wall_x, 300, 20, 100), Layers.WORLD)
+		var p1 := Fx.p1(sim, [[70, dir], [1, dir | J], [30, dir]], Vector2(190, Fx.STAND_Y))
+		var rows := _log(sim, p1)
+		await t.run_ticks(sim, 80)
+		var against := -1
+		var lost: Array = []
+		for i in range(1, 70):
+			if against < 0 and absf(rows[i]["pos"].x - rows[i - 1]["pos"].x) < 0.01:
+				against = i
+			if against >= 0 and not rows[i]["floor"]:
+				lost.append(rows[i]["tick"])
+		var label := "naar %s" % ("rechts" if dir == R else "links")
+		t.check(against > 0 and against < 40, "%s: P1 kwam niet tegen de muur (eerste stilstand %d)" % [label, against])
+		t.check(lost.is_empty(), "%s: vloer kwijt tegen de muur op tick %s" % [label, lost])
+		t.check(rows[70]["ev"] & Motor.EV_JUMP != 0 and rows[75]["pos"].y < Fx.STAND_Y - 15.0,
+			"%s: geen sprong %d ticks na het aanlopen (events %d, y %.2f)" % [label, 70 - against, rows[70]["ev"], rows[75]["pos"].y])
+		await t.cleanup()
+	# Een kademuur van 45 px: tegen de muur aan lopen, springen, en erop staan.
+	var sim2 = Fx.world(t)
+	Fx.block(t, "Kademuur", Rect2(260, Fx.FLOOR_TOP - 45.0, 400, 45), Layers.WORLD)
+	var p := Fx.p1(sim2, [[60, R], [1, R | J], [60, R]], Vector2(190, Fx.STAND_Y))
+	await t.run_ticks(sim2, 120)
+	t.check(p.motor.on_floor and absf(p.position.y - (Fx.FLOOR_TOP - 45.0 - 15.0)) < 0.1 and p.position.x > 270.0,
+		"kademuur 45: P1 staat op %s (verwacht op de muur, y %.1f)" % [p.position, Fx.FLOOR_TOP - 60.0])
+	await t.cleanup()
+
+
 # --- E-05 ----------------------------------------------------------------
 
 ## Lagen en maskers volgens de tabel; P1 tegen licht-, door schaduwmuur; P2 omgekeerd.

@@ -1,7 +1,9 @@
 extends RefCounted
 ## De gescripte geoefende run door de Kadewijk (S1–S9; gdd §4.5, L-08,
 ## FK-2, C-15; T8a #83; deel 2: S5 B2, S6 pompgang, S7 luik en kanaal;
-## deel 3: S9 de lage kade, het luik, B1 met logbladzijde 3, de schacht naar S1).
+## deel 3: S9 de lage kade, het luik, B1 met logbladzijde 3, de schacht naar S1;
+## de lus (#83): met `lus` en een `boss_input` de hele route S1 → S8 → de boss →
+## S9 → de trap naar het plein → trap 2 → terug → S9 → S1).
 ##
 ## Een inputbron (`sample(tick) -> int`) die per tick kijkt waar P1, zijn echo
 ## en de vijanden staan en daarop de knoppen kiest, zoals `flow_bot.gd` van de
@@ -88,6 +90,21 @@ var stuits := 0
 var kanaal_no_stuit := false
 ## S9, de trap naar het plein: de x waar de bot heen stuurt in de lucht.
 var _trap_x := NAN
+## De lus (#83): na `S7-deur` speelt `boss_input` de boss in S8; na
+## `BOSS_VERSLAGEN` de deur links uit, de trap op, trap 2 pompen, de trap af en
+## S9 tot `SLICE_EIND` (`LUS_NEXT`). Zonder `lus` blijft alles zoals de runs van
+## deel 1–3 (S8-eind wacht op het einde).
+var lus := false
+## Maakt de inputbron voor de boss: `func(sim, boss) -> RefCounted` met
+## `sample(tick)` (de test geeft `boss_bot.gd`); leeg = niet gebruikt.
+var boss_input: Callable
+var _boss_source: RefCounted = null
+## Ticks waarop de boss-bron het overnam en waarop de boss verslagen was (lus).
+var boss_from := -1
+var boss_until := -1
+## De lus: na deze stap komt die stap (in plaats van de volgende in `_legs`).
+const LUS_NEXT := {"S8-eind": "S9-deur", "S9-deur": "S9-trap", "S9-trap": "S6-trap2",
+	"S6-trap2": "S9-trap-af", "S9-trap-af": "S9-kade"}
 
 ## De route: [naam, soort, parameter].
 var _legs := [
@@ -128,6 +145,9 @@ var _legs := [
 	# Niet in de run: de trap naar het plein en terug (de test zet `leg` hierop).
 	["S9-trap", "trap9", null],
 	["S9-trap-af", "trap9_af", null],
+	# Alleen in de lus (`LUS_NEXT`): na de boss de deur links uit, en op het plein trap 2.
+	["S9-deur", "west", &"S9"],
+	["S6-trap2", "trap2", null],
 	# Niet in de run (S8-eind wacht op het einde): de arena-test zet `leg` hierop.
 	# Blijft de laatste stap.
 	["S8-rad", "turn", 7],
@@ -199,15 +219,25 @@ func _update_stuck() -> void:
 
 
 func _next_leg(echo_line: bool) -> void:
-	lines[_legs[leg][0]] = echo_line
-	leg_done[_legs[leg][0]] = _tick
+	var done_name: String = _legs[leg][0]
+	lines[done_name] = echo_line
+	leg_done[done_name] = _tick
 	leg += 1
+	if lus and LUS_NEXT.has(done_name):
+		leg = _leg_index(LUS_NEXT[done_name])
 	sub = ""
 	_off_ledge = false
 	_from_tread = false
 	_since = 0
 	_stuck = 0
 	_last_x = INF
+
+
+func _leg_index(leg_name_: String) -> int:
+	for i in _legs.size():
+		if _legs[i][0] == leg_name_:
+			return i
+	return _legs.size()
 
 
 func _tp(i: int) -> Dictionary:
@@ -279,7 +309,11 @@ func _decide() -> int:
 			if _room.run_over:
 				_next_leg(false)
 				return 0
+			if lus and _room.room == &"S8":
+				return _leg_boss()
 			return R
+		"trap2":
+			return _leg_trap2()
 	return 0
 
 
@@ -1081,3 +1115,59 @@ func _leg_stuit9() -> int:
 				return R
 			return 0
 	return L
+
+
+# --- De lus (#83): de boss, trap 2 en terug -----------------------------------------
+
+## S8 in de lus: `boss_input` speelt de Gemaalmeester (de bot van de boss-runs,
+## B-9) tot `BOSS_VERSLAGEN`; daarna is S8-eind klaar (verder met `S9-deur`).
+func _leg_boss() -> int:
+	if _room.is_boss_defeated():
+		if boss_until < 0:
+			boss_until = _tick
+		_next_leg(false)
+		return L
+	if _boss_source == null:
+		if _room.boss == null or not boss_input.is_valid():
+			return L
+		_boss_source = boss_input.call(_room.sim, _room.boss)
+		boss_from = _tick
+	return _boss_source.sample(_tick)
+
+
+## Trap 2 (SL-02, LM-08): van de trap het plein op naar rechts door de pompgang,
+## elke schoep één keer slaan (de echo slaat ze D ticks later nog eens); is trap
+## 2 vol, of maakt de echo hem vol, dan terug naar links naar de trap. Anders
+## keert P1 na de laatste schoep en slaat hij ze op de terugweg nog eens,
+## zolang er licht is (GM-10: na de boss 100 LP, 4 + 4 slagen = 100 G).
+func _leg_trap2() -> int:
+	var g: Gemaal = _room.gemaal
+	if g == null:
+		return R
+	if sub != "" and (g.trap_2_tick >= 0 or _will_fill_trap_2()):
+		_next_leg(int(g.strokes.get("echo", 0)) > _echo_base)
+		return L
+	match sub:
+		"":
+			sub = "gang"
+			_pass_dir = 1
+			_struck = {}
+			_visit_strokes = 0
+			_echo_base = int(g.strokes.get("echo", 0))
+			return R
+		"gang":
+			var bits := _walk(_pass_dir) | _pump_bits()
+			if _past_gang() and int(_room.meter.value) > 0:
+				_pass_dir = -_pass_dir
+				_struck = {}
+			return bits
+	return 0
+
+
+## Maakt de echo trap 2 vol met de slagen die hij nog herhaalt?
+func _will_fill_trap_2() -> bool:
+	var g: Gemaal = _room.gemaal
+	if not _room.echo_on or _room.echo == null:
+		return false
+	var pending := _visit_strokes - (int(g.strokes.get("echo", 0)) - _echo_base)
+	return int(g.fill) + mini(pending * Gemaal.per_stroke(), int(_room.meter.value)) >= 2 * Gemaal.MAX

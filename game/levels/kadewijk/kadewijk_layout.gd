@@ -129,11 +129,11 @@ const B2_RIGHT := 4080.0
 ## Vloeren van onder naar boven: de kade, richel 1–3, de zolder.
 const B2_LEVELS := [260.0, 170.0, 80.0, -10.0, -100.0]
 const S5_ZOLDER := -100.0
-## Het lampglas (L-12, WS-08; placeholder, de GP maakt het object) op de
+## Het lampglas (L-12, WS-08; de `Pickup` `S5/Lampglas` staat hier) op de
 ## zolder, 105 px boven richel 3: alleen met de bounce in één beweging te
 ## halen, of via de treden (langzame lijn).
 const LAMPGLAS := Vector2(3900, S5_ZOLDER - HALF_H)
-## Logbladzijde 1 (het logboek op de tafel in het huis, placeholder).
+## Logbladzijde 1 (het logboek op de tafel in het huis; de `Pickup` `S5/Logbladzijde1`).
 const LOGBLAD_1 := Vector2(3700, S5_FLOOR - 12.0)
 
 ## --- S6 Gemaalplein: loopbrug, plein, pompgang (FK-5, L-14 b), sluis ---
@@ -164,7 +164,7 @@ const S6_WATER_LOW := 400.0
 ## echo): eenrichtingstreden van 45 px (FK-6) recht boven elkaar.
 const S6_STAIR_X := 4200.0
 const S6_STAIR := [215.0, 170.0, 125.0, 80.0, 35.0, -10.0, -55.0]
-## Logbladzijde 2 en de bevroren echo's (placeholders).
+## Logbladzijde 2 (de `Pickup` `S6/Logbladzijde2`) en de bevroren echo's (placeholders).
 const LOGBLAD_2 := Vector2(4920, S6_FLOOR - 12.0)
 
 ## --- S7 Sluiskelder: de sokkel, het luik, het kanaal met twee Dwaallichten ---
@@ -198,7 +198,11 @@ const ARENA_FLOOR := 680.0
 const ARENA_W := 600.0
 const ARENA_ORIGIN := Vector2(ARENA_WALL_L, ARENA_FLOOR)
 const ARENA_DOOR_R := Rect2(4780, 360, 20, 260)
-const ARENA_DOOR_L := Rect2(4160, 360, 20, 360)
+## De deur links tot de bovenkant van de vloer (#83, GP): eronder ligt de drempel
+## (`Drempel`), zodat er na `BOSS_VERSLAGEN` geen gat van 20 px in de vloer
+## tussen de arena en S9 valt (de deur liep eerst tot 720 door).
+const ARENA_DOOR_L := Rect2(4160, 360, 20, ARENA_FLOOR - 360.0)
+const ARENA_DREMPEL_L := Rect2(4160, ARENA_FLOOR, 20, 720.0 - ARENA_FLOOR)
 ## Blokken die bij het laden open staan (geen collision, niet in beeld); de
 ## Gameplay Programmer sluit ze bij `BOSS_START` (`Kadewijk.set_door`).
 const START_OPEN := ["DeurRechts"]
@@ -215,9 +219,9 @@ const S9_DOOR_FLOOR := 680.0       ## = `ARENA_FLOOR`: je loopt de arena uit
 const S9_KADE := 635.0             ## de lage kade: 45 boven de vloer bij de deur (FK-6)
 const S9_LAAG := 700.0             ## de benedenkade, onder het luik
 const S9_STEP_X := 3980.0          ## de kademuur van de lage kade (45 hoog)
-## Placeholder voor de waterstand (LM-10, SL-02): tot `s = 2` staat de lage
-## kade onder water. Een blok dat de Gameplay Programmer opent met
-## `Kadewijk.set_door(&"S9", "Hoogwater", false)` als trap 2 vol is.
+## De waterstand (LM-10, SL-02): tot `s = 2` staat de lage kade onder water.
+## Een blok dat `kadewijk.gd` opent met `set_door(&"S9", "Hoogwater", false)`
+## 180 ticks nadat trap 2 vol is (#83).
 const S9_HOOGWATER := Rect2(3920, 360, 60, S9_KADE - 360.0)
 ## De brugpijler onder S4 (B2 met twee verdiepingen, zoals S5): de lage kade
 ## loopt tegen de pijler; keren en bouncen naar richel 1 (tegen de pijlerwand
@@ -249,7 +253,7 @@ const S9_SHAFT_RIGHT := 500.0
 ## De schacht: eenrichtingstreden recht boven elkaar, ≤ 45 px (FK-6), van de
 ## galerij (610) tot het snelluik (320).
 const S9_SHAFT := [569.0, 528.0, 486.0, 445.0, 403.0, 362.0]
-## Logbladzijde 3 (WS-08, placeholder) op de galerij: 105 px boven de
+## Logbladzijde 3 (WS-08; de `Pickup` `S9/Logbladzijde3`) op de galerij: 105 px boven de
 ## benedenkade, dus in één beweging alleen met de bounce (L-12; zoals het
 ## lampglas). Langzame lijn: de treden van B1.
 const LOGBLAD_3 := Vector2(300, S9_UP - HALF_H)
@@ -493,6 +497,7 @@ static func blocks(id: StringName, d: int) -> Array:
 			out.append(["Vloer", Rect2(ARENA_WALL_L, ARENA_FLOOR, ARENA_W, r.end.y - ARENA_FLOOR), false])
 			out.append(["MuurRechts", Rect2(ARENA_WALL_R, S7_LOW, r.end.x - ARENA_WALL_R, r.end.y - S7_LOW), false])
 			out.append(["DeurLinks", ARENA_DOOR_L, false])
+			out.append(["Drempel", ARENA_DREMPEL_L, false])
 			out.append(["DeurRechts", ARENA_DOOR_R, false])
 		&"S9":
 			var z := keerzone(d)

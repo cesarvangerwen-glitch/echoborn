@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
 [ext_resource type="Script" path="res://scripts/save/checkpoint.gd" id="2_checkpoint"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://bawq6fn53orlp" path="res://art/wereld/kadewijk/s1_kade_ingang_speelvlak_grijs.png" id="13_speelvlak"]
 [ext_resource type="Texture2D" uid="uid://bm36iktj7judw" path="res://art/wereld/kadewijk/s1_kade_ingang_licht_grijs.png" id="14_licht"]
 [ext_resource type="Texture2D" uid="uid://dg07h8sh17u2v" path="res://art/wereld/kadewijk/s1_kade_ingang_voor_grijs.png" id="15_voor"]
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_slice_eind.gd" id="3_slice_eind"]
 
 [sub_resource type="RectangleShape2D" id="Rect_checkpoint"]
 size = Vector2(40, 40)
@@ -68,3 +69,7 @@ shape = SubResource("Rect_checkpoint")
 position = Vector2(580, 215)
 color = Color(0.62, 0.62, 0.68, 0.45)
 polygon = PackedVector2Array(-8, -15, 8, -15, 8, 15, -8, 15)
+
+[node name="SliceEind" type="Node2D" parent="."]
+position = Vector2(480, 320)
+script = ExtResource("3_slice_eind")

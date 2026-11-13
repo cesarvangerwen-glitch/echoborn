@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
 [ext_resource type="Script" path="res://scripts/combat/slice_enemy.gd" id="2_enemy"]
 [ext_resource type="Script" path="res://scripts/objects/luik.gd" id="3_luik"]
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_schaduwklep.gd" id="20_schaduwklep"]
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_luikbeeld.gd" id="21_luikbeeld"]
+[ext_resource type="Script" path="res://scripts/objects/pickup.gd" id="30_pickup"]
 
 [node name="S9Inhoud" type="Node2D"]
 position = Vector2(-2080, -540)
@@ -40,7 +41,11 @@ script = ExtResource("21_luikbeeld")
 [node name="Schaduwklep" type="Sprite2D" parent="."]
 script = ExtResource("20_schaduwklep")
 
-[node name="Logbladzijde3" type="Polygon2D" parent="."]
+[node name="Logbladzijde3" type="Node2D" parent="."]
 position = Vector2(300, 595)
+script = ExtResource("30_pickup")
+nummer = 3
+
+[node name="Beeld" type="Polygon2D" parent="Logbladzijde3"]
 color = Color(0.85, 0.8, 0.6, 0.8)
 polygon = PackedVector2Array(-5, -6, 5, -6, 5, 6, -5, 6)

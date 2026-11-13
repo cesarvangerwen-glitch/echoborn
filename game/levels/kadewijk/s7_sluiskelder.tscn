@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
 [ext_resource type="Script" path="res://scripts/combat/slice_enemy.gd" id="2_enemy"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://c8wsbj8phc2wv" path="res://art/wereld/kadewijk/s7_sluiskelder_licht_grijs.png" id="14_licht"]
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_objecten.gd" id="16_objecten"]
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_luikbeeld.gd" id="21_luikbeeld"]
+[ext_resource type="Script" path="res://scripts/objects/pickup.gd" id="30_pickup"]
 
 [node name="S7Inhoud" type="Node2D"]
 position = Vector2(-5280, -540)
@@ -56,6 +57,16 @@ sokkel = true
 position = Vector2(5150, 440)
 color = Color(0.7, 0.62, 0.4, 0.9)
 polygon = PackedVector2Array(-8, -14, 8, -14, 8, 0, -8, 0)
+
+[node name="Neerslag" type="Node2D" parent="."]
+position = Vector2(5150, 425)
+script = ExtResource("30_pickup")
+soort = 2
+vaardigheid = &"V-01"
+
+[node name="Beeld" type="Polygon2D" parent="Neerslag"]
+color = Color(1, 0.85, 0.5, 0.9)
+polygon = PackedVector2Array(0, -40, 5, -35, 0, -30, -5, -35)
 
 [node name="Luik" type="Node2D" parent="."]
 position = Vector2(5280, 444)
