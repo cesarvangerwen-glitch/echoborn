@@ -1,6 +1,6 @@
 # Slice-audio (T8d), deel 1: SFX-set, signalen en muziekplan
 
-Versie 0.1.1 · 2026-11-12 · Eigenaar: **Composer/Sound Designer** · Lead-review: Audio Director · Issue [#86](https://github.com/cesarvangerwen-glitch/echoborn/issues/86) (T8d, `docs/productie/fase-2-kader.md` v0.4 §2 en §4)
+Versie 0.1.2 · 2026-11-13 · Eigenaar: **Composer/Sound Designer** · Lead-review: Audio Director · Issue [#86](https://github.com/cesarvangerwen-glitch/echoborn/issues/86) (T8d, `docs/productie/fase-2-kader.md` v0.4 §2 en §4)
 Bouwt op: `docs/audio/bible.md` v0.3 (§2–§8, §10, §11), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.1 (§2, §3, §7, §9), `docs/design/gdd.md` v0.8 (E-02t, E-07d, E-14b, C-12e, C-14), `docs/design/wereld.md` §2.2 (kamerlijst S1–S9), `game/scripts/echo/echo_hints.gd` (signalen `plank_signal_on`, `doelstreep_on`).
 
 Dit is **deel 1** van T8d: alles wat **niet** van de staart D afhangt. Het F2-fragment (`docs/audio/f2-fragment/`) is de klankbron: dezelfde klokken, hetzelfde water en dezelfde `echo_versie`, want de CEO vond de F0-geluiden "heel leuk" en het fragment klonk als een beiaard en "jij, maar hol". Deel 2 (na de vaste timing) staat in §5.
@@ -38,6 +38,52 @@ Dit is **deel 1** van T8d: alles wat **niet** van de staart D afhangt. Het F2-fr
 **Opnieuw maken:** `python3 docs/audio/t8d-slice/bron/genereer_slice_sfx.py` vanaf de repo-root. Nodig: numpy, scipy (en het F2-script, dat het importeert); optioneel ffmpeg met libvorbis (OGG) en matplotlib (PNG). De WAV-bestanden zijn **byte-gelijk** opnieuw te maken (twee runs gaven dezelfde hashes, bv. `pantser_tink_placeholder.wav` = `a1692a6d…49df8b`).
 
 **Niveaus:** elk bestand staat op een **vast niveau per soort** (max. momentane loudness, 400 ms), zodat ze op één schaal tegenover elkaar staan, met 0 dB gain in de speler: tells −15, aanvallen −14, tink en treffers −17, knallen −13, finisherslag −19 (echo −23), lussen −30 (Wankel −26), signalen −29 / −27 LUFS. True peak ≤ −1,5 dBTP voor alle bestanden. De mix zelf (bussen, duk, voorrang) is van de Audio Director (bible §8, §10).
+
+### 1.1 Luisterfragment voor de luistercheck in MT2 (V-10, bible §9.4)
+
+**Bestand:** `docs/audio/luistercheck-mt2/luistercheck_mt2_placeholder.ogg` (66,6 s, Vorbis q6, 48 kHz, stereo, ± 1 MB). Script: `docs/audio/luistercheck-mt2/bron/genereer_luistercheck_mt2.py`; tijden en metingen in `meting_placeholder.json` ernaast.
+
+**Wat het is.** Het fragment dat F2 claimt (v2, 15,5 s) is kort voor drie vragen. Deze reeks rendert **niets nieuws**: alles komt uit v2 of uit zijn eigen bouwstenen (`f2-fragment/losse-sfx/`). **Deel A begint op 0,0 s en is sample voor sample v2** (het script controleert de sha256 van v2 en de gelijkheid), dus de tijden van bible §9.4 en de kaart (L1–L3) kloppen zonder aanpassing. Daarna per vraag de stukken nog een keer naast elkaar, en tot slot v2 nog een keer heel. Tussen de delen 2 s stilte; geen stem en geen signaaltoon (die zou je met een klok verwarren).
+
+| Tijd (s) | Deel | Wat | Vraag |
+|---|---|---|---|
+| 0,0–15,5 | A | v2 heel (bible §9.1) | L1–L3 |
+| 17,5–25,6 | L1 | 2×: carillon grijs (v2 1,9–3,3 s: aftelslag 1 en 2, de klokslag met de echo) → opgepompt (v2 10,3–11,9 s: aftelling en ketting) | L1 |
+| 27,6–30,3 | L2 | in de mix: slag van P1 (v2 0,35–1,35 s) → de echo (v2 2,15–3,15 s) | L2 |
+| 31,0–35,8 | L2 | 2× los: `p1_slag` → `echo_slag` (= `echo_versie` van die slag, 7 dB zachter, bible §4) | L2 |
+| 37,8–49,1 | L3 | 2×: grijs (v2 3,9–6,2 s, wereld zonder spelers) → opgepompt (v2 12,0–14,3 s) | L3 |
+| 51,1–66,6 | B | v2 nog een keer heel | — |
+
+**Niveau.** Stukken uit v2 op 0 dB (alleen 15 ms in- en uitfaden). De losse P1-slag op het niveau van de P1-slag in v2 en de echo 7 dB lager, daarna beide 1,4 dB zachter zodat hun true peak onder die van v2 blijft.
+
+**Metingen** (script, pyloudnorm en ffmpeg ebur128, onafhankelijk):
+
+| Meting | WAV (opnieuw te maken) | OGG na decoderen | Doel (bible §8) |
+|---|---|---|---|
+| Geïntegreerde loudness | −17,9 (script) / −18,0 (pyloudnorm) / −18,0 (ebur128) LUFS | −18,0 (ebur128 en pyloudnorm) | −18 ± 2 ✓ |
+| True peak | −1,8 dBTP (script en ebur128) | −1,5 dBTP | ≤ −1 ✓ |
+| Clipping | 0 samples | — | 0 ✓ |
+| Deel A en B gelijk aan v2 | ja (sample voor sample) | — | — |
+
+**Opnieuw maken:** `python3 docs/audio/luistercheck-mt2/bron/genereer_luistercheck_mt2.py` vanaf de repo-root (`--wav` houdt de WAV). De WAV is byte-gelijk opnieuw te maken (sha256 `b5524e39…e69fff`, twee runs gelijk); in de repo staat alleen de OGG (de WAV is 12,8 MB). De OGG kan per ffmpeg-build verschillen.
+
+**Voor de kaart (QA Lead).** Antwoorden op L1–L3 kunnen na deel A; de rest is herhaling naast elkaar. Luisteren ± 1 min 10 s, met antwoorden ± 2 min. Het pad komt in V-10 en op de kaart via de QA Lead (#250); ik wijzig het testplan en de kaart niet.
+
+### 1.2 Pompslag op een schoep (#243, bible §4.1)
+
+**Bestand:** `game/audio/sfx/omgeving/pompslag_schoep_placeholder.wav` (+ `.import` van Godot 4.6.3, standaardinstellingen; TD-besluit (c)). Eén bestand voor P1, P2 en de echo, **geen echo-variant** (bible §4.1, §11). Script: `audio-bron/sfx/omgeving/genereer_pompslag_schoep.py` (vaste seed, byte-gelijk opnieuw te maken; bouwt op het F2-script).
+
+**Klank:** machinefamilie (bible §3), zoals de pompslag in het gemaal van F2: een korte klik van hout op ijzer, de plof van de schoep in het water (98 → 52 Hz), vijf houtmodi (176–1690 Hz), het ijzer van de as (310, 742, 1214, 1987 Hz), een waterstoot (300–2400 Hz) en spatbelletjes (Minnaert, 420–1900 Hz). Een zachte true-peak-limiter op de eerste milliseconden van de klap.
+
+| Meting | Waarde | Eis #243 | |
+|---|---|---|---|
+| Duur | **28 ticks** (0,467 s); de echo-versie (`pitch_scale` 0,944) duurt 29,7 ticks | ≤ 30 ticks | ✓ |
+| Max. momentane loudness (400 ms) | **−17,0 LUFS** (script, pyloudnorm en ffmpeg ebur128 gelijk) | −17 | ✓ |
+| True peak | **−1,8 dBTP** (script en ebur128) | ≤ −1,5 | ✓ |
+| Aandeel boven 250 Hz | **44,8 %** (60–250 Hz: 42,6 %; zwaartepunt 373 Hz) | ≥ 35 % | ✓ |
+| Clipping | 0 samples | — | ✓ |
+
+**Controle (eis van de Audio Director in #243)** in `docs/audio/pompslag-schoep/`: `pompslag_controle_zelfde_tick_placeholder.wav` (P1 en de echo met `pitch_scale` 2^(−1/12) op dezelfde tick) en `pompslag_controle_s6_reeks_placeholder.wav` (S6 bij D = 60: P1 op tick 0, 20, 40, 60, de echo op 60, 80, 100, 120). Gemeten: de twee slagen houden **elk hun eigen partialen** (P1 176 / 310 / 404 / 739 Hz, de echo 166 / 293 / 381 / 697 Hz; in de som staan ze allebei los), en de echo klinkt 1,7 ticks langer. **Of dat als twee slagen leest, kan ik niet meten**: op dezelfde tick vallen de aanslagen samen, dus het verschil zit alleen in de toonhoogte en de staart. De som is ± +3,7 dB luider en ± +5,5 dB hoger in piek (true peak +3,7 dBTP zonder gain; de controles staan daarom 5,1–5,2 dB lager). Dat vangen de limiter op de Master en de 3 stemmen van bible §8.3 op; dat is de mix van de Audio Director.
 
 ---
 
@@ -201,6 +247,7 @@ Waarom 120 BPM: een **aanloop van 30 ticks is precies één tel**. De zwiep en d
 | **Audio Director** | (1) Lead-review van deze set en van het muziekplan. (2) Bible naar D = 60 (kop, §6.1, §9 en §10 staan nog op D = 120) en een besluit over voorstel §5 punt 1. (3) Wanneer gaat de set naar `game/audio/sfx/` (bible §11)? Dan ook de import-instellingen en de lus-punten van de drie `_lus`-bestanden. |
 | **Combat Designer** | Mag de aanloop van de pompslag in fase 1 van **40 naar 30 of 60 ticks** (één of twee tellen bij 120 BPM)? Niet nodig voor de leesbaarheid, wel voor muziek die met de maat meetelt (§4.4). Blijft het 40, dan valt de slag gewoon tussen de tellen. |
 | **Gameplay Programmer** | Voor de aansluiting later: B-6 levert per aanval een vlag `aanloop`/`actief` en B-10 de events; het geluid hoort op de eerste tick van de aanloop te starten (niet op het actieve vlak), zie §2. Voor de doelstreep: `doelstreep_strength` op de tick van `doelstreep_on` bepaalt wachttijd en beginpunt in het bestand (§3), en de aftelling volgt §3.1. |
+| **Audio Director** (#243) | (4) Leest de pompslag van P1 en die van de echo op dezelfde tick als twee slagen (§1.2)? Meetbaar is alleen dat de partialen los blijven; het oordeel hoort bij de luisterreeks of de opname van S6. (5) Import-instellingen van `pompslag_schoep_placeholder.wav` staan op de standaard van Godot (`compress/mode` 2); pas aan in de assetlijst als dat moet. |
 | **Iedereen** | Niemand in de studio kan luisteren. De metingen (niveaus, stijging, aandeel boven 250 Hz, tickduur) bewijzen de vorm, niet dat het goed klinkt. Het eerste echte oordeel is de luisterreeks bij de Audio Director en het spel bij MT2. |
 
 **Beperkingen:** de geluiden zijn placeholder (eerste versie, niet beluisterd); de grootste risico's zijn dat de stoom van de pompslag en de schraap van de Kadeloper te veel op ruis lijken, en dat de maat-tel (± 55 keer per gevecht) gaat vervelen ondanks de demping. Twee bestanden liggen vooral onder 250 Hz (`gm_wankel_start` en de Wankel-lus, 20–27 % erboven): dat mag, omdat hun informatie de **stilte** van het carillon is, niet het geluid zelf.
@@ -209,5 +256,6 @@ Waarom 120 BPM: een **aanloop van 30 ticks is precies één tel**. De zwiep en d
 
 | Versie | Wat |
 |---|---|
+| 0.1.2 | Luisterfragment voor de luistercheck in MT2 (§1.1, V-10 van `docs/qa/testplan-mt2.md`): v2 ongewijzigd op 0,0 s plus de stukken per vraag naast elkaar, 66,6 s, −18,0 LUFS, −1,5 dBTP na decoderen. Sample `pompslag_schoep_placeholder.wav` in `game/audio/sfx/omgeving/` (§1.2, #243): 28 ticks, −17,0 LUFS momentaan, −1,8 dBTP, 44,8 % boven 250 Hz, met de controle P1 + echo (−1 halve toon) op dezelfde tick. |
 | 0.1.1 | Lead-review Audio Director (PR #193, klein): timing van de doelstreep-voorslag gecorrigeerd (streep aan op t 30, voorslag t 33 → knal t 63; wachttijd en beginpunt in §3); besluit over de aftelling naast de doelstreep opgenomen (§3.1, §5 punt 1); zin over het aandeel boven 250 Hz klopt nu voor de maat-tel (§2); `schotdrager_aanloop` met de piek in de laatste 3 ticks (§2.1). |
 | 0.1 | Eerste versie (T8d deel 1, #86): 72 placeholder-SFX (vijanden, Gemaalmeester, finisher, ketting, signalen) met tabel en metingen, luisterreeks, signalen voor plank en doelstreep, muziekplan grijs → licht met de motieven M1/M2, en wat pas na de vaste timing kan. |
