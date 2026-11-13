@@ -717,8 +717,8 @@ def zwiep_effect(staat, soort, f):
 
 
 def tell(w, h, fase):
-    """Tell-taal (deel 1 §4.3): het vlak waar de aanval komt, in vijandrood. Vroeg 25 % (vijandkern 3),
-    laat 75 % (vijandkern 4), met een gestippelde bovenlijn; actief vol (kern 4) met een rand in kern 7."""
+    """Tell-taal (deel 1 §4.3): het vlak waar de aanval komt, in vijandrood. Vroeg 25 %, laat 75 %, beide in
+    vijandkern 4 (ook zonder kleur leesbaar; Lead-review AD op PR #266), met een gestippelde bovenlijn; actief vol (kern 4) met een rand in kern 7."""
     c = Cel((int(w), int(h), 0, h))
     alles = np.ones_like(c.solid)
     if fase == "actief":
@@ -727,7 +727,7 @@ def tell(w, h, fase):
         c.put(rand, "vijandkern", 7, solid=False)
     else:
         dens = {"vroeg": 0.25, "laat": 0.75}[fase]
-        c.put(alles & (c.BAY < dens), "vijandkern", 3 if fase == "vroeg" else 4, solid=False)
+        c.put(alles & (c.BAY < dens), "vijandkern", 4, solid=False)        # vroeg/laat verschillen in dichtheid (AD, PR #266)
         lijn = np.zeros_like(alles)
         lijn[0, :] = (np.arange(c.w) % 4) < 2
         c.put(lijn, "vijandkern", 6, solid=False)
@@ -751,6 +751,9 @@ def spuigat(staat, f):
 
 
 # ------------------------------------------------------------------ atlas en manifest
+RAND = 1                                                          # px transparante rand rond elk frame
+
+
 class Blad:
     """Een atlas: per animatie een rij frames van één celgrootte."""
 
@@ -762,25 +765,28 @@ class Blad:
         frames = {s: [maak(s, i) for i in range(n)] for s in STATEN}
         self.rijen.append((naam, frames, ticks, lus, extra))
 
-    def export(self):
+    def export(self, P=RAND):
+        """Elk frame krijgt rondom P px transparante rand (eis van de echo-contour van de TA, #267): de cel in
+        de atlas is cw + 2P bij ch + 2P; de offset in het manifest schuift (-P, -P)."""
         kol = max(len(fr["grijs"]) for _, fr, _, _, _ in self.rijen)
-        W, H = kol * self.cw, len(self.rijen) * self.ch
+        CW, CH = self.cw + 2 * P, self.ch + 2 * P
+        W, H = kol * CW, len(self.rijen) * CH
         anims = {}
         for s in STATEN:
             img = np.zeros((H, W, 4))
             for r, (naam, fr, _, _, _) in enumerate(self.rijen):
                 for i, c in enumerate(fr[s]):
-                    img[r * self.ch:(r + 1) * self.ch, i * self.cw:(i + 1) * self.cw] = c.render(s)
+                    img[r * CH + P:r * CH + P + self.ch, i * CW + P:i * CW + P + self.cw] = c.render(s)
             D2.save(img, os.path.join(UIT_GAME, f"gemaalmeester_{self.naam}_{s}.png"))
         items = []
         for r, (naam, fr, ticks, lus, extra) in enumerate(self.rijen):
             for i, c in enumerate(fr["grijs"]):
-                items.append((i * self.cw, r * self.ch, c))
-            anims[naam] = dict(frames=[[i * self.cw, r * self.ch, self.cw, self.ch] for i in range(len(fr["grijs"]))],
+                items.append((i * CW + P, r * CH + P, c))
+            anims[naam] = dict(frames=[[i * CW, r * CH, CW, CH] for i in range(len(fr["grijs"]))],
                                ticks=list(ticks), lus=lus, **extra)
         D1.index_atlas(items, W, H).save(os.path.join(UIT_GAME, f"gemaalmeester_{self.naam}_index.png"))
         return dict(bestanden={s: f"gemaalmeester_{self.naam}_{s}.png" for s in STATEN + ["index"]},
-                    cel=[self.cw, self.ch], atlas=[W, H], animaties=anims)
+                    cel=[CW, CH], rand_px=P, atlas=[W, H], animaties=anims)
 
 
 def verdeel(totaal, n):
@@ -995,6 +1001,8 @@ def metingen(bg):
                 L = R.srgb_to_lab(img)[..., 0]
                 L0 = R.srgb_to_lab(z)[..., 0]
                 out[(staat, f"tell {naam} {fase} (ΔL* gemiddeld)")] = abs(float(L[mt].mean() - L0[mt].mean()))
+                gezet = masker_van(t, ax, ay0)
+                out[(staat, f"tell {naam} {fase} (ΔL* gezette pixels, mediaan)")] = abs(float(np.median(L[gezet] - L0[gezet])))
         # de kern open tegen het schot (zelfde plek): leest de opening zonder kleur?
         a = boss_beeld(z.copy(), staat, lich, ketel(staat, "kern", 0))
         b = boss_beeld(z.copy(), staat, lich, ketel(staat, "schot", 0))
@@ -1251,6 +1259,7 @@ def main():
     for naam, b in bladen.items():
         e = b.export()
         e.update(PLAATSING[naam])
+        e["offset"] = [e["offset"][0] - RAND, e["offset"][1] - RAND]       # de rand van 1 px
         manifest["bladen"][naam] = e
     manifest["koppeling"] = {
         "state == FIGHT, fase 1": "lichaam idle; ketel schot (core_open: kern); rad draai_s0 frame 0 op (300, 120), achter het lichaam",

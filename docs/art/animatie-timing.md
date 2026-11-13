@@ -1,6 +1,6 @@
 # Animatie-timing
 
-Versie 0.1 · Eigenaar: Animator · Issue [#265](https://github.com/cesarvangerwen-glitch/echoborn/issues/265) (assetlijst S-14) · Hoort bij `docs/art/bible.md` v0, `docs/art/slice-kadewijk.md` v0.5 (§4, §12) en `docs/design/gemaalmeester.md` v0.2.3
+Versie 0.1.1 · Eigenaar: Animator · Issue [#265](https://github.com/cesarvangerwen-glitch/echoborn/issues/265) (assetlijst S-14) · Hoort bij `docs/art/bible.md` v0, `docs/art/slice-kadewijk.md` v0.5 (§4, §12) en `docs/design/gemaalmeester.md` v0.2.3
 
 Frames per animatie en per aanvalsfase. Tijden in **ticks** (60 per seconde, dus frames bij 60 fps). De bron van elke tijd is `game/data/vijanden/slice.csv`; de generator leest die, dus een nieuwe waarde in data geeft na een nieuwe run nieuwe tick-lijsten in het manifest. Dit document bevat nu de Gemaalmeester. Spelers, echo en vijanden volgen in eigen secties.
 
@@ -27,7 +27,9 @@ Frames per animatie en per aanvalsfase. Tijden in **ticks** (60 per seconde, dus
 
 De boss draait niet en loopt niet (GM-02). De ketel staat dus altijd op dezelfde plek. Daarom is hij in lagen opgedeeld, zodat de staat van het schot los van de pose loopt:
 
-| Blad | Cel | Plaatsing (`offset` = linksboven, node-coördinaten) | z |
+In de tabel staan de cel en de offset van de **inhoud**. In de atlas heeft elk frame rondom **1 px transparante rand** (§1.4). De cel in het manifest is daarom 2 px breder en hoger, en de offset ligt (−1, −1) verder: lichaam 130 × 178 op (235, −177). Het manifest (`cel`, `offset`, `rand_px`) geeft de echte waarden.
+
+| Blad | Cel (inhoud) | Plaatsing (`offset` = linksboven van de inhoud, node-coördinaten) | z |
 |---|---|---|---:|
 | `rad` | 112 × 72 | `rad.position` + (−56, −44): de hurtbox (96 × 40) valt op kolom 8–104, rij 24–64. De loopkat rijdt op de onderkant van de balk van S8 (158 px). | −3 |
 | `lichaam` | 128 × 176 | boss-node + (236, −176): lichaam 252–348, 160 hoog | −2 |
@@ -102,6 +104,7 @@ Effecten:
 - **Bovenrand van 2 px** op elk lijfdeel en op de velg van het rad, in elk frame behalve het oplossen (deel 1 §4.2). In grijs en half gloeien de bovenrand en de kern een tint feller (VJ-06).
 - **De boss houdt zijn kleur in elke toestand**: lijf, kern, roest, ijzer en hout zijn een figuur (bible §4.1.5, deel 1 §4.2 regel 2). **Water en stoom volgen de toestand**: in grijs zijn ze grijs. Amber en cyaan komen niet in de boss; het merk is een overlay van de UI (`game/art/ui/wereld/merk_*`). Stoom is grijs-wit, nooit FelLicht (GMB-06).
 - Geen rotatie of schaal, geen transparantie, contour van 1 px bijna-zwart rond het silhouet, alleen ordered dithering (stoom, water, de tell).
+- **1 px transparante rand rond elk frame** (eis van de echo-contour van de TA, [#267](https://github.com/cesarvangerwen-glitch/echoborn/issues/267)). De contour-shader tekent 1 px buiten het silhouet. Zonder rand valt die lijn buiten het frame, of pakt hij pixels van het buurframe in de atlas. Dit geldt voor **elke sprite van de Animator**: de spelers en hun echo's, de vijanden en de boss. Ook als een frame tot de rand van zijn cel loopt (de sokkel op de vloer, een tell-vlak), komt de rand er in de atlas omheen. De generator doet dat (`RAND = 1` in `Blad.export`) en controleert het: 0 van de 191 frames heeft een pixel op de rand.
 
 ### 1.5 Metingen (`genereer_gemaalmeester.py`, S8 bij D = 60)
 
@@ -115,14 +118,14 @@ Effecten:
 | Velg van het rad (hout, mediaan) | 13,0 | 10,7 | — |
 | Kern open tegen het schot, op dezelfde plek (p90) | 27,1 | 15,2 | leesbaar zonder kleur (grijs) ✓ |
 
-Tells: ΔL\* van het vlak met en zonder tell (gemiddeld over het vlak):
+Tells: ΔL\* van het vlak met en zonder tell, gemiddeld over het vlak, en die van de gezette pixels zelf (mediaan). Sinds v0.1.1 staan vroeg en laat allebei in **vijandkern 4**. Ze verschillen alleen nog in dichtheid (25 % tegen 75 %), zodat ook de vroege stap zonder kleur leest (Lead-review AD op PR #266; was vijandkern 3, 4,8 / 3,9):
 
-| Tell | Grijs vroeg / laat / actief | Kleur vroeg / laat / actief |
-|---|---|---|
-| Pompslag (fase 1 links, vóór de plint en de wand) | 4,8 / **20,0** / **31,8** | 3,9 / 17,4 / 28,6 |
-| Schoepenzwiep (links, vóór het tegenlicht van het raam) | 6,6 / **24,7** / **37,0** | 5,9 / 22,5 / 34,1 |
+| Tell | Grijs vroeg / laat / actief | Kleur vroeg / laat / actief | Gezette pixels, vroeg en laat (grijs / kleur) |
+|---|---|---|---|
+| Pompslag (fase 1 links, vóór de plint en de wand) | **7,4** / **20,0** / **31,8** | 6,5 / 17,4 / 28,6 | 41,7 / 40,7 |
+| Schoepenzwiep (links, vóór het tegenlicht van het raam) | **9,2** / **24,7** / **37,0** | 8,4 / 22,5 / 34,1 | 41,5–41,7 / 39,4–40,6 |
 
-De tell wordt in luminantie elke stap duidelijker. De vroege stap (25 %, vijandkern 3) is bewust zacht en leest vooral op kleur: in een grijze hal is het het enige rood. De late stap en het actieve vlak zijn ook zonder kleur te lezen (`s8_gemaalmeester_leesbaarheid_x2.png`).
+De tell wordt in luminantie elke stap duidelijker. Elke gezette pixel van de vroege stap ligt nu ± 40 in L\* van de achtergrond. Gemiddeld over het vlak is hij zacht (7–9), want maar een kwart van de pixels is gezet: dat is het verschil met laat (17–25). Zo leest hij zonder kleur als een gestippeld vlak dat dichter wordt (`s8_gemaalmeester_leesbaarheid_x2.png`).
 
 **Punt van de CD (#247): de holle echo naast P1 bij de ketel.** P1 staat bij het schot, de echo op 6 en op 3 px (half en bijna helemaal over P1), vóór het schot en vóór de open kern:
 
@@ -151,7 +154,6 @@ Het manifest (`koppeling`) zegt per signaal en vlag welke animatie loopt. Kort:
 - **De loopkat in de achtergrond van S8** (deel 5, midden boven de boss) blijft staan als het rad wegrijdt. Het rad heeft nu zijn eigen loopkat. Voorstel aan de AD: de vaste loopkat uit `s8_machinehal_midden_*` halen, of hem als "parkeerplek" laten staan.
 - **Scheuren per kant op het rad** (`s0`–`s3`) en de ketel als voortgang: besluit van de UX Designer (combat §9.2).
 - **Echo op 3 px over P1 in grijs:** ΔL\* 40,0, op de grens. Als de echo-shader er is (F-07/S-10), meet ik opnieuw. Voorstel voor de TA, zoals de AD in §9.7 van het slice-document: de bijna-zwarte buitencontour van de echo altijd 1 px laten staan, ook waar hij over P1 valt.
-- **De vroege tell (25 %)** leest in luminantie zwak (ΔL\* 4–7). Dat volgt de tell-taal van deel 1 §4.3. Wil de AD of de Combat Designer dat ook de vroege stap zonder kleur leest, dan wordt het vijandkern 4 op 25 %. Dat is één regel in de generator.
 - **De gedeelde echo van de finisher** (S-15) is van de TA met de AD. De boss speelt in die 120 ticks `wankel` en bij elke finisherslag `geraakt`.
 - **Audio** (T8d): de frames volgen de tels van §9.3 van combat (sissende zuiger in de aanloop, de tink, de breuk, het ratelen van het rad). De Audio Director kan de tick-lijsten uit het manifest gebruiken.
 - **Ware Deck-test** van de boss en de tells (bible §10): TA bij de eerste Deck-build.
@@ -160,4 +162,5 @@ Het manifest (`koppeling`) zegt per signaal en vlag welke animatie loopt. Kort:
 
 | Versie | Wat |
 |---|---|
+| 0.1.1 | Lead-review AD op PR #266: de vroege tell in vijandkern 4 (verschil met laat alleen in dichtheid), opnieuw gemeten (§1.5); de eis van 1 px transparante rand per frame voor de echo-contour van de TA (#267), in de generator en in §1.2 en §1.4. |
 | 0.1 | Eerste versie: de Gemaalmeester (S-14), [#265](https://github.com/cesarvangerwen-glitch/echoborn/issues/265). |
