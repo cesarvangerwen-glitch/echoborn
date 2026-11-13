@@ -338,7 +338,18 @@ func test_meter_and_gemaal_restore(t) -> void:
 	progress.store_world()
 	t.check(progress.state.lichtmeter == 55 and progress.state.gemalen[&"gemaal_k3"] == {"vulstand": 40, "vol": false},
 		"store_world: %s" % [progress.state.to_dict()])
+	# Schema v2 (LM-10): store_world schrijft ook de waterstand `s` van de wijk
+	# van het gemaal (het aantal volle trappen), en dat leest `from_dict` terug.
+	t.check(progress.state.waterstanden == {&"gemaal_k3": 0}, "waterstand bij G 40: %s" % [progress.state.waterstanden])
+	first[1].trappen = 2
+	first[1].fill = 200
+	progress.store_world()
+	var errors := PackedStringArray()
+	var reread: GameState = GameState.from_dict(progress.state.to_dict(), errors)
+	t.check(progress.state.waterstand(&"gemaal_k3") == 2 and reread != null and reread.waterstand(&"gemaal_k3") == 2,
+		"waterstand bij G 200 (2 trappen): %s, %s" % [progress.state.waterstanden, errors])
 	progress.state.set_gemaal(&"gemaal_k3", 100, true)
+	progress.state.set_waterstand(&"gemaal_k3", 1)
 	progress.state.lichtmeter = 12
 	var second: Array = build.call()
 	var signals: Array = []
