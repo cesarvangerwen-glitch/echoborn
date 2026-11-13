@@ -66,6 +66,7 @@ Doel: de flownormen van pillar 1 meten (sprongketen, merk-arena, één gemaal). 
 | Schaduwklep (V-01d), 3 frames | `game/art/wereld/kadewijk/kadewijk_objecten_*.png` | **Eindkwaliteit** (deel 3 van #85); koppeling TA met GP |
 | S-04/S-05/S-07/S-11 voor **S5, S6 en S7** (interieur sluiswachtershuis, gemaal met rad en pompgang, sluiskelder), laag `gemaal_aan` (trap 1), objecten: breekbaar luik (S7, S9), holle schaduwklep, pompschoep, pompslag, sluisklep, sokkel, gemaalrad 8f | `game/art/wereld/kadewijk/`, `slice-kadewijk.md` §11 | **Eindkwaliteit** (deel 4 van #85); koppeling TA met GP |
 | S-04/S-05/S-07 voor **S8 Machinehal en S9 Lage kade** (hal met tegenlicht en de balk van het rad; verlichte wijk, getijdenrand, gezakt water, brug, kelder), deuren en hoogwater als vaste stukken | `game/art/wereld/kadewijk/`, `slice-kadewijk.md` §12 | **Eindkwaliteit** (deel 5 van #85); koppeling TA met GP |
+| S-14 Gemaalmeester: lichaam (idle, aarzeling, pompslag en schoepenzwiep per kant, fasewissel, Wankel, geraakt, oplossen), ketel (schot, tink, breuk, kern, schot sluit, merkplek), rad (draaien in 4 stadia van scheuren, treffer, trillen), effecten (pompslag, zwiep, tells, spuigaten); grijs/half/kleur/index en manifest | `game/art/animatie/gemaalmeester/`, `docs/art/animatie-timing.md` §1 | **Eindkwaliteit** ([#265](https://github.com/cesarvangerwen-glitch/echoborn/issues/265)); koppeling TA met GP |
 
 ## 4. Open punten
 

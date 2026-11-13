@@ -1,0 +1,2166 @@
+{
+ "versie": "0.1",
+ "eigenaar": "Animator",
+ "issue": 265,
+ "bron": "docs/art/slice/bron/genereer_gemaalmeester.py",
+ "maten": "uit game/data/vijanden/slice.csv (groep gemaalmeester) en game/scripts/combat/gemaalmeester.gd",
+ "knoop": "De boss-node staat op de linkermuur van de arena, op de bovenkant van de vloer; arena-x naar rechts, node-y = -arena-y. `offset` = linksboven van een cel in node-coördinaten (Sprite2D, centered = false).",
+ "ticks": "per frame, in ticks van 60 per seconde (= frames bij 60 fps); `stuurt` zegt welke vlag uit boss.gd/gemaalmeester.gd het frame kiest, als het niet op tijd loopt",
+ "bladen": {
+  "lichaam": {
+   "bestanden": {
+    "grijs": "gemaalmeester_lichaam_grijs.png",
+    "half": "gemaalmeester_lichaam_half.png",
+    "kleur": "gemaalmeester_lichaam_kleur.png",
+    "index": "gemaalmeester_lichaam_index.png"
+   },
+   "cel": [
+    130,
+    178
+   ],
+   "rand_px": 1,
+   "atlas": [
+    1300,
+    3916
+   ],
+   "animaties": {
+    "idle": {
+     "frames": [
+      [
+       0,
+       0,
+       130,
+       178
+      ],
+      [
+       130,
+       0,
+       130,
+       178
+      ],
+      [
+       260,
+       0,
+       130,
+       178
+      ],
+      [
+       390,
+       0,
+       130,
+       178
+      ],
+      [
+       520,
+       0,
+       130,
+       178
+      ],
+      [
+       650,
+       0,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      10,
+      10,
+      10,
+      10,
+      10,
+      10
+     ],
+     "lus": true
+    },
+    "aarzeling_links": {
+     "frames": [
+      [
+       0,
+       178,
+       130,
+       178
+      ],
+      [
+       130,
+       178,
+       130,
+       178
+      ],
+      [
+       260,
+       178,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      7,
+      7,
+      6
+     ],
+     "lus": false,
+     "kant": -1,
+     "volgt": "pomp_aanloop_links",
+     "noot": "de eerste aanloop (eerste_aanloop = 60): eerst deze 3 frames (20 ticks), dan pomp_aanloop over de resterende 40"
+    },
+    "pomp_aanloop_links": {
+     "frames": [
+      [
+       0,
+       356,
+       130,
+       178
+      ],
+      [
+       130,
+       356,
+       130,
+       178
+      ],
+      [
+       260,
+       356,
+       130,
+       178
+      ],
+      [
+       390,
+       356,
+       130,
+       178
+      ],
+      [
+       520,
+       356,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      10,
+      9,
+      9,
+      9,
+      3
+     ],
+     "lus": false,
+     "kant": -1,
+     "stuurt": "windup_progress: frame 0-3 op kwarten van (aanloop - 3); frame 4 (uithaal) de laatste 3 ticks",
+     "ticks_fase2": [
+      7,
+      7,
+      7,
+      6,
+      3
+     ]
+    },
+    "pomp_slag_links": {
+     "frames": [
+      [
+       0,
+       534,
+       130,
+       178
+      ],
+      [
+       130,
+       534,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      3,
+      3
+     ],
+     "lus": false,
+     "kant": -1,
+     "noot": "het verste frame: valt samen met de actieve ticks"
+    },
+    "pomp_ligt_links": {
+     "frames": [
+      [
+       0,
+       712,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      24
+     ],
+     "lus": false,
+     "kant": -1
+    },
+    "pomp_terug_links": {
+     "frames": [
+      [
+       0,
+       890,
+       130,
+       178
+      ],
+      [
+       130,
+       890,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      6,
+      6
+     ],
+     "lus": false,
+     "kant": -1,
+     "noot": "na het herstel, in de rust van de maat; daarna idle"
+    },
+    "aarzeling_rechts": {
+     "frames": [
+      [
+       0,
+       1068,
+       130,
+       178
+      ],
+      [
+       130,
+       1068,
+       130,
+       178
+      ],
+      [
+       260,
+       1068,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      7,
+      7,
+      6
+     ],
+     "lus": false,
+     "kant": 1,
+     "volgt": "pomp_aanloop_rechts",
+     "noot": "de eerste aanloop (eerste_aanloop = 60): eerst deze 3 frames (20 ticks), dan pomp_aanloop over de resterende 40"
+    },
+    "pomp_aanloop_rechts": {
+     "frames": [
+      [
+       0,
+       1246,
+       130,
+       178
+      ],
+      [
+       130,
+       1246,
+       130,
+       178
+      ],
+      [
+       260,
+       1246,
+       130,
+       178
+      ],
+      [
+       390,
+       1246,
+       130,
+       178
+      ],
+      [
+       520,
+       1246,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      10,
+      9,
+      9,
+      9,
+      3
+     ],
+     "lus": false,
+     "kant": 1,
+     "stuurt": "windup_progress: frame 0-3 op kwarten van (aanloop - 3); frame 4 (uithaal) de laatste 3 ticks",
+     "ticks_fase2": [
+      7,
+      7,
+      7,
+      6,
+      3
+     ]
+    },
+    "pomp_slag_rechts": {
+     "frames": [
+      [
+       0,
+       1424,
+       130,
+       178
+      ],
+      [
+       130,
+       1424,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      3,
+      3
+     ],
+     "lus": false,
+     "kant": 1,
+     "noot": "het verste frame: valt samen met de actieve ticks"
+    },
+    "pomp_ligt_rechts": {
+     "frames": [
+      [
+       0,
+       1602,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      24
+     ],
+     "lus": false,
+     "kant": 1
+    },
+    "pomp_terug_rechts": {
+     "frames": [
+      [
+       0,
+       1780,
+       130,
+       178
+      ],
+      [
+       130,
+       1780,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      6,
+      6
+     ],
+     "lus": false,
+     "kant": 1,
+     "noot": "na het herstel, in de rust van de maat; daarna idle"
+    },
+    "zwiep_aanloop_links": {
+     "frames": [
+      [
+       0,
+       1958,
+       130,
+       178
+      ],
+      [
+       130,
+       1958,
+       130,
+       178
+      ],
+      [
+       260,
+       1958,
+       130,
+       178
+      ],
+      [
+       390,
+       1958,
+       130,
+       178
+      ],
+      [
+       520,
+       1958,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      7,
+      7,
+      7,
+      6,
+      3
+     ],
+     "lus": false,
+     "kant": -1,
+     "stuurt": "windup_progress, zoals pomp_aanloop"
+    },
+    "zwiep_veeg_links": {
+     "frames": [
+      [
+       0,
+       2136,
+       130,
+       178
+      ],
+      [
+       130,
+       2136,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      4,
+      4
+     ],
+     "lus": false,
+     "kant": -1
+    },
+    "zwiep_uit_links": {
+     "frames": [
+      [
+       0,
+       2314,
+       130,
+       178
+      ],
+      [
+       130,
+       2314,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      10,
+      10
+     ],
+     "lus": false,
+     "kant": -1
+    },
+    "zwiep_aanloop_rechts": {
+     "frames": [
+      [
+       0,
+       2492,
+       130,
+       178
+      ],
+      [
+       130,
+       2492,
+       130,
+       178
+      ],
+      [
+       260,
+       2492,
+       130,
+       178
+      ],
+      [
+       390,
+       2492,
+       130,
+       178
+      ],
+      [
+       520,
+       2492,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      7,
+      7,
+      7,
+      6,
+      3
+     ],
+     "lus": false,
+     "kant": 1,
+     "stuurt": "windup_progress, zoals pomp_aanloop"
+    },
+    "zwiep_veeg_rechts": {
+     "frames": [
+      [
+       0,
+       2670,
+       130,
+       178
+      ],
+      [
+       130,
+       2670,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      4,
+      4
+     ],
+     "lus": false,
+     "kant": 1
+    },
+    "zwiep_uit_rechts": {
+     "frames": [
+      [
+       0,
+       2848,
+       130,
+       178
+      ],
+      [
+       130,
+       2848,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      10,
+      10
+     ],
+     "lus": false,
+     "kant": 1
+    },
+    "fasewissel": {
+     "frames": [
+      [
+       0,
+       3026,
+       130,
+       178
+      ],
+      [
+       130,
+       3026,
+       130,
+       178
+      ],
+      [
+       260,
+       3026,
+       130,
+       178
+      ],
+      [
+       390,
+       3026,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      15,
+      15,
+      15,
+      15
+     ],
+     "lus": false
+    },
+    "wankel_in": {
+     "frames": [
+      [
+       0,
+       3204,
+       130,
+       178
+      ],
+      [
+       130,
+       3204,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      8,
+      8
+     ],
+     "lus": false,
+     "volgt": "wankel"
+    },
+    "wankel": {
+     "frames": [
+      [
+       0,
+       3382,
+       130,
+       178
+      ],
+      [
+       130,
+       3382,
+       130,
+       178
+      ],
+      [
+       260,
+       3382,
+       130,
+       178
+      ],
+      [
+       390,
+       3382,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      12,
+      4,
+      16,
+      6
+     ],
+     "lus": true,
+     "noot": "hapert: onregelmatige tijden; geen aanvallen, geen tijdslimiet (GM-08)"
+    },
+    "geraakt": {
+     "frames": [
+      [
+       0,
+       3560,
+       130,
+       178
+      ],
+      [
+       130,
+       3560,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      4,
+      4
+     ],
+     "lus": false,
+     "noot": "bij een treffer op de kern (fase 1) en bij elke finisherslag (Wankel/finisher); daarna terug"
+    },
+    "oplossen": {
+     "frames": [
+      [
+       0,
+       3738,
+       130,
+       178
+      ],
+      [
+       130,
+       3738,
+       130,
+       178
+      ],
+      [
+       260,
+       3738,
+       130,
+       178
+      ],
+      [
+       390,
+       3738,
+       130,
+       178
+      ],
+      [
+       520,
+       3738,
+       130,
+       178
+      ],
+      [
+       650,
+       3738,
+       130,
+       178
+      ],
+      [
+       780,
+       3738,
+       130,
+       178
+      ],
+      [
+       910,
+       3738,
+       130,
+       178
+      ],
+      [
+       1040,
+       3738,
+       130,
+       178
+      ],
+      [
+       1170,
+       3738,
+       130,
+       178
+      ]
+     ],
+     "ticks": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+     ],
+     "lus": false,
+     "noot": "GM-10: op BOSS_VERSLAGEN; laatste frame = bijna leeg, daarna niets tekenen"
+    }
+   },
+   "offset": [
+    235.0,
+    -177
+   ],
+   "ten_opzichte_van": "boss-node (linkermuur, bovenkant vloer)",
+   "z_index": -2,
+   "noot": "lichaam_x1/x2 = 252-348 en 160 hoog vallen op kolom 16-112, rij 16-176"
+  },
+  "ketel": {
+   "bestanden": {
+    "grijs": "gemaalmeester_ketel_grijs.png",
+    "half": "gemaalmeester_ketel_half.png",
+    "kleur": "gemaalmeester_ketel_kleur.png",
+    "index": "gemaalmeester_ketel_index.png"
+   },
+   "cel": [
+    66,
+    66
+   ],
+   "rand_px": 1,
+   "atlas": [
+    660,
+    660
+   ],
+   "animaties": {
+    "schot": {
+     "frames": [
+      [
+       0,
+       0,
+       66,
+       66
+      ],
+      [
+       66,
+       0,
+       66,
+       66
+      ]
+     ],
+     "ticks": [
+      30,
+      30
+     ],
+     "lus": true,
+     "noot": "fase 1, intact (Merkbaar): de naad gloeit"
+    },
+    "tink": {
+     "frames": [
+      [
+       0,
+       66,
+       66,
+       66
+      ]
+     ],
+     "ticks": [
+      4
+     ],
+     "lus": false,
+     "noot": "een gewone treffer op het intacte schot (`ketel.tink_tick`)"
+    },
+    "breuk": {
+     "frames": [
+      [
+       0,
+       132,
+       66,
+       66
+      ],
+      [
+       66,
+       132,
+       66,
+       66
+      ],
+      [
+       132,
+       132,
+       66,
+       66
+      ]
+     ],
+     "ticks": [
+      4,
+      4,
+      4
+     ],
+     "lus": false,
+     "volgt": "kern",
+     "noot": "SCHOT_BREUK (shot_broken)"
+    },
+    "kern": {
+     "frames": [
+      [
+       0,
+       198,
+       66,
+       66
+      ],
+      [
+       66,
+       198,
+       66,
+       66
+      ],
+      [
+       132,
+       198,
+       66,
+       66
+      ],
+      [
+       198,
+       198,
+       66,
+       66
+      ]
+     ],
+     "ticks": [
+      8,
+      8,
+      8,
+      8
+     ],
+     "lus": true,
+     "noot": "core_open"
+    },
+    "kern_geraakt": {
+     "frames": [
+      [
+       0,
+       264,
+       66,
+       66
+      ],
+      [
+       66,
+       264,
+       66,
+       66
+      ]
+     ],
+     "ticks": [
+      3,
+      3
+     ],
+     "lus": false,
+     "volgt": "kern"
+    },
+    "schot_sluit": {
+     "frames": [
+      [
+       0,
+       330,
+       66,
+       66
+      ],
+      [
+       66,
+       330,
+       66,
+       66
+      ],
+      [
+       132,
+       330,
+       66,
+       66
+      ]
+     ],
+     "ticks": [
+      7,
+      7,
+      6
+     ],
+     "lus": false,
+     "volgt": "schot",
+     "noot": "KERN_DICHT (core_closed)"
+    },
+    "schot_dicht": {
+     "frames": [
+      [
+       0,
+       396,
+       66,
+       66
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "noot": "fasewissel en fase 2: voorgoed dicht, gelast, niet Merkbaar (GM-07)"
+    },
+    "merkplek_open": {
+     "frames": [
+      [
+       0,
+       462,
+       66,
+       66
+      ],
+      [
+       66,
+       462,
+       66,
+       66
+      ],
+      [
+       132,
+       462,
+       66,
+       66
+      ]
+     ],
+     "ticks": [
+      7,
+      7,
+      6
+     ],
+     "lus": false,
+     "volgt": "merkplek",
+     "noot": "op Wankel (GMB-05)"
+    },
+    "merkplek": {
+     "frames": [
+      [
+       0,
+       528,
+       66,
+       66
+      ],
+      [
+       66,
+       528,
+       66,
+       66
+      ]
+     ],
+     "ticks": [
+      20,
+      20
+     ],
+     "lus": true
+    },
+    "oplossen": {
+     "frames": [
+      [
+       0,
+       594,
+       66,
+       66
+      ],
+      [
+       66,
+       594,
+       66,
+       66
+      ],
+      [
+       132,
+       594,
+       66,
+       66
+      ],
+      [
+       198,
+       594,
+       66,
+       66
+      ],
+      [
+       264,
+       594,
+       66,
+       66
+      ],
+      [
+       330,
+       594,
+       66,
+       66
+      ],
+      [
+       396,
+       594,
+       66,
+       66
+      ],
+      [
+       462,
+       594,
+       66,
+       66
+      ],
+      [
+       528,
+       594,
+       66,
+       66
+      ],
+      [
+       594,
+       594,
+       66,
+       66
+      ]
+     ],
+     "ticks": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+     ],
+     "lus": false,
+     "noot": "gelijk met lichaam/oplossen"
+    }
+   },
+   "offset": [
+    267.0,
+    -69
+   ],
+   "ten_opzichte_van": "boss-node",
+   "z_index": -1,
+   "noot": "het schot/de kern (276-324 x 12-60) valt op kolom 8-56, rij 8-56; boven het lichaam"
+  },
+  "rad": {
+   "bestanden": {
+    "grijs": "gemaalmeester_rad_grijs.png",
+    "half": "gemaalmeester_rad_half.png",
+    "kleur": "gemaalmeester_rad_kleur.png",
+    "index": "gemaalmeester_rad_index.png"
+   },
+   "cel": [
+    114,
+    74
+   ],
+   "rand_px": 1,
+   "atlas": [
+    912,
+    962
+   ],
+   "animaties": {
+    "draai_s0": {
+     "frames": [
+      [
+       0,
+       0,
+       114,
+       74
+      ],
+      [
+       114,
+       0,
+       114,
+       74
+      ],
+      [
+       228,
+       0,
+       114,
+       74
+      ],
+      [
+       342,
+       0,
+       114,
+       74
+      ],
+      [
+       456,
+       0,
+       114,
+       74
+      ],
+      [
+       570,
+       0,
+       114,
+       74
+      ],
+      [
+       684,
+       0,
+       114,
+       74
+      ],
+      [
+       798,
+       0,
+       114,
+       74
+      ]
+     ],
+     "ticks": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+     ],
+     "lus": true,
+     "scheur": 0,
+     "ticks_draaien": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+     ],
+     "noot": "hangt: 8 ticks per frame; tijdens fasewissel en draaien (RadState.TURNING): 3 ticks per frame"
+    },
+    "treffer_s0": {
+     "frames": [
+      [
+       0,
+       74,
+       114,
+       74
+      ],
+      [
+       114,
+       74,
+       114,
+       74
+      ]
+     ],
+     "ticks": [
+      3,
+      3
+     ],
+     "lus": false,
+     "scheur": 0,
+     "noot": "RAD_TREFFER (rad_hit); daarna draai"
+    },
+    "trilt_s0": {
+     "frames": [
+      [
+       0,
+       148,
+       114,
+       74
+      ],
+      [
+       114,
+       148,
+       114,
+       74
+      ]
+     ],
+     "ticks": [
+      2,
+      2
+     ],
+     "lus": true,
+     "scheur": 0,
+     "noot": "RadState.SHAKING (rad_tril = 20 ticks); het frame verschuift zelf 1 px heen en weer"
+    },
+    "draai_s1": {
+     "frames": [
+      [
+       0,
+       222,
+       114,
+       74
+      ],
+      [
+       114,
+       222,
+       114,
+       74
+      ],
+      [
+       228,
+       222,
+       114,
+       74
+      ],
+      [
+       342,
+       222,
+       114,
+       74
+      ],
+      [
+       456,
+       222,
+       114,
+       74
+      ],
+      [
+       570,
+       222,
+       114,
+       74
+      ],
+      [
+       684,
+       222,
+       114,
+       74
+      ],
+      [
+       798,
+       222,
+       114,
+       74
+      ]
+     ],
+     "ticks": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+     ],
+     "lus": true,
+     "scheur": 1,
+     "ticks_draaien": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+     ],
+     "noot": "hangt: 8 ticks per frame; tijdens fasewissel en draaien (RadState.TURNING): 3 ticks per frame"
+    },
+    "treffer_s1": {
+     "frames": [
+      [
+       0,
+       296,
+       114,
+       74
+      ],
+      [
+       114,
+       296,
+       114,
+       74
+      ]
+     ],
+     "ticks": [
+      3,
+      3
+     ],
+     "lus": false,
+     "scheur": 1,
+     "noot": "RAD_TREFFER (rad_hit); daarna draai"
+    },
+    "trilt_s1": {
+     "frames": [
+      [
+       0,
+       370,
+       114,
+       74
+      ],
+      [
+       114,
+       370,
+       114,
+       74
+      ]
+     ],
+     "ticks": [
+      2,
+      2
+     ],
+     "lus": true,
+     "scheur": 1,
+     "noot": "RadState.SHAKING (rad_tril = 20 ticks); het frame verschuift zelf 1 px heen en weer"
+    },
+    "draai_s2": {
+     "frames": [
+      [
+       0,
+       444,
+       114,
+       74
+      ],
+      [
+       114,
+       444,
+       114,
+       74
+      ],
+      [
+       228,
+       444,
+       114,
+       74
+      ],
+      [
+       342,
+       444,
+       114,
+       74
+      ],
+      [
+       456,
+       444,
+       114,
+       74
+      ],
+      [
+       570,
+       444,
+       114,
+       74
+      ],
+      [
+       684,
+       444,
+       114,
+       74
+      ],
+      [
+       798,
+       444,
+       114,
+       74
+      ]
+     ],
+     "ticks": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+     ],
+     "lus": true,
+     "scheur": 2,
+     "ticks_draaien": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+     ],
+     "noot": "hangt: 8 ticks per frame; tijdens fasewissel en draaien (RadState.TURNING): 3 ticks per frame"
+    },
+    "treffer_s2": {
+     "frames": [
+      [
+       0,
+       518,
+       114,
+       74
+      ],
+      [
+       114,
+       518,
+       114,
+       74
+      ]
+     ],
+     "ticks": [
+      3,
+      3
+     ],
+     "lus": false,
+     "scheur": 2,
+     "noot": "RAD_TREFFER (rad_hit); daarna draai"
+    },
+    "trilt_s2": {
+     "frames": [
+      [
+       0,
+       592,
+       114,
+       74
+      ],
+      [
+       114,
+       592,
+       114,
+       74
+      ]
+     ],
+     "ticks": [
+      2,
+      2
+     ],
+     "lus": true,
+     "scheur": 2,
+     "noot": "RadState.SHAKING (rad_tril = 20 ticks); het frame verschuift zelf 1 px heen en weer"
+    },
+    "draai_s3": {
+     "frames": [
+      [
+       0,
+       666,
+       114,
+       74
+      ],
+      [
+       114,
+       666,
+       114,
+       74
+      ],
+      [
+       228,
+       666,
+       114,
+       74
+      ],
+      [
+       342,
+       666,
+       114,
+       74
+      ],
+      [
+       456,
+       666,
+       114,
+       74
+      ],
+      [
+       570,
+       666,
+       114,
+       74
+      ],
+      [
+       684,
+       666,
+       114,
+       74
+      ],
+      [
+       798,
+       666,
+       114,
+       74
+      ]
+     ],
+     "ticks": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+     ],
+     "lus": true,
+     "scheur": 3,
+     "ticks_draaien": [
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3,
+      3
+     ],
+     "noot": "hangt: 8 ticks per frame; tijdens fasewissel en draaien (RadState.TURNING): 3 ticks per frame"
+    },
+    "treffer_s3": {
+     "frames": [
+      [
+       0,
+       740,
+       114,
+       74
+      ],
+      [
+       114,
+       740,
+       114,
+       74
+      ]
+     ],
+     "ticks": [
+      3,
+      3
+     ],
+     "lus": false,
+     "scheur": 3,
+     "noot": "RAD_TREFFER (rad_hit); daarna draai"
+    },
+    "trilt_s3": {
+     "frames": [
+      [
+       0,
+       814,
+       114,
+       74
+      ],
+      [
+       114,
+       814,
+       114,
+       74
+      ]
+     ],
+     "ticks": [
+      2,
+      2
+     ],
+     "lus": true,
+     "scheur": 3,
+     "noot": "RadState.SHAKING (rad_tril = 20 ticks); het frame verschuift zelf 1 px heen en weer"
+    },
+    "oplossen": {
+     "frames": [
+      [
+       0,
+       888,
+       114,
+       74
+      ],
+      [
+       114,
+       888,
+       114,
+       74
+      ],
+      [
+       228,
+       888,
+       114,
+       74
+      ],
+      [
+       342,
+       888,
+       114,
+       74
+      ],
+      [
+       456,
+       888,
+       114,
+       74
+      ],
+      [
+       570,
+       888,
+       114,
+       74
+      ],
+      [
+       684,
+       888,
+       114,
+       74
+      ],
+      [
+       798,
+       888,
+       114,
+       74
+      ]
+     ],
+     "ticks": [
+      7,
+      7,
+      7,
+      7,
+      7,
+      7,
+      7,
+      7
+     ],
+     "lus": false
+    }
+   },
+   "offset": [
+    -57,
+    -45.0
+   ],
+   "ten_opzichte_van": "rad.position (middelpunt van de hurtbox)",
+   "z_index": -3,
+   "noot": "de hurtbox (96 x 40) valt op kolom 8-104, rij 24-64. In fase 1 (RadState.HIDDEN) hangt het rad achter de rug van het lichaam op (300, 120): draai_s0 frame 0, stil"
+  },
+  "pompslag": {
+   "bestanden": {
+    "grijs": "gemaalmeester_pompslag_grijs.png",
+    "half": "gemaalmeester_pompslag_half.png",
+    "kleur": "gemaalmeester_pompslag_kleur.png",
+    "index": "gemaalmeester_pompslag_index.png"
+   },
+   "cel": [
+    178,
+    42
+   ],
+   "rand_px": 1,
+   "atlas": [
+    712,
+    126
+   ],
+   "animaties": {
+    "aanloop": {
+     "frames": [
+      [
+       0,
+       0,
+       178,
+       42
+      ],
+      [
+       178,
+       0,
+       178,
+       42
+      ],
+      [
+       356,
+       0,
+       178,
+       42
+      ],
+      [
+       534,
+       0,
+       178,
+       42
+      ]
+     ],
+     "ticks": [
+      10,
+      10,
+      10,
+      10
+     ],
+     "lus": false,
+     "stuurt": "windup_progress in kwarten"
+    },
+    "actief": {
+     "frames": [
+      [
+       0,
+       42,
+       178,
+       42
+      ],
+      [
+       178,
+       42,
+       178,
+       42
+      ]
+     ],
+     "ticks": [
+      3,
+      3
+     ],
+     "lus": false
+    },
+    "herstel": {
+     "frames": [
+      [
+       0,
+       84,
+       178,
+       42
+      ],
+      [
+       178,
+       84,
+       178,
+       42
+      ],
+      [
+       356,
+       84,
+       178,
+       42
+      ]
+     ],
+     "ticks": [
+      8,
+      8,
+      8
+     ],
+     "lus": false
+    }
+   },
+   "offset": [
+    -9,
+    -13.0
+   ],
+   "ten_opzichte_van": "attack_box.position (linksboven)",
+   "z_index": 1,
+   "noot": "het vlak (160 x 24) valt op kolom 8-168, rij 12-36"
+  },
+  "zwiep_links": {
+   "bestanden": {
+    "grijs": "gemaalmeester_zwiep_links_grijs.png",
+    "half": "gemaalmeester_zwiep_links_half.png",
+    "kleur": "gemaalmeester_zwiep_links_kleur.png",
+    "index": "gemaalmeester_zwiep_links_index.png"
+   },
+   "cel": [
+    302,
+    42
+   ],
+   "rand_px": 1,
+   "atlas": [
+    604,
+    126
+   ],
+   "animaties": {
+    "aanloop": {
+     "frames": [
+      [
+       0,
+       0,
+       302,
+       42
+      ],
+      [
+       302,
+       0,
+       302,
+       42
+      ]
+     ],
+     "ticks": [
+      8,
+      7
+     ],
+     "lus": false,
+     "stuurt": "windup_progress >= 0,5 (de tweede helft van de aanloop)"
+    },
+    "actief": {
+     "frames": [
+      [
+       0,
+       42,
+       302,
+       42
+      ],
+      [
+       302,
+       42,
+       302,
+       42
+      ]
+     ],
+     "ticks": [
+      4,
+      4
+     ],
+     "lus": false
+    },
+    "herstel": {
+     "frames": [
+      [
+       0,
+       84,
+       302,
+       42
+      ],
+      [
+       302,
+       84,
+       302,
+       42
+      ]
+     ],
+     "ticks": [
+      10,
+      10
+     ],
+     "lus": false
+    }
+   },
+   "offset": [
+    -1,
+    -11.0
+   ],
+   "ten_opzichte_van": "attack_box.position",
+   "z_index": 1,
+   "noot": "het vlak (300 x 24) valt op rij 10-34; rechts: zwiep_rechts op dezelfde plek"
+  },
+  "zwiep_rechts": {
+   "bestanden": {
+    "grijs": "gemaalmeester_zwiep_rechts_grijs.png",
+    "half": "gemaalmeester_zwiep_rechts_half.png",
+    "kleur": "gemaalmeester_zwiep_rechts_kleur.png",
+    "index": "gemaalmeester_zwiep_rechts_index.png"
+   },
+   "cel": [
+    302,
+    42
+   ],
+   "rand_px": 1,
+   "atlas": [
+    604,
+    126
+   ],
+   "animaties": {
+    "aanloop": {
+     "frames": [
+      [
+       0,
+       0,
+       302,
+       42
+      ],
+      [
+       302,
+       0,
+       302,
+       42
+      ]
+     ],
+     "ticks": [
+      8,
+      7
+     ],
+     "lus": false,
+     "stuurt": "windup_progress >= 0,5 (de tweede helft van de aanloop)"
+    },
+    "actief": {
+     "frames": [
+      [
+       0,
+       42,
+       302,
+       42
+      ],
+      [
+       302,
+       42,
+       302,
+       42
+      ]
+     ],
+     "ticks": [
+      4,
+      4
+     ],
+     "lus": false
+    },
+    "herstel": {
+     "frames": [
+      [
+       0,
+       84,
+       302,
+       42
+      ],
+      [
+       302,
+       84,
+       302,
+       42
+      ]
+     ],
+     "ticks": [
+      10,
+      10
+     ],
+     "lus": false
+    }
+   },
+   "offset": [
+    -1,
+    -11.0
+   ],
+   "ten_opzichte_van": "attack_box.position",
+   "z_index": 1
+  },
+  "tell_pomp": {
+   "bestanden": {
+    "grijs": "gemaalmeester_tell_pomp_grijs.png",
+    "half": "gemaalmeester_tell_pomp_half.png",
+    "kleur": "gemaalmeester_tell_pomp_kleur.png",
+    "index": "gemaalmeester_tell_pomp_index.png"
+   },
+   "cel": [
+    162,
+    26
+   ],
+   "rand_px": 1,
+   "atlas": [
+    162,
+    78
+   ],
+   "animaties": {
+    "vroeg": {
+     "frames": [
+      [
+       0,
+       0,
+       162,
+       26
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "windup_progress < 0,5"
+    },
+    "laat": {
+     "frames": [
+      [
+       0,
+       26,
+       162,
+       26
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "windup_progress >= 0,5"
+    },
+    "actief": {
+     "frames": [
+      [
+       0,
+       52,
+       162,
+       26
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "is_attack_active()"
+    }
+   },
+   "offset": [
+    -1,
+    -1
+   ],
+   "ten_opzichte_van": "attack_box.position",
+   "z_index": 0,
+   "noot": "precies het vlak; onder het effect"
+  },
+  "tell_zwiep": {
+   "bestanden": {
+    "grijs": "gemaalmeester_tell_zwiep_grijs.png",
+    "half": "gemaalmeester_tell_zwiep_half.png",
+    "kleur": "gemaalmeester_tell_zwiep_kleur.png",
+    "index": "gemaalmeester_tell_zwiep_index.png"
+   },
+   "cel": [
+    302,
+    26
+   ],
+   "rand_px": 1,
+   "atlas": [
+    302,
+    78
+   ],
+   "animaties": {
+    "vroeg": {
+     "frames": [
+      [
+       0,
+       0,
+       302,
+       26
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "windup_progress < 0,5"
+    },
+    "laat": {
+     "frames": [
+      [
+       0,
+       26,
+       302,
+       26
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "windup_progress >= 0,5"
+    },
+    "actief": {
+     "frames": [
+      [
+       0,
+       52,
+       302,
+       26
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "is_attack_active()"
+    }
+   },
+   "offset": [
+    -1,
+    -1
+   ],
+   "ten_opzichte_van": "attack_box.position",
+   "z_index": 0
+  },
+  "spuigat": {
+   "bestanden": {
+    "grijs": "gemaalmeester_spuigat_grijs.png",
+    "half": "gemaalmeester_spuigat_half.png",
+    "kleur": "gemaalmeester_spuigat_kleur.png",
+    "index": "gemaalmeester_spuigat_index.png"
+   },
+   "cel": [
+    26,
+    34
+   ],
+   "rand_px": 1,
+   "atlas": [
+    78,
+    68
+   ],
+   "animaties": {
+    "gloei": {
+     "frames": [
+      [
+       0,
+       0,
+       26,
+       34
+      ],
+      [
+       26,
+       0,
+       26,
+       34
+      ],
+      [
+       52,
+       0,
+       26,
+       34
+      ]
+     ],
+     "ticks": [
+      10,
+      10,
+      10
+     ],
+     "lus": false,
+     "volgt": "stoom",
+     "noot": "spout_glowing (30 ticks)"
+    },
+    "stoom": {
+     "frames": [
+      [
+       0,
+       34,
+       26,
+       34
+      ],
+      [
+       26,
+       34,
+       26,
+       34
+      ]
+     ],
+     "ticks": [
+      15,
+      15
+     ],
+     "lus": false,
+     "noot": "de add stapt uit de stoom (add_inactief)"
+    }
+   },
+   "offset": [
+    -13,
+    -21
+   ],
+   "ten_opzichte_van": "(spuigat_links|spuigat_rechts, 0) in de boss-node",
+   "z_index": -1
+  }
+ },
+ "koppeling": {
+  "state == FIGHT, fase 1": "lichaam idle; ketel schot (core_open: kern); rad draai_s0 frame 0 op (300, 120), achter het lichaam",
+  "attack_started(kind, side)": "lichaam pomp_aanloop_<kant> of zwiep_aanloop_<kant> (de allereerste: aarzeling_<kant>, dan pomp_aanloop); tell_<kind> en het effect op attack_box",
+  "attack_phase ACTIVE / RECOVER": "<kind>_slag/_veeg en daarna _ligt/_uit; tell actief; effect actief/herstel",
+  "ketel.tink_tick": "ketel tink (4 ticks)",
+  "shot_broken / core_closed": "ketel breuk -> kern / schot_sluit -> schot",
+  "damaged (kern of finisherslag)": "ketel kern_geraakt en lichaam geraakt",
+  "spout_glowing": "spuigat gloei op beide spuigaten, dan stoom",
+  "phase_changed('wissel')": "lichaam fasewissel; ketel schot_dicht; rad draai met ticks_draaien vanaf (300, 120)",
+  "rad_state HANGING / SHAKING / TURNING": "rad draai_s<n> / trilt_s<n> / draai_s<n> met ticks_draaien; rad_hit: treffer_s<n>",
+  "scheur": "s<n> = min(3, rad_turns // 3): het rad scheurt per ± 3 kanten (voorstel UX §9.2, de UX Designer beslist)",
+  "state == WANKEL / FINISHER": "lichaam wankel_in -> wankel (finisher_strike: geraakt); ketel merkplek_open -> merkplek",
+  "boss_defeated": "lichaam oplossen, ketel oplossen en rad oplossen tegelijk; daarna niets meer tekenen (GM-10)"
+ },
+ "import": {
+  "map": "res://art/animatie/gemaalmeester/",
+  "texture": "Lossless, mipmaps uit, filter Nearest op het CanvasItem, repeat uit (zoals kadewijk_kamers.json)",
+  "toestanden": "grijs (het gevecht, s = 1) / half / kleur; index = R materiaal-id, G tint*32+16, A 255 (de vijandkleuren zijn in elke toestand gelijk; de index is die van grijs)"
+ }
+}
