@@ -31,7 +31,7 @@ const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
 const EnemyData = preload("res://scripts/combat/enemy_data.gd")
 const Zone = preload("res://scripts/objects/zone.gd")
 const Gemaal = preload("res://scripts/light/gemaal.gd")
-const Luik = preload("res://levels/kadewijk/kadewijk_luik.gd")
+const Luik = preload("res://scripts/objects/luik.gd")
 const SlowDash = preload("res://tests/slow_dash_input.gd")
 const InputBits = preload("res://scripts/input/input_bits.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
@@ -55,6 +55,10 @@ const MAX_FRAMES := {
 	"test_deel2_s6_zonder_licht": 12000,
 	"test_deel2_s6_los": 10000,
 	"test_deel2_arena_bounce_haalt_rad": 6000,
+	"test_deel2_echo_breekt_niet_d60": 12000,
+	"test_deel2_echo_breekt_niet_d90": 12000,
+	"test_deel2_echo_breekt_niet_d120": 12000,
+	"test_deel2_echo_breekt_niet_d180": 12000,
 }
 static var _runs := {}
 
@@ -437,6 +441,50 @@ func test_deel2_zonder_echo_d180(t) -> void:
 	_check_slow_lines(t, 180)
 
 
+# --- De schaduwklep (V-01d, #227): de echo breekt 0× van S1 tot S8 -----------
+
+## De hele run S1 → S8 met echo (de visie-review van S7 in #227): de echo
+## breekt nergens, ook niet op het luik van S7. P1 breekt het luik met een
+## neerslag (`LUIK` door p1), de echo staat op de schaduwklep en speelt de
+## neerslag af (de schaduwklep is weg door de echo, op `breuk + D`), en valt
+## achter P1 aan door het luik.
+func _echo_breekt_niet(t, d: int) -> void:
+	var parts := _wijk(t, d, true, &"S1", &"S8")
+	var wijk = parts[0]
+	var bot = parts[1]
+	var breaks: Array = []
+	wijk.echo.broke.connect(func(tick: int, at: Vector2) -> void: breaks.append([tick, at]))
+	await _run(t, wijk)
+	var luik: Luik = wijk.loader.kamers[&"S7"].inhoud_node.get_node("Luik")
+	var rows: Array = wijk.meetlog.rows
+	var rep = FlowReport.from_rows(rows, true)
+	var label := "D=%d S1 → S8" % d
+	t.check(wijk.run_over and wijk.room == &"S8", "%s: S8 niet gehaald (tick %d, stap %s, P1 %s)" % [label, wijk.sim.tick, bot.leg_name(), wijk.p1.position])
+	t.check(breaks.is_empty(), "%s: de echo brak %d× (%s)" % [label, breaks.size(), breaks])
+	t.check(_count(rows, "LUIK") == 1 and luik.opened_by == "p1", "%s: luik %d× open, door %s (verwacht 1× door p1)" % [label, _count(rows, "LUIK"), luik.opened_by])
+	t.check(luik.schaduwklep_weg_by == "echo" and luik.schaduwklep_weg_tick == luik.opened_tick + d,
+		"%s: schaduwklep weg op %d door %s (verwacht breuk %d + D door de echo)" % [label, luik.schaduwklep_weg_tick, luik.schaduwklep_weg_by, luik.opened_tick])
+	t.note("%s: %d ticks (%s), luik open op %d, schaduwklep weg op %d (%s), echo-breuken %d, MP-4 %.0f %%" % [label, wijk.run_ticks(),
+		rep.room_time, luik.opened_tick, luik.schaduwklep_weg_tick, luik.schaduwklep_weg_by, breaks.size(), rep.echo_empty_share * 100.0])
+	await _free(t, parts)
+
+
+func test_deel2_echo_breekt_niet_d60(t) -> void:
+	await _echo_breekt_niet(t, 60)
+
+
+func test_deel2_echo_breekt_niet_d90(t) -> void:
+	await _echo_breekt_niet(t, 90)
+
+
+func test_deel2_echo_breekt_niet_d120(t) -> void:
+	await _echo_breekt_niet(t, 120)
+
+
+func test_deel2_echo_breekt_niet_d180(t) -> void:
+	await _echo_breekt_niet(t, 180)
+
+
 # --- W-12 bij B2: de langzame lijn met dash (gdd v0.8.2 §4.8.7) ---------------
 
 ## Vanaf het begin van S5 tot de bot verdieping `leg` van B2 heeft afgerond.
@@ -585,9 +633,13 @@ func test_deel2_s7_los(t) -> void:
 		var parts := _wijk(t, 60, echo_on, &"S7", &"S8")
 		var wijk = parts[0]
 		var bot = parts[1]
+		var breaks := {"n": 0}
+		if wijk.echo != null:
+			wijk.echo.broke.connect(func(_tick: int, _at: Vector2) -> void: breaks["n"] += 1)
 		await _run(t, wijk, 3000)
 		var rows: Array = wijk.meetlog.rows
 		var label := "S7 echo %s" % ("aan" if echo_on else "uit")
+		t.check(breaks["n"] == 0, "%s: de echo brak %d× (V-01d, schaduwklep)" % [label, breaks["n"]])
 		t.check(wijk.run_over and wijk.room == &"S8", "%s: S8 niet gehaald (stap %s, P1 %s)" % [label, bot.leg_name(), wijk.p1.position])
 		t.check(_count(rows, "LUIK") == 1, "%s: luik niet open (%d)" % [label, _count(rows, "LUIK")])
 		t.check(bot.lines.get("S7-kanaal", false) and _count(rows, "STUIT") >= 3, "%s: geen stuitlijn (luik + 2 Dwaallichten) (stuits %d, lijn %s)" % [label, _count(rows, "STUIT"), bot.lines.get("S7-kanaal")])

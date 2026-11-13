@@ -4,6 +4,14 @@ extends SceneTree
 ## Draaien (vanuit de repo-root):
 ##   godot --headless --path game --fixed-fps 60 -s res://tests/run_tests.gd
 ##
+## Zonder opties draaien alle scripts in TEST_SCRIPTS. Opties na `--` (#233):
+##   --groep=kort   TEST_SCRIPTS zonder LANG_SCRIPTS (CI-job `kort`)
+##   --groep=lang   alleen LANG_SCRIPTS (CI-job `lang`)
+##   --scripts=a,b  alleen deze paden (bv. de meta-run in CI)
+## Samen draaien `kort` en `lang` precies TEST_SCRIPTS. Een onbekende optie, een
+## LANG-script dat niet in TEST_SCRIPTS staat of een lege keuze is FAIL; bij een onbekende optie
+## of een lege keuze draait er geen test.
+##
 ## Voert elke methode `test_*` uit in de scripts in TEST_SCRIPTS. Elke test
 ## krijgt een TestContext en mag `await` gebruiken. Exitcode 0 = alles groen.
 ##
@@ -32,6 +40,7 @@ const TEST_SCRIPTS := [
 	"res://tests/test_input_router.gd",
 	"res://tests/test_events.gd",
 	"res://tests/test_objects.gd",
+	"res://tests/test_luik.gd",
 	"res://tests/test_motor.gd",
 	"res://tests/test_echo_v04.gd",
 	"res://tests/test_combat.gd",
@@ -60,6 +69,17 @@ const TEST_SCRIPTS := [
 	"res://tests/test_kadewijk.gd",
 	"res://tests/test_kadewijk_deel2.gd",
 	"res://tests/test_kadewijk_art.gd",
+	"res://tests/test_kadewijk_boss.gd",
+]
+
+## De scripted runs die het langst duren (CI windows, #233: samen ± 200 van de 330 s). Ze draaien
+## in CI in een eigen job (`--groep=lang`), naast de rest (`--groep=kort`). Een nieuw testscript dat
+## in CI langer dan ± 20 s duurt (de runner print de duur per script), komt hier ook bij.
+const LANG_SCRIPTS := [
+	"res://tests/test_wachtbot.gd",
+	"res://tests/test_boss_runs.gd",
+	"res://tests/test_kadewijk.gd",
+	"res://tests/test_kadewijk_deel2.gd",
 	"res://tests/test_kadewijk_boss.gd",
 ]
 
@@ -96,7 +116,16 @@ func _run() -> void:
 		print("\nFAIL test_context.gd laadt niet; geen tests gedraaid")
 		_finish(started)
 		return
-	for path: String in TEST_SCRIPTS:
+	var scripts := _selected_scripts()
+	if scripts.is_empty():
+		_finish(started)
+		return
+	# Eén frame vóór de eerste test: in `_initialize` krijgt een node die een test aan de root hangt
+	# nog geen `_ready` (#233: met `--groep=lang` is `test_wachtbot.gd` het eerste script, en zijn
+	# FlowRoom had dan geen P1). In een volledige run gebeurde dat al in de eerste tests.
+	await process_frame
+	for path: String in scripts:
+		var script_started := Time.get_ticks_msec()
 		print("\n%s" % path)
 		_check_errors_outside_tests("vóór %s" % path.get_file())
 		var script: GDScript = load(path)
@@ -122,9 +151,39 @@ func _run() -> void:
 		if tests_in_script == 0:
 			_failed += 1
 			print("  FAIL geen test_*-methoden gevonden")
+		print("  (%.1f s)" % ((Time.get_ticks_msec() - script_started) / 1000.0))
 	await process_frame
 	_check_errors_outside_tests("na de laatste test")
 	_finish(started)
+
+
+## De scripts van deze run, uit de opties na `--` (zie boven). Een fout in de opties is FAIL.
+func _selected_scripts() -> Array:
+	var result: Array = TEST_SCRIPTS.duplicate()
+	var label := "alle"
+	for path: String in LANG_SCRIPTS:
+		if not TEST_SCRIPTS.has(path):
+			_failed += 1
+			print("\nFAIL LANG_SCRIPTS: %s staat niet in TEST_SCRIPTS" % path)
+	for arg: String in OS.get_cmdline_user_args():
+		if arg == "--groep=kort":
+			result = TEST_SCRIPTS.filter(func(p: String) -> bool: return not LANG_SCRIPTS.has(p))
+			label = "kort"
+		elif arg == "--groep=lang":
+			result = LANG_SCRIPTS.duplicate()
+			label = "lang"
+		elif arg.begins_with("--scripts="):
+			result = Array(arg.trim_prefix("--scripts=").split(",", false))
+			label = "--scripts"
+		else:
+			_failed += 1
+			print("\nFAIL onbekende optie %s; geen tests gedraaid" % arg)
+			return []
+	if result.is_empty():
+		_failed += 1
+		print("\nFAIL geen testscripts gekozen")
+	print("\ngroep %s: %d van %d scripts" % [label, result.size(), TEST_SCRIPTS.size()])
+	return result
 
 
 func _finish(started: int) -> void:
