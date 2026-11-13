@@ -1,0 +1,26 @@
+{
+  "_toelichting": "Waarden van de audio-koppeling (scripts/audio/). Audio bible §4.1, §8, §10; slice-audio.md §1.2 en §7.2. De bussen staan in de code (regel, geen tuning): pompslag en luik op SFX, de holle rad-treffer van de echo op Echo. Een leeg of nog niet bestaand pad = stil, zonder fout.",
+  "pompslag": {
+    "_toelichting": "#243: P1, P2 en de echo hetzelfde bestand en volume; de echo echo_halftonen lager (−1 = 2^(−1/12) ≈ 0,944).",
+    "stream": "res://audio/sfx/omgeving/pompslag_schoep_placeholder.wav",
+    "volume_db": 0.0,
+    "echo_halftonen": -1.0,
+    "max_stemmen": 3
+  },
+  "luik_breekt": {
+    "_toelichting": "Hetzelfde breekgeluid voor P1, P2 en de echo. Het bestand bestaat nog niet (Composer/Sound Designer).",
+    "stream": "",
+    "volume_db": 0.0,
+    "max_stemmen": 2
+  },
+  "rad_treffer": {
+    "_toelichting": "P1/P2: stream_1, op de treffer die kant_treffers haalt stream_2 (nog niet in game/audio/). De echo: altijd echo_stream op bus Echo vanaf echo_start_s, nooit stream_2.",
+    "stream_1": "res://audio/sfx/gemaalmeester/gm_rad_treffer_1_placeholder.wav",
+    "stream_2": "res://audio/sfx/gemaalmeester/gm_rad_treffer_2_placeholder.wav",
+    "volume_db": 0.0,
+    "echo_stream": "res://audio/sfx/echo/echo_gm_rad_treffer_1_placeholder.wav",
+    "echo_volume_db": 0.0,
+    "echo_start_s": 0.2,
+    "max_stemmen": 3
+  }
+}
