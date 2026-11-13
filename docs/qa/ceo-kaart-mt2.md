@@ -1,6 +1,6 @@
 # CEO-kaart MT2: de Kadewijk spelen, met de Gemaalmeester
 
-Versie 0.1.3 · 2026-11-13 · Eigenaar: QA Lead · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250)
+Versie 0.1.4 · 2026-11-13 · Eigenaar: QA Lead · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250)
 
 **Nog niet spelen.** Deze kaart is voor ná MT1 (de flow-kamer). De Producer stuurt je de kaart als de bots op de hele Kadewijk groen zijn; dan staan de build en de links hieronder ingevuld.
 
@@ -82,7 +82,7 @@ Een antwoord als `1 A, 2 C F G, 3 A, 4 A, 5 4 4 5 3, 6 B, …` is genoeg.
 
 ## 4. Luisteren (± 2 min)
 
-Open het fragment: *link in te vullen* (± 1 min; je kunt al na 15,5 s antwoorden, daarna komt elk stukje nog eens per vraag). Luister op **koptelefoon** (tv-luidsprekers niet nodig). Antwoord met **ja** of **nee**; een korte opmerking mag.
+Open het fragment: https://github.com/cesarvangerwen-glitch/echoborn/raw/85c665002d4113273c6fc307a60505be49f08cbd/docs/audio/luistercheck-mt2/luistercheck_mt2_placeholder.ogg (± 1 min; je kunt al na 15,5 s antwoorden, daarna komt elk stukje nog eens per vraag). Luister op **koptelefoon** (tv-luidsprekers niet nodig). Antwoord met **ja** of **nee**; een korte opmerking mag.
 
 ```
 L1 Klinkt het als een carillon? (klokjes op 2,1 en 2,35 s, klokslag op 2,6 s; daarna 10,5–11,1 s)  ja / nee
@@ -108,6 +108,7 @@ Klaar. De agent in de chat zet alles in de repo; QA schrijft het rapport.
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.1.4 | 2026-11-13 | Link naar het luisterfragment ingevuld (§4, #260) |
 | 0.1.3 | 2026-11-13 | Vraag 9b (de wandeling na trap 2: beloning of leeg lopen; besluit LGD over B-1, #83); luisterfragment ± 1 min, antwoorden kan na 15,5 s (Composer/Sound Designer in #250, PR #260); 15 vragen, nog ± 15 min |
 | 0.1.2 | 2026-11-13 | Start met `kadewijk.tscn` + F6 (niet F5) tot MT1 klaar is (PR #257); spelvenster sluiten, niet de stopknop (anders geen CSV); stopregel ± 8 min, spelen ± 6–8 min, zodat ± 15 min klopt; bovenaan §3: 12 en 14 zijn de enige open velden; doel met het tweede keer pompen na de boss (trap 2) (SM-review #251). Na Lead-review EP (#258): F6 = de wijk opnieuw bij de deur, alleen als je echt vastzit, doodgaan is geen vastzitten |
 | 0.1.1 | 2026-11-13 | Na Lead-review EP (PR #251): ± 15 min; stopregel ± 10 min (§2); luisteren alleen op koptelefoon, ± 2 min (§4) |
