@@ -3,8 +3,8 @@ extends Node2D
 ## van de Art Director in `docs/art/slice-kadewijk.md` §9.4, manifest
 ## `res://art/wereld/kadewijk/kadewijk_kamers.json`).
 ##
-## Staat als node `Art` in de kamerscène (`s1_kade_ingang.tscn`,
-## `s3_vismarkt.tscn`), onder de wortel van de inhoud. Die wortel staat op
+## Staat als node `Art` in de kamerscène (S1–S7: `s1_kade_ingang.tscn` …
+## `s7_sluiskelder.tscn`), onder de wortel van de inhoud. Die wortel staat op
 ## `-midden van de kamer`, dus alles hieronder staat in wereldcoördinaten
 ## (zoals `kadewijk_inhoud.gd`).
 ##
@@ -21,6 +21,12 @@ extends Node2D
 ##   linksboven op het blok met dezelfde naam uit `Layout.blocks(kamer_id, D)`,
 ##   met `region` = de maat van het blok, begrensd tot de texture. Geen blok bij
 ##   deze D (het B3-blok bij D ≤ 60): geen stuk. Na `Speelvlak` in de boom, z −10.
+## - Extra lagen (manifest `kamers.<naam>.extra`, deel 4 §11.3: in S6
+##   `gemaal_aan` voor trap 1): een `Sprite2D` met die naam, linksboven op de
+##   kamer, z uit het manifest, standaard uit. `set_extra(naam, aan)` zet hem;
+##   in S6 doet `Objecten` (`kadewijk_objecten.gd`) dat uit de stand van het gemaal.
+## - Objecten uit de objectenatlas (`kadewijk_object.gd` en de scripts daarop)
+##   in deze kamer volgen `set_staat()` mee (groep `kadewijk_object`).
 ## - Toestand `grijs` / `half` / `kleur`: zolang de LUT-shader er niet is,
 ##   wisselt `set_staat()` de textures. De waterstand (`s`) bestaat nog niet;
 ##   de GP roept dit later aan (`grijs` bij `s < 2`, `kleur` bij `s = 2`).
@@ -66,6 +72,7 @@ static func manifest() -> Dictionary:
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_bouw_vaste_stukken(Inhoud.tail)
+	_bouw_extra()
 	_bouw_eenrichting(Inhoud.tail)
 	var ouder := get_parent()
 	if ouder != null and not ouder.is_node_ready():
@@ -94,6 +101,35 @@ func set_staat(nieuw: String) -> void:
 	var atlas := _atlas(nieuw)
 	for np in _stukken():
 		np.texture = atlas
+	var ouder := get_parent()
+	if ouder != null and is_inside_tree():
+		for obj in get_tree().get_nodes_in_group(&"kadewijk_object"):
+			if ouder.is_ancestor_of(obj):
+				obj.set_staat(nieuw)
+
+
+## Zet een extra laag (bv. `gemaal_aan`) aan of uit.
+func set_extra(laag: String, aan: bool) -> void:
+	var sprite := get_node_or_null(NodePath(laag)) as Sprite2D
+	if sprite != null:
+		sprite.visible = aan
+
+
+func _bouw_extra() -> void:
+	var extra: Dictionary = manifest().get("kamers", {}).get(naam, {}).get("extra", {})
+	for laag: String in extra:
+		var sprite := Sprite2D.new()
+		sprite.name = laag
+		sprite.texture = load(DIR + String(extra[laag]["bestand"]))
+		sprite.centered = false
+		sprite.z_index = int(extra[laag].get("z_index", 0))
+		sprite.position = Layout.ROOMS[kamer_id].position
+		sprite.visible = false
+		var speelvlak := get_node_or_null(^"Speelvlak")
+		if speelvlak != null:
+			speelvlak.add_sibling(sprite)
+		else:
+			add_child(sprite)
 
 
 ## De eenrichtingsstukken van deze kamer (leeg als de kamer er geen heeft).
