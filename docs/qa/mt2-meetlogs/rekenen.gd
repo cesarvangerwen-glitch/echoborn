@@ -14,7 +14,11 @@ extends SceneTree
 ##   - RV-1: de hangtijd boven de echo per keerpunt (W33), uit het hanglog
 ##     van `botlogs.gd` (`hang_*.csv`); een meetlog van de CEO heeft geen
 ##     hanglog, dan alleen de uitkomst A–D;
-##   - echo-acties per soort en per kamer; `DEBUG`, `RESPAWN`, `BREEK`.
+##   - echo-acties per soort en per kamer; `DEBUG`, `RESPAWN`, `BREEK`;
+##   - **gaten en rustpunt** (besluit LGD over B-1, #83): daar telt ook een
+##     `POMP` van de echo als echo-moment; MP-2 blijft zonder `POMP` (gdd §4.5).
+##     Plus het gat van de laatste pompslag van de echo bij trap 2 tot de
+##     eerste echo-actie in S9 (de wandeling na trap 2, kaart vraag 9b).
 ##
 ## Draaien vanuit de root van de repo (Godot 4.6.3):
 ##   godot --headless --path game -s "$PWD/docs/qa/mt2-meetlogs/rekenen.gd" -- <map met CSV's>
@@ -102,6 +106,17 @@ func _actions(rows: Array) -> Array:
 	return out
 
 
+## Echo-momenten voor de gaten en het rustpunt (LGD, B-1): de MP-2-acties plus
+## elke `POMP` van de echo.
+func _moments(rows: Array, acts: Array) -> Array:
+	var out: Array = acts.duplicate()
+	for r: Array in rows:
+		if r[2] == "POMP" and r[4] == "echo":
+			out.append([int(r[0]), r[1], "POMP"])
+	out.sort_custom(func(a, b) -> bool: return a[0] < b[0])
+	return out
+
+
 func _report(file_name: String, rows: Array, hang: Array) -> void:
 	var d := _d_of(file_name, rows)
 	var rep = FlowReport.from_rows(rows, true)
@@ -111,6 +126,7 @@ func _report(file_name: String, rows: Array, hang: Array) -> void:
 	var boss_b := _first(rows, "BOSS_VERSLAGEN")
 	var in_boss := func(t: int) -> bool: return boss_a >= 0 and t >= boss_a and (boss_b < 0 or t <= boss_b)
 	var acts := _actions(rows)
+	var moments := _moments(rows, acts)
 	print("\n=== %s (D = %d) ===" % [file_name, d])
 	print("runtijd %d ticks (%.1f s), SLICE_EIND %s, BOSS %d → %d (%.1f s)" % [end - start, (end - start) / 60.0,
 		_first(rows, "SLICE_EIND"), boss_a, boss_b, (boss_b - boss_a) / 60.0 if boss_a >= 0 and boss_b >= 0 else 0.0])
@@ -140,7 +156,7 @@ func _report(file_name: String, rows: Array, hang: Array) -> void:
 		var s9_end := _first(rows, "SLICE_EIND")
 		if s9_end < 0:
 			s9_end = end
-		for a: Array in acts:
+		for a: Array in moments:
 			if a[0] > s9_in and a[0] <= s9_end and a[1] == "S9":
 				gaps.append(a[0] - last)
 				last = a[0]
@@ -148,7 +164,34 @@ func _report(file_name: String, rows: Array, hang: Array) -> void:
 		var ok := gaps.size() > 0 and gaps[0] <= S9_RUST
 		for i in range(1, gaps.size()):
 			ok = ok and gaps[i] <= S9_GAT
-		print("  S9 gaten vanaf binnenkomst %d: %s · rustpunt ≤ %d, daarna ≤ %d: %s" % [s9_in, gaps, S9_RUST, S9_GAT, "ja" if ok else "NEE"])
+		print("  S9 gaten vanaf binnenkomst %d (met POMP van de echo): %s · rustpunt ≤ %d, daarna ≤ %d: %s" % [s9_in, gaps, S9_RUST, S9_GAT, "ja" if ok else "NEE"])
+	# Langste gat zonder echo-moment (met POMP van de echo), naast MP-2.
+	var gap_m := 0
+	var gap_at := start
+	var prev := start
+	for a: Array in moments:
+		if a[0] - prev > gap_m:
+			gap_m = a[0] - prev
+			gap_at = prev
+		prev = a[0]
+	print("  langste gat zonder echo-moment (met POMP van de echo): %d ticks (%.1f s) vanaf tick %d" % [gap_m, gap_m / 60.0, gap_at])
+	# Na trap 2: laatste POMP van de echo vóór TRAP_VOL 2 (en erna) → eerste echo-actie in S9.
+	var trap2 := -1
+	for r: Array in rows:
+		if r[2] == "TRAP_VOL" and r[3] == "2":
+			trap2 = int(r[0])
+	if trap2 >= 0:
+		var last_pomp := -1
+		for r: Array in rows:
+			if r[2] == "POMP" and r[4] == "echo" and int(r[0]) <= trap2 + 120:
+				last_pomp = int(r[0])
+		var first_s9 := -1
+		for a: Array in acts:
+			if a[0] > last_pomp and a[1] == "S9":
+				first_s9 = a[0]
+				break
+		print("  na trap 2: laatste pompslag van de echo %d → eerste echo-actie in S9 %d: %d ticks (%.1f s; rustpunt ± 12 s, gat < 40 s)" % [
+			last_pomp, first_s9, first_s9 - last_pomp, (first_s9 - last_pomp) / 60.0])
 
 	# --- punt 4: MP-3, MP-4, MP-6 ---
 	print("MP-3 %.0f %% van %d landingen zonder stilstand · MP-4 echo Leeg %.1f %% · MP-6 %.0f %% van %d LP met de echo, %d pompslagen van de echo · BREEK %d · RESPAWN %d · DEBUG %d" % [

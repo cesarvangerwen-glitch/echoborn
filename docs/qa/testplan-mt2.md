@@ -1,6 +1,6 @@
 # Testplan MT2: mijlpaaltest Kadewijk S1–S9 met de Gemaalmeester (T11, F4, F4b(a) solo)
 
-Versie 0.1.3 · 2026-11-13 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250) (deel van T11, [#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88)) · Lead-review: Executive Producer
+Versie 0.1.4 · 2026-11-13 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250) (deel van T11, [#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88)) · Lead-review: Executive Producer
 
 Basis: fasekader v0.4 (`docs/productie/fase-2-kader.md`: §3 F4 en F4b, §4 mijlpaaltest MT2, regel tegen weggooiwerk, T11); besluiten van 2026-11-12 in `docs/beslissingen.md` (D = 60 als werkaanname, fase 2 parallel, **de CEO test alleen bij mijlpalen**, kaart ± 10–15 min); kamerdoc `docs/design/kamers/kadewijk.md` v0.4.4 (§3–§9); `docs/design/gemaalmeester.md` v0.2.2 §8 (GM-a–GM-d); `docs/design/combat/slice-vijanden-en-boss.md` v0.1.4 (§2.6, open punt 15); gdd §3.5 (V-01) en **§5.1** (grens F4b(b)); `docs/audio/bible.md` §9.4 (luistercheck F2); `docs/art/slice-kadewijk.md` §9.7; testplan MT1 v0.1.3 (`docs/qa/testplan-mt1.md`, W25–W30).
 
@@ -37,6 +37,7 @@ Niet in MT2: co-op en P2 (MT3, F4b(c)); eindkwaliteit van art en audio als oorde
 | RV-3 | **Verveelt de herhaling in S5** (vier keer keren, geen gevecht)? | besluit 3 LGD bij de visie-review (#227); slice-vijanden §2.6 rij S5 | kamertijd S5 tegen de bot (1304 ticks), A–D per verdieping, MP-1 in S5 | vraag 7 |
 | RV-4 | **De lege loop na golf 2 in S3**: 540 ticks (9,0 s) van de laatste ontploffing in S3 tot de lancering in S4 | CD (#212), `kadewijk.md` §6b; slice-vijanden open punt 15 ("punt voor de Combat Designer na MT2") | het gat zonder echo-actie van de laatste `ONTPLOFFING` in S3 tot de volgende echo-actie | vraag 9 |
 | RV-5 | **Leesbaarheid van de echo in kleur vóór een verlicht raam** (S3; ΔL\* 35 tegen ≥ 40) | AD, `slice-kadewijk.md` §9.7 | alleen de kaart (beeld, niet in het log); alleen als de build de kleurtoestand van S3 toont (§2.1, V-9) | vraag 13 |
+| RV-6 | **De wandeling na trap 2** (de trap af en de kade naar de pijler, ± 20 s zonder echo-moment bij de bot): beloning of leeg lopen? | B-1 (§2.4), [besluit LGD in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429) | ticks van de laatste `POMP` van de echo bij trap 2 tot de eerste echo-actie in S9 (`rekenen.gd`) | vraag 9b |
 
 ## 2. Voorwaarden vóór de sessie
 
@@ -55,7 +56,7 @@ De Producer geeft de CEO de kaart pas als alle regels hieronder ✅ zijn. Ontbre
 | V-7 | **Geen valkuil-toetsen**: F8, de D-toetsen en F4 loggen eerst een regel `DEBUG` (waarde de toets, bron de kamer, de nieuwe D of `echo_uit`/`echo_aan`), zodat QA een run met een sprong herkent | De kaart verbiedt ze, maar een misdruk moet zichtbaar zijn | Tools Programmer | ✅ via PR [#257](https://github.com/cesarvangerwen-glitch/echoborn/pull/257) (`f18dff2`) |
 | V-8 | **Respawn werkt in elke kamer** en kost geen vastloper: bij 0 levenspunten terug op het checkpoint (S1, na de eerste pompslag S6), `RESPAWN` in het log | GM-11, SL-03 | GP | ✅ in code en tests (`kadewijk.md` §5, §3e); controle in de doorloop van V-10 |
 | V-9 | **Kleurtoestand van S3** (voor RV-5): de verlichte wijk met de verlichte ramen in kleur in de build, en de echo in zijn eindweergave (rand + buitencontour, F-07/S-10) | Zonder kleur is RV-5 niet te vragen | TA, AD | ☐ **geen harde voorwaarde**: ontbreekt het, dan schrapt QA vraag 13 en schuift RV-5 naar MT3 |
-| V-10 | **Luistercheck klaar**: het fragment dat F2 claimt (v2, `docs/audio/f2-fragment/f2_merk_aftelling_carillon_placeholder.wav`) staat op `main`, met de link in de kaart | Audio bible §9.4 | Audio Director | ☐ link invullen |
+| V-10 | **Luistercheck klaar**: het luisterfragment voor MT2, `docs/audio/luistercheck-mt2/luistercheck_mt2_placeholder.ogg` (66,6 s; 0,0–15,5 s is het F2-fragment v2 sample voor sample, daarna L1–L3 per vraag naast elkaar; PR [#260](https://github.com/cesarvangerwen-glitch/echoborn/pull/260) van de Composer/Sound Designer, nog in review), staat op `main`, met de link in de kaart §4 | Audio bible §9.4 | Composer/Sound Designer, Audio Director | ☐ wacht op de merge van #260; daarna de link in de kaart |
 
 ### 2.2 Bots groen op de build
 
@@ -65,7 +66,7 @@ Gedraaid door QA op de build van §2.3, met de suite (`godot --headless --path g
 |---|---|---|---|---|
 | 1 | **Gescripte lus S1 → S8 → S9 → S1** met de boss (`kadewijk_bot.gd` + `boss_bot.gd`), `RUN_EIND` op `SLICE_EIND` | loopt zonder dood en zonder F8; echo breekt 0× (besluit 1 LGD, #227; besluit 4 in #252) | 15 504 ticks (258,4 s), 0 echo-breuken bij 60/120/180, 1 treffer, 0 respawns, alles opgepakt (`kadewijk.md` §6d) | ✅ |
 | 2 | MP-1 per kamer | ≤ 300 ticks | lus: langste 56 (de arena), dus elke kamer ≤ 300 | ✅ |
-| 3 | MP-2 per kamer, en het langste gat | ≥ 3,0 per min in elke kamer; gat ≤ 40 s; S9 rustpunt ≤ 720, daarna ≤ 600 ticks | lus D = 60: per kamer S1 6,3 · S2 10,4 · S3 15,3 · S4 14,4 · S5 9,9 · **S6 3,5** · S7 16,7 · S8 27,2 · S9 5,2; langste gat **2101 ticks (35,0 s)**, van de laatste actie in de arena tot B2a in S9; S9 na de trap af: **932** / 246 / 524 / 590 / 597 / 391 | ☐ **S9-rustpunt in de lus 932 > 720** (bevinding B-1, §2.4); MP-2 per kamer en gat ≤ 40 s gehaald |
+| 3 | MP-2 per kamer, en het langste gat | ≥ 3,0 per min in elke kamer; gat ≤ 40 s (de MT2-norm, fasekader §3) | lus D = 60: per kamer S1 6,3 · S2 10,4 · S3 15,3 · S4 14,4 · S5 9,9 · **S6 3,5** · S7 16,7 · S8 27,2 · S9 5,2; langste gat **2101 ticks (35,0 s)** | ✅ voor de MT2-norm. **B-1: bevinding** (rustpunt na de boss), **geen voorwaarde** (EP, [Lead-review #261](https://github.com/cesarvangerwen-glitch/echoborn/pull/261#issuecomment-6845616031)) |
 | 4 | MP-3, MP-4, MP-6 | ≥ 75 % / ≤ 40 % / ≥ 40 % | lus D = 60: **76 %** van 29 landingen (de 7 met stilstand alle in S8 fase 1; op de route 100 %) / 0,4 % / 71 % van 643 LP, 8 pompslagen van de echo | ✅ (MP-3 krap, §2.4) |
 | 5 | SL-01 en het gemaal | ≥ 100 LP vóór de eerste pompslag; gemaal vol op de eerste doorgang | 112 LP; ✓ | ✅ |
 | 6 | Gemaal → arena-deur | ≤ 10 s (SL-03, GM-11) | 555 ticks (9,2 s) | ✅ |
@@ -76,7 +77,7 @@ Gedraaid door QA op de build van §2.3, met de suite (`godot --headless --path g
 | 11 | Suite | volledig groen, ook D = 90 / 120 / 180 als regressie | **437 geslaagd, 0 mislukt** (271,7 s) op `de037be`, Godot 4.6.3 headless | ✅ |
 | 12 | Start, D en meetlog (V-5, V-6) | test: de build start de Kadewijk op D = 60; het meetlog schrijft een CSV met de naam van V-6 | `test_kadewijk_meetlog.gd` (PR #257): MT1-start ongewijzigd, D = 60 met echo aan, één CSV met de juiste naam en kop, `_afgebroken`, `DEBUG` | ✅ |
 
-**Stand op `de037be` (2026-11-13): niet groen.** ✅: V-2–V-8; bot-punten 1, 2, 4–12. Open: V-1 (MT1 wacht op de CEO), V-10 (link naar het luisterfragment), bot-punt 3 (het S9-rustpunt in de lus, bevinding B-1). V-9 is geen harde voorwaarde.
+**Stand op `de037be` (2026-11-13): niet groen.** ✅: V-2–V-8; bot-punten 1–12 (punt 3 met bevinding B-1, geen voorwaarde). Open: V-1 (MT1 wacht op de CEO) en V-10 (het luisterfragment, PR #260 in review). V-9 is geen harde voorwaarde.
 
 ### 2.4 Uitkomst van de MT2-tooling op de lus (QA, `de037be`)
 
@@ -89,6 +90,7 @@ Gedraaid met `docs/qa/mt2-meetlogs/botlogs.gd` (de lus zoals `test_kadewijk_lus.
 | Laagste MP-2 per kamer | S6 3,5 | S6 3,5 | S6 3,5 | **S7 0,0** (alleen 3 stuits, geen ontploffing) |
 | Langste gat | 2101 (35,0 s) | 2100 | 2129 | 2161 (36,0 s) |
 | S9 na de trap af: rustpunt / grootste gat daarna | **932** / 597 | **943** / 590 | **958** / 591 | **988** / 597 |
+| Na trap 2: laatste pompslag van de echo → eerste echo-actie in S9 (B-1, met `POMP` van de echo, LGD) | **1202 (20,0 s)** | 1183 | 1168 | 1138 |
 | F4b(b) (1) / (2) / (3) | 8,2 / 4,1 · 4,9 / 78 % | 8,6 / 4,5 · 5,2 / 80 % | 8,4 / 4,4 · 5,1 / 79 % | 8,3 / 4,2 · 4,9 / 79 % |
 | RV-2 S7: stuits boven het kanaal / ontploffingen | 2 / 2 | 2 / 2 | 2 / 1 | 2 / 0 |
 | RV-4 lege loop S3 → S4 | 539 (9,0 s) | 535 | **638** (10,6 s) | **727** (12,1 s) |
@@ -100,7 +102,7 @@ Gedraaid met `docs/qa/mt2-meetlogs/botlogs.gd` (de lus zoals `test_kadewijk_lus.
 
 | # | Bevinding | Ernst | Voor |
 |---|---|---|---|
-| B-1 | **Na de boss in de lus geen rustpunt ≤ 12 s.** Van `BOSS_VERSLAGEN` (11 175) tot de eerste echo-actie in S9 (B2a, 13 156) zit 1981 ticks (33 s) zonder MP-2-actie: de deur uit, de trap op, trap 2 pompen (8 slagen, 4 van de echo; `POMP` telt niet in MP-2), de trap af en 932 ticks (15,5 s) over de kade naar de pijler. De test van S9 (`kadewijk.md` §6c) meet het rustpunt vanaf de deur (656), niet na de trap af. Het gat blijft < 40 s (MP-2), maar haalt de grens van #227 (rustpunt ≤ ± 12 s) in de lus niet | geen blocker voor MT2 (MP-2 gehaald), wel bot-punt 3 ☐ | WLD (de kade na de trap af), LGD (telt een pompslag van de echo als echo-actie voor het rustpunt?) |
+| B-1 | **Na de boss in de lus geen rustpunt ≤ 12 s.** Van `BOSS_VERSLAGEN` (11 175) tot de eerste echo-actie in S9 (B2a, 13 156) zit 1981 ticks (33 s) zonder MP-2-actie: de deur uit, de trap op, trap 2 pompen, de trap af en 932 ticks over de kade naar de pijler. **Besluit LGD** ([besluit LGD in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429)): voor de gaten en het rustpunt telt een `POMP` van de echo als echo-moment (voor MP-2 niet); dan blijft **± 20 s** (1202 ticks bij D = 60) van de laatste pompslag van de echo bij trap 2 tot B2a in S9. Geen ombouw vóór MT2: de kaart vraagt het (vraag 9b, RV-6), QA meet het gat. Is het in MT2 "leeg", dan kiest de WLD de goedkoopste ingreep (een echo-moment op of onder de trap terug); S9 blijft maatvast tot er een herontwerp is. **Geen MT2-voorwaarde** (EP, Lead-review #261) | bevinding, geen blocker | LGD (besloten), WLD (na MT2, en een `note` in `test_kadewijk_lus.gd`) |
 | B-2 | **MP-3 76 %, krap op 75 %**: de 7 landingen met stilstand liggen alle in S8 fase 1 (de boss-bot wacht ≥ 20 ticks op het schot); op de route 100 %. Een CEO die in fase 1 ook wacht, kan MP-3 missen door de boss | info | Combat Designer |
 | B-3 | **S6 MP-2 3,5 per min**, bij elke D de krapste kamer (de pompgang telt niet in MP-2) | info | LGD |
 | B-4 | Regressie D = 180: S7 MP-2 0,0 (de merken in het kanaal knallen niet meer); D = 120/180: RV-4 > 600 | info, alleen bij een andere D | Combat Designer, LGD |
@@ -164,6 +166,7 @@ Zoals MT1 §4.2 en W26, nu per keerpunt van de slice: **S1-B1, S2-B3, S2-B1, S4-
 | RV-3 S5 | kamertijd S5 tegen 1304; A–D voor B2a–d; MP-1 en MP-2 in S5 | bot 1304 ticks, 4 × A | vraag 7 = C ("te lang, saai"): bevinding voor de LGD en CD (besluit 3 opnieuw: variatie, niet per se een vijand) |
 | RV-4 lege loop | ticks van de laatste `ONTPLOFFING` in S3 tot de volgende echo-actie (S4) | bot 540 (9,0 s) | > 600 ticks (± 10 s) **of** vraag 9 = B: punt 15 voor de Combat Designer (de Kadeloper naar het begin van de aanloop, of de aanloop korter) |
 | RV-5 raam | niets uit het log; alleen vraag 13 (als V-9 ✅) | AD: ΔL\* 35 tegen ≥ 40 | vraag 13 = B of C: de buitencontour van 1 px in kleur voor de TA (F-07/S-10) |
+| RV-6 na trap 2 | ticks van de laatste `POMP` van de echo bij trap 2 tot de eerste echo-actie in S9; gaten en rustpunt met `POMP` van de echo als echo-moment (LGD, B-1) | bot 1202 (20,0 s) | vraag 9b = B ("leeg lopen"): de WLD kiest een echo-moment op of onder de trap terug (LGD, #83). A = beloning: zo laten |
 
 ### 4.4 Tooling (`docs/qa/mt2-meetlogs/`)
 
@@ -183,7 +186,7 @@ Draaiboek: `docs/qa/ceo-kaart-mt2.md`.
 |---|---|---|
 | 0 | Zip uitpakken in een nieuwe map, oude meetlogs opzij, openen; HUD-check | ± 3 min |
 | 1 | **Eén doorloop** S1 → S9 → S1 (van de proloogdeur tot terug op de gang van S1), op D = 60 | ± 6–8 min, stopregel ± 8 min (bot ± 4,3 min; zie onder) |
-| 2 | 14 meerkeuzevragen in de Claude-chat (letters) | ± 2 min |
+| 2 | 15 meerkeuzevragen (1–14 en 9b) in de Claude-chat (letters) | ± 2 min |
 | 3 | Luistercheck F2: drie keer ja/nee, **alleen koptelefoon** | ± 2 min |
 | 4 | Antwoorden en CSV's in de Claude-chat | ± 1 min |
 
@@ -208,6 +211,7 @@ Alles **meerkeuze**, met letters (W34). Volgorde: eerst wat de kernfantasie en h
 | 7 | Het trappenhuis (S5, vier keer omdraaien) was… | A een lekker ritme · B net goed · C te lang, saai · D weet ik niet meer | RV-3 | §4.3 |
 | 8 | Over het kanaal in de kelder (S7) ging je… | A stuitend op de lichtjes · B door de bodem van het kanaal · C geprobeerd te stuiten, lukte niet · D weet ik niet meer | RV-2 | §4.3, naast het log |
 | 9 | Na het tweede groepje vijanden op de markt (S3), tot de sprong over de kloof… | A prima, even rust · B te lang niets te doen · C niet gemerkt | RV-4 | §4.3 |
+| 9b | Na het pompen van trap 2, de trap af en over de kade: voelde dat als… | A beloning · B leeg lopen · C niet gemerkt · D daar niet gekomen | RV-6, LGD (#83) | §4.3; naast het gat uit het meetlog |
 | 10 | Hoe brak je het schot (de klep) van de boss? | A snapte het meteen · B na een tijdje · C per toeval · D niet gelukt | GM-a | naast de tijd `BOSS_START` → `SCHOT_BREUK` (≤ 60 s) |
 | 11 | Bij de finisher (de laatste slagen) zag je vooral… | A mijn eigen slagen · B mijn echo die meesloeg · C een filmpje · D niet gehaald | GM-c | A of B = goed |
 | 12 | Het merk (wat je met slaan op een vijand zet) deed je denken aan… | A nergens aan · B een ander spel: (naam) · C iets anders: (een paar woorden) | M1, O-8 | *Nine Sols* bij B = terug naar afwijkpunt 2 (gdd §2.13); zwak signaal |
@@ -264,6 +268,7 @@ D = 60 is een CEO-besluit **als werkaanname** (nog niet gespeeld, `beslissingen.
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.1.4 | 2026-11-13 | Na Lead-review EP (#261): bot-punt 3 ✅ voor de MT2-norm, B-1 bevinding en geen voorwaarde; besluit LGD over B-1 ([besluit LGD in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429)): `POMP` van de echo telt voor gaten en rustpunt (niet voor MP-2), `rekenen.gd` aangepast (na trap 2: 1202 ticks, 20,0 s); RV-6 en vraag 9b; V-10 met het luisterfragment uit PR #260 |
 | 0.1.3 | 2026-11-13 | MT2-tooling gebouwd (`docs/qa/mt2-meetlogs/botlogs.gd`, `rekenen.gd`; MT1-scripts ongewijzigd) en gedraaid op de lus bij D = 60/90/120/180; suite 437/0. Bot-punten 4, 9, 10, 11 ✅, punt 3 ☐ (S9-rustpunt in de lus 932 > 720, B-1); §2.4 met de uitkomst, de hangtijd (D = 60: 9–10 ticks op elk keerpunt) en de bevindingen B-1–B-4; open punt 3 gesloten |
 | 0.1.2 | 2026-11-13 | Stand bijgewerkt: V-2 (a)–(c) ✅ (CD past, boss 97,9 s / fase 2 63,5 s en vaste arena-camera via #253), V-3 (a) ✅ (CD past), V-4 ✅ (lus, 0 echo-breuken via #252/#254), bot-punten 1, 2, 7 ✅; V-5–V-7 naar PR #257 (start: `kadewijk.tscn` + F6 tot MT1 klaar is; spelvenster sluiten, niet de stopknop, anders geen CSV); stopregel ± 8 min, spelen ± 6–8 min (SM-review #251). Na Lead-review EP (#258): open punt 1 op ± 8 min; V-2 (d) en V-3 (b) ✅ (S8 en S9 maatvast, LGD in #83). Na SM-review #258: V-5–V-7 en bot-punt 12 ✅ via #257 (`f18dff2`), stand-regel op `f18dff2`, open punt 2 gesloten |
 | 0.1.1 | 2026-11-13 | Na Lead-review EP (PR #251): luistercheck alleen koptelefoon ± 2 min, stopregel ± 10 min, sessie ± 15 min (§1, §5, W35), open punt 1 gesloten; V-2 met de lengte van de boss (95–150 s, fase 2 ≤ 65 s, #247) en de vaste arena-camera, bot-punt 7 daarop aangepast |
