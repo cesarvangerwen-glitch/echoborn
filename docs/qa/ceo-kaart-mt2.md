@@ -1,10 +1,10 @@
 # CEO-kaart MT2: de Kadewijk spelen, met de Gemaalmeester
 
-Versie 0.1 · 2026-11-13 · Eigenaar: QA Lead · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250)
+Versie 0.1.1 · 2026-11-13 · Eigenaar: QA Lead · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250)
 
 **Nog niet spelen.** Deze kaart is voor ná MT1 (de flow-kamer). De Producer stuurt je de kaart als de bots op de hele Kadewijk groen zijn; dan staan de build en de links hieronder ingevuld.
 
-**Tijd: ± 15–20 min.** Solo, op de staart van **1 s (D = 60)**. Je speelt de Kadewijk **één keer** van begin tot eind (± 7–10 min), beantwoordt 14 vragen met een letter (± 2 min) en luistert naar één geluidsfragment (± 3–5 min). Geen kladje nodig.
+**Tijd: ± 15 min.** Solo, op de staart van **1 s (D = 60)**. Je speelt de Kadewijk **één keer** van begin tot eind (± 7–10 min), beantwoordt 14 vragen met een letter (± 2 min) en luistert op koptelefoon naar één geluidsfragment (± 2 min). Geen kladje nodig.
 
 **Lees §1–§4. Lees §6 pas nadat je alles verstuurd hebt.**
 
@@ -31,7 +31,7 @@ Build: commit *in te vullen*. Zip van precies die versie: *in te vullen* (speel 
 
 - **Niet drukken**: Enter of Start (tweede speler), F1/F2/F3/F7 (andere staart), F4 (echo uit), F8 (kamer overslaan).
 - **Dood?** Je begint opnieuw bij het laatste punt. Gewoon doorspelen.
-- **Stoppen mag** na ± 12 min spelen, of na 3 keer dood bij de boss. Sluit dan het spelvenster en zet bij vraag 14 waar je was.
+- **Stoppen mag** na ± 10 min spelen, of na 3 keer dood bij de boss. Sluit dan het spelvenster en zet bij vraag 14 waar je was.
 
 ## 3. Vragen (typ in de Claude-chat, ± 2 min)
 
@@ -77,9 +77,9 @@ Bijlage: alle meetlog-CSV's van vandaag
 
 Een antwoord als `1 A, 2 C F G, 3 A, 4 A, 5 4 4 5 3, 6 B, …` is genoeg.
 
-## 4. Luisteren (± 3–5 min)
+## 4. Luisteren (± 2 min)
 
-Open het fragment: *link in te vullen* (± 12 s). Luister op **koptelefoon** én op **tv-luidsprekers**. Antwoord met **ja** of **nee**; een korte opmerking mag.
+Open het fragment: *link in te vullen* (± 12 s). Luister op **koptelefoon** (tv-luidsprekers niet nodig). Antwoord met **ja** of **nee**; een korte opmerking mag.
 
 ```
 L1 Klinkt het als een carillon? (klokjes op 2,1 en 2,35 s, klokslag op 2,6 s; daarna 10,5–11,1 s)  ja / nee
@@ -105,4 +105,5 @@ Klaar. De agent in de chat zet alles in de repo; QA schrijft het rapport.
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.1.1 | 2026-11-13 | Na Lead-review EP (PR #251): ± 15 min; stopregel ± 10 min (§2); luisteren alleen op koptelefoon, ± 2 min (§4) |
 | 0.1 | 2026-11-13 | Eerste versie (#250): na MT1; één doorloop S1 → S9 → S1 op D = 60 met stopregel; 14 meerkeuzevragen (F4b(a), R-V1, MP-5 in vier delen, de vijf meetvragen uit de reviews, GM-a, GM-c, M1, X); luistercheck F2 (bible §9.4); meetlogs via de Claude-chat. Build, zip en fragmentlink nog in te vullen |
