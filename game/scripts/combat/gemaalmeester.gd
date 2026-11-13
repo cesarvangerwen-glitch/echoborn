@@ -39,6 +39,7 @@ signal rad_turning(tick: int, reason: String, to_side: int)
 const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
 const GemaalmeesterBeeld = preload("res://art/animatie/gemaalmeester/gemaalmeester_beeld.gd")
+const RadAudio = preload("res://scripts/audio/rad_audio.gd")
 
 enum Phase { ONE, SWITCH, TWO }
 ## Het rad (§3.5): weg (fase 1), hangt (raakbaar), trilt, draait naar de andere muur.
@@ -92,6 +93,8 @@ var _noted_tick := -1
 var _rad_coop := false
 ## Het beeld (sprites), alleen beeld (TA, #265).
 var _beeld: GemaalmeesterBeeld
+## RAD_TREFFER-geluid (#243, bible §4.1): luistert alleen naar `rad_hit`.
+var audio: RadAudio
 
 
 ## De boss op `origin`: de linkermuur van de arena, op de bovenkant van de vloer.
@@ -109,6 +112,10 @@ func setup_gemaalmeester(origin: Vector2) -> void:
 	var y2 := EnemyData.value(g, "rad_y2")
 	rad = add_part("Rad", Vector2(EnemyData.value(g, "rad_breedte"), y2 - y1), Vector2(rad_x(-1), (y1 + y2) * 0.5))
 	_build_visual()
+	if audio == null:
+		audio = RadAudio.new()
+		add_child(audio)
+		audio.bind(self)
 	on_reset(0)
 
 

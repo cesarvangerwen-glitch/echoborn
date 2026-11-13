@@ -47,6 +47,8 @@ signal opened(tick: int, by: String)
 ## "tijd" (`D + G` ticks na de breuk).
 signal schaduwklep_weg(tick: int, by: String)
 
+const LuikAudio = preload("res://scripts/audio/luik_audio.gd")
+
 ## Breedte en dikte van de klep (wereldpx). De node staat 4 px onder de
 ## bovenkant van de klep: daar ligt het middelpunt van de hurtbox (8 px hoog).
 @export var size := Vector2(40, 16)
@@ -66,6 +68,8 @@ var schaduwklep_tot := -1
 var schaduwklep_weg_tick := -1
 var schaduwklep_weg_by := ""
 var _klep: StaticBody2D
+## Het breekgeluid (#243, bible §4.1): luistert alleen naar de signalen.
+var audio: LuikAudio
 
 
 func _init() -> void:
@@ -101,6 +105,10 @@ func _ready() -> void:
 	add_child(_klep)
 	if is_open:
 		_set_layer(0)
+	if audio == null:
+		audio = LuikAudio.new()
+		add_child(audio)
+		audio.bind(self)
 
 
 ## De klep, voor tests (laag: `collision_layer`).

@@ -45,6 +45,7 @@ signal sluice_opened(tick: int)
 signal trap_full(tick: int, trap: int)
 
 const Tuning = preload("res://scripts/echo/tuning.gd")
+const PompslagAudio = preload("res://scripts/audio/pompslag_audio.gd")
 
 ## LM-03: LP per pompslag (startwaarde 15, testbereik 10–25, gdd §2.9).
 static func per_stroke() -> int:
@@ -99,6 +100,8 @@ var _last_dry := Vector2.ZERO
 var _has_dry := false
 ## Vol geladen uit een save: het water staat al laag (`restore_state`).
 var _drained := false
+## Het geluid van de pompslag (#243, bible §4.1): luistert alleen naar `pumped`.
+var audio: PompslagAudio
 
 
 ## `p_vanes`: één schoep (Node2D) of een lijst schoepen (LM-03).
@@ -151,6 +154,10 @@ func _setup_common() -> void:
 	_water_visual.color = Color(0.25, 0.35, 0.45, 0.7)
 	add_child(_water_visual)
 	_update_water_visual(y_high)
+	if audio == null:
+		audio = PompslagAudio.new()
+		add_child(audio)
+		audio.bind(self)
 
 
 ## Is G = 100 bereikt (LM-03, LM-06; trap 1)? Dat bewaart de save als `vol`.

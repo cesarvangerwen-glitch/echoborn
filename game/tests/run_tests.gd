@@ -41,6 +41,7 @@ const TEST_SCRIPTS := [
 	"res://tests/test_events.gd",
 	"res://tests/test_objects.gd",
 	"res://tests/test_luik.gd",
+	"res://tests/test_audio_pompslag.gd",
 	"res://tests/test_motor.gd",
 	"res://tests/test_echo_v04.gd",
 	"res://tests/test_combat.gd",
