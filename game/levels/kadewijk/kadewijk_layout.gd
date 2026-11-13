@@ -224,9 +224,15 @@ const S9_HOOGWATER := Rect2(3920, 360, 60, S9_KADE - 360.0)
 ## rechts), daar keren en bouncen naar richel 2, die over de pijler gaat; dan
 ## naar links eraf, terug op de kade. Een schacht van 480 px, dus de maten van
 ## B2 (`b2_keerzone`, `b2_ledge`). Langzame lijn: de treden 30/60/90.
-const S9_PIJLER := Rect2(2520, 455, 60, S9_KADE - 455.0)
-const S9_B2_LEFT := 2580.0
-const S9_B2_RIGHT := 3060.0
+## Visie-review CD (#227, voorstel A): de pijler 240 px dichter bij de deur, zodat
+## het eerste stuk kade (het rustpunt na de boss) ≤ ± 12 s is bij elke D.
+const S9_PIJLER := Rect2(2760, 455, 60, S9_KADE - 455.0)
+const S9_B2_LEFT := 2820.0
+const S9_B2_RIGHT := 3300.0
+## Een Dwaallicht boven de kade tussen de pijler en het E-paar (#227, voorstel A;
+## plaatsing van de Combat Designer, afwijking 19): stuiten (V-01b), en de echo
+## laat het merk knallen. Baan van 32 px, onderkant 40 px boven de kade (§2.6).
+const S9_DWAALLICHT_X := 2310.0
 const S9_B2_LEVELS := [S9_KADE, S9_KADE - 90.0, S9_KADE - 180.0]
 ## Het luik in de kade (V-01, SL-04; `scripts/objects/luik.gd`, zoals in S7), vlak
 ## vóór de kadewand: de lage kade loopt dood.

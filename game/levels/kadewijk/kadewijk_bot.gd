@@ -119,6 +119,7 @@ var _legs := [
 	["S9-B2a", "turn", 9],
 	["S9-B2b", "turn", 10],
 	["S9-pijler", "pijler9", null],
+	["S9-dwaallicht", "stuit9", null],
 	["S9-paar", "fight", null],
 	["S9-luik", "luik", 1],
 	["S9-B1", "turn", 8],
@@ -251,6 +252,8 @@ func _decide() -> int:
 			return _leg_luik(Layout.LUIK, Layout.S7_UP, Layout.S7_LOW)
 		"kade9":
 			return _leg_kade9()
+		"stuit9":
+			return _leg_stuit9()
 		"pijler9":
 			# Van richel 2 over de pijler naar links, de kade weer op.
 			if _on_level(Layout.S9_KADE) and _p1().position.x < Layout.S9_PIJLER.position.x:
@@ -598,7 +601,7 @@ func _target(here: StringName) -> Node2D:
 	var best: Node2D = null
 	var best_d := INF
 	for e in _room.enemies_in(here):
-		if absf(e.position.y - p.position.y) > 40.0:
+		if absf(e.position.y - p.position.y) > 40.0 or e.enemy_type == SliceEnemy.Type.DWAALLICHT:
 			continue
 		if _room.echo_on and _room.echo != null:
 			if _room.sim.combat.mark_on(e) != null:
@@ -612,9 +615,12 @@ func _target(here: StringName) -> Node2D:
 	return best
 
 
-## Niemand meer om te verslaan (een heel pantser zonder echo telt niet, L-13 e).
+## Niemand meer om te verslaan (een heel pantser zonder echo telt niet, L-13 e;
+## een Dwaallicht is geen tegenstander op de vloer, S9).
 func _no_enemies_left(here: StringName) -> bool:
 	for e in _room.enemies_in(here):
+		if e.enemy_type == SliceEnemy.Type.DWAALLICHT:
+			continue
 		if not (e.armor_intact and (not _room.echo_on or _room.echo == null)):
 			return false
 	return true
@@ -931,10 +937,10 @@ func _leg_kanaal() -> int:
 
 ## Het volgende Dwaallicht in de looprichting (naar links) dat nog leeft en
 ## dat P1 nog niet raakte met een neerslag (gestund = net geraakt).
-func _next_wisp() -> Node2D:
+func _next_wisp(here: StringName = &"S7") -> Node2D:
 	var p := _p1()
 	var best: Node2D = null
-	for e in _room.enemies_in(&"S7"):
+	for e in _room.enemies_in(here):
 		if e.enemy_type != SliceEnemy.Type.DWAALLICHT:
 			continue
 		if e.is_stunned(_tick) or (_room.sim.combat.mark_on(e) != null):
@@ -1040,4 +1046,38 @@ func _leg_trap9_af() -> int:
 	for tr: Array in Layout.s9_trap_treads():
 		if _on_level(float(tr[0])):
 			return R if float(tr[1]) <= Layout.S9_TRAP_LEFT else L
+	return L
+
+
+## S9, het Dwaallicht boven de kade (V-01b, #227): springen als het ± 44 px vóór
+## je hangt (vóór het duikt), boven het Dwaallicht een neerslag, stuiten, en
+## naar links de kade weer op. De echo laat het merk achter je knallen.
+func _leg_stuit9() -> int:
+	var p := _p1()
+	if sub == "air" and _since > 2 and _on_level(Layout.S9_KADE):
+		_next_leg(stuits > 0)
+		return L
+	match sub:
+		"":
+			if _on_level(Layout.S9_KADE) and p.position.x - Layout.S9_DWAALLICHT_X <= 44.0:
+				sub = "air"
+				_since = 0
+				return L | _tap(J)
+			return L
+		"air":
+			var target := _next_wisp(&"S9")
+			if target == null:
+				return L
+			var dx: float = target.position.x - p.position.x
+			var feet := p.position.y + Layout.HALF_H
+			var top: float = target.position.y - 8.0
+			if absf(dx) <= 10.0 and feet > top - 20.0 and feet < top + 14.0 and _tick - _last_attack >= 4:
+				_last_attack = _tick
+				stuits += 1
+				return DOWN | _tap(A)
+			if dx < -2.0:
+				return L
+			if dx > 2.0:
+				return R
+			return 0
 	return L
