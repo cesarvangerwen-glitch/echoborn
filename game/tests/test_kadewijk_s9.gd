@@ -15,6 +15,9 @@ extends RefCounted
 ##   (alleen met een neerslag), B1 via de echolijn, logbladzijde 3, MP-1 en
 ##   MP-2 per kamer, zonder echo hooguit 2× (C-15, FK-2), en keren bij B1
 ##   ≥ 30 ticks sneller dan de langzame lijn zonder dash en ≤ 2× (gdd §4.3).
+## - De gaten zonder echo-actie (visie-review CD, #227, voorstel A): het rustpunt
+##   na de boss ≤ ± 12 s, daarna geen gat > ± 10 s; getoetst bij D = 60, bij de
+##   andere D gerapporteerd (Lead-review #239).
 ## - Het hoogwater houdt de lage kade dicht tot `s = 2`; een gewone slag opent
 ##   het luik niet (SL-04, L-03); de trap naar het plein werkt omhoog en omlaag;
 ##   het snelluik in S1 is eenrichting (van boven sta je erop).
@@ -277,7 +280,10 @@ func _s9_run(t, d: int, echo_on: bool) -> Array:
 	t.check(wijk.logblad_3_tick > 0, "%s: logbladzijde 3 niet gehaald" % label)
 	t.check(_count(rows, "RESPAWN") == 0 and wijk.p1.health > 0, "%s: P1 stierf (%d respawns)" % [label, _count(rows, "RESPAWN")])
 	t.check(wijk.most_at_once <= 5, "%s: %d vijanden tegelijk (L-13 f)" % [label, wijk.most_at_once])
-	t.check(wijk.enemies_in(&"S9").is_empty(), "%s: %d Kadelopers over in S9" % [label, wijk.enemies_in(&"S9").size()])
+	# Het E-paar is verslagen; het Dwaallicht (#227) gaat alleen met de echo dood
+	# (de merksprong), zonder echo blijft het gestund achter.
+	var walkers: Array = wijk.enemies_in(&"S9").filter(func(e: Node) -> bool: return e.enemy_type == SliceEnemy.Type.KADELOPER)
+	t.check(walkers.is_empty(), "%s: %d Kadelopers over in S9" % [label, walkers.size()])
 	var still := _still_per_room(rows)
 	for id: StringName in [&"S9", &"S1"]:
 		t.check(int(still.get(String(id), 0)) <= 300, "%s %s: langste stilstand %d ticks (MP-1 ≤ 300)" % [label, id, still.get(String(id), 0)])
@@ -289,9 +295,36 @@ func _s9_run(t, d: int, echo_on: bool) -> Array:
 	return [parts, rep]
 
 
+## De gaten zonder echo-actie in S9 (visie-review CD, #227, voorstel A): het
+## eerste stuk (van de deur tot de eerste echo-actie) is het rustpunt na de boss,
+## ≤ `RUST_MAX`; daarna geen gat > `GAT_MAX` (ook niet van de laatste actie tot
+## `SLICE_EIND`). Een actie zoals MP-2 (`FlowReport.actions`).
+const RUST_MAX := 720   ## ± 12 s
+const GAT_MAX := 600    ## ± 10 s
+
+
+func _gaps(rep) -> Array:
+	var out: Array = []
+	var prev: int = rep.start
+	for a: Array in rep.actions:
+		out.append(int(a[0]) - prev)
+		prev = int(a[0])
+	out.append(rep.end - prev)
+	return out
+
+
 func _check_echo_run(t, d: int, out: Array) -> void:
 	var bot = out[0][1]
 	var rep = out[1]
+	var gaps := _gaps(rep)
+	var rest := gaps.slice(1)
+	# Hard bij D = 60 (de gekozen D); bij de andere D rapport (Lead-review #239).
+	if d == 60:
+		t.check(gaps.size() >= 2 and gaps[0] <= RUST_MAX, "D=%d S9: rustpunt (deur → eerste echo-actie) %d ticks (≤ %d, ± 12 s; CD #227)" % [d, gaps[0] if gaps.size() else -1, RUST_MAX])
+		t.check(not rest.is_empty() and rest.max() <= GAT_MAX, "D=%d S9: langste gat buiten het rustpunt %d ticks (≤ %d, ± 10 s; CD #227), gaten %s" % [d, rest.max() if rest.size() else -1, GAT_MAX, gaps])
+	else:
+		t.note("D=%d S9: rustpunt %d (norm bij D = 60: ≤ %d), langste gat daarna %d (≤ %d) (rapport)" % [d, gaps[0] if gaps.size() else -1, RUST_MAX, rest.max() if rest.size() else -1, GAT_MAX])
+	t.note("D=%d S9: gaten zonder echo-actie %s ticks (rustpunt %.1f s, daarna langste %.1f s)" % [d, gaps, gaps[0] / 60.0, rest.max() / 60.0 if rest.size() else 0.0])
 	for n: String in S9_TURNS:
 		t.check(bot.lines.get(n, false), "D=%d %s: niet via de echolijn (L-08)" % [d, n])
 	var per: float = rep.actions_per_min_room.get("S9", 0.0)
@@ -378,7 +411,7 @@ func test_s9_zonder_echo_d180(t) -> void:
 ## Waar een meting van een keerpunt begint: B2 van de pijler op de kade rechts
 ## van de pijlerwand (aanloop 620 px), B1 op de benedenkade onder het luik.
 const KEER_START := {
-	"S9-B2a": Vector2(3200, Layout.S9_KADE - Layout.HALF_H),
+	"S9-B2a": Vector2(3440, Layout.S9_KADE - Layout.HALF_H),
 	"S9-B1": Vector2(580, Layout.S9_LAAG - Layout.HALF_H),
 }
 

@@ -1,6 +1,6 @@
 # Kamers: de Kadewijk (wijk 1.3, de slice): S1–S9
 
-Versie 0.4.2 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8, deel 3 S9) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
+Versie 0.4.4 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8, deel 3 S9) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
 
 Bronnen: `docs/design/wereld.md` v0.2 §2 (kamerlijst §2.2, SL-regels §2.3, vijandtypes §2.4, T8a §2.5, acceptatie §2.6), `docs/design/gdd.md` v0.8.2 (§4.3 bouwstenen met D in formules, L-08–L-14, §4.5 normen, §4.8.5 vaste basis, §4.8.7 de langzame lijn met dash), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.3 (§2.6 plaatsing, VJ-01–VJ-08, §3.2 arena), `docs/design/gemaalmeester.md` v0.2.1 (GM-01, GM-07, GM-11), `docs/productie/fase-2-kader.md` v0.4 §4, `docs/tech/ontwerp.md` v0.3 (§3a, §7, §12 "naar T8a"), de visie-review van de CD ([comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), `docs/concept/visie-review/kadewijk/`).
 
@@ -50,17 +50,17 @@ Deel 1 van T8a voor de WLD: de eerste vier kamers van de kritieke route maatvast
 ```
  y=320  |=gang S1=[u]|  (kademuur S1)                                                 S5 |trap|=plein (S6)
  y=360  +-----------+----------------------------- S9 Lage kade ------------------------+----+-- S8 --
- y=455  |           |                             ___pijler==richel 2      |wand        |  T |
- y=545  | schacht^  |                                  |   ==richel 1====|            |  T |
- y=610  |=galerij==^| (L3)                             |                               |  T |
- y=635  |           |wand [luik]=kade========E-paar=====|pijler============kade=========W|  T |
+ y=455  |           |                                   ___pijler==richel 2      |wand  |  T |
+ y=545  | schacht^  |                       d                |   ==richel 1====|      |  T |
+ y=610  |=galerij==^| (L3)                                   |                       |  T |
+ y=635  |           |wand [luik]=kade==E-paar====kade========|pijler============kade=W|  T |
  y=680  |           |      |                                                         ===vloer==<=deur
  y=700  |=benedenkade======|                                                                    |
  y=720  +--------------------------------------------------------------------------------------+
- x=     0  20   460-500 520 560  700        1700      2520 2580          3060       3920 3980 4100 4160
+ x=     0  20   460-500 520 560  700  1060     2310   2760 2820          3300  3920 3980 4100 4160
 ```
 
-`[u]` = het snelluik (een eenrichtingsluik in de gang van S1), `L3` = logbladzijde 3, `W` = het hoogwater (dicht tot `s = 2`), `T` = de trap naar het plein (treden om en om). Buren: S8–S9 (de deur links van de arena), S5–S9 (de trap loopt door de hoek van S5 omhoog naar het plein) en S9–S1 (het snelluik).
+`[u]` = het snelluik (een eenrichtingsluik in de gang van S1), `L3` = logbladzijde 3, `W` = het hoogwater (dicht tot `s = 2`), `d` = het Dwaallicht boven de kade, `T` = de trap naar het plein (treden om en om). Buren: S8–S9 (de deur links van de arena), S5–S9 (de trap loopt door de hoek van S5 omhoog naar het plein) en S9–S1 (het snelluik).
 
 | Kamer | Rechthoek (x, y, b, h) | Begin (LM-08) | Wat |
 |---|---|---|---|
@@ -157,8 +157,9 @@ Wereld.md §2.2: na de boss terug naar het plein voor trap 2, het water naar `s 
 
 - **De deur** (x 4160): de vloer van de arena (680) loopt door tot de kademuur (x 3980). De **trap naar het plein** staat in de hoek (x 4100–4150, wanden tot 640, zodat je er van de deur onderdoor loopt): negen eenrichtingstreden van 30 px, **om en om tegen de linker- en de rechterwand, 42 px boven elkaar** (FK-6), van 638 tot 302; de bovenste twee liggen in S5 (x 4100–4160 onder de rechterwand van het huis, achter een wand van 20 px: geen weg van het huis naar het plein). Van de bovenste spring je naar rechts het plein op (260). Omlaag stap je aan de open kant van een trede af en vang je de volgende. Gemeten: omhoog 318 ticks (5,3 s), omlaag 307.
 - **Het hoogwater** (x 3920–3980, 360–635): de placeholder voor de waterstand. Tot `s = 2` staat de lage kade onder water: een blok `Hoogwater` dat je niet over komt (L-14 d: je ziet wat er onder water ligt). De GP opent het met `Kadewijk.set_door(&"S9", "Hoogwater", false)` als trap 2 vol is (SL-02, LM-10) en vervangt het door `Diepwater`/`Sluis`.
-- **De lage kade** (635, 45 boven de vloer bij de deur, FK-6) naar links. **De brugpijler** onder S4 (x 2520–2580, top 455): een **B2 van twee verdiepingen** in een schacht van 480 px (x 2580–3060), zoals in S5: keren tegen de pijler, bounce naar richel 1 (545, tegen de pijlerwand rechts, die tot 551 hangt: je loopt eronder de schacht in), keren tegen de wand, bounce naar richel 2 (455, tegen de pijler), over de pijler naar links eraf, terug op de kade. Richels `480 − Z`, gat Z (`b2_keerzone`), treden 30/60/90 (langzame lijn). Nieuw ten opzichte van de opzet in §9 v0.3.1: zonder pijler haalt S9 MP-2 per kamer niet (afwijking 16).
-- **Het E-paar** (x 1700 / 1728 op de kade): 2 Kadelopers, **verlicht** (VJ-06: `lit = true` in de scène; v × 0,5, aanloop +10), 28 px (`paar_e`).
+- **De lage kade** (635, 45 boven de vloer bij de deur, FK-6) naar links. **Het rustpunt na de boss** (#227): van de deur tot de pijler 940 px vlakke kade, de verlichte wijk en het gezakte water in beeld (10,9 s bij D = 60, 11,9 s bij D = 180; ≤ ± 12 s). **De brugpijler** (x 2760–2820, top 455): een **B2 van twee verdiepingen** in een schacht van 480 px (x 2820–3300), zoals in S5: keren tegen de pijler, bounce naar richel 1 (545, tegen de pijlerwand rechts, die tot 551 hangt: je loopt eronder de schacht in), keren tegen de wand, bounce naar richel 2 (455, tegen de pijler), over de pijler naar links eraf, terug op de kade. Richels `480 − Z`, gat Z (`b2_keerzone`), treden 30/60/90 (langzame lijn). Nieuw ten opzichte van de opzet in §9 v0.3.1: zonder pijler haalt S9 MP-2 per kamer niet (afwijking 16).
+- **Het Dwaallicht** (x 2310, baan 2294–2326, onderkant 40 px boven de kade, verlicht; #227, afwijking 19): je springt ± 44 px ervoor, stuit erop met een neerslag (V-01b) en de echo laat het merk achter je knallen (V-01e). Zonder echo stuit P1 ook; het Dwaallicht blijft dan gestund achter.
+- **Het E-paar** (x 1060 / 1088 op de kade, halverwege tussen het Dwaallicht en het luik; #227, afwijking 19): 2 Kadelopers, **verlicht** (VJ-06: `lit = true` in de scène; v × 0,5, aanloop +10), 28 px (`paar_e`).
 - **Het luik** (x 560–600, in een plaat van 16 px vlak vóór de kadewand op x 520–540): de lage kade loopt dood (SL-04: zonder V-01 een doodlopende kade, L-03: de scheur in de klep). Een neerslag opent het (`scripts/objects/luik.gd`, zoals in S7); P1 valt 65 px naar de benedenkade (700), die onder de plaat en de kadewand door naar links loopt.
 - **B1 tegen de grachtwand** (x 20, onder de wand van S1): dezelfde maten als S1, één verdieping lager: aanloop van de landing onder het luik tot de wand 560 px (≥ D + 24), galerij op 90 (610) vanaf Z tot de schacht, treden 30/60/90. **Logbladzijde 3** ligt op de galerij (x 300), **105 px boven de benedenkade**: in één beweging alleen met de bounce (L-12), langzame lijn de treden (C-15).
 - **De schacht en het snelluik**: van het eind van de galerij (x 460) eenrichtingstreden recht boven elkaar (569 … 362, ≤ 42 px) naar het **snelluik** in de gang van S1 (x 460–500 op 320, een eenrichtingsvloer achter het begin, buiten de aanloop van B1): van onder spring je erdoor, van boven loop je eroverheen. Wie er van S9 door komt en op de gang staat, is rond: **`SLICE_EIND`** (placeholder in `kadewijk.gd`; met `run_end` = `RUN_END_LUS` eindigt de run daar). De snelkoppeling ligt op een echolijn (L-12: de bounce van B1 naar de galerij), met de treden als langzame lijn.
@@ -172,7 +173,7 @@ Wereld.md §2.2: na de boss terug naar het plein voor trap 2, het water naar `s 
 | S4 | `Overkant`: 1 Kadeloper op x 3260 | ≥ 80 px van de landing van de lancering (± 3090) | — |
 | S6 | `Paar1A`, `Paar1B`: 2 Kadelopers op het plein, x 4340 / 4382 | **K-paar**, 42 px (`paar_k`): twee merken, de ketting; ≥ 98 px van de eerste schoep (FK-5: ≥ 80). Komen terug zolang het gemaal niet vol is | — |
 | S7 | `Dwaallicht1`, `Dwaallicht2` boven het kanaal, x 5013 / 5067 | Banen van 32 px (de level-regel zet ze bij het laden met `setup_enemy`; de `@export` volgt van de GP), onderkant 40 px boven de vloer | — |
-| S9 | `Paar1A`, `Paar1B`: 2 Kadelopers op de lage kade, x 1700 / 1728 | **E-paar**, 28 px (`paar_e`), **verlicht** (VJ-06, `lit` in de scène tot de waterstand het zet, GP); tussen de brugpijler en het luik | — |
+| S9 | `Dwaallicht1` boven de kade, x 2310 (baan 32 px, verlicht), en `Paar1A`, `Paar1B`: 2 Kadelopers op de lage kade, x 1060 / 1088 | **E-paar**, 28 px (`paar_e`), **verlicht** (VJ-06, `lit` in de scène tot de waterstand het zet, GP); tussen de brugpijler en het luik | — |
 
 De **paren** (VJ-05) zet het gebiedsscript bij het laden met `SliceEnemy.make_pair` en de afstand uit `slice.csv`. Een `@export` voor de paargenoot (zodat het paar in de scène staat) volgt van de Gameplay Programmer (ontwerp.md §12).
 
@@ -302,19 +303,22 @@ Solo. De run loopt van het begin van S9 (bij de deur van de arena, het hoogwater
 
 | | **D = 60** | D = 120 | D = 180 | Norm |
 |---|---|---|---|---|
-| S9 → gang S1 met echo | **3003 ticks (50,0 s)** (S9 2952, S1 50) | 2979 | 2995 | — |
-| Zonder echo | 3221 (**1,07×**, marge 2785 ticks tot 2×) | 3220 (1,08×) | 3220 (1,08×) | ≤ 2× (C-15, FK-2): ✓ |
+| S9 → gang S1 met echo | **3004 ticks (50,1 s)** (S9 2953, S1 50) | 2980 | 2996 | — |
+| Zonder echo | 3222 (**1,07×**, marge 2786 ticks tot 2×) | 3221 (1,08×) | 3222 (1,08×) | ≤ 2× (C-15, FK-2): ✓ |
+| **Gaten zonder echo-actie** (#227: rustpunt, B2a → B2b, → Dwaallicht, → E-paar, → B1, → SLICE_EIND) | **656** / 246 / 524 / 590 / **597** / 390 (rustpunt 10,9 s, daarna ≤ 9,9 s) | 682 / 238 / 550 / 591 / 562 / 356 | **712** / 246 / 588 / **597** / 526 / 326 | rustpunt ≤ 720 (± 12 s), daarna ≤ 600 (± 10 s): ✓ (test bij D = 60, rapport bij de andere D, [Lead-review #239](https://github.com/cesarvangerwen-glitch/echoborn/pull/239#issuecomment-6840184277); krap, zie §9) |
 | Keren / langzame lijn zonder dash: B2a, B2b (pijler), B1 (grachtwand) | **68 / 104 (+36, 1,53×)** elk (B1 105) | 95 / 145 (+50) | 124–133 / 186 (+53 … +62) | ≥ 30, ≤ 2× (gdd §4.3): ✓ |
 | Snelste langzame lijn met dash (W-12, n = 4 … 24), B2a, B2b, B1 | **94 (+26, 1,38×)** elk (dash 8; dash 4 mist) | — | — | ≥ 20, ≤ 2× (gdd §4.8.7): ✓ (alleen D = 60, [Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983); de andere D dekken de maatcheck en S5/S1) |
 | Bounce / landing (van de wand) | 54 / 120 | 122 / 190 | 166–182 / 234–250 | landing ≥ Z + 8 |
 | MP-1 langste stilstand S9 (met / zonder echo) | 2 / 46 | 4 / 46 | 4 / 46 | ≤ 300: ✓ |
-| **MP-2 per kamer S9** | **4,9 per min** (pijler 2, B1 1, het E-paar 1) | 4,9 | 4,9 | ≥ 3,0: ✓ |
-| MP-2 langste gat | 917 ticks (15,3 s) | 882 | 846 | ≤ 40 s: ✓ |
-| MP-3 / MP-4 / MP-6 | 100 % van 3 / 4 % / 78 % van 27 LP | — / 8 % / 78 % | — / 12 % / 78 % | (rapport) |
-| Luik (alleen een neerslag), logbladzijde 3, SLICE_EIND | ✓, ✓ (tick 2721), ✓ | ✓ | ✓ | SL-04, L-12 |
+| **MP-2 per kamer S9** | **6,1 per min** (pijler 2, het Dwaallicht 1, het E-paar 1, B1 1) | 6,1 | 6,1 | ≥ 3,0: ✓ |
+| MP-2 langste gat | 656 ticks (10,9 s, het rustpunt) | 682 | 712 | ≤ 40 s: ✓ |
+| MP-3 / MP-4 / MP-6 | 100 % van 3 / 2 % / 77 % van 35 LP | — / 4 % / 77 % | — / — / 77 % | (rapport) |
+| Luik (alleen een neerslag), logbladzijde 3, SLICE_EIND | ✓, ✓ (tick 2722), ✓ | ✓ | ✓ | SL-04, L-12 |
 | Hoogwater dicht: P1 komt niet op de lage kade | ✓ | — | — | L-14 d |
 | Trap naar het plein en terug | omhoog 318, omlaag 307 ticks | — | — | FK-6, L-10 |
 | Treffers op P1, vijanden tegelijk | 0, ≤ 5 | 0 | 0 | L-13 f |
+
+**Voor #227 (v0.4.2)** waren de gaten bij D = 60 776 / 246 / 673 / 917 / 390 ticks (rustpunt 12,9 s, pijler → E-paar 11,2 s, E-paar → B1 15,3 s); de CD gaf S9 "past niet". Nu: de pijler 240 px naar de deur (rustpunt ≤ 12 s), een Dwaallicht tussen pijler en E-paar, en het E-paar naar x 1060 (§3f, afwijking 19). De runs van deel 1 en 2 geven nog steeds dezelfde ticks (vergeleken met `main`, groep `lang`).
 
 **De runs van deel 1 en 2 zijn niet veranderd**: dezelfde ticks in elke run (S1–S4, S1 → S7, per kamer los, B2 met dash, gemaal → arena-deur 555), ook met S9 als buur van S1 en S5 en het snelluik in S1. **De run zonder echo van deel 2 op de grens** (SM-review #223): de test meldt nu de marge per D: **D = 60 479 ticks tot 2× (1,90×), D = 120 892 (1,82×), D = 180 1672 (1,69×); terugkeren 4 van 4 bij elke D (marge 0)**. De test van S6 los meldt dat C-15 bewust met gelijk licht wordt vergeleken (1,45×, LGD-besluit bij afwijking 10).
 
@@ -366,12 +370,14 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 | 16 | **De brugpijler (B2, twee verdiepingen) op de lage kade**, niet in de opzet van §9 v0.3.1. Zonder haalde S9 MP-2 per kamer niet: **2,93 per min** (één bounce en één ketting in 41 s, waarvan ± 29 s lopen over 3500 px kade). Met de pijler 4,9 per min. De pijler gebruikt de maten van B2 in S5 (schacht 480, `b2_keerzone`) | **Akkoord** ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)): MP-2 4,9 met de maten van B2 en de eis bij keren bij elke D; of de ± 29 s kade past, is een vraag voor de CD |
 | 17 | **De lage kade op 635** in plaats van 620 (voorstel §9 v0.3.1): 45 boven de vloer bij de deur (één trede, FK-6), en onder het luik 49 px vrij boven de benedenkade (700) | **Akkoord** ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)): FK-6, één trede van 45 |
 | 18 | **Placeholders van de WLD**: het hoogwater (een blok tot `s = 2`), `SLICE_EIND` (in `kadewijk.gd` als P1 van S9 op de gang van S1 staat), logbladzijde 3 (een markering; `LOGBLAD` in de meetlog), `lit` van het E-paar met de hand. De echte objecten (trap 2, `Diepwater`/`Sluis`, de pick-up) zijn van de GP | Ter info ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)) |
+| 19 | **S9 na de visie-review (#227, voorstel A; de plaatsing van vijanden is van de Combat Designer)**: (a) de pijler 240 px naar de deur (x 2760–3300; WLD), zodat het rustpunt na de boss ≤ ± 12 s is bij elke D; (b) **een Dwaallicht erbij** boven de kade op x 2310 (verlicht, baan 32, 40 px boven de kade; nieuw in S9, §2.6 noemt alleen het E-paar); (c) **het E-paar van x 1700 naar 1060**. Zonder (b) haalt geen plaatsing van het E-paar "geen gat > ± 10 s" na een korter rustpunt: van de pijler tot B1 is ± 23 s lopen. Nog steeds 3 vijandtypes, ≤ 5 tegelijk. De gaten zitten krap onder 600 (590–597 bij D = 60 en 180) | **Akkoord** ([Lead-review #239](https://github.com/cesarvangerwen-glitch/echoborn/pull/239#issuecomment-6840184277)); de Combat Designer ter info |
 
 **Visie-review van S5–S7** (CD, [comment in #227](https://github.com/cesarvangerwen-glitch/echoborn/issues/227#issuecomment-6835171911), bot-doorloop op D = 60; één regel per kamer):
 
 - **S5 Sluiswachtershuis: Visie-review: past** (CD, #227): vier keer keren, de echo tegemoet, een verdieping hoger (68 tegen 104 ticks), geen stilstand; het trappenhuis is een ritme. Punten: vier keer hetzelfde (variatie), de meter vol na B2b (R-V2), het lampglas op de zoldervloer (telt niet voor R-V2).
 - **S6 Gemaalplein: Visie-review: past** (CD, #227): de sterkste kamer van deel 2; de echo is je tweede slag en je pomp (K-paar, vier schoepen, het gemaal vol in één doorgang). Punt voor art en audio: de pompslag van de echo even zwaar als die van P1.
-- **S7 Sluiskelder: Visie-review: past niet** (CD, #227): het kanaal werkt (stuiten, de echo knalt de merken), maar **de echo breekt op het luik** (tick 4992): als hij de neerslag afspeelt, is de klep weg (E-08b). Her-review alleen van het luik.
+- **S7 Sluiskelder: Visie-review: past** (CD, her-review [comment in #227](https://github.com/cesarvangerwen-glitch/echoborn/issues/227#issuecomment-6839394512); eerst "past niet", #227): met de schaduwklep (#232) speelt de echo je neerslag op het luik af en valt achter je aan, 0 breuken in S1 → S8; hij laat de Dwaallichten in het kanaal knallen. Punt voor de AD, geen blokkade: maak de schaduwklep zichtbaar (een holle afdruk van de klep).
+- **S9 Lage kade: Visie-review: past niet → aangepast** (CD, [comment in #227](https://github.com/cesarvangerwen-glitch/echoborn/issues/227#issuecomment-6839394512)): de echo-momenten zijn goed (pijler, E-paar, B1, de echo valt mee door het luik), maar drie stukken vlakke kade van 12,9 / ± 9,5 / 15,3 s, ± 60 % van de kamer. Aangepast volgens voorstel A (afwijking 19, §6c): het eerste stuk is het rustpunt (10,9 s), daarna geen gat > 10 s. Her-review alleen van de doorloop van S9.
 
 **Besluiten LGD bij de visie-review** ([comment in #227](https://github.com/cesarvangerwen-glitch/echoborn/issues/227#issuecomment-6836180810)):
 
@@ -394,10 +400,10 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 | S2 | **Maatvast** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): bots groen, `Visie-review: past` (#212), het B3-punt besloten (8) |
 | S3 | **Maatvast** na de merge van #217 (LGD bevestigt): bots groen, `past`; het lege stuk na golf 2 is een punt, geen herontwerp |
 | S4 | **Maatvast** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): bots groen, `Visie-review: past` (#212), afwijking 7 akkoord (#220) |
-| S5, S6 | **Maatvast na de merge van de contactbladen (#228)** (LGD, #227): bots groen, `Visie-review: past`, besluiten 2 en 3 |
-| S7 | **Kandidaat** tot de schaduwklep er is (besluit 1, GP) en de CD bij de her-review van het luik `past` geeft |
+| S5, S6 | **Maatvast** (#228 gemerged; LGD, #227): bots groen, `Visie-review: past`, besluiten 2 en 3 |
+| S7 | **Maatvast** ([Lead-review #239](https://github.com/cesarvangerwen-glitch/echoborn/pull/239#issuecomment-6840184277)): de schaduwklep is er (#232), `Visie-review: past` na de her-review (#227), bots groen |
 | S8 | **Kandidaat voor de maten**: de arena volgt GM-01 en §3.2; maatvast pas met de boss erin (GP, B-9 in de arena) |
-| S9 | **Kandidaat** ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)): bots groen (§6c), afwijking 14–17 akkoord; de visie-review van de CD ontbreekt en het luik volgt besluit 1 |
+| S9 | **Kandidaat**: bots groen (§6c), afwijking 14–18 akkoord (#231); de CD gaf "past niet" (#227), aangepast volgens voorstel A (afwijking 19), wacht op de her-review van de doorloop |
 
 ## 9. Open punten
 
@@ -440,7 +446,11 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 - **Bevinding B4 (geldt al zonder bolder)**: gdd §4.3 zegt "bounce + dash haalt tot op de vloer ± 145 px", dus niet over de kloof. Dat klopt met de dash op de top. Wie aan de rand op zijn echo wacht, bounct en pas laat in de val dasht (de dash zet `v.y` op 0), komt wél over: middelpunt tot x 3076 (de overkant begint op 3052), met of zonder bolder. Het blijft een echolijn (een bounce op de echo), maar geen lancering. Zonder echo kom je niet over (test, ook van de bolder af: 3046).
 - **Flow-kamer B4** heeft nog de oude werkwijze (stap terug, 15 ticks stilstand bij D = 60, `flowkamer.md` §9). Geen nieuwe geometrie in de flow-kamer zolang MT1 erop speelt; de bolder kan daar na MT1, als de LGD dat wil.
 
-**Creative Director:** visie-review van S5–S7 (§3b–§3d; in de run van deel 2 bij D = 60: S5 tick ± 3005–4310, S6 ± 4310–4810). S2 en S4: "past" (#212, gedaan). S9 (§3f; de run van §6c, 50 s): ± 29 s daarvan is lopen over de kade, met de pijler, het E-paar en het luik ertussen; past dat bij "de wijk is je beloning"?
+**Creative Director:** visie-review van S5–S7 (§3b–§3d; in de run van deel 2 bij D = 60: S5 tick ± 3005–4310, S6 ± 4310–4810). S2 en S4: "past" (#212, gedaan). S9: ~~past dat bij "de wijk is je beloning"?~~ "past niet" (#227); aangepast (afwijking 19), **her-review van de doorloop van S9** (§6c: rustpunt 10,9 s, daarna ≤ 9,9 s).
+
+**Lead Game Designer (#227):** ~~afwijking 19~~ akkoord ([Lead-review #239](https://github.com/cesarvangerwen-glitch/echoborn/pull/239#issuecomment-6840184277)).
+
+**Gaten in S9 (besluit LGD, [Lead-review #239](https://github.com/cesarvangerwen-glitch/echoborn/pull/239#issuecomment-6840184277)):** de gaten zitten krap onder ± 10 s (590–597 ticks bij D = 60). Brengt een wijziging een gat boven 600, kijk dan eerst naar **voorstel B van de CD** (een kortere kade, of een korte val of trede naar de benedenkade), **niet naar een ruimere grens**. De test is hard bij D = 60; bij 120 en 180 rapport.
 
 **Lead Game Designer (deel 3):** ~~afwijking 14–17~~ akkoord ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)).
 
@@ -467,6 +477,8 @@ Besluiten: D = 60 als werkaanname, bereik 1–3 s, en fase 2 parallel, ook bouwe
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie: S1–S4 als grijze kamers, bot en tests bij D = 60 (120/180 regressie) |
 | 0.1.1 | 2026-11-12 | Lead-review #208: langzame lijn met dash gemeten bij 60/90/120 (§6), besluiten van de LGD per afwijking en maatvast-stand per kamer (§8), open punten bijgewerkt (§9) |
+| 0.4.4 | 2026-11-13 | [Lead-review #239](https://github.com/cesarvangerwen-glitch/echoborn/pull/239#issuecomment-6840184277): afwijking 19 akkoord, S7 maatvast; de gaten-test hard bij D = 60 en rapport bij 120/180 (§6c); §9: bij een gat boven 600 eerst voorstel B. Merge met `main` (#236–#238) |
+| 0.4.3 | 2026-11-13 | [#227](https://github.com/cesarvangerwen-glitch/echoborn/issues/227), visie-review S9 "past niet": voorstel A gebouwd (§3f): de pijler naar de deur (rustpunt ≤ 12 s), een Dwaallicht boven de kade, het E-paar naar x 1060; gat-meting in `test_kadewijk_s9.gd` (§6c). Afwijking 19 (§8). §8: S7 "past" na de her-review, S9 "past niet → aangepast", S5 en S6 maatvast |
 | 0.4.2 | 2026-11-12 | Merge met `main` na #229 (de Gemaalmeester in S8, GP) en #230 (art S1/S3, TA): §3e, §6b en §9 van de GP en de S9-delen samen; `BOSS_START` is een besluit van de LGD (#229) in plaats van een werkaanname van de GP |
 | 0.4.1 | 2026-11-12 | [Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983): besluiten bij afwijking 14–18 (§8); kleine punten: maatcheck van de pijler per D en W-12 voor de drie keerpunten van S9 bij D = 60 (§6c). Visie-review S5–S7 (#227) per kamer en de besluiten 1–3 van de LGD (§8), maatvast-stand, open punten (§9) |
 | 0.4 | 2026-11-12 | [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) deel 3: **S9 de lage kade** grijs en speelbaar (§2, §3f): de trap naar het plein (voor trap 2), het hoogwater (placeholder voor `s = 2`), de brugpijler (B2), het E-paar verlicht, het luik (SL-04), B1 met logbladzijde 3 (L-12) en de schacht naar het snelluik in S1 (`SLICE_EIND`). Bot en `test_kadewijk_s9.gd` (§6c) bij D = 60/120/180: zonder echo 1,07×, MP-2 S9 4,9 per min. SM-punten #223: de marge per D bij de run zonder echo, C-15 met gelijk licht in de melding van S6. Afwijkingen 14–18 (§8), open punten (§9) |

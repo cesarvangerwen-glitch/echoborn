@@ -10,14 +10,23 @@ script = ExtResource("1_inhoud")
 kamer_id = &"S9"
 
 [node name="Paar1A" type="Node2D" parent="."]
-position = Vector2(1700, 623)
+position = Vector2(1060, 623)
 script = ExtResource("2_enemy")
 lit = true
 
 [node name="Paar1B" type="Node2D" parent="."]
-position = Vector2(1728, 623)
+position = Vector2(1088, 623)
 script = ExtResource("2_enemy")
 lit = true
+
+[node name="Dwaallicht1" type="Node2D" parent="."]
+position = Vector2(2310, 587)
+script = ExtResource("2_enemy")
+enemy_type = 2
+lit = true
+floor_top = 635.0
+lane_from = 2294.0
+lane_to = 2326.0
 
 [node name="Luik" type="Node2D" parent="."]
 position = Vector2(580, 639)
