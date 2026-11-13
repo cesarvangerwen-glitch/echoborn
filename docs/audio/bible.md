@@ -21,7 +21,7 @@ Deze bible legt vast hoe *Polderlight* (werktitel, besluit #96) klinkt en wat el
 Twee preciseringen, zodat de eis toetsbaar is:
 
 1. **Wat het fragment moet dragen.** Niet "mooi geluid" in het algemeen, maar de drie dingen waar de pillars van afhangen: (a) de **merk-aftelling met het carillon** (R-V1, E-14b), (b) een **echo die je hoort als jezelf, maar hol** (pillar 1, gdd O-4), en (c) **grijs → leven** (pillar 2). Het fragment in §9 bevat alle drie.
-2. **Hoe het beoordeeld wordt.** Geen rol in de studio kan luisteren; we beoordelen met metingen. Daarom haalt het fragment eerst de **harde drempels** uit §8 (loudness, piek, hoorbaarheid boven het bed). Daarnaast telt **één luistercheck door een mens** (besluit van de EP, eigenaar van het kader): **F2 = SM-score Kwaliteit ≥ 7 én drie keer "ja" van de CEO**, zonder eigen cijfer, op drie vragen: (1) klinkt het als een carillon, (2) hoor je dat de tweede slag "jij maar hol" is, (3) voelt het opgepompte deel warmer. Op koptelefoon en op tv-luidsprekers, ± 3–5 minuten, 0 runs. Er komt **één check, alleen op de versie die F2 claimt** (v2), op de kaart van mijlpaaltest **MT2**, vóór T8d (besluit van de EP, Lead-review PR #199). Niet in MT1, zodat die kaart binnen ± 15 min blijft (`testplan-mt1.md` §1), en geen aparte CEO-sessie: de CEO test alleen bij mijlpalen (besluit 2026-11-12 (2)).
+2. **Hoe het beoordeeld wordt.** Geen rol in de studio kan luisteren; we beoordelen met metingen. Daarom haalt het fragment eerst de **harde drempels** uit §8 (loudness, piek, hoorbaarheid boven het bed). Daarnaast telt **één luistercheck door een mens** (besluit van de EP, eigenaar van het kader): **F2 = SM-score Kwaliteit ≥ 7 én drie keer "ja" van de CEO**, zonder eigen cijfer, op drie vragen: (1) klinkt het als een carillon, (2) hoor je dat de tweede slag "jij maar hol" is, (3) voelt het opgepompte deel warmer. Alleen op koptelefoon, ± 2 minuten, 0 runs (EP-besluit, PR #251: zo blijft de kaart van MT2 binnen ± 15 min; een tv-check kan later, als dat nodig blijkt, met de slice-audio in MT3). Er komt **één check, alleen op de versie die F2 claimt** (v2), op de kaart van mijlpaaltest **MT2**, vóór T8d (besluit van de EP, Lead-review PR #199). Niet in MT1, zodat die kaart binnen ± 15 min blijft (`testplan-mt1.md` §1), en geen aparte CEO-sessie: de CEO test alleen bij mijlpalen (besluit 2026-11-12 (2)).
 
 ---
 
@@ -297,7 +297,7 @@ Alle waarden komen uit het script; de loudness ook onafhankelijk uit **ffmpeg eb
 
 ### 9.4 Luistercheck voor de CEO (MT2)
 
-Eén keer, op de kaart van MT2 vóór T8d (§0), op dit fragment (`f2_merk_aftelling_carillon_placeholder.wav`), op koptelefoon én op tv-luidsprekers, ± 3–5 minuten. Antwoord per vraag met **ja** of **nee**, zonder cijfer; een korte opmerking mag.
+Eén keer, op de kaart van MT2 vóór T8d (§0), op dit fragment (`f2_merk_aftelling_carillon_placeholder.wav`), alleen op koptelefoon, ± 2 minuten (EP-besluit, PR #251). Antwoord per vraag met **ja** of **nee**, zonder cijfer; een korte opmerking mag.
 
 1. **Klinkt het als een carillon?** Luister naar de klokjes op 2,1 s en 2,35 s en de klokslag op 2,6 s; daarna 10,5–11,1 s.
 2. **Hoor je dat de slag op 2,6 s "jij, maar hol" is?** Vergelijk de slag van speler 1 op 0,6 s met de echo op 2,6 s (en 9,0 s met 11,0 s).
@@ -353,7 +353,7 @@ Master  (HardLimiter, plafond −1 dB)
 
 ## 13. Open punten
 
-- **QA Lead:** zet de drie luistervragen uit §9.4 op de kaart van **MT2**, vóór T8d (fragment v2, koptelefoon en tv, ± 3–5 min, ja/nee zonder cijfer); niet op de kaart van MT1, geen aparte CEO-sessie (EP-besluit, PR #199).
+- **QA Lead:** zet de drie luistervragen uit §9.4 op de kaart van **MT2**, vóór T8d (fragment v2, alleen koptelefoon, ± 2 min, ja/nee zonder cijfer; EP-besluit, PR #251); niet op de kaart van MT1, geen aparte CEO-sessie (EP-besluit, PR #199). Een tv-check kan later, met de slice-audio in MT3.
 - **Fragment v2** (§9) claimt F2: SM-score Kwaliteit en de luistercheck van de CEO op die versie. Haalt het geen 7 of geen drie keer "ja", dan een `brainstorm`-issue met de opties uit §9.3.
 - **Assetlijst** (`docs/audio/assetlijst.md`) en muziek per gebied: v1, na T3a (welke events en vaardigheden er komen).
 - **gdd O-4** (speelt de echo audio af?) is met §2 A1 beantwoord: ja, gedempt. De LGD kan O-4 sluiten.
@@ -366,7 +366,7 @@ Master  (HardLimiter, plafond −1 dB)
 
 | Versie | Datum | Wijziging |
 |---|---|---|
-| 0.5 | 2026-11-13 | #243 (CD-punt S6, #227): nieuw §4.1, echo-acties met gewicht. Het objectgeluid volgt de regels: de pompslag van de echo krijgt hetzelfde sample, volume, dezelfde bus en ruimte-send als die van P1, zonder filter of extra galm, alleen −1 halve toon; zo ook het luik breken. De rad-treffer van de echo blijft hol (5 SE, telt niet voor de kant) en speelt nooit `gm_rad_treffer_2`. §2 A1, §8.3, §10, §11, §12 en §13 bijgewerkt. Audio zit nog niet in de code: taak in #243. |
+| 0.5 | 2026-11-13 | #243 (CD-punt S6, #227): nieuw §4.1, echo-acties met gewicht. Het objectgeluid volgt de regels: de pompslag van de echo krijgt hetzelfde sample, volume, dezelfde bus en ruimte-send als die van P1, zonder filter of extra galm, alleen −1 halve toon; zo ook het luik breken. De rad-treffer van de echo blijft hol (5 SE, telt niet voor de kant) en speelt nooit `gm_rad_treffer_2`. §2 A1, §8.3, §10, §11, §12 en §13 bijgewerkt. Lead-review EP (PR #249): de luistercheck in MT2 alleen op koptelefoon, ± 2 min (EP-besluit, PR #251; §0, §9.4, §13). Audio zit nog niet in de code: taak in #243. |
 | 0.4 | 2026-11-12 | Op D = 60 (besluit 2026-11-12, #196): kop met werkaanname D = 60, bereik 60–180 ticks, merk solo D + 30 / co-op 150 (C-12e), knal op D + 3 en de doelstreep; §2 A2 en §6.1 met de knal op D + 3 en de aftelling naast de doelstreep (slag 1 blijft, slag 2 en 3 vallen weg, voorslag t 33 → knal t 63; streep weg vóór D: slag 3 terug; co-op ongewijzigd), zoals in `slice-audio.md` v0.1.1 §3.1; §10 `MerkAudio` met levensduur `L` en dezelfde regel; §9 (F2) als klankreferentie, gemaakt op D = 120; §12 en §13 bijgewerkt. Lead-review EP (PR #199): de luistercheck gaat naar de kaart van MT2, vóór T8d, niet MT1 en geen aparte sessie (§0, §9.4, §13). |
 | 0.3 | 2026-11-09 | Fragment v2 dat F2 claimt (§9): water als bellenmodel, gelaagde P1-slag, harmonium met celeste, riet-geruis en toetsklik, galm met spiegelbronnen en nagalm per band, droger grijs, gemaal zonder subsonisch laag, dukken van bed en muziek, levensduur zonder echo (doven op D + 30) als losse reeks; metingen met ffmpeg ebur128 en timing op ticks; luistervragen klaar voor T17 (§9.4). §3, §4, §5 bijgewerkt met de v2-metingen. |
 | 0.2 | 2026-11-09 | Lead-review EP (PR #106): doven op D + 30 met een zachte slag 4 op D + 15 (§6.1, §10); EP-besluit over de luistercheck (§0, §9, §13); WAV byte-gelijk, OGG per build (§9). |
