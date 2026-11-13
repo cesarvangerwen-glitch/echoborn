@@ -1,11 +1,11 @@
 {
- "versie": "0.3",
+ "versie": "0.4",
  "eigenaar": "Art Director",
  "issue": 85,
  "d_render": 60,
  "gemaal_werkaanname": [
-  4960.0,
-  150.0
+  4600.0,
+  140.0
  ],
  "kamers": {
   "s1_kade_ingang": {
@@ -336,6 +336,270 @@
     }
    ],
    "ramen": 136
+  },
+  "s5_sluiswachtershuis": {
+   "wereld_rect": [
+    3520,
+    -200,
+    640,
+    560
+   ],
+   "lagen": [
+    {
+     "naam": "achter",
+     "z_index": -30,
+     "bestanden": {
+      "grijs": "s5_sluiswachtershuis_achter_grijs.png",
+      "half": "s5_sluiswachtershuis_achter_half.png",
+      "kleur": "s5_sluiswachtershuis_achter_kleur.png",
+      "index": "s5_sluiswachtershuis_achter_index.png"
+     }
+    },
+    {
+     "naam": "midden",
+     "z_index": -20,
+     "bestanden": {
+      "grijs": "s5_sluiswachtershuis_midden_grijs.png",
+      "half": "s5_sluiswachtershuis_midden_half.png",
+      "kleur": "s5_sluiswachtershuis_midden_kleur.png",
+      "index": "s5_sluiswachtershuis_midden_index.png"
+     }
+    },
+    {
+     "naam": "speelvlak",
+     "z_index": -10,
+     "bestanden": {
+      "grijs": "s5_sluiswachtershuis_speelvlak_grijs.png",
+      "half": "s5_sluiswachtershuis_speelvlak_half.png",
+      "kleur": "s5_sluiswachtershuis_speelvlak_kleur.png",
+      "index": "s5_sluiswachtershuis_speelvlak_index.png"
+     }
+    },
+    {
+     "naam": "licht",
+     "z_index": -5,
+     "bestanden": {
+      "grijs": "s5_sluiswachtershuis_licht_grijs.png",
+      "half": "s5_sluiswachtershuis_licht_half.png",
+      "kleur": "s5_sluiswachtershuis_licht_kleur.png"
+     }
+    }
+   ],
+   "lampen": [
+    {
+     "x": 3775,
+     "y": 242,
+     "straal_band1": 72,
+     "aan_in": [
+      "grijs",
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 3612,
+     "y": 138,
+     "straal_band1": 68,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 4068,
+     "y": 48,
+     "straal_band1": 68,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 3612,
+     "y": -42,
+     "straal_band1": 68,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    }
+   ],
+   "ramen": 16
+  },
+  "s6_gemaalplein": {
+   "wereld_rect": [
+    4160,
+    -200,
+    960,
+    560
+   ],
+   "lagen": [
+    {
+     "naam": "achter",
+     "z_index": -30,
+     "bestanden": {
+      "grijs": "s6_gemaalplein_achter_grijs.png",
+      "half": "s6_gemaalplein_achter_half.png",
+      "kleur": "s6_gemaalplein_achter_kleur.png",
+      "index": "s6_gemaalplein_achter_index.png"
+     }
+    },
+    {
+     "naam": "midden",
+     "z_index": -20,
+     "bestanden": {
+      "grijs": "s6_gemaalplein_midden_grijs.png",
+      "half": "s6_gemaalplein_midden_half.png",
+      "kleur": "s6_gemaalplein_midden_kleur.png",
+      "index": "s6_gemaalplein_midden_index.png"
+     }
+    },
+    {
+     "naam": "speelvlak",
+     "z_index": -10,
+     "bestanden": {
+      "grijs": "s6_gemaalplein_speelvlak_grijs.png",
+      "half": "s6_gemaalplein_speelvlak_half.png",
+      "kleur": "s6_gemaalplein_speelvlak_kleur.png",
+      "index": "s6_gemaalplein_speelvlak_index.png"
+     }
+    },
+    {
+     "naam": "licht",
+     "z_index": -5,
+     "bestanden": {
+      "grijs": "s6_gemaalplein_licht_grijs.png",
+      "half": "s6_gemaalplein_licht_half.png",
+      "kleur": "s6_gemaalplein_licht_kleur.png"
+     }
+    }
+   ],
+   "lampen": [
+    {
+     "x": 4320,
+     "y": 220,
+     "straal_band1": 80,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 4980,
+     "y": 220,
+     "straal_band1": 80,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 4600,
+     "y": 220,
+     "straal_band1": 128,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    }
+   ],
+   "ramen": 67,
+   "extra": {
+    "gemaal_aan": {
+     "bestand": "s6_gemaalplein_gemaal_aan_grijs.png",
+     "z_index": -15,
+     "wanneer": "zichtbaar als het gemaal vol is (GEMAAL_VOL, trap 1) en s < 2; uit bij s = 2 (dan staat alles in `kleur`)"
+    }
+   }
+  },
+  "s7_sluiskelder": {
+   "wereld_rect": [
+    4800,
+    360,
+    960,
+    360
+   ],
+   "lagen": [
+    {
+     "naam": "achter",
+     "z_index": -30,
+     "bestanden": {
+      "grijs": "s7_sluiskelder_achter_grijs.png",
+      "half": "s7_sluiskelder_achter_half.png",
+      "kleur": "s7_sluiskelder_achter_kleur.png",
+      "index": "s7_sluiskelder_achter_index.png"
+     }
+    },
+    {
+     "naam": "midden",
+     "z_index": -20,
+     "bestanden": {
+      "grijs": "s7_sluiskelder_midden_grijs.png",
+      "half": "s7_sluiskelder_midden_half.png",
+      "kleur": "s7_sluiskelder_midden_kleur.png",
+      "index": "s7_sluiskelder_midden_index.png"
+     }
+    },
+    {
+     "naam": "speelvlak",
+     "z_index": -10,
+     "bestanden": {
+      "grijs": "s7_sluiskelder_speelvlak_grijs.png",
+      "half": "s7_sluiskelder_speelvlak_half.png",
+      "kleur": "s7_sluiskelder_speelvlak_kleur.png",
+      "index": "s7_sluiskelder_speelvlak_index.png"
+     }
+    },
+    {
+     "naam": "licht",
+     "z_index": -5,
+     "bestanden": {
+      "grijs": "s7_sluiskelder_licht_grijs.png",
+      "half": "s7_sluiskelder_licht_half.png",
+      "kleur": "s7_sluiskelder_licht_kleur.png"
+     }
+    }
+   ],
+   "lampen": [
+    {
+     "x": 5150,
+     "y": 426,
+     "straal_band1": 64,
+     "aan_in": [
+      "grijs",
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 5046,
+     "y": 494,
+     "straal_band1": 80,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 5366,
+     "y": 494,
+     "straal_band1": 80,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 5686,
+     "y": 494,
+     "straal_band1": 80,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    }
+   ],
+   "ramen": 0
   }
  },
  "eenrichting": {
@@ -378,6 +642,28 @@
     "marge_links": 16,
     "marge_rechts": 16,
     "herhaal": "tile"
+   },
+   "trede_r": {
+    "region": [
+     0,
+     48,
+     48,
+     16
+    ],
+    "marge_links": 16,
+    "marge_rechts": 16,
+    "herhaal": "tile"
+   },
+   "richel": {
+    "region": [
+     0,
+     64,
+     48,
+     16
+    ],
+    "marge_links": 16,
+    "marge_rechts": 16,
+    "herhaal": "tile"
    }
   },
   "blokken": {
@@ -389,7 +675,23 @@
    "S2/Galerij70": "galerij",
    "S2/B1Trede30": "trede",
    "S2/B1Trede60": "trede",
-   "S2/B1Trede90": "trede"
+   "S2/B1Trede90": "trede",
+   "S5/Richel1": "richel",
+   "S5/Richel2": "richel",
+   "S5/Richel3": "richel",
+   "S5/Zolder": "richel",
+   "S5/B2aTrede30": "trede_r",
+   "S5/B2aTrede60": "trede_r",
+   "S5/B2aTrede90": "trede_r",
+   "S5/B2bTrede30": "trede",
+   "S5/B2bTrede60": "trede",
+   "S5/B2bTrede90": "trede",
+   "S5/B2cTrede30": "trede_r",
+   "S5/B2cTrede60": "trede_r",
+   "S5/B2cTrede90": "trede_r",
+   "S5/B2dTrede30": "trede",
+   "S5/B2dTrede60": "trede",
+   "S5/B2dTrede90": "trede"
   },
   "plaatsing": "NinePatchRect op Rect2(blok.position, Vector2(blok.size.x, 16)); loopvlak = bovenrand van het blok"
  },
@@ -450,8 +752,204 @@
     ]
    ],
    "fps": 12,
-   "plaatsing": "Sprite2D op de rechthoek van het luik (Luik, 40 x 16), linksboven; zichtbaar zolang de schaduwklep bestaat (laag 5); bij `schaduwklep_weg` de frames 1 en 2 afspelen, dan weg",
-   "z_index": -9
+   "z_index": -9,
+   "plaatsing": "Sprite2D op de rechthoek van het luik (40 x 16), linksboven; frame 0 zolang de schaduwklep op laag 5 staat; bij `schaduwklep_weg` frame 1 en 2, dan weg. Hol (rand + arcering), zoals de echo"
+  },
+  "luik": {
+   "frames": [
+    [
+     0,
+     16,
+     40,
+     16
+    ],
+    [
+     40,
+     16,
+     40,
+     16
+    ],
+    [
+     80,
+     16,
+     40,
+     16
+    ],
+    [
+     120,
+     16,
+     40,
+     16
+    ]
+   ],
+   "fps": 15,
+   "z_index": -9,
+   "plaatsing": "Luik (scripts/objects/luik.gd), 40 x 16, linksboven op de rechthoek: frame 0 dicht (met scheur, L-03), bij `opened` frame 1–2, daarna frame 3 (open, ook na laden met `verslagen`). S7 en S9"
+  },
+  "pompschoep": {
+   "frames": [
+    [
+     0,
+     32,
+     32,
+     48
+    ],
+    [
+     32,
+     32,
+     32,
+     48
+    ],
+    [
+     64,
+     32,
+     32,
+     48
+    ],
+    [
+     96,
+     32,
+     32,
+     48
+    ],
+    [
+     128,
+     32,
+     32,
+     48
+    ]
+   ],
+   "fps": 20,
+   "z_index": -5,
+   "plaatsing": "Pomprad (scripts/light/pomprad.gd), hurtbox 32 x 48 gecentreerd: frame 0 rust, bij een treffer 1–4 en terug naar 0. **P1 en de echo gebruiken dezelfde frames en dezelfde timing** (CD #227)"
+  },
+  "pompslag": {
+   "frames": [
+    [
+     0,
+     80,
+     48,
+     48
+    ],
+    [
+     48,
+     80,
+     48,
+     48
+    ],
+    [
+     96,
+     80,
+     48,
+     48
+    ],
+    [
+     144,
+     80,
+     48,
+     48
+    ],
+    [
+     192,
+     80,
+     48,
+     48
+    ]
+   ],
+   "fps": 20,
+   "z_index": 5,
+   "plaatsing": "Effect op het midden van de schoep bij elke pompslag, 100 % dekkend, ook voor de echo (geen transparantie, geen kleinere versie): de echo is een tweede lichaam, geen nagalm"
+  },
+  "sluisklep": {
+   "frames": [
+    [
+     0,
+     128,
+     64,
+     16
+    ],
+    [
+     64,
+     128,
+     64,
+     16
+    ]
+   ],
+   "z_index": -9,
+   "plaatsing": "S6/Sluis (60 x 10), linksboven op (5000, 260) met 2 px marge in de cel: frame 0 dicht, 1 open (t_v)"
+  },
+  "sokkel": {
+   "frames": [
+    [
+     0,
+     144,
+     32,
+     32
+    ],
+    [
+     32,
+     144,
+     32,
+     32
+    ]
+   ],
+   "z_index": -15,
+   "plaatsing": "De sokkel van V-01 in S7, onderkant op de bovenvloer bij x 5150: 0 uit, 1 aan (warme gloed)"
+  },
+  "gemaal_rad": {
+   "frames": [
+    [
+     0,
+     176,
+     96,
+     96
+    ],
+    [
+     96,
+     176,
+     96,
+     96
+    ],
+    [
+     192,
+     176,
+     96,
+     96
+    ],
+    [
+     288,
+     176,
+     96,
+     96
+    ],
+    [
+     384,
+     176,
+     96,
+     96
+    ],
+    [
+     480,
+     176,
+     96,
+     96
+    ],
+    [
+     576,
+     176,
+     96,
+     96
+    ],
+    [
+     672,
+     176,
+     96,
+     96
+    ]
+   ],
+   "fps": 10,
+   "z_index": -19,
+   "plaatsing": "S6, middelpunt op S6/Gemaal (4600, 140): staat stil (frame 0) tot de eerste pompslag, draait als het gemaal pompt"
   }
  }
 }
