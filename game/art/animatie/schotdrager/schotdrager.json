@@ -1,0 +1,700 @@
+{
+ "versie": "0.1",
+ "eigenaar": "Animator",
+ "issue": 272,
+ "bron": "docs/art/slice/bron/genereer_vijanden.py",
+ "maten": "uit game/data/vijanden/slice.csv (groep schotdrager) en game/scripts/combat/slice_enemy.gd",
+ "knoop": "De vijand-node staat in het midden van de hurtbox (slice_enemy.gd: position = (x, vloer - hoogte/2)). `offset` = linksboven van een cel in node-coördinaten (Sprite2D, centered = false), kijkrichting rechts.",
+ "ticks": "per frame, in ticks van 60 per seconde (= frames bij 60 fps); `stuurt` zegt welke vlag het frame kiest, als het niet op tijd loopt",
+ "bladen": {
+  "schotdrager": {
+   "bestanden": {
+    "grijs": "schotdrager_grijs.png",
+    "half": "schotdrager_half.png",
+    "kleur": "schotdrager_kleur.png",
+    "index": "schotdrager_index.png"
+   },
+   "cel": [
+    58,
+    42
+   ],
+   "rand_px": 1,
+   "atlas": [
+    464,
+    714
+   ],
+   "animaties": {
+    "staan": {
+     "frames": [
+      [
+       0,
+       0,
+       58,
+       42
+      ],
+      [
+       58,
+       0,
+       58,
+       42
+      ],
+      [
+       116,
+       0,
+       58,
+       42
+      ],
+      [
+       174,
+       0,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      12,
+      12,
+      12,
+      12
+     ],
+     "lus": true
+    },
+    "lopen": {
+     "frames": [
+      [
+       0,
+       42,
+       58,
+       42
+      ],
+      [
+       58,
+       42,
+       58,
+       42
+      ],
+      [
+       116,
+       42,
+       58,
+       42
+      ],
+      [
+       174,
+       42,
+       58,
+       42
+      ],
+      [
+       232,
+       42,
+       58,
+       42
+      ],
+      [
+       290,
+       42,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+     ],
+     "lus": true
+    },
+    "stoot_aanloop": {
+     "frames": [
+      [
+       0,
+       84,
+       58,
+       42
+      ],
+      [
+       58,
+       84,
+       58,
+       42
+      ],
+      [
+       116,
+       84,
+       58,
+       42
+      ],
+      [
+       174,
+       84,
+       58,
+       42
+      ],
+      [
+       232,
+       84,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      7,
+      7,
+      7,
+      6,
+      3
+     ],
+     "lus": false,
+     "stuurt": "windup_progress, zoals haak_aanloop",
+     "ticks_verlicht": [
+      10,
+      9,
+      9,
+      9,
+      3
+     ]
+    },
+    "stoot_actief": {
+     "frames": [
+      [
+       0,
+       126,
+       58,
+       42
+      ],
+      [
+       58,
+       126,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      3,
+      3
+     ],
+     "lus": false,
+     "noot": "het verste frame: de voorkant van het schot op de verste rand van het vlak (x 32)"
+    },
+    "stoot_herstel": {
+     "frames": [
+      [
+       0,
+       168,
+       58,
+       42
+      ],
+      [
+       58,
+       168,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      10,
+      10
+     ],
+     "lus": false,
+     "volgt": "lopen"
+    },
+    "stil": {
+     "frames": [
+      [
+       0,
+       210,
+       58,
+       42
+      ],
+      [
+       58,
+       210,
+       58,
+       42
+      ],
+      [
+       116,
+       210,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      4,
+      18,
+      8
+     ],
+     "lus": false
+    },
+    "tink": {
+     "frames": [
+      [
+       0,
+       252,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      4
+     ],
+     "lus": false,
+     "noot": "VJ-07: een treffer op het intacte schot (TINK_TICKS 4): witte ster en bovenrand; daarna terug"
+    },
+    "breuk": {
+     "frames": [
+      [
+       0,
+       294,
+       58,
+       42
+      ],
+      [
+       58,
+       294,
+       58,
+       42
+      ],
+      [
+       116,
+       294,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      4,
+      4,
+      4
+     ],
+     "lus": false,
+     "volgt": "gebroken_staan",
+     "noot": "break_armor: het schot barst (gloed in de barsten), springt in drie stukken en valt (12)"
+    },
+    "stuk": {
+     "frames": [
+      [
+       0,
+       336,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "noot": "de stukken op de vloer, zonder de vijand: blijft liggen op de plek van de breuk (node-positie bij break_armor)"
+    },
+    "uit_stoom": {
+     "frames": [
+      [
+       0,
+       378,
+       58,
+       42
+      ],
+      [
+       58,
+       378,
+       58,
+       42
+      ],
+      [
+       116,
+       378,
+       58,
+       42
+      ],
+      [
+       174,
+       378,
+       58,
+       42
+      ],
+      [
+       232,
+       378,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      6,
+      6,
+      6,
+      6,
+      6
+     ],
+     "lus": false,
+     "volgt": "lopen",
+     "noot": "de Schotdrager is geen add; voor de volledigheid (combat §9.1: als de Kadeloper)"
+    },
+    "dood": {
+     "frames": [
+      [
+       0,
+       420,
+       58,
+       42
+      ],
+      [
+       58,
+       420,
+       58,
+       42
+      ],
+      [
+       116,
+       420,
+       58,
+       42
+      ],
+      [
+       174,
+       420,
+       58,
+       42
+      ],
+      [
+       232,
+       420,
+       58,
+       42
+      ],
+      [
+       290,
+       420,
+       58,
+       42
+      ],
+      [
+       348,
+       420,
+       58,
+       42
+      ],
+      [
+       406,
+       420,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+     ],
+     "lus": false,
+     "noot": "kan alleen gebroken sterven (E-14g); als de Kadeloper"
+    },
+    "gebroken_staan": {
+     "frames": [
+      [
+       0,
+       462,
+       58,
+       42
+      ],
+      [
+       58,
+       462,
+       58,
+       42
+      ],
+      [
+       116,
+       462,
+       58,
+       42
+      ],
+      [
+       174,
+       462,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      12,
+      12,
+      12,
+      12
+     ],
+     "lus": true,
+     "noot": "na break_armor: hij stoot met het stuk schot dat hij overhoudt (zelfde vlak 24 x 16)"
+    },
+    "gebroken_lopen": {
+     "frames": [
+      [
+       0,
+       504,
+       58,
+       42
+      ],
+      [
+       58,
+       504,
+       58,
+       42
+      ],
+      [
+       116,
+       504,
+       58,
+       42
+      ],
+      [
+       174,
+       504,
+       58,
+       42
+      ],
+      [
+       232,
+       504,
+       58,
+       42
+      ],
+      [
+       290,
+       504,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+     ],
+     "lus": true,
+     "noot": "na break_armor: hij stoot met het stuk schot dat hij overhoudt (zelfde vlak 24 x 16)"
+    },
+    "gebroken_aanloop": {
+     "frames": [
+      [
+       0,
+       546,
+       58,
+       42
+      ],
+      [
+       58,
+       546,
+       58,
+       42
+      ],
+      [
+       116,
+       546,
+       58,
+       42
+      ],
+      [
+       174,
+       546,
+       58,
+       42
+      ],
+      [
+       232,
+       546,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      7,
+      7,
+      7,
+      6,
+      3
+     ],
+     "lus": false,
+     "noot": "na break_armor: hij stoot met het stuk schot dat hij overhoudt (zelfde vlak 24 x 16)"
+    },
+    "gebroken_actief": {
+     "frames": [
+      [
+       0,
+       588,
+       58,
+       42
+      ],
+      [
+       58,
+       588,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      3,
+      3
+     ],
+     "lus": false,
+     "noot": "na break_armor: hij stoot met het stuk schot dat hij overhoudt (zelfde vlak 24 x 16)"
+    },
+    "gebroken_herstel": {
+     "frames": [
+      [
+       0,
+       630,
+       58,
+       42
+      ],
+      [
+       58,
+       630,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      10,
+      10
+     ],
+     "lus": false,
+     "noot": "na break_armor: hij stoot met het stuk schot dat hij overhoudt (zelfde vlak 24 x 16)"
+    },
+    "gebroken_stil": {
+     "frames": [
+      [
+       0,
+       672,
+       58,
+       42
+      ],
+      [
+       58,
+       672,
+       58,
+       42
+      ],
+      [
+       116,
+       672,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      4,
+      18,
+      8
+     ],
+     "lus": false,
+     "noot": "na break_armor: hij stoot met het stuk schot dat hij overhoudt (zelfde vlak 24 x 16)"
+    }
+   },
+   "offset": [
+    -23,
+    -27
+   ],
+   "offset_links": [
+    -35,
+    -27
+   ],
+   "ten_opzichte_van": "vijand-node (midden van de hurtbox 16 x 24; de vloer ligt 12 px onder de node)",
+   "flip_h": "kijkrichting links (`facing < 0`): flip_h = true en `offset_links`",
+   "noot": "de hurtbox valt op kolom 15-31, rij 15-39 (met de rand); de vloer op rij 39",
+   "z_index": 0
+  },
+  "tell_stoot": {
+   "bestanden": {
+    "grijs": "schotdrager_tell_stoot_grijs.png",
+    "half": "schotdrager_tell_stoot_half.png",
+    "kleur": "schotdrager_tell_stoot_kleur.png",
+    "index": "schotdrager_tell_stoot_index.png"
+   },
+   "cel": [
+    26,
+    18
+   ],
+   "rand_px": 1,
+   "atlas": [
+    26,
+    54
+   ],
+   "animaties": {
+    "vroeg": {
+     "frames": [
+      [
+       0,
+       0,
+       26,
+       18
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "windup_progress < 0,5"
+    },
+    "laat": {
+     "frames": [
+      [
+       0,
+       18,
+       26,
+       18
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "windup_progress >= 0,5"
+    },
+    "actief": {
+     "frames": [
+      [
+       0,
+       36,
+       26,
+       18
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "is_attack_active()"
+    }
+   },
+   "offset": [
+    -1,
+    -1
+   ],
+   "ten_opzichte_van": "_walker_box().position: precies het vlak",
+   "z_index": 1
+  }
+ },
+ "koppeling": {
+  "armor_intact": "staan / lopen / stoot_aanloop / stoot_actief / stoot_herstel / stil; tell_stoot op _walker_box()",
+  "tink(tick)": "tink (4 ticks), daarna terug naar wat hij deed",
+  "break_armor(tick)": "breuk (12), daarna gebroken_*; zet `stuk` als losse Sprite2D op de node-positie van dat moment",
+  "na de breuk": "gebroken_staan / gebroken_lopen / gebroken_aanloop / gebroken_actief / gebroken_herstel / gebroken_stil",
+  "dood": "dood (48 ticks); hij kan alleen gebroken sterven"
+ },
+ "import": {
+  "map": "res://art/animatie/schotdrager/",
+  "texture": "Lossless, mipmaps uit, filter Nearest op het CanvasItem, repeat uit (zoals de Gemaalmeester)",
+  "toestanden": "grijs en half = donkere wijk (s < 2: rand en kern feller, VJ-06) / kleur = verlicht; index = R materiaal-id, G tint*32+16, A 255"
+ }
+}

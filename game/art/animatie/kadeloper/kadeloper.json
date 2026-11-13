@@ -1,0 +1,444 @@
+{
+ "versie": "0.1",
+ "eigenaar": "Animator",
+ "issue": 272,
+ "bron": "docs/art/slice/bron/genereer_vijanden.py",
+ "maten": "uit game/data/vijanden/slice.csv (groep kadeloper) en game/scripts/combat/slice_enemy.gd",
+ "knoop": "De vijand-node staat in het midden van de hurtbox (slice_enemy.gd: position = (x, vloer - hoogte/2)). `offset` = linksboven van een cel in node-coördinaten (Sprite2D, centered = false), kijkrichting rechts.",
+ "ticks": "per frame, in ticks van 60 per seconde (= frames bij 60 fps); `stuurt` zegt welke vlag het frame kiest, als het niet op tijd loopt",
+ "bladen": {
+  "kadeloper": {
+   "bestanden": {
+    "grijs": "kadeloper_grijs.png",
+    "half": "kadeloper_half.png",
+    "kleur": "kadeloper_kleur.png",
+    "index": "kadeloper_index.png"
+   },
+   "cel": [
+    58,
+    42
+   ],
+   "rand_px": 1,
+   "atlas": [
+    464,
+    336
+   ],
+   "animaties": {
+    "staan": {
+     "frames": [
+      [
+       0,
+       0,
+       58,
+       42
+      ],
+      [
+       58,
+       0,
+       58,
+       42
+      ],
+      [
+       116,
+       0,
+       58,
+       42
+      ],
+      [
+       174,
+       0,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      12,
+      12,
+      12,
+      12
+     ],
+     "lus": true,
+     "noot": "staat stil (geen pad, VJ-05 houdt hem tegen); ademt, de stekels wiegen"
+    },
+    "lopen": {
+     "frames": [
+      [
+       0,
+       42,
+       58,
+       42
+      ],
+      [
+       58,
+       42,
+       58,
+       42
+      ],
+      [
+       116,
+       42,
+       58,
+       42
+      ],
+      [
+       174,
+       42,
+       58,
+       42
+      ],
+      [
+       232,
+       42,
+       58,
+       42
+      ],
+      [
+       290,
+       42,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+     ],
+     "lus": true,
+     "noot": "48 ticks per cyclus; bij 0,5 px/tick (D = 60) 24 px per cyclus, 12 px per stap. Verlicht (0,25): ticks x 2"
+    },
+    "haak_aanloop": {
+     "frames": [
+      [
+       0,
+       84,
+       58,
+       42
+      ],
+      [
+       58,
+       84,
+       58,
+       42
+      ],
+      [
+       116,
+       84,
+       58,
+       42
+      ],
+      [
+       174,
+       84,
+       58,
+       42
+      ],
+      [
+       232,
+       84,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      7,
+      7,
+      7,
+      6,
+      3
+     ],
+     "lus": false,
+     "stuurt": "windup_progress: frame 0-3 op kwarten van (aanloop - 3); frame 4 (uithaal) de laatste 3 ticks",
+     "ticks_verlicht": [
+      10,
+      9,
+      9,
+      9,
+      3
+     ]
+    },
+    "haak_slag": {
+     "frames": [
+      [
+       0,
+       126,
+       58,
+       42
+      ],
+      [
+       58,
+       126,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      3,
+      3
+     ],
+     "lus": false,
+     "noot": "het verste frame: de haak op de verste rand van het vlak (x 28), valt samen met de actieve ticks"
+    },
+    "haak_herstel": {
+     "frames": [
+      [
+       0,
+       168,
+       58,
+       42
+      ],
+      [
+       58,
+       168,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      10,
+      10
+     ],
+     "lus": false,
+     "volgt": "lopen"
+    },
+    "stil": {
+     "frames": [
+      [
+       0,
+       210,
+       58,
+       42
+      ],
+      [
+       58,
+       210,
+       58,
+       42
+      ],
+      [
+       116,
+       210,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      4,
+      18,
+      8
+     ],
+     "lus": false,
+     "noot": "VJ-04: stil na een treffer (30): schok, knik (lijf 1 px lager, ogen een streep, kern dooft een tint), terug"
+    },
+    "dood": {
+     "frames": [
+      [
+       0,
+       252,
+       58,
+       42
+      ],
+      [
+       58,
+       252,
+       58,
+       42
+      ],
+      [
+       116,
+       252,
+       58,
+       42
+      ],
+      [
+       174,
+       252,
+       58,
+       42
+      ],
+      [
+       232,
+       252,
+       58,
+       42
+      ],
+      [
+       290,
+       252,
+       58,
+       42
+      ],
+      [
+       348,
+       252,
+       58,
+       42
+      ],
+      [
+       406,
+       252,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+     ],
+     "lus": false,
+     "noot": "lost op in donker water (combat §9.1); voorstel 48 ticks, daarna niets meer tekenen"
+    },
+    "uit_stoom": {
+     "frames": [
+      [
+       0,
+       294,
+       58,
+       42
+      ],
+      [
+       58,
+       294,
+       58,
+       42
+      ],
+      [
+       116,
+       294,
+       58,
+       42
+      ],
+      [
+       174,
+       294,
+       58,
+       42
+      ],
+      [
+       232,
+       294,
+       58,
+       42
+      ]
+     ],
+     "ticks": [
+      6,
+      6,
+      6,
+      6,
+      6
+     ],
+     "lus": false,
+     "volgt": "lopen",
+     "noot": "adds uit de spuigaten van de Gemaalmeester (add_inactief 30): stoom, silhouet, ogen, rand"
+    }
+   },
+   "offset": [
+    -23,
+    -27
+   ],
+   "offset_links": [
+    -35,
+    -27
+   ],
+   "ten_opzichte_van": "vijand-node (midden van de hurtbox 16 x 24; de vloer ligt 12 px onder de node)",
+   "flip_h": "kijkrichting links (`facing < 0`): flip_h = true en `offset_links`",
+   "noot": "de hurtbox valt op kolom 15-31, rij 15-39 (met de rand); de vloer op rij 39",
+   "z_index": 0
+  },
+  "tell_haak": {
+   "bestanden": {
+    "grijs": "kadeloper_tell_haak_grijs.png",
+    "half": "kadeloper_tell_haak_half.png",
+    "kleur": "kadeloper_tell_haak_kleur.png",
+    "index": "kadeloper_tell_haak_index.png"
+   },
+   "cel": [
+    22,
+    18
+   ],
+   "rand_px": 1,
+   "atlas": [
+    22,
+    54
+   ],
+   "animaties": {
+    "vroeg": {
+     "frames": [
+      [
+       0,
+       0,
+       22,
+       18
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "windup_progress < 0,5"
+    },
+    "laat": {
+     "frames": [
+      [
+       0,
+       18,
+       22,
+       18
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "windup_progress >= 0,5"
+    },
+    "actief": {
+     "frames": [
+      [
+       0,
+       36,
+       22,
+       18
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "is_attack_active()"
+    }
+   },
+   "offset": [
+    -1,
+    -1
+   ],
+   "ten_opzichte_van": "_walker_box().position (linksboven): het vlak valt precies op de inhoud (de cel heeft 1 px rand)",
+   "z_index": 1
+  }
+ },
+ "koppeling": {
+  "lopen / staan": "lopen als hij beweegt (v > 0), anders staan; kijkrichting = facing (flip_h en offset_links)",
+  "_start_windup (Phase.WINDUP)": "haak_aanloop op windup_progress; tell_haak vroeg/laat op _walker_box() van dat moment",
+  "Phase.ACTIVE": "haak_slag; tell_haak actief (onder de sprite: z 1 tegen 0 mag ook, het vlak blijft zichtbaar vóór hem)",
+  "Phase.RECOVER": "haak_herstel, daarna lopen",
+  "stun (VJ-04)": "stil (30 ticks), daarna lopen of staan",
+  "dood (levens 0)": "dood (48 ticks), daarna niets meer tekenen",
+  "add uit een spuigat": "uit_stoom (add_inactief 30) op de plek van het spuigat, daarna lopen",
+  "verlicht (s = 2, VJ-06)": "de kleur-atlas (rand en kern een tint zachter); aanloop met ticks_verlicht (40), lopen trager in de tijd"
+ },
+ "import": {
+  "map": "res://art/animatie/kadeloper/",
+  "texture": "Lossless, mipmaps uit, filter Nearest op het CanvasItem, repeat uit (zoals de Gemaalmeester)",
+  "toestanden": "grijs en half = donkere wijk (s < 2: rand en kern feller, VJ-06) / kleur = verlicht; index = R materiaal-id, G tint*32+16, A 255"
+ }
+}
