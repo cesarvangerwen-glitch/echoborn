@@ -52,6 +52,9 @@ ONE_WAY_T = 6
 ROOM_H = 360
 S1 = dict(x=0, w=640)
 S1_WALL, S1_FLOOR, S1_UP, S1_QUAY_LEFT = 20, 320, 230, 500
+# Het snelluik (deel 3, PR #231): eenrichtingsluik in de gang, x 460..500 op 320; eronder de schacht naar S9.
+SNELLUIK = (460, S1_FLOOR, 40)
+S1_GANG_END = SNELLUIK[0]
 S3 = dict(x=1600, w=960)
 S3_ENTRY_RIGHT, S3_FLOOR, S2_TOP = 1680, 260, 70
 S3_PLATFORMS = [(1820, 190, 120), (2180, 190, 120)]
@@ -76,6 +79,7 @@ def s1_eenrichting(d):
     for h in (30, 60, 90):
         w = tread_90_width(d) if h == 90 else TREAD_W
         out.append((f"B1Trede{h}", "trede", S1_WALL, S1_FLOOR - h, w))
+    out.append(("Snelluik", "snelluik", SNELLUIK[0], SNELLUIK[1], SNELLUIK[2]))   # vast, maar ook een stuk
     return out
 
 
@@ -388,6 +392,31 @@ def trede_stuk():
     return t
 
 
+def snelluik_stuk():
+    """NinePatch 48x16 voor het snelluik (S1, x 460..500, eenrichting van onder): eiken luik in een
+    ijzeren kader, met ringgreep. Links/rechts 16 = kader, midden herhaalbaar. Loopvlak = rij 0."""
+    t = T(48, 16)
+    yy, xx = np.mgrid[0:16, 0:48]
+    t.box(0, 0, 48, 6, "hout", 4)
+    t.fill((yy <= 5) & (xx % 6 == 5), "hout", 2)                       # planken
+    t.fill((yy == 3) & (xx % 6 == 2), "hout", 4)
+    t.box(0, 0, 48, 1, "steen", 7)                                      # hardstenen sponning (loopvlak, licht)
+    t.box(0, 1, 48, 2, "hout", 6)
+    t.box(0, 5, 48, 6, "ijzer", 2)
+    t.box(0, 0, 3, 6, "ijzer", 4)
+    t.box(45, 0, 48, 6, "ijzer", 4)
+    t.fill((yy == 3) & ((xx == 1) | (xx == 46)), "ijzer", 6)            # klinknagels
+    # scharnieren links, ringgreep rechts
+    t.box(4, 2, 12, 4, "ijzer", 2)
+    t.box(4, 2, 12, 3, "ijzer", 4)
+    t.fill(np.abs(np.hypot(xx - 39.5, yy - 3.0) - 1.8) < 0.6, "ijzer", 5)
+    # onderkant: de schacht in, met de balk die het luik draagt
+    t.box(0, 6, 3, 10, "ijzer", 2)
+    t.box(45, 6, 48, 10, "ijzer", 2)
+    t.fill((yy >= 6) & (yy <= 7) & (xx >= 3) & (xx < 45), "raamdonker", 1)
+    return t
+
+
 def ninepatch(t_full, w):
     """Zet een NinePatch-stuk uit op breedte w (links 16, midden herhaald, rechts 16), als de engine doet."""
     assert w >= 32, "eenrichtingsblokken zijn minstens 40 px breed"
@@ -398,7 +427,8 @@ def ninepatch(t_full, w):
     return out
 
 
-EENRICHTING = {"galerij": galerij_stuk(), "trede": trede_stuk()}
+EENRICHTING = {"galerij": galerij_stuk(), "trede": trede_stuk(), "snelluik": snelluik_stuk()}
+EENR_VOLGORDE = ["galerij", "trede", "snelluik"]
 
 
 def kasseien(seed):
@@ -851,13 +881,26 @@ def bouw_s1():
         k.paint(k.rect(S1_WALL - 6, yy0, S1_WALL - 5, yy0 + 4), "speelvlak", "ijzer", 3)
     k.paint(wand & (YY >= 336) & (k.BAY < 0.5), "speelvlak", "klimop", 1)
     k.tegels(lambda i, j, x, y: ("kade_boven_m1" if i % 2 else "kade_boven_m2") if j == 0 else
-             ("kelderbodem_m1" if i % 2 else "kelderbodem_m2"), S1_WALL, S1_FLOOR, S1_QUAY_LEFT, ROOM_H, "speelvlak")
+             ("kelderbodem_m1" if i % 2 else "kelderbodem_m2"), S1_WALL, S1_FLOOR, S1_GANG_END, ROOM_H, "speelvlak")
     k.tegels(lambda i, j, x, y: ("kade_boven_l" if i == 0 else ("kade_boven_m1" if i % 2 else "kade_boven_m2")) if j == 0 else
              ("kade_meerring" if (i, j) == (2, 3) else ("rooster" if (i, j) == (6, 5) else
               ("kade_wand_hoog_m1" if j < 4 else "kade_wand_laag_m2"))),
              S1_QUAY_LEFT, S1_UP, 640, ROOM_H, "speelvlak")
-    k.tegels(lambda i, j, x, y: "baksteen_donker_m1" if (i + j) % 2 else "baksteen_donker_m2", S1_WALL, 344, S1_QUAY_LEFT, ROOM_H, "speelvlak")
-    k.add(k.rect(S1_WALL, 344, S1_QUAY_LEFT, ROOM_H), "speelvlak", -1)
+    k.tegels(lambda i, j, x, y: "baksteen_donker_m1" if (i + j) % 2 else "baksteen_donker_m2", S1_WALL, 344, S1_GANG_END, ROOM_H, "speelvlak")
+    k.add(k.rect(S1_WALL, 344, S1_GANG_END, ROOM_H), "speelvlak", -1)
+    # kopse kant van de gang aan de schacht (x 459): hardsteen, een tint lichter
+    kop = k.rect(S1_GANG_END - 2, S1_FLOOR + 6, S1_GANG_END, ROOM_H)
+    k.paint(kop, "speelvlak", "steen", 3)
+    k.paint(kop & (XX == S1_GANG_END - 1), "speelvlak", "steen", 1)
+    # de schacht onder het snelluik (midden: geen collision), naar S9
+    schacht = k.rect(S1_GANG_END, S1_FLOOR, S1_QUAY_LEFT, ROOM_H)
+    k.tegels(lambda i, j, x, y: "baksteen_donker_m1" if (i + j) % 2 else "baksteen_donker_m2",
+             S1_GANG_END, S1_FLOOR, S1_QUAY_LEFT, ROOM_H, "midden", dt=-1)
+    k.add(schacht & (YY > 334), "midden", -1)
+    k.paint(schacht & (XX >= S1_QUAY_LEFT - 3), "midden", "raamdonker", 1)
+    for ly in range(330, ROOM_H, 8):                # klimijzers in de schacht
+        k.paint(k.rect(474, ly, 486, ly + 1), "midden", "ijzer", 3)
+    k.paint(k.rect(473, 326, 474, ROOM_H) | k.rect(486, 326, 487, ROOM_H), "midden", "ijzer", 2)
     km = k.rect(S1_QUAY_LEFT, S1_UP, 640, ROOM_H)
     k.paint(km & (XX == S1_QUAY_LEFT), "speelvlak", "steen", 2)
     k.paint(km & (XX == S1_QUAY_LEFT + 1) & (YY > S1_UP + 6), "speelvlak", "steen", 4)
@@ -1125,7 +1168,7 @@ def geometrie_controle(img, kamer, blokken):
 
 def blokken_s1(d=D):
     z = keerzone(d)
-    out = [(0, 0, S1_WALL, ROOM_H, False), (S1_WALL, S1_FLOOR, S1_QUAY_LEFT - S1_WALL, ROOM_H - S1_FLOOR, False),
+    out = [(0, 0, S1_WALL, ROOM_H, False), (S1_WALL, S1_FLOOR, S1_GANG_END - S1_WALL, ROOM_H - S1_FLOOR, False),
            (S1_QUAY_LEFT, S1_UP, 640 - S1_QUAY_LEFT, ROOM_H - S1_UP, False)]
     for (_, _, x, y, w) in s1_eenrichting(d):
         out.append((x, y, w, ONE_WAY_T, True))
@@ -1197,19 +1240,21 @@ def export_kamer(k, manifest, extra_lagen=None):
 
 
 def eenrichting_export(manifest):
-    w, h = 48, 32
+    w, h = 48, 16 * len(EENR_VOLGORDE)
     for staat in STATEN:
         img = np.zeros((h, w, 4))
-        for i, soort in enumerate(["galerij", "trede"]):
+        for i, soort in enumerate(EENR_VOLGORDE):
             img[i * 16:(i + 1) * 16] = EENRICHTING[soort].render(staat)
         save(img, os.path.join(UIT_GAME, f"kadewijk_eenrichting_{staat}.png"))
-    items = [(0, 0, EENRICHTING["galerij"]), (0, 16, EENRICHTING["trede"])]
+    items = [(0, 16 * i, EENRICHTING[s_]) for i, s_ in enumerate(EENR_VOLGORDE)]
     D1.index_atlas(items, w, h).save(os.path.join(UIT_GAME, "kadewijk_eenrichting_index.png"))
     manifest["eenrichting"] = dict(
         atlas={s: f"kadewijk_eenrichting_{s}.png" for s in STATEN + ["index"]},
         stukken={"galerij": dict(region=[0, 0, 48, 16], marge_links=16, marge_rechts=16, herhaal="tile"),
-                 "trede": dict(region=[0, 16, 48, 16], marge_links=16, marge_rechts=16, herhaal="tile")},
-        blokken={"S1/Galerij": "galerij", "S1/B1Trede30": "trede", "S1/B1Trede60": "trede", "S1/B1Trede90": "trede"},
+                 "trede": dict(region=[0, 16, 48, 16], marge_links=16, marge_rechts=16, herhaal="tile"),
+                 "snelluik": dict(region=[0, 32, 48, 16], marge_links=16, marge_rechts=16, herhaal="tile")},
+        blokken={"S1/Galerij": "galerij", "S1/B1Trede30": "trede", "S1/B1Trede60": "trede", "S1/B1Trede90": "trede",
+                 "S1/Snelluik": "snelluik"},
         plaatsing="NinePatchRect op Rect2(blok.position, Vector2(blok.size.x, 16)); loopvlak = bovenrand van het blok",
     )
 
@@ -1298,12 +1343,12 @@ def main():
     # eenrichtingsstukken x4 (overzicht)
     ov = []
     for staat in STATEN:
-        a = np.zeros((32, 48, 3)) + D1.BG
-        for i, soort in enumerate(["galerij", "trede"]):
+        a = np.zeros((16 * len(EENR_VOLGORDE), 48, 3)) + D1.BG
+        for i, soort in enumerate(EENR_VOLGORDE):
             r_ = EENRICHTING[soort].render(staat)
             a[i * 16:(i + 1) * 16] = over(a[i * 16:(i + 1) * 16], r_)
         ov.append(a)
-        ov.append(np.zeros((32, 4, 3)) + D1.BG)
+        ov.append(np.zeros((16 * len(EENR_VOLGORDE), 4, 3)) + D1.BG)
     save(np.concatenate(ov, 1), os.path.join(UIT_DOCS, "kadewijk_eenrichting_x4.png"), 4)
 
     print("  metingen (gemiddelde chroma CIELAB, ΔL* loopvlak tegen de 2..6 px erboven):")

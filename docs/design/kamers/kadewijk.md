@@ -1,6 +1,6 @@
 # Kamers: de Kadewijk (wijk 1.3, de slice): S1–S9
 
-Versie 0.4.3 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8, deel 3 S9) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
+Versie 0.4.4 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8, deel 3 S9) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
 
 Bronnen: `docs/design/wereld.md` v0.2 §2 (kamerlijst §2.2, SL-regels §2.3, vijandtypes §2.4, T8a §2.5, acceptatie §2.6), `docs/design/gdd.md` v0.8.2 (§4.3 bouwstenen met D in formules, L-08–L-14, §4.5 normen, §4.8.5 vaste basis, §4.8.7 de langzame lijn met dash), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.3 (§2.6 plaatsing, VJ-01–VJ-08, §3.2 arena), `docs/design/gemaalmeester.md` v0.2.1 (GM-01, GM-07, GM-11), `docs/productie/fase-2-kader.md` v0.4 §4, `docs/tech/ontwerp.md` v0.3 (§3a, §7, §12 "naar T8a"), de visie-review van de CD ([comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), `docs/concept/visie-review/kadewijk/`).
 
@@ -305,7 +305,7 @@ Solo. De run loopt van het begin van S9 (bij de deur van de arena, het hoogwater
 |---|---|---|---|---|
 | S9 → gang S1 met echo | **3004 ticks (50,1 s)** (S9 2953, S1 50) | 2980 | 2996 | — |
 | Zonder echo | 3222 (**1,07×**, marge 2786 ticks tot 2×) | 3221 (1,08×) | 3222 (1,08×) | ≤ 2× (C-15, FK-2): ✓ |
-| **Gaten zonder echo-actie** (#227: rustpunt, B2a → B2b, → Dwaallicht, → E-paar, → B1, → SLICE_EIND) | **656** / 246 / 524 / 590 / **597** / 390 (rustpunt 10,9 s, daarna ≤ 9,9 s) | 682 / 238 / 550 / 591 / 562 / 356 | **712** / 246 / 588 / **597** / 526 / 326 | rustpunt ≤ 720 (± 12 s), daarna ≤ 600 (± 10 s): ✓ (test; krap, zie §9) |
+| **Gaten zonder echo-actie** (#227: rustpunt, B2a → B2b, → Dwaallicht, → E-paar, → B1, → SLICE_EIND) | **656** / 246 / 524 / 590 / **597** / 390 (rustpunt 10,9 s, daarna ≤ 9,9 s) | 682 / 238 / 550 / 591 / 562 / 356 | **712** / 246 / 588 / **597** / 526 / 326 | rustpunt ≤ 720 (± 12 s), daarna ≤ 600 (± 10 s): ✓ (test bij D = 60, rapport bij de andere D, [Lead-review #239](https://github.com/cesarvangerwen-glitch/echoborn/pull/239#issuecomment-6840184277); krap, zie §9) |
 | Keren / langzame lijn zonder dash: B2a, B2b (pijler), B1 (grachtwand) | **68 / 104 (+36, 1,53×)** elk (B1 105) | 95 / 145 (+50) | 124–133 / 186 (+53 … +62) | ≥ 30, ≤ 2× (gdd §4.3): ✓ |
 | Snelste langzame lijn met dash (W-12, n = 4 … 24), B2a, B2b, B1 | **94 (+26, 1,38×)** elk (dash 8; dash 4 mist) | — | — | ≥ 20, ≤ 2× (gdd §4.8.7): ✓ (alleen D = 60, [Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983); de andere D dekken de maatcheck en S5/S1) |
 | Bounce / landing (van de wand) | 54 / 120 | 122 / 190 | 166–182 / 234–250 | landing ≥ Z + 8 |
@@ -370,7 +370,7 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 | 16 | **De brugpijler (B2, twee verdiepingen) op de lage kade**, niet in de opzet van §9 v0.3.1. Zonder haalde S9 MP-2 per kamer niet: **2,93 per min** (één bounce en één ketting in 41 s, waarvan ± 29 s lopen over 3500 px kade). Met de pijler 4,9 per min. De pijler gebruikt de maten van B2 in S5 (schacht 480, `b2_keerzone`) | **Akkoord** ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)): MP-2 4,9 met de maten van B2 en de eis bij keren bij elke D; of de ± 29 s kade past, is een vraag voor de CD |
 | 17 | **De lage kade op 635** in plaats van 620 (voorstel §9 v0.3.1): 45 boven de vloer bij de deur (één trede, FK-6), en onder het luik 49 px vrij boven de benedenkade (700) | **Akkoord** ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)): FK-6, één trede van 45 |
 | 18 | **Placeholders van de WLD**: het hoogwater (een blok tot `s = 2`), `SLICE_EIND` (in `kadewijk.gd` als P1 van S9 op de gang van S1 staat), logbladzijde 3 (een markering; `LOGBLAD` in de meetlog), `lit` van het E-paar met de hand. De echte objecten (trap 2, `Diepwater`/`Sluis`, de pick-up) zijn van de GP | Ter info ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)) |
-| 19 | **S9 na de visie-review (#227, voorstel A; de plaatsing van vijanden is van de Combat Designer)**: (a) de pijler 240 px naar de deur (x 2760–3300; WLD), zodat het rustpunt na de boss ≤ ± 12 s is bij elke D; (b) **een Dwaallicht erbij** boven de kade op x 2310 (verlicht, baan 32, 40 px boven de kade; nieuw in S9, §2.6 noemt alleen het E-paar); (c) **het E-paar van x 1700 naar 1060**. Zonder (b) haalt geen plaatsing van het E-paar "geen gat > ± 10 s" na een korter rustpunt: van de pijler tot B1 is ± 23 s lopen. Nog steeds 3 vijandtypes, ≤ 5 tegelijk. De gaten zitten krap onder 600 (590–597 bij D = 60 en 180) | — (voor de LGD; de Combat Designer ter info) |
+| 19 | **S9 na de visie-review (#227, voorstel A; de plaatsing van vijanden is van de Combat Designer)**: (a) de pijler 240 px naar de deur (x 2760–3300; WLD), zodat het rustpunt na de boss ≤ ± 12 s is bij elke D; (b) **een Dwaallicht erbij** boven de kade op x 2310 (verlicht, baan 32, 40 px boven de kade; nieuw in S9, §2.6 noemt alleen het E-paar); (c) **het E-paar van x 1700 naar 1060**. Zonder (b) haalt geen plaatsing van het E-paar "geen gat > ± 10 s" na een korter rustpunt: van de pijler tot B1 is ± 23 s lopen. Nog steeds 3 vijandtypes, ≤ 5 tegelijk. De gaten zitten krap onder 600 (590–597 bij D = 60 en 180) | **Akkoord** ([Lead-review #239](https://github.com/cesarvangerwen-glitch/echoborn/pull/239#issuecomment-6840184277)); de Combat Designer ter info |
 
 **Visie-review van S5–S7** (CD, [comment in #227](https://github.com/cesarvangerwen-glitch/echoborn/issues/227#issuecomment-6835171911), bot-doorloop op D = 60; één regel per kamer):
 
@@ -401,7 +401,7 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 | S3 | **Maatvast** na de merge van #217 (LGD bevestigt): bots groen, `past`; het lege stuk na golf 2 is een punt, geen herontwerp |
 | S4 | **Maatvast** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): bots groen, `Visie-review: past` (#212), afwijking 7 akkoord (#220) |
 | S5, S6 | **Maatvast** (#228 gemerged; LGD, #227): bots groen, `Visie-review: past`, besluiten 2 en 3 |
-| S7 | **Kandidaat → maatvast als de LGD het bevestigt**: de schaduwklep is er (#232) en de CD gaf bij de her-review `past` ([comment in #227](https://github.com/cesarvangerwen-glitch/echoborn/issues/227#issuecomment-6839394512)) |
+| S7 | **Maatvast** ([Lead-review #239](https://github.com/cesarvangerwen-glitch/echoborn/pull/239#issuecomment-6840184277)): de schaduwklep is er (#232), `Visie-review: past` na de her-review (#227), bots groen |
 | S8 | **Kandidaat voor de maten**: de arena volgt GM-01 en §3.2; maatvast pas met de boss erin (GP, B-9 in de arena) |
 | S9 | **Kandidaat**: bots groen (§6c), afwijking 14–18 akkoord (#231); de CD gaf "past niet" (#227), aangepast volgens voorstel A (afwijking 19), wacht op de her-review van de doorloop |
 
@@ -448,7 +448,9 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 
 **Creative Director:** visie-review van S5–S7 (§3b–§3d; in de run van deel 2 bij D = 60: S5 tick ± 3005–4310, S6 ± 4310–4810). S2 en S4: "past" (#212, gedaan). S9: ~~past dat bij "de wijk is je beloning"?~~ "past niet" (#227); aangepast (afwijking 19), **her-review van de doorloop van S9** (§6c: rustpunt 10,9 s, daarna ≤ 9,9 s).
 
-**Lead Game Designer (#227):** afwijking 19 (het Dwaallicht erbij en het E-paar verplaatst, terrein van de Combat Designer). De gaten zitten krap onder ± 10 s (590–597 ticks): een kleine wijziging in S9 kan de test van de gaten rood maken; ruimer kan met een kortere kade (voorstel B van de CD) of een tweede moment op de benedenkade.
+**Lead Game Designer (#227):** ~~afwijking 19~~ akkoord ([Lead-review #239](https://github.com/cesarvangerwen-glitch/echoborn/pull/239#issuecomment-6840184277)).
+
+**Gaten in S9 (besluit LGD, [Lead-review #239](https://github.com/cesarvangerwen-glitch/echoborn/pull/239#issuecomment-6840184277)):** de gaten zitten krap onder ± 10 s (590–597 ticks bij D = 60). Brengt een wijziging een gat boven 600, kijk dan eerst naar **voorstel B van de CD** (een kortere kade, of een korte val of trede naar de benedenkade), **niet naar een ruimere grens**. De test is hard bij D = 60; bij 120 en 180 rapport.
 
 **Lead Game Designer (deel 3):** ~~afwijking 14–17~~ akkoord ([Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983)).
 
@@ -475,6 +477,7 @@ Besluiten: D = 60 als werkaanname, bereik 1–3 s, en fase 2 parallel, ook bouwe
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie: S1–S4 als grijze kamers, bot en tests bij D = 60 (120/180 regressie) |
 | 0.1.1 | 2026-11-12 | Lead-review #208: langzame lijn met dash gemeten bij 60/90/120 (§6), besluiten van de LGD per afwijking en maatvast-stand per kamer (§8), open punten bijgewerkt (§9) |
+| 0.4.4 | 2026-11-13 | [Lead-review #239](https://github.com/cesarvangerwen-glitch/echoborn/pull/239#issuecomment-6840184277): afwijking 19 akkoord, S7 maatvast; de gaten-test hard bij D = 60 en rapport bij 120/180 (§6c); §9: bij een gat boven 600 eerst voorstel B. Merge met `main` (#236–#238) |
 | 0.4.3 | 2026-11-13 | [#227](https://github.com/cesarvangerwen-glitch/echoborn/issues/227), visie-review S9 "past niet": voorstel A gebouwd (§3f): de pijler naar de deur (rustpunt ≤ 12 s), een Dwaallicht boven de kade, het E-paar naar x 1060; gat-meting in `test_kadewijk_s9.gd` (§6c). Afwijking 19 (§8). §8: S7 "past" na de her-review, S9 "past niet → aangepast", S5 en S6 maatvast |
 | 0.4.2 | 2026-11-12 | Merge met `main` na #229 (de Gemaalmeester in S8, GP) en #230 (art S1/S3, TA): §3e, §6b en §9 van de GP en de S9-delen samen; `BOSS_START` is een besluit van de LGD (#229) in plaats van een werkaanname van de GP |
 | 0.4.1 | 2026-11-12 | [Lead-review #231](https://github.com/cesarvangerwen-glitch/echoborn/pull/231#issuecomment-6836179983): besluiten bij afwijking 14–18 (§8); kleine punten: maatcheck van de pijler per D en W-12 voor de drie keerpunten van S9 bij D = 60 (§6c). Visie-review S5–S7 (#227) per kamer en de besluiten 1–3 van de LGD (§8), maatvast-stand, open punten (§9) |

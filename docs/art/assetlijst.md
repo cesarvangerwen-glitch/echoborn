@@ -61,7 +61,9 @@ Doel: de flownormen van pillar 1 meten (sprongketen, merk-arena, één gemaal). 
 | Kleurscript en lichtovergang (studie) | `docs/art/slice/kleurscript_*`, `lichtovergang_*` | Placeholder (deel 1 van #85) |
 | S-04 tileset Kadewijk, eerste set (46 tegels) en props (pomprad 8f, straatlamp, halo, boograam, bolder, sluisbalk), 3 toestanden + index-atlas | `docs/art/slice/tiles/` | Placeholder (deel 1 van #85) |
 | S-03 / S-13 concept: 3 vijandtypes en de Gemaalmeester (stijlregels) | `docs/art/slice/concept_*` | Concept (deel 1 van #85) |
-| S-04/S-05/S-06/S-07 voor **S1 Kade-ingang en S3 Vismarkt**: kamerlagen (achter, midden, speelvlak, licht, voor) in grijs, half en kleur plus index, NinePatch-stukken voor de eenrichtingsblokken per D, manifest | `game/art/wereld/kadewijk/`, renders in `docs/art/slice/eindkwaliteit/`, `slice-kadewijk.md` §9 | **Eindkwaliteit** (deel 2 van #85); de koppeling aan de scènes volgt (TA) |
+| S-04/S-05/S-06/S-07 voor **S1 Kade-ingang en S3 Vismarkt**: kamerlagen (achter, midden, speelvlak, licht, voor) in grijs, half en kleur plus index, NinePatch-stukken voor de eenrichtingsblokken per D, manifest | `game/art/wereld/kadewijk/`, renders in `docs/art/slice/eindkwaliteit/`, `slice-kadewijk.md` §9 | **Eindkwaliteit** (deel 2 van #85); gekoppeld in #230 (TA) |
+| S-04/S-05/S-06/S-07 voor **S2 Kadegang en S4 Brugkloof**, het snelluik van S1 en de vaste stukken per D (B3-wand, B3-blok) | `game/art/wereld/kadewijk/`, `slice-kadewijk.md` §10 | **Eindkwaliteit** (deel 3 van #85); koppeling S2/S4 volgt (TA) |
+| Schaduwklep (V-01d), 3 frames | `game/art/wereld/kadewijk/kadewijk_objecten_*.png` | **Eindkwaliteit** (deel 3 van #85); koppeling TA met GP |
 
 ## 4. Open punten
 

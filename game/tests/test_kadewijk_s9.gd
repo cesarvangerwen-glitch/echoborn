@@ -16,7 +16,8 @@ extends RefCounted
 ##   MP-2 per kamer, zonder echo hooguit 2× (C-15, FK-2), en keren bij B1
 ##   ≥ 30 ticks sneller dan de langzame lijn zonder dash en ≤ 2× (gdd §4.3).
 ## - De gaten zonder echo-actie (visie-review CD, #227, voorstel A): het rustpunt
-##   na de boss ≤ ± 12 s, daarna geen gat > ± 10 s.
+##   na de boss ≤ ± 12 s, daarna geen gat > ± 10 s; getoetst bij D = 60, bij de
+##   andere D gerapporteerd (Lead-review #239).
 ## - Het hoogwater houdt de lage kade dicht tot `s = 2`; een gewone slag opent
 ##   het luik niet (SL-04, L-03); de trap naar het plein werkt omhoog en omlaag;
 ##   het snelluik in S1 is eenrichting (van boven sta je erop).
@@ -316,9 +317,13 @@ func _check_echo_run(t, d: int, out: Array) -> void:
 	var bot = out[0][1]
 	var rep = out[1]
 	var gaps := _gaps(rep)
-	t.check(gaps.size() >= 2 and gaps[0] <= RUST_MAX, "D=%d S9: rustpunt (deur → eerste echo-actie) %d ticks (≤ %d, ± 12 s; CD #227)" % [d, gaps[0] if gaps.size() else -1, RUST_MAX])
 	var rest := gaps.slice(1)
-	t.check(not rest.is_empty() and rest.max() <= GAT_MAX, "D=%d S9: langste gat buiten het rustpunt %d ticks (≤ %d, ± 10 s; CD #227), gaten %s" % [d, rest.max() if rest.size() else -1, GAT_MAX, gaps])
+	# Hard bij D = 60 (de gekozen D); bij de andere D rapport (Lead-review #239).
+	if d == 60:
+		t.check(gaps.size() >= 2 and gaps[0] <= RUST_MAX, "D=%d S9: rustpunt (deur → eerste echo-actie) %d ticks (≤ %d, ± 12 s; CD #227)" % [d, gaps[0] if gaps.size() else -1, RUST_MAX])
+		t.check(not rest.is_empty() and rest.max() <= GAT_MAX, "D=%d S9: langste gat buiten het rustpunt %d ticks (≤ %d, ± 10 s; CD #227), gaten %s" % [d, rest.max() if rest.size() else -1, GAT_MAX, gaps])
+	else:
+		t.note("D=%d S9: rustpunt %d (norm bij D = 60: ≤ %d), langste gat daarna %d (≤ %d) (rapport)" % [d, gaps[0] if gaps.size() else -1, RUST_MAX, rest.max() if rest.size() else -1, GAT_MAX])
 	t.note("D=%d S9: gaten zonder echo-actie %s ticks (rustpunt %.1f s, daarna langste %.1f s)" % [d, gaps, gaps[0] / 60.0, rest.max() / 60.0 if rest.size() else 0.0])
 	for n: String in S9_TURNS:
 		t.check(bot.lines.get(n, false), "D=%d %s: niet via de echolijn (L-08)" % [d, n])

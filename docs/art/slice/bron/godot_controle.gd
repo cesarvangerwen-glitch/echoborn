@@ -1,6 +1,7 @@
 extends SceneTree
-## Controle van de Art Director (#85, deel 2): zet de kamerlagen van S1/S3 en de
-## eenrichtingsstukken op de blokken van `Layout.blocks()` in Godot 4.6, tekent de
+## Controle van de Art Director (#85, deel 2 en 3): zet de kamerlagen van S1–S4 en de
+## eenrichtingsstukken (en in S2 de vaste stukken per D) op de blokken van
+## `Layout.blocks()` in Godot 4.6, tekent de
 ## collision-randen erover (cyaan = vast, geel = eenrichting) en bewaart een PNG.
 ## Geen spelcode: alleen een voorbeeld van de koppeling voor de Technical Artist
 ## (`docs/art/slice-kadewijk.md` §9.4). Laadt de PNG's met `Image.load_from_file`,
@@ -24,7 +25,7 @@ func _init() -> void:
 	var staat: String = args[1]
 	var d := int(args[2])
 	var out: String = args[3]
-	var naam: String = {&"S1": "s1_kade_ingang", &"S3": "s3_vismarkt"}[room]
+	var naam: String = {&"S1": "s1_kade_ingang", &"S2": "s2_kadegang", &"S3": "s3_vismarkt", &"S4": "s4_brugkloof"}[room]
 	var r: Rect2 = Layout.ROOMS[room]
 	var vp := SubViewport.new()
 	vp.size = Vector2i(int(r.size.x), int(r.size.y))
@@ -44,20 +45,33 @@ func _init() -> void:
 		s.position = r.position
 		world.add_child(s)
 		if laag == "speelvlak":
+			var m: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(DIR + "kadewijk_kamers.json"))
+			# vaste stukken per D (S2: de rand van de B3-wand en het B3-blok; deel 3)
+			var b3 := maxi(d - 60, 0)
+			if room == &"S2":
+				var wand := Sprite2D.new()
+				wand.texture = tex(m["vaste_stukken"]["S2/B3Wand"]["bestanden"][staat])
+				wand.centered = false
+				wand.position = Vector2(1250 + b3, 76)
+				world.add_child(wand)
+				if b3 > 0:
+					var blok := Sprite2D.new()
+					blok.texture = tex(m["vaste_stukken"]["S2/B3Blok"]["bestanden"][staat])
+					blok.centered = false
+					blok.region_enabled = true
+					blok.region_rect = Rect2(0, 0, b3, 45)
+					blok.position = Vector2(1250, 185)
+					world.add_child(blok)
 			var atlas := tex("kadewijk_eenrichting_%s.png" % staat)
 			for spec: Array in Layout.blocks(room, d):
-				var nm := str(spec[0])
-				var soort := ""
-				if nm == "Galerij":
-					soort = "galerij"
-				elif nm.begins_with("B1Trede"):
-					soort = "trede"
+				var soort: String = m["eenrichting"]["blokken"].get("%s/%s" % [room, spec[0]], "")
 				if soort == "":
 					continue
+				var reg: Array = m["eenrichting"]["stukken"][soort]["region"]
 				var rc: Rect2 = spec[1]
 				var np := NinePatchRect.new()
 				np.texture = atlas
-				np.region_rect = Rect2(0, 0 if soort == "galerij" else 16, 48, 16)
+				np.region_rect = Rect2(reg[0], reg[1], reg[2], reg[3])
 				np.patch_margin_left = 16
 				np.patch_margin_right = 16
 				np.axis_stretch_horizontal = NinePatchRect.AXIS_STRETCH_MODE_TILE

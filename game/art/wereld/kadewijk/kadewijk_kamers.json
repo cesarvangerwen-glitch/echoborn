@@ -1,5 +1,5 @@
 {
- "versie": "0.2",
+ "versie": "0.3",
  "eigenaar": "Art Director",
  "issue": 85,
  "d_render": 60,
@@ -196,6 +196,146 @@
     }
    ],
    "ramen": 137
+  },
+  "s2_kadegang": {
+   "wereld_rect": [
+    640,
+    0,
+    960,
+    360
+   ],
+   "lagen": [
+    {
+     "naam": "achter",
+     "z_index": -30,
+     "bestanden": {
+      "grijs": "s2_kadegang_achter_grijs.png",
+      "half": "s2_kadegang_achter_half.png",
+      "kleur": "s2_kadegang_achter_kleur.png",
+      "index": "s2_kadegang_achter_index.png"
+     }
+    },
+    {
+     "naam": "midden",
+     "z_index": -20,
+     "bestanden": {
+      "grijs": "s2_kadegang_midden_grijs.png",
+      "half": "s2_kadegang_midden_half.png",
+      "kleur": "s2_kadegang_midden_kleur.png",
+      "index": "s2_kadegang_midden_index.png"
+     }
+    },
+    {
+     "naam": "speelvlak",
+     "z_index": -10,
+     "bestanden": {
+      "grijs": "s2_kadegang_speelvlak_grijs.png",
+      "half": "s2_kadegang_speelvlak_half.png",
+      "kleur": "s2_kadegang_speelvlak_kleur.png",
+      "index": "s2_kadegang_speelvlak_index.png"
+     }
+    },
+    {
+     "naam": "licht",
+     "z_index": -5,
+     "bestanden": {
+      "grijs": "s2_kadegang_licht_grijs.png",
+      "half": "s2_kadegang_licht_half.png",
+      "kleur": "s2_kadegang_licht_kleur.png"
+     }
+    }
+   ],
+   "lampen": [
+    {
+     "x": 1518,
+     "y": 164,
+     "straal_band1": 80,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 848,
+     "y": 190,
+     "straal_band1": 80,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    }
+   ],
+   "ramen": 71
+  },
+  "s4_brugkloof": {
+   "wereld_rect": [
+    2560,
+    0,
+    960,
+    360
+   ],
+   "lagen": [
+    {
+     "naam": "achter",
+     "z_index": -30,
+     "bestanden": {
+      "grijs": "s4_brugkloof_achter_grijs.png",
+      "half": "s4_brugkloof_achter_half.png",
+      "kleur": "s4_brugkloof_achter_kleur.png",
+      "index": "s4_brugkloof_achter_index.png"
+     }
+    },
+    {
+     "naam": "midden",
+     "z_index": -20,
+     "bestanden": {
+      "grijs": "s4_brugkloof_midden_grijs.png",
+      "half": "s4_brugkloof_midden_half.png",
+      "kleur": "s4_brugkloof_midden_kleur.png",
+      "index": "s4_brugkloof_midden_index.png"
+     }
+    },
+    {
+     "naam": "speelvlak",
+     "z_index": -10,
+     "bestanden": {
+      "grijs": "s4_brugkloof_speelvlak_grijs.png",
+      "half": "s4_brugkloof_speelvlak_half.png",
+      "kleur": "s4_brugkloof_speelvlak_kleur.png",
+      "index": "s4_brugkloof_speelvlak_index.png"
+     }
+    },
+    {
+     "naam": "licht",
+     "z_index": -5,
+     "bestanden": {
+      "grijs": "s4_brugkloof_licht_grijs.png",
+      "half": "s4_brugkloof_licht_half.png",
+      "kleur": "s4_brugkloof_licht_kleur.png"
+     }
+    }
+   ],
+   "lampen": [
+    {
+     "x": 2740,
+     "y": 220,
+     "straal_band1": 80,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 3320,
+     "y": 220,
+     "straal_band1": 80,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    }
+   ],
+   "ramen": 136
   }
  },
  "eenrichting": {
@@ -227,13 +367,29 @@
     "marge_links": 16,
     "marge_rechts": 16,
     "herhaal": "tile"
+   },
+   "snelluik": {
+    "region": [
+     0,
+     32,
+     48,
+     16
+    ],
+    "marge_links": 16,
+    "marge_rechts": 16,
+    "herhaal": "tile"
    }
   },
   "blokken": {
    "S1/Galerij": "galerij",
    "S1/B1Trede30": "trede",
    "S1/B1Trede60": "trede",
-   "S1/B1Trede90": "trede"
+   "S1/B1Trede90": "trede",
+   "S1/Snelluik": "snelluik",
+   "S2/Galerij70": "galerij",
+   "S2/B1Trede30": "trede",
+   "S2/B1Trede60": "trede",
+   "S2/B1Trede90": "trede"
   },
   "plaatsing": "NinePatchRect op Rect2(blok.position, Vector2(blok.size.x, 16)); loopvlak = bovenrand van het blok"
  },
@@ -242,5 +398,60 @@
   "texture": "Lossless, mipmaps uit, filter Nearest op het CanvasItem (texture_filter = NEAREST), repeat uit",
   "positie": "Sprite2D, centered = false, global_position = wereld_rect.position (linksboven van de kamer)",
   "toestanden": "grijs / half / kleur; index = R materiaal-id, G tint*32+16, B 255 = raam, A 255"
+ },
+ "vaste_stukken": {
+  "S2/B3Wand": {
+   "plaatsing": "Sprite2D, linksboven op (B3_BLOCK_LEFT + b3_width(D), S2_TOP + ONE_WAY_T) = (1250 + b, 76); z -10",
+   "reden": "de kopse kant van de pakhuismuur is de B3-keerwand en schuift mee met D",
+   "bestanden": {
+    "grijs": "s2_kadegang_b3_wand_grijs.png",
+    "half": "s2_kadegang_b3_wand_half.png",
+    "kleur": "s2_kadegang_b3_wand_kleur.png",
+    "index": "s2_kadegang_b3_wand_index.png"
+   }
+  },
+  "S2/B3Blok": {
+   "plaatsing": "Sprite2D met region_enabled, region = (0, 0, b3_width(D), 45), linksboven op (1250, 185); alleen bij D > 60; z -10",
+   "reden": "het B3-blok bestaat pas bij D > 60",
+   "bestanden": {
+    "grijs": "s2_kadegang_b3_blok_grijs.png",
+    "half": "s2_kadegang_b3_blok_half.png",
+    "kleur": "s2_kadegang_b3_blok_kleur.png",
+    "index": "s2_kadegang_b3_blok_index.png"
+   }
+  }
+ },
+ "objecten": {
+  "atlas": {
+   "grijs": "kadewijk_objecten_grijs.png",
+   "half": "kadewijk_objecten_half.png",
+   "kleur": "kadewijk_objecten_kleur.png",
+   "index": "kadewijk_objecten_index.png"
+  },
+  "schaduwklep": {
+   "frames": [
+    [
+     0,
+     0,
+     40,
+     16
+    ],
+    [
+     40,
+     0,
+     40,
+     16
+    ],
+    [
+     80,
+     0,
+     40,
+     16
+    ]
+   ],
+   "fps": 12,
+   "plaatsing": "Sprite2D op de rechthoek van het luik (Luik, 40 x 16), linksboven; zichtbaar zolang de schaduwklep bestaat (laag 5); bij `schaduwklep_weg` de frames 1 en 2 afspelen, dan weg",
+   "z_index": -9
+  }
  }
 }
