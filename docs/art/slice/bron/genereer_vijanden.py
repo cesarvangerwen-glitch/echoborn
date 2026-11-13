@@ -89,7 +89,7 @@ def afwerk(c, dk, randdeel):
     boven = np.vstack([np.zeros((1, c.w), bool), randdeel[:-1]])     # de rand volgt de rug, de stekels staan erop
     top = s & ~boven & randdeel & (c.mat == MI["vijandlijf"])
     onder = np.vstack([np.zeros((1, c.w), bool), top[:-1]]) & s & ~top & (c.mat == MI["vijandlijf"])
-    c.put(onder, "vijandkern", 5 if dk else 4)
+    c.put(onder, "vijandkern", 5 if dk else 6)           # kleur: kern 6 (Lead-review AD op PR #275; was 4)
     c.put(top, "vijandkern", 7)
     cont = ndimage.binary_dilation(s) & ~s & (c.mat < 0)
     c.mat[cont] = MI["vijandlijf"]
@@ -404,8 +404,9 @@ def uit_stoom(staat, i, schot):
         s = c.solid.copy()
         c.mat[s], c.t[s] = MI["vijandlijf"], 0 if i < 2 else 1
         c.lijf[:] = False
-        if i == 0:
-            c.wis(s)
+        if i == 0:                                       # alleen stoom, zonder contour (geen beeldtaal van de echo)
+            c.mat[:] = -1
+            c.solid[:] = False
         if i == 2:
             ogen = c.rect(13, 9, 16, 11) & (c.BAY < 0.5)
             c.put(ogen & s, "vijandkern", 6, lijf=False)
@@ -913,9 +914,10 @@ def metingen(KM):
             top = masker(c, x, y, h, w, lambda q: bovenrand_van(q, 1))
             kern = masker(c, x, y, h, w, lambda q: (q.mat == MI["vijandkern"]) & (q.t >= 4) & ~bovenrand_van(q, 2))
             lijf = masker(c, x, y, h, w, lambda q: q.mat == MI["vijandlijf"])
+            cont = masker(c, x, y, h, w, lambda q: (q.mat == MI["vijandlijf"]) & (q.t == 0) & ~q.solid)
             rijen.append(dict(kamer=id_, type=typ, x=wx, wat=wat, staat=staat,
                               bovenrand=ring_dl(L, L0, m, top), kern=ring_dl(L, L0, m, kern),
-                              lijf=ring_dl(L, L0, m, lijf, 50)))
+                              lijf=ring_dl(L, L0, m, lijf, 50), contour=ring_dl(L, L0, m, cont, 50)))
     return rijen
 
 
@@ -1042,9 +1044,12 @@ def kamers_blad(KM):
     """Alle plekken uit combat §2.6 in grijs en kleur, met de vijand op zijn plek (staan/zweven)."""
     per = {}
     for (id_, typ, wx, wy, kant, wat) in PLEKKEN:
-        per.setdefault(id_, []).append((typ, wx, wy, kant))
+        sleutel = id_ if id_ != "S9" else f"S9 {'E-PAAR' if wx < 2000 else 'DWAALLICHT'}"
+        per.setdefault(sleutel, []).append((id_, typ, wx, wy, kant))
     delen = []
-    for id_, lst in per.items():
+    for naam, lst in per.items():
+        id_ = lst[0][0]
+        lst = [q[1:] for q in lst]
         rx, ry = int(B[id_]["rect"][0]), int(B[id_]["rect"][1])
         cx = int(np.mean([wx for _, wx, _, _ in lst])) - rx
         cy = int(np.mean([wy for _, _, wy, _ in lst])) - ry - 20
@@ -1059,7 +1064,7 @@ def kamers_blad(KM):
                 items.append((c, *plaats(typ, c, wx, wy, kant, id_)))
             beelden.append(scene(KM, id_, staat, items, cx, cy, w, 80))
         rij = np.concatenate([beelden[0], np.zeros((80, 4, 3)) + D1.BG, beelden[1]], 1)
-        delen.append((id_, rij))
+        delen.append((naam, rij))
     W = max(r.shape[1] for _, r in delen)
     out = []
     for id_, r in delen:
@@ -1268,10 +1273,10 @@ def main():
     D2.save(kamers_blad(KM), os.path.join(UIT_DOCS, "vijanden_in_de_kamers_x2.png"), 2)
 
     met = metingen(KM)
-    print("  ΔL* tegen de ring van 2-6 px (bible §6 regel 4, deel 1 §4.2): bovenrand p90 / kern p90 / lijf mediaan")
+    print("  ΔL* tegen de ring van 2-6 px (bible §6 regel 4, deel 1 §4.2): bovenrand p90 / kern p90 / lijf mediaan / contour mediaan")
     for r in met:
         print(f"    {r['kamer']} {r['type']:11s} x {r['x']:5.0f} {r['wat']:20s} {r['staat']:6s} "
-              f"{r['bovenrand']:5.1f} {r['kern']:5.1f} {r['lijf']:5.1f}")
+              f"{r['bovenrand']:5.1f} {r['kern']:5.1f} {r['lijf']:5.1f} {r['contour']:5.1f}")
     tm = tell_metingen(KM)
     print("  tells: ΔL* van het vlak met/zonder tell (gemiddeld) / van de gezette pixels (mediaan)")
     for r in tm:
