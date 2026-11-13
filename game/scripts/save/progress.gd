@@ -3,7 +3,7 @@ extends Node
 ## voortgang van het spel dat nu loopt. Enige bron voor een save.
 ##
 ## Twee lagen:
-## - `scripts/save/game_state.gd` (`GameState`) is het schema (v1): de inhoud
+## - `scripts/save/game_state.gd` (`GameState`) is het schema (v2): de inhoud
 ##   van één save, een `RefCounted` die je maakt, vergelijkt en wegschrijft.
 ## - Deze node (autoload `Progress`) houdt de huidige inhoud vast in `state`,
 ##   weet in welk slot het spel loopt, en kent de delen van de wereld die hun
@@ -113,7 +113,7 @@ func bind_gemaal(gemaal: Node, id: StringName) -> void:
 func unbind_gemaal(gemaal: Node, id: StringName) -> void:
 	if _gemalen.get(id) != gemaal:
 		return
-	state.set_gemaal(id, gemaal.fill, gemaal.is_full())
+	_store_gemaal(id, gemaal)
 	_gemalen.erase(id)
 
 
@@ -154,7 +154,9 @@ func has_checkpoint_in_area() -> bool:
 
 
 ## Schrijft de stand van de wereld naar `state`: de objecten in de geladen
-## kamers (`AreaLoader.store_objects`), de lichtmeter en de gemalen.
+## kamers (`AreaLoader.store_objects`), de lichtmeter en de gemalen (met de
+## waterstand van hun wijk). Levenspunten, vaardigheden en verzamelobjecten
+## (schema v2) bindt de Gameplay Programmer nog (ontwerp.md §12).
 ## `SaveService` roept dit vlak vóór elke save aan.
 func store_world() -> void:
 	if is_instance_valid(_loader):
@@ -164,7 +166,15 @@ func store_world() -> void:
 	for id in _gemalen:
 		var gemaal: Node = _gemalen[id]
 		if is_instance_valid(gemaal):
-			state.set_gemaal(id, gemaal.fill, gemaal.is_full())
+			_store_gemaal(id, gemaal)
+
+
+## De stand van een gemaal naar `state`: `G` en `vol`, en de waterstand `s`
+## van zijn wijk (LM-10, schema v2: de id van het gemaal is de id van de
+## wijk, L-14; `s` = het aantal volle trappen, `Gemaal.stand()`).
+func _store_gemaal(id: StringName, gemaal: Node) -> void:
+	state.set_gemaal(id, gemaal.fill, gemaal.is_full())
+	state.set_waterstand(id, gemaal.stand())
 
 
 ## Een checkpoint (E-04b, LM-08): P1 verschijnt na laden op `positie`, in de

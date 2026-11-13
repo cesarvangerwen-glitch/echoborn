@@ -23,17 +23,47 @@ extends Node
 
 const GameState = preload("res://scripts/save/game_state.gd")
 
-## Huidige versie van het schema.
-const VERSION := 1
+## Huidige versie van het schema (v2: LM-12 compleet, ontwerp.md §7).
+const VERSION := 2
 const DEFAULT_DIR := "user://saves"
 
 
 ## Migraties: {van_versie: Callable(data: Dictionary) -> Dictionary}, die
-## versie n naar n + 1 brengen. Nog leeg: v1 is de eerste versie. Een nieuwe
-## versie voegt hier een regel toe en verhoogt VERSION. `read` en `migrate`
-## nemen ook een eigen tabel aan (tests); leeg = deze.
+## versie n naar n + 1 brengen. Een nieuwe versie voegt hier een regel toe en
+## verhoogt VERSION. `read` en `migrate` nemen ook een eigen tabel aan
+## (tests); leeg = deze.
 static func builtin_migrations() -> Dictionary:
-	return {}
+	return {1: func(data: Dictionary) -> Dictionary: return migrate_1_to_2(data)}
+
+
+## v1 → v2 (ontwerp.md §7): de velden van LM-12 die v1 nog niet had.
+## - `levenspunten`: vol, de startwaarde (5, LM-07). v1 kende geen
+##   verzamelobjecten, dus ook geen lampglas.
+## - `waterstanden`: per gemaal (één per wijk, L-14) `s` = het aantal volle
+##   trappen, `floor(vulstand / 100)`, hooguit 2 (LM-08, LM-10). Een vulstand
+##   die geen eindig getal ≥ 0 is, blijft zonder `s`: `GameState.from_dict`
+##   weigert die save toch.
+## - `vaardigheden`: geen; `verzamelobjecten`: geen. De vlaggen van opgepakte
+##   objecten (`<gebied>/<kamer>/<pad>`) blijven in `vlaggen` staan, dus een
+##   opgepakt object blijft weg.
+## Verandert `data` zelf (`migrate` geeft een kopie).
+static func migrate_1_to_2(data: Dictionary) -> Dictionary:
+	data["levenspunten"] = GameState.start_levenspunten()
+	var w := {}
+	var gemalen: Variant = data.get("gemalen")
+	if typeof(gemalen) == TYPE_DICTIONARY:
+		for id in gemalen:
+			var entry: Variant = gemalen[id]
+			if typeof(entry) != TYPE_DICTIONARY:
+				continue
+			var g: Variant = entry.get("vulstand")
+			if (typeof(g) != TYPE_INT and typeof(g) != TYPE_FLOAT) or not is_finite(float(g)) or float(g) < 0.0:
+				continue
+			w[id] = mini(int(floorf(float(g) / GameState.TRAP_G)), GameState.WATERSTAND_MAX)
+	data["waterstanden"] = w
+	data["vaardigheden"] = []
+	data["verzamelobjecten"] = {}
+	return data
 
 
 static func slot_path(slot: int, dir: String = DEFAULT_DIR) -> String:

@@ -1,7 +1,8 @@
 extends RefCounted
-## Tests voor opslaan en laden v1 (T5b, #82; ontwerp.md §7): rondreis exact,
-## atomair schrijven met back-up, versies en migratie, en laden op een
-## checkpoint in de goede kamer met een Lege echo.
+## Tests voor opslaan en laden (T5b, #82; ontwerp.md §7): rondreis exact,
+## atomair schrijven met back-up, versies en migratie (ook de echte 1 → 2),
+## de controles van schema v2, en laden op een checkpoint in de goede kamer
+## met een Lege echo.
 
 const Fx = preload("res://tests/echo_fixture.gd")
 const GameState = preload("res://scripts/save/game_state.gd")
@@ -22,6 +23,8 @@ func _state() -> GameState:
 	state.set_gemaal(&"gemaal_k3", 37, false)
 	state.set_flag(&"sluis_k3_open")
 	state.speeltijd_ticks = 123456
+	state.levenspunten = 4
+	state.set_waterstand(&"gemaal_k3", 0)
 	return state
 
 
@@ -53,7 +56,7 @@ func test_save_roundtrip_exact_and_deterministic(t) -> void:
 	SaveService.write(path, state)
 	t.check(FileAccess.get_file_as_string(path) == first, "tweede save van dezelfde inhoud geeft een ander bestand")
 	t.check(not FileAccess.file_exists(path + ".tmp"), ".tmp blijft staan")
-	t.check(first.contains("\"version\": 1"), "versie niet in het bestand")
+	t.check(first.contains("\"version\": %d" % SaveService.VERSION), "versie niet in het bestand")
 	_clear()
 
 
@@ -83,18 +86,19 @@ func test_save_backup_when_file_is_broken(t) -> void:
 
 
 ## Een save van een nieuwere versie of zonder versie wordt geweigerd; een
-## oudere gaat stap voor stap door de migraties (hier een testmigratie 1 → 2,
-## want v1 is de eerste versie). Een ontbrekende migratie is een fout.
+## oudere gaat stap voor stap door de migraties (hier een eigen testtabel
+## 1 → 2 → 3, los van de echte). Een ontbrekende migratie is een fout.
 func test_save_versions_and_migration(t) -> void:
 	var data := _state().to_dict()
-	data["version"] = 1
+	data["version"] = SaveService.VERSION
 	var errors := PackedStringArray()
-	t.check(SaveService.migrate(data, errors) == data and errors.is_empty(), "v1 → v1 verandert iets: %s" % errors)
+	t.check(SaveService.migrate(data, errors) == data and errors.is_empty(), "huidige versie → zelfde verandert iets: %s" % errors)
 	var future := data.duplicate(true)
-	future["version"] = 2
+	future["version"] = SaveService.VERSION + 1
 	errors = PackedStringArray()
-	t.check(SaveService.migrate(future, errors).is_empty() and errors[0].contains("versie 2"),
+	t.check(SaveService.migrate(future, errors).is_empty() and errors[0].contains("versie %d" % (SaveService.VERSION + 1)),
 		"nieuwere versie niet geweigerd: %s" % errors)
+	data["version"] = 1
 	var missing := data.duplicate(true)
 	missing.erase("version")
 	errors = PackedStringArray()
@@ -111,6 +115,7 @@ func test_save_versions_and_migration(t) -> void:
 	t.check(data["lichtmeter"] == 64, "migratie veranderde de invoer")
 	errors = PackedStringArray()
 	SaveService.migrate(data, errors, {1: double_light}, 3)
+	data["version"] = SaveService.VERSION
 	t.check(errors.size() == 1 and errors[0].contains("2 naar 3"), "ontbrekende migratie niet gemeld: %s" % errors)
 	var broken := data.duplicate(true)
 	broken["checkpoint"].erase("x")
@@ -249,3 +254,138 @@ func test_save_from_dict_checks_range(t) -> void:
 		errors = PackedStringArray()
 		t.check(GameState.from_dict(data, errors) == null and errors.size() == 1 and errors[0].contains(name.strip_edges()),
 			"%s buiten bereik niet geweigerd: %s" % [name, errors])
+
+
+## Een save van v1 zoals v1 hem schreef (zonder de velden van v2).
+func _v1_text(gemalen: Dictionary) -> String:
+	var data := _state().to_dict()
+	for key in ["levenspunten", "waterstanden", "vaardigheden", "verzamelobjecten"]:
+		data.erase(key)
+	data["gemalen"] = gemalen
+	data["vlaggen"]["kadewijk/S7/Neerslag"] = true
+	data["version"] = 1
+	return JSON.stringify(data, "\t", true, true)
+
+
+## Schema v2 (LM-12): levenspunten, waterstand per wijk, vaardigheden en
+## verzamelobjecten gaan exact heen en terug; de vaardigheden staan
+## gesorteerd in het bestand; het maximum aan levenspunten volgt uit de
+## lampglazen (LM-07, WS-08 a).
+func test_save_v2_roundtrip(t) -> void:
+	_clear()
+	var path := SaveService.slot_path(6, DIR)
+	var state := _state()
+	state.levenspunten = 6
+	state.set_gemaal(&"kadewijk/S6/Gemaal", 200, true)
+	state.set_waterstand(&"kadewijk/S6/Gemaal", 2)
+	state.set_vaardigheid(&"V-02")
+	state.set_vaardigheid(&"V-01")
+	state.add_verzamelobject(&"kadewijk/S5/Lampglas", &"lampglas")
+	state.add_verzamelobject(&"kadewijk/S9/Logblad3", &"logbladzijde")
+	t.check(state.max_levenspunten() == 6 and state.lampglazen() == 1, "max levenspunten: %d" % state.max_levenspunten())
+	t.check(SaveService.write(path, state) == OK, "schrijven mislukt")
+	var text := FileAccess.get_file_as_string(path)
+	t.check(text.contains("\"version\": 2"), "geen versie 2 in het bestand")
+	t.check(text.find("\"V-01\"") >= 0 and text.find("\"V-01\"") < text.find("\"V-02\""), "vaardigheden niet gesorteerd")
+	var result := SaveService.read(path)
+	var loaded: GameState = result["state"]
+	t.check(loaded != null and loaded.equals(state), "v2 niet gelijk na laden: %s" % [result["errors"]])
+	t.check(loaded != null and loaded.levenspunten == 6 and loaded.waterstand(&"kadewijk/S6/Gemaal") == 2
+		and loaded.has_vaardigheid(&"V-01") and loaded.has_vaardigheid(&"V-02") and not loaded.has_vaardigheid(&"V-03")
+		and loaded.has_verzamelobject(&"kadewijk/S5/Lampglas") and loaded.max_levenspunten() == 6,
+		"velden van v2 niet terug")
+	var fresh := GameState.new()
+	t.check(fresh.levenspunten == GameState.start_levenspunten() and fresh.levenspunten == 5
+		and fresh.max_levenspunten() == 5 and fresh.waterstand(&"x") == 0, "nieuw spel: %s" % [fresh.to_dict()])
+	_clear()
+
+
+## Migratie 1 → 2 (`builtin_migrations`): volle levenspunten, per gemaal `s`
+## = het aantal volle trappen (LM-10, één gemaal per wijk), geen vaardigheden
+## en geen verzamelobjecten; de rest (ook de vlag van een opgepakt object)
+## blijft. De volgende save is v2 en laadt gelijk.
+func test_save_migration_1_to_2(t) -> void:
+	_clear()
+	var path := SaveService.slot_path(7, DIR)
+	DirAccess.make_dir_recursive_absolute(DIR)
+	_write_text(path, _v1_text({
+		"gemaal_k3": {"vulstand": 37, "vol": false},
+		"wijk_b": {"vulstand": 100, "vol": true},
+		"wijk_c": {"vulstand": 199, "vol": true},
+		"kadewijk/S6/Gemaal": {"vulstand": 200, "vol": true},
+	}))
+	var result := SaveService.read(path)
+	var loaded: GameState = result["state"]
+	t.check(loaded != null and result["errors"].is_empty() and result["version"] == 1 and not result["from_backup"],
+		"v1 laadt niet: %s" % [result["errors"]])
+	if loaded == null:
+		_clear()
+		return
+	t.check(loaded.levenspunten == 5, "levenspunten na migratie: %d" % loaded.levenspunten)
+	t.check(loaded.waterstanden == {&"gemaal_k3": 0, &"wijk_b": 1, &"wijk_c": 1, &"kadewijk/S6/Gemaal": 2},
+		"waterstanden na migratie: %s" % [loaded.waterstanden])
+	t.check(loaded.vaardigheden.is_empty() and loaded.verzamelobjecten.is_empty(), "vaardigheden of verzamelobjecten na migratie")
+	t.check(loaded.lichtmeter == 64 and loaded.checkpoint_kamer == &"K2" and loaded.has_flag(&"sluis_k3_open")
+		and loaded.has_flag(&"kadewijk/S7/Neerslag") and loaded.gemalen[&"wijk_c"]["vulstand"] == 199,
+		"v1-velden veranderd door de migratie")
+	t.check(SaveService.write(path, loaded) == OK, "schrijven na migratie mislukt")
+	t.check(FileAccess.get_file_as_string(path).contains("\"version\": 2"), "volgende save is geen v2")
+	var again: GameState = SaveService.read(path)["state"]
+	t.check(again != null and again.equals(loaded), "v2 na migratie niet gelijk")
+	# Ook via een kapotte save: de back-up van v1 migreert.
+	_write_text(path, "{\"version\": 2, \"gebi")
+	_write_text(path + ".bak", _v1_text({"gemaal_k3": {"vulstand": 100, "vol": true}}))
+	var backup := SaveService.read(path)
+	t.check(backup["from_backup"] and backup["state"] != null and backup["state"].waterstand(&"gemaal_k3") == 1,
+		"back-up van v1 niet gemigreerd: %s" % [backup["errors"]])
+	# Een kapotte v1 blijft kapot: de migratie raadt niets.
+	var bad: Dictionary = JSON.parse_string(_v1_text({"gemaal_k3": {"vulstand": -5, "vol": false}}))
+	var errors := PackedStringArray()
+	var migrated := SaveService.migrate(bad, errors)
+	t.check(errors.is_empty() and not migrated["waterstanden"].has("gemaal_k3")
+		and GameState.from_dict(migrated, errors) == null and errors.size() == 1 and errors[0].contains("vulstand"),
+		"kapotte v1 na migratie: %s" % errors)
+	_clear()
+
+
+## De controles van v2 in `from_dict`: grenzen zijn goed; daarbuiten precies
+## één fout met de naam van het veld, en geen toestand.
+func test_save_v2_from_dict_checks(t) -> void:
+	var base := _state()
+	base.set_gemaal(&"kadewijk/S6/Gemaal", 150, true)
+	base.set_waterstand(&"kadewijk/S6/Gemaal", 1)
+	base.set_vaardigheid(&"V-01")
+	base.add_verzamelobject(&"a/S1/Lampglas", &"lampglas")
+	var edge := base.to_dict()
+	edge["levenspunten"] = 9
+	edge["waterstanden"]["wijk_zonder_gemaal"] = 2
+	for i in 3:
+		edge["verzamelobjecten"]["g%d/Lampglas" % i] = "lampglas"
+	var errors := PackedStringArray()
+	t.check(GameState.from_dict(edge, errors) != null and errors.is_empty(), "grenzen v2 geweigerd: %s" % errors)
+	edge["levenspunten"] = 0
+	errors = PackedStringArray()
+	t.check(GameState.from_dict(edge, errors) != null, "levenspunten 0 geweigerd: %s" % errors)
+	var cases := {
+		"levenspunten": func(d: Dictionary) -> void: d["levenspunten"] = 10,
+		"levenspunten ": func(d: Dictionary) -> void: d["levenspunten"] = -1,
+		"levenspunten  ": func(d: Dictionary) -> void: d["levenspunten"] = 2.5,
+		"waterstanden.wijk_x": func(d: Dictionary) -> void: d["waterstanden"]["wijk_x"] = 3,
+		"waterstand 'wijk_y'": func(d: Dictionary) -> void: d["waterstanden"]["wijk_y"] = "1",
+		"trap": func(d: Dictionary) -> void: d["waterstanden"]["kadewijk/S6/Gemaal"] = 2,
+		"vaardigheid 'Neerslag'": func(d: Dictionary) -> void: d["vaardigheden"] = ["Neerslag"],
+		"vaardigheid 'V--1'": func(d: Dictionary) -> void: d["vaardigheden"] = ["V--1"],
+		"twee keer": func(d: Dictionary) -> void: d["vaardigheden"] = ["V-01", "V-01"],
+		"vaardigheid '1'": func(d: Dictionary) -> void: d["vaardigheden"] = [1],
+		"verzamelobject 'x'": func(d: Dictionary) -> void: d["verzamelobjecten"]["x"] = "munt",
+		"lampglazen": func(d: Dictionary) -> void: d["verzamelobjecten"].merge(
+			{"g0/L": "lampglas", "g1/L": "lampglas", "g2/L": "lampglas", "g3/L": "lampglas"}),
+		"'vaardigheden'": func(d: Dictionary) -> void: d["vaardigheden"] = {"V-01": true},
+		"'verzamelobjecten' ontbreekt": func(d: Dictionary) -> void: d.erase("verzamelobjecten"),
+	}
+	for name: String in cases:
+		var data := base.to_dict()
+		(cases[name] as Callable).call(data)
+		errors = PackedStringArray()
+		t.check(GameState.from_dict(data, errors) == null and errors.size() == 1 and errors[0].contains(name.strip_edges()),
+			"%s niet geweigerd: %s" % [name, errors])
