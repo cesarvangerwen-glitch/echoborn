@@ -16,6 +16,11 @@ extends Node2D
 ##   de laag: hier komt per blok uit `Layout.blocks(kamer_id, D)` een
 ##   `NinePatchRect` uit de eenrichtingsatlas, met het loopvlak (rij 0) op de
 ##   bovenkant van het blok. Zo schuiven de stukken mee met D.
+## - Vaste stukken per D (manifest `vaste_stukken`, deel 3 §10.2: in S2 de
+##   kopse kant van het pakhuis `B3Wand` en het `B3Blok`): een `Sprite2D`
+##   linksboven op het blok met dezelfde naam uit `Layout.blocks(kamer_id, D)`,
+##   met `region` = de maat van het blok, begrensd tot de texture. Geen blok bij
+##   deze D (het B3-blok bij D ≤ 60): geen stuk. Na `Speelvlak` in de boom, z −10.
 ## - Toestand `grijs` / `half` / `kleur`: zolang de LUT-shader er niet is,
 ##   wisselt `set_staat()` de textures. De waterstand (`s`) bestaat nog niet;
 ##   de GP roept dit later aan (`grijs` bij `s < 2`, `kleur` bij `s = 2`).
@@ -32,6 +37,8 @@ const STATEN := ["grijs", "half", "kleur"]
 const LAGEN := {"achter": "Achter", "midden": "Midden", "speelvlak": "Speelvlak", "licht": "Licht", "voor": "Voor"}
 ## Net boven `speelvlak` (−10), onder `licht` (−5).
 const EENRICHTING_Z := -9
+## Zelfde z als `speelvlak` (manifest `vaste_stukken`).
+const VAST_Z := -10
 
 ## Kamer in `Layout` (bv. `&"S1"`).
 @export var kamer_id: StringName = &""
@@ -58,6 +65,7 @@ static func manifest() -> Dictionary:
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_bouw_vaste_stukken(Inhoud.tail)
 	_bouw_eenrichting(Inhoud.tail)
 	var ouder := get_parent()
 	if ouder != null and not ouder.is_node_ready():
@@ -78,6 +86,11 @@ func set_staat(nieuw: String) -> void:
 		var bestand: String = laag["bestanden"].get(nieuw, "")
 		if sprite != null and bestand != "":
 			sprite.texture = load(DIR + bestand)
+	var vast: Dictionary = manifest().get("vaste_stukken", {})
+	for sprite in _vaste_stukken():
+		var bestand: String = vast.get("%s/%s" % [kamer_id, sprite.name], {}).get("bestanden", {}).get(nieuw, "")
+		if bestand != "":
+			sprite.texture = load(DIR + bestand)
 	var atlas := _atlas(nieuw)
 	for np in _stukken():
 		np.texture = atlas
@@ -92,6 +105,44 @@ func _stukken() -> Array[NinePatchRect]:
 			if child is NinePatchRect:
 				out.append(child)
 	return out
+
+
+## De vaste stukken van deze kamer (leeg als de kamer er geen heeft).
+func _vaste_stukken() -> Array[Sprite2D]:
+	var out: Array[Sprite2D] = []
+	var map := get_node_or_null(^"VasteStukken")
+	if map != null:
+		for child in map.get_children():
+			if child is Sprite2D:
+				out.append(child)
+	return out
+
+
+func _bouw_vaste_stukken(d: int) -> void:
+	var vast: Dictionary = manifest().get("vaste_stukken", {})
+	var map := Node2D.new()
+	map.name = "VasteStukken"
+	map.z_index = VAST_Z
+	var speelvlak := get_node_or_null(^"Speelvlak")
+	if speelvlak != null:
+		speelvlak.add_sibling(map)
+	else:
+		add_child(map)
+	for spec: Array in Layout.blocks(kamer_id, d):
+		var stuk: Dictionary = vast.get("%s/%s" % [kamer_id, spec[0]], {})
+		var bestand: String = stuk.get("bestanden", {}).get(staat, "")
+		if bestand == "":
+			continue
+		var rect: Rect2 = spec[1]
+		var tex: Texture2D = load(DIR + bestand)
+		var sprite := Sprite2D.new()
+		sprite.name = String(spec[0])
+		sprite.texture = tex
+		sprite.centered = false
+		sprite.region_enabled = true
+		sprite.region_rect = Rect2(Vector2.ZERO, rect.size.min(Vector2(tex.get_size())))
+		sprite.position = rect.position
+		map.add_child(sprite)
 
 
 func _atlas(st: String) -> Texture2D:

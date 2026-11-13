@@ -1,12 +1,47 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
 [ext_resource type="Script" path="res://scripts/combat/slice_enemy.gd" id="2_enemy"]
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_art.gd" id="10_art"]
+[ext_resource type="Texture2D" uid="uid://dk4io3jrbvprl" path="res://art/wereld/kadewijk/s2_kadegang_achter_grijs.png" id="11_achter"]
+[ext_resource type="Texture2D" uid="uid://c8kunofntar8g" path="res://art/wereld/kadewijk/s2_kadegang_midden_grijs.png" id="12_midden"]
+[ext_resource type="Texture2D" uid="uid://cldqjb0ggxr0o" path="res://art/wereld/kadewijk/s2_kadegang_speelvlak_grijs.png" id="13_speelvlak"]
+[ext_resource type="Texture2D" uid="uid://bj414o5w0w58s" path="res://art/wereld/kadewijk/s2_kadegang_licht_grijs.png" id="14_licht"]
 
 [node name="S2Inhoud" type="Node2D"]
 position = Vector2(-1120, -180)
 script = ExtResource("1_inhoud")
 kamer_id = &"S2"
+
+[node name="Art" type="Node2D" parent="."]
+texture_filter = 1
+script = ExtResource("10_art")
+kamer_id = &"S2"
+naam = "s2_kadegang"
+
+[node name="Achter" type="Sprite2D" parent="Art"]
+z_index = -30
+position = Vector2(640, 0)
+texture = ExtResource("11_achter")
+centered = false
+
+[node name="Midden" type="Sprite2D" parent="Art"]
+z_index = -20
+position = Vector2(640, 0)
+texture = ExtResource("12_midden")
+centered = false
+
+[node name="Speelvlak" type="Sprite2D" parent="Art"]
+z_index = -10
+position = Vector2(640, 0)
+texture = ExtResource("13_speelvlak")
+centered = false
+
+[node name="Licht" type="Sprite2D" parent="Art"]
+z_index = -5
+position = Vector2(640, 0)
+texture = ExtResource("14_licht")
+centered = false
 
 [node name="Paar1A" type="Node2D" parent="."]
 position = Vector2(880, 148)
