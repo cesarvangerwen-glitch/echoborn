@@ -123,7 +123,7 @@ def bouw_s8():
     k.paint((vw < 54) & (vw > 46), "huizen", "ijzer", 2)
     k.paint((vw < 46) & (np.abs(np.sin(np.arctan2(YY - vloer + 60, XX - wl - 20) * 3)) < 0.1), "huizen", "ijzer", 2)
     k.paint(vw < 8, "huizen", "ijzer", 3)
-    # de balk van het rad (fase 2: het rad hangt op 100–140 boven de vloer) en een loopkat
+    # de balk van het rad (fase 2: het rad hangt op 100–140 boven de vloer)
     by = vloer - 168
     k.paint(k.rect(wl, by, wr, by + 10), "midden", "ijzer", 3)
     k.paint(k.rect(wl, by, wr, by + 1), "midden", "ijzer", 5)
@@ -131,8 +131,7 @@ def bouw_s8():
     k.paint(k.rect(wl, by + 3, wr, by + 4) & (XX % 12 == 0), "midden", "ijzer", 6)   # klinknagels
     for kx in (wl + 4, wr - 14):
         k.paint(k.rect(kx, by - 30, kx + 10, by + 10) & ((np.abs((XX - kx) - (YY - by + 30) * 0.25) < 2) | (YY > by)), "midden", "ijzer", 2)
-    k.paint(k.rect(cx - 10, by + 10, cx + 10, by + 16), "midden", "ijzer", 4)        # loopkat
-    k.paint(k.rect(cx - 1, by + 16, cx + 1, by + 26), "midden", "ijzer", 3)          # ketting (het rad is van de boss)
+    # geen vaste loopkat en ketting: het rad van de Animator heeft zijn eigen loopkat op de balk (besluit AD, #266)
     # --- speelvlak: de vloer (gietijzeren platen op hardsteen), de spuigaten, muren en drempel
     _, x, y, bw, bh, _ = blok("S8", "Vloer")
     k.tegels(lambda i, j, xx_, yy_: ("kade_boven_m1" if i % 2 else "kade_boven_m2") if j == 0 else
@@ -462,3 +461,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # laatste stap (EP/SM, #268): steekt er ergens een loopvlak buiten zijn blok? Dan faalt de run.
+    import controleer_stukbreedte
+    if controleer_stukbreedte.controleer(D2.REPO) > 0:
+        sys.exit("controleer_stukbreedte: loopvlak buiten zijn blok, zie hierboven")
