@@ -680,8 +680,8 @@ def objecten_export(manifest):
                                 "(geen transparantie, geen kleinere versie): de echo is een tweede lichaam, geen nagalm"),
         sluisklep=dict(frames=meta["sluisklep"], z_index=-9, plaatsing="S6/Sluis (60 x 10), linksboven op (5000, 260) met 2 px marge in de cel: frame 0 dicht, 1 open (t_v)"),
         sokkel=dict(frames=meta["sokkel"], z_index=-15, plaatsing="De sokkel van V-01 in S7, onderkant op de bovenvloer bij x 5150: 0 uit, 1 aan (warme gloed)"),
-        gemaal_rad=dict(frames=meta["gemaal_rad"], fps=10, z_index=-19,
-                        plaatsing="S6, middelpunt op S6/Gemaal (4600, 140): staat stil (frame 0) tot de eerste pompslag, draait als het gemaal pompt"),
+        gemaal_rad=dict(frames=meta["gemaal_rad"], fps=10, fps_vol=6, z_index=-19,
+                        plaatsing="S6, middelpunt op S6/Gemaal (4600, 140): staat stil (frame 0) tot de eerste pompslag, draait op `fps` zolang het gemaal vult en daarna op `fps_vol` (vol = het gemaal houdt de wijk droog; besluit AD #244)"),
     )
     return items, W_, H_
 

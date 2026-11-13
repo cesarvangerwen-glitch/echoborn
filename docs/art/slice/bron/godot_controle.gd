@@ -1,5 +1,5 @@
 extends SceneTree
-## Controle van de Art Director (#85, deel 2–4): zet de kamerlagen van S1–S7 en de
+## Controle van de Art Director (#85, deel 2–5): zet de kamerlagen van S1–S9 en de
 ## eenrichtingsstukken (en in S2 de vaste stukken per D) op de blokken van
 ## `Layout.blocks()` in Godot 4.6, tekent de
 ## collision-randen erover (cyaan = vast, geel = eenrichting) en bewaart een PNG.
@@ -25,7 +25,7 @@ func _init() -> void:
 	var staat: String = args[1]
 	var d := int(args[2])
 	var out: String = args[3]
-	var naam: String = {&"S1": "s1_kade_ingang", &"S2": "s2_kadegang", &"S3": "s3_vismarkt", &"S4": "s4_brugkloof", &"S5": "s5_sluiswachtershuis", &"S6": "s6_gemaalplein", &"S7": "s7_sluiskelder"}[room]
+	var naam: String = {&"S1": "s1_kade_ingang", &"S2": "s2_kadegang", &"S3": "s3_vismarkt", &"S4": "s4_brugkloof", &"S5": "s5_sluiswachtershuis", &"S6": "s6_gemaalplein", &"S7": "s7_sluiskelder", &"S8": "s8_machinehal", &"S9": "s9_lage_kade"}[room]
 	var r: Rect2 = Layout.ROOMS[room]
 	var vp := SubViewport.new()
 	vp.size = Vector2i(int(r.size.x), int(r.size.y))
@@ -46,22 +46,21 @@ func _init() -> void:
 		world.add_child(s)
 		if laag == "speelvlak":
 			var m: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(DIR + "kadewijk_kamers.json"))
-			# vaste stukken per D (S2: de rand van de B3-wand en het B3-blok; deel 3)
-			var b3 := maxi(d - 60, 0)
-			if room == &"S2":
-				var wand := Sprite2D.new()
-				wand.texture = tex(m["vaste_stukken"]["S2/B3Wand"]["bestanden"][staat])
-				wand.centered = false
-				wand.position = Vector2(1250 + b3, 76)
-				world.add_child(wand)
-				if b3 > 0:
-					var blok := Sprite2D.new()
-					blok.texture = tex(m["vaste_stukken"]["S2/B3Blok"]["bestanden"][staat])
-					blok.centered = false
-					blok.region_enabled = true
-					blok.region_rect = Rect2(0, 0, b3, 45)
-					blok.position = Vector2(1250, 185)
-					world.add_child(blok)
+			# vaste stukken (S2: B3-wand en -blok per D; S8: deuren; S9: hoogwater), linksboven op hun blok,
+			# region = de maat van het blok, begrensd tot de texture (zoals kadewijk_art.gd)
+			for spec: Array in Layout.blocks(room, d):
+				var vs: Dictionary = m.get("vaste_stukken", {}).get("%s/%s" % [room, spec[0]], {})
+				if vs.is_empty() or str(spec[0]) == "DeurRechts":
+					continue
+				var t2 := tex(vs["bestanden"][staat])
+				var rc0: Rect2 = spec[1]
+				var sp := Sprite2D.new()
+				sp.texture = t2
+				sp.centered = false
+				sp.region_enabled = true
+				sp.region_rect = Rect2(Vector2.ZERO, rc0.size.min(Vector2(t2.get_size())))
+				sp.position = rc0.position
+				world.add_child(sp)
 			var atlas := tex("kadewijk_eenrichting_%s.png" % staat)
 			for spec: Array in Layout.blocks(room, d):
 				var soort: String = m["eenrichting"]["blokken"].get("%s/%s" % [room, spec[0]], "")

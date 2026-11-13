@@ -1,6 +1,6 @@
-# Slice-art Kadewijk: kleurscript, lichtovergang, tileset, stijlregels vijanden (deel 1) en eindkwaliteit S1–S7 (deel 2–4)
+# Slice-art Kadewijk: kleurscript, lichtovergang, tileset, stijlregels vijanden (deel 1) en eindkwaliteit S1–S9 (deel 2–5)
 
-Versie 0.4 · Eigenaar: Art Director · Issue [#85](https://github.com/cesarvangerwen-glitch/echoborn/issues/85) (T8c, deel 1–4) · Hoort bij `docs/art/bible.md` v0 en `docs/art/assetlijst.md`
+Versie 0.5 · Eigenaar: Art Director · Issue [#85](https://github.com/cesarvangerwen-glitch/echoborn/issues/85) (T8c, deel 1–5) · Hoort bij `docs/art/bible.md` v0 en `docs/art/assetlijst.md`
 Bronnen: `docs/design/wereld.md` v0.2 §2 (slice Kadewijk), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.1 (§2, §3, §9), `docs/narrative/verhaal-v2.md` §4.3 en §6, `docs/art/ui-stijlgids.md` (merk, klokring, `#ff475c`), fasekader fase 2 v0.4 §2 (T8c) en §4.
 
 ## 0. Werkaanname (kader §5)
@@ -183,8 +183,9 @@ Bladen: `concept_vijanden_x4_placeholder.png` (per type: silhouet, idle, aanloop
 | Eindkwaliteit S1 en S3 | Art Director | **Gedaan in deel 2 (§9)** |
 | Eindkwaliteit S2 en S4, snelluik S1, schaduwklep | Art Director | **Gedaan in deel 3 (§10)** |
 | Eindkwaliteit S5, S6, S7 en de luiken | Art Director | **Gedaan in deel 4 (§11)** |
-| Eindkwaliteit S8 en S9 | Art Director met Environment Artist | S8 als de boss erin zit (kandidaat), S9 na de her-review (kadewijk.md §8) |
-| Koppeling van S5–S7, de objecten (luik, schaduwklep, schoep, pompslag, sluis, sokkel, rad) en de laag `gemaal_aan` (§11.4) | Technical Artist met GP | Volgende stap; SM-review (code in `game/`) |
+| Eindkwaliteit S8 en S9 | Art Director | **Gedaan in deel 5 (§12)**; daarmee staat de hele Kadewijk op eindkwaliteit |
+| Koppeling van S5–S7 en de objecten | Technical Artist met GP | **Gedaan in #244** |
+| Koppeling van S8/S9, de deuren en het hoogwater als vaste stukken, `fps_vol` van het rad (§12.4) | Technical Artist met GP | Volgende stap; SM-review (code in `game/`) |
 | Koppeling van S1/S3 aan de kamerscènes | Technical Artist | **Gedaan in #230** |
 | Koppeling van S2/S4, de vaste stukken van S2 en de schaduwklep (§10.4) | Technical Artist (schaduwklep met de GP) | Volgende stap; SM-review (code in `game/`) |
 | Regels van §4.2 (bovenrand 2 px, tell-taal, amber/cyaan alleen als merk-overlay) en de drie nieuwe ramps opnemen in bible v1 §3 en §6, met de drempels: **bovenrand ΔL\* ≥ 50** tegen de directe achtergrond (ring van 2–6 px), in grijs én kleur (gemeten 50–75); de bestaande eis van **ΔL\* ≥ 40** op vulling of contour wordt voor vijanden "op bovenrand of kern" (het lijf haalt 2,6–37); kleurafstanden **ΔE76 ≥ 30, en ≥ 25 bij deuteranopie**, anders ΔL\* ≥ 20 of vorm (bible §7.1); en uit het kleurscript (§1) een **gemiddelde chroma ≤ ± 12 tot trap 2** (gemeten 3–12), en de beat na trap 2 minstens ± 1,5× de hoogste grijze beat (gemeten 20 tegen 12) | Art Director | Bible v1 |
@@ -200,6 +201,7 @@ Deel 1: alles in `docs/art/slice/` (behalve `eindkwaliteit/`) wordt gemaakt door
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.5 | 2026-11-13 | Deel 5 van T8c (#85): **S8 Machinehal en S9 Lage kade op eindkwaliteit** (maatvast, LGD in #83), de deuren van S8 en het hoogwater van S9 als vaste stukken, `fps_vol` = 6 voor het rad (besluit #244), `godot_controle.gd` generiek voor vaste stukken (§12). |
 | 0.4 | 2026-11-13 | Deel 4 van T8c (#85): **S5, S6 en S7 op eindkwaliteit** (S5 met variatie per verdieping, LGD #227), de laag `gemaal_aan` voor trap 1 in S6, de objecten (breekbaar luik voor S7 en S9, **holle** schaduwklep, pompschoep en pompslag gelijk voor P1 en de echo, sluisklep, sokkel, rad), de geometrie uit `kadewijk_blokken.json`, het gemaal voor de kleurgolf op `S6/Gemaal` (§11). |
 | 0.3 | 2026-11-13 | Deel 3 van T8c (#85): **S2 en S4 op eindkwaliteit**, het **snelluik** in S1 (PR #231) als eenrichtingsstuk, de vaste stukken per D van S2 (B3-wand, B3-blok), de **schaduwklep** zichtbaar (PR #232), renders, metingen en Godot-controle (§10). |
 | 0.2 | 2026-11-12 | Deel 2 van T8c (#85): **S1 en S3 op eindkwaliteit** (§9): lagen per kamer in grijs, half, kleur en index in `game/art/wereld/kadewijk/`, eenrichtingsstukken per D als NinePatch, manifest, importconventie en overdracht aan de TA, renders en metingen in `docs/art/slice/eindkwaliteit/`, controle in Godot 4.6.3. |
@@ -402,3 +404,54 @@ S7 blijft in kleur rustiger (11,3): het is een kelder zonder lucht en zonder gev
 - Audio van de pompslag van de echo: Audio Director (§11.2).
 - S8 (als de boss erin zit) en S9 (na de her-review). Het punt van de CD over S9 (het lege scherm tussen het Dwaallicht en het E-paar: daar moet het beeld de beloning zijn) neem ik mee als S9 maatvast is.
 - Bevroren echo's (kinderen in S6, de koppen in S5) en de logbladzijden: Animator en GP.
+
+---
+
+## 12. Deel 5: S8 Machinehal en S9 Lage kade
+
+**Werkaanname (kader §5):** S8 en S9 zijn maatvast (LGD, [comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6844964137)). Daarmee zijn **S1–S9 alle negen maatvast en op eindkwaliteit**. `kadewijk_blokken.json` is opnieuw gedumpt; alleen S8 is veranderd (de drempel onder `DeurLinks`, afwijking 20). De assets van S1–S7 blijven daardoor bit voor bit gelijk. Er is één uitzondering: het manifest, met `fps_vol` en de nieuwe stukken.
+
+### 12.1 Wat de kamers laten zien
+
+| Kamer | Beeld | Grijs / kleur |
+|---|---|---|
+| **S8 Machinehal** (één scherm, vaste camera) | De achterwand van de hal met een **groot boograam achter de ketel**. Het koude licht en een gedithered tegenlicht van 2 tinten rond het silhouet (deel 1 §4.4) laten het donkere lijf van de Gemaalmeester lezen. Verder:<br>• de **balk** waaraan het rad hangt (fase 2: 100–140 boven de vloer), met een loopkat en een ketting; het rad zelf is van de boss (Animator, S-14);<br>• buizen, manometers en een vliegwiel-stomp;<br>• een gietijzeren vloer met de twee **spuigaten** (GMB-03);<br>• de deuropeningen, met de **deuren als vaste stukken**. | Grijs (`s = 1`, het gevecht): **geen warm licht in de arena**, alleen koud tegenlicht. Rood is van de boss (kleurscript S8: de koudste beat). Kleur (na de boss): twee wandlampen. Warm licht hoort na de boss (L-14e). |
+| **S9 Lage kade** (4160 px) | **De verlichte wijk boven je**: een gevelrij op de hoge kade, het belfort en een stenen **brug** over de gracht tussen het Dwaallicht en het E-paar (x 1480–1940), met lantaarns. Daaronder de **oude kademuur met de getijdenrand** (de oude waterstand, nat en groen eronder), duikers, meerringen, en het **gezakte water** ervoor met weerspiegelde lichten. Bij het **rustpunt** liggen twee bootjes met lantaarns aan de kade. Links de **kelder onder S1**: een tongewelf, de galerij van B1, de schacht met licht uit het snelluik, de platen rond het luik en de benedenkade. Verder de brugpijler met zijn bogen. Onder de brug ligt de wijk in de slagschaduw; daar blijven de ramen donker, zodat de richels lezen. Ten slotte het hoogwater als vast stuk en de trap naar het plein. | Grijs: geen lamp, het water is donker. **Kleur (na trap 2, de hoofdtoestand van S9)**: alle ramen en lantaarns aan, en de lichten weerspiegeld in het water. |
+
+**De punten van de CD:**
+- **S8, de holle echo naast P1 bij de ketel in fase 1** (`s8_machinehal_ketel_echo_x4.png`, met de concept-boss uit deel 1): de contour van de echo haalt ΔL\* **74 in grijs en 64 in kleur**, P1 haalt 84 en 83 (norm ≥ 40). De echo staat vóór het donkere lijf. Zijn lichte holle rand en de donkere arcering lezen daar als tweede lichaam, niet als een vlek op de ketel.
+- **S9, het beeld als beloning bij het rustpunt en tussen het Dwaallicht en het E-paar:** `s9_lage_kade_rustpunt_x2.png` (x 3060–3700) en `s9_lage_kade_tussenstuk_x2.png` (x 1440–2080). In beide zijn de verlichte wijk en het gezakte water met de getijdenrand in beeld. Het tussenstuk heeft de brug, het rustpunt de bootjes.
+
+### 12.2 Assets
+
+- `s8_machinehal_*` (640 × 360) en `s9_lage_kade_*` (4160 × 360), met de lagen achter, midden, speelvlak en licht in grijs, half, kleur en index. De `.import`-bestanden zijn gecommit.
+- **Vaste stukken** (manifest `vaste_stukken`), elk zichtbaar zolang het blok collision heeft (`Kadewijk.set_door`):
+  - `kadewijk_s8_deurlinks_*` (20 × 320, dicht tot `BOSS_VERSLAGEN`);
+  - `kadewijk_s8_deurrechts_*` (20 × 260, open tot `BOSS_START`);
+  - `kadewijk_s9_hoogwater_*` (60 × 275, een sluisdeur met sijpelend water, weg bij `s = 2`).
+- **Eenrichting per D in S9**: `Galerij` en `B1Trede*` (galerij, trede), `PijlerRichel1/2` (galerij), `B2aTrede*` (trede) en `B2bTrede*` (trede_r). De vaste eenrichtingsblokken (de schacht, de trap naar het plein) zitten in `speelvlak`.
+- **`objecten.gemaal_rad.fps_vol = 6`** (besluit #244): het rad draait op `fps` (10) zolang het gemaal vult, en blijft daarna draaien op 6.
+
+### 12.3 Metingen
+
+| | S8 grijs | S8 kleur | S9 grijs | S9 kleur | Norm |
+|---|---:|---:|---:|---:|---|
+| Gemiddelde chroma | 2,8 | 16,8 | 2,9 | 14,1 | grijs ≤ 12 ✓ |
+| ΔL\* loopvlakken (alle blokken met een bovenkant, zonder vaste stukken) | 31–36 | 45–55 | 20–47 | 27–63 | ≥ 20 ✓ |
+| ΔL\* contour echo / P1 bij de ketel | 74 / 84 | 64 / 83 | | | ≥ 40 ✓ |
+
+**Controle in Godot 4.6.3:** `godot_controle_s8_s9.png` laat S8 zien, en S9 in uitsneden: de kelder, de pijler bij D = 60 en 120, en het hoogwater met de trap. De vaste stukken worden nu generiek geplaatst, zoals `kadewijk_art.gd` dat doet. De hele suite is groen: **437 geslaagd, 0 mislukt**.
+
+### 12.4 Overdracht aan de TA (met de GP)
+
+1. **S8 en S9:** een node `Art` zoals in #230/#244. S9 is 4160 breed: één `Sprite2D` per laag werkt. Bij een probleem met de grootte van textures op de Deck kan ik de lagen in stroken van 1024 leveren; zeg het dan.
+2. **Deuren en hoogwater:** de vaste stukken op hun blok, zichtbaar zolang het blok collision heeft. `DeurRechts` begint open (`START_OPEN`): dan niet tekenen.
+3. **Rad:** lees `fps_vol` als het gemaal vol is.
+4. **Boss:** de sprites van de Gemaalmeester (S-14) zijn van de Animator. De concept-boss in de renders van deze PR komt uit deel 1 en dient alleen ter beoordeling.
+
+### 12.5 Wat openstaat
+
+- Koppeling van S8/S9, de deuren, het hoogwater en `fps_vol` (§12.4): TA met GP, daarna een SM-review.
+- De sprites van de boss (S-14) en de bevroren echo's (S-12): Animator.
+- De LUT-shader en de kleurgolf in de engine (§2): TA. Met S1–S9 kan de golf nu over de hele wijk.
+- Bible v1: de regels uit §6 en de chroma op volle art (§9.5).

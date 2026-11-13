@@ -1,5 +1,5 @@
 {
- "versie": "0.4",
+ "versie": "0.5",
  "eigenaar": "Art Director",
  "issue": 85,
  "d_render": 60,
@@ -600,6 +600,236 @@
     }
    ],
    "ramen": 0
+  },
+  "s8_machinehal": {
+   "wereld_rect": [
+    4160,
+    360,
+    640,
+    360
+   ],
+   "lagen": [
+    {
+     "naam": "achter",
+     "z_index": -30,
+     "bestanden": {
+      "grijs": "s8_machinehal_achter_grijs.png",
+      "half": "s8_machinehal_achter_half.png",
+      "kleur": "s8_machinehal_achter_kleur.png",
+      "index": "s8_machinehal_achter_index.png"
+     }
+    },
+    {
+     "naam": "midden",
+     "z_index": -20,
+     "bestanden": {
+      "grijs": "s8_machinehal_midden_grijs.png",
+      "half": "s8_machinehal_midden_half.png",
+      "kleur": "s8_machinehal_midden_kleur.png",
+      "index": "s8_machinehal_midden_index.png"
+     }
+    },
+    {
+     "naam": "speelvlak",
+     "z_index": -10,
+     "bestanden": {
+      "grijs": "s8_machinehal_speelvlak_grijs.png",
+      "half": "s8_machinehal_speelvlak_half.png",
+      "kleur": "s8_machinehal_speelvlak_kleur.png",
+      "index": "s8_machinehal_speelvlak_index.png"
+     }
+    },
+    {
+     "naam": "licht",
+     "z_index": -5,
+     "bestanden": {
+      "grijs": "s8_machinehal_licht_grijs.png",
+      "half": "s8_machinehal_licht_half.png",
+      "kleur": "s8_machinehal_licht_kleur.png"
+     }
+    }
+   ],
+   "lampen": [
+    {
+     "x": 4288,
+     "y": 494,
+     "straal_band1": 88,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 4672,
+     "y": 494,
+     "straal_band1": 88,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    }
+   ],
+   "ramen": 0
+  },
+  "s9_lage_kade": {
+   "wereld_rect": [
+    0,
+    360,
+    4160,
+    360
+   ],
+   "lagen": [
+    {
+     "naam": "achter",
+     "z_index": -30,
+     "bestanden": {
+      "grijs": "s9_lage_kade_achter_grijs.png",
+      "half": "s9_lage_kade_achter_half.png",
+      "kleur": "s9_lage_kade_achter_kleur.png",
+      "index": "s9_lage_kade_achter_index.png"
+     }
+    },
+    {
+     "naam": "midden",
+     "z_index": -20,
+     "bestanden": {
+      "grijs": "s9_lage_kade_midden_grijs.png",
+      "half": "s9_lage_kade_midden_half.png",
+      "kleur": "s9_lage_kade_midden_kleur.png",
+      "index": "s9_lage_kade_midden_index.png"
+     }
+    },
+    {
+     "naam": "speelvlak",
+     "z_index": -10,
+     "bestanden": {
+      "grijs": "s9_lage_kade_speelvlak_grijs.png",
+      "half": "s9_lage_kade_speelvlak_half.png",
+      "kleur": "s9_lage_kade_speelvlak_kleur.png",
+      "index": "s9_lage_kade_speelvlak_index.png"
+     }
+    },
+    {
+     "naam": "licht",
+     "z_index": -5,
+     "bestanden": {
+      "grijs": "s9_lage_kade_licht_grijs.png",
+      "half": "s9_lage_kade_licht_half.png",
+      "kleur": "s9_lage_kade_licht_kleur.png"
+     }
+    }
+   ],
+   "lampen": [
+    {
+     "x": 1510,
+     "y": 423,
+     "straal_band1": 56,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 1710,
+     "y": 423,
+     "straal_band1": 56,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 1910,
+     "y": 423,
+     "straal_band1": 56,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 3459,
+     "y": 597,
+     "straal_band1": 48,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 3591,
+     "y": 597,
+     "straal_band1": 48,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 288,
+     "y": 570,
+     "straal_band1": 72,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 900,
+     "y": 595,
+     "straal_band1": 64,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 1420,
+     "y": 595,
+     "straal_band1": 64,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 1940,
+     "y": 595,
+     "straal_band1": 64,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 2460,
+     "y": 595,
+     "straal_band1": 64,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 2980,
+     "y": 595,
+     "straal_band1": 64,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    },
+    {
+     "x": 3500,
+     "y": 595,
+     "straal_band1": 64,
+     "aan_in": [
+      "half",
+      "kleur"
+     ]
+    }
+   ],
+   "ramen": 481
   }
  },
  "eenrichting": {
@@ -691,7 +921,19 @@
    "S5/B2cTrede90": "trede_r",
    "S5/B2dTrede30": "trede",
    "S5/B2dTrede60": "trede",
-   "S5/B2dTrede90": "trede"
+   "S5/B2dTrede90": "trede",
+   "S9/Galerij": "galerij",
+   "S9/B1Trede30": "trede",
+   "S9/B1Trede60": "trede",
+   "S9/B1Trede90": "trede",
+   "S9/PijlerRichel1": "galerij",
+   "S9/PijlerRichel2": "galerij",
+   "S9/B2aTrede30": "trede",
+   "S9/B2aTrede60": "trede",
+   "S9/B2aTrede90": "trede",
+   "S9/B2bTrede30": "trede_r",
+   "S9/B2bTrede60": "trede_r",
+   "S9/B2bTrede90": "trede_r"
   },
   "plaatsing": "NinePatchRect op Rect2(blok.position, Vector2(blok.size.x, 16)); loopvlak = bovenrand van het blok"
  },
@@ -720,6 +962,33 @@
     "half": "s2_kadegang_b3_blok_half.png",
     "kleur": "s2_kadegang_b3_blok_kleur.png",
     "index": "s2_kadegang_b3_blok_index.png"
+   }
+  },
+  "S8/DeurLinks": {
+   "plaatsing": "Sprite2D linksboven op het blok met dezelfde naam, z -10; dicht tot BOSS_VERSLAGEN: zichtbaar zolang het blok collision heeft (`Kadewijk.set_door`)",
+   "bestanden": {
+    "grijs": "kadewijk_s8_deurlinks_grijs.png",
+    "half": "kadewijk_s8_deurlinks_half.png",
+    "kleur": "kadewijk_s8_deurlinks_kleur.png",
+    "index": "kadewijk_s8_deurlinks_index.png"
+   }
+  },
+  "S8/DeurRechts": {
+   "plaatsing": "Sprite2D linksboven op het blok met dezelfde naam, z -10; open tot BOSS_START (START_OPEN): zichtbaar zolang het blok collision heeft",
+   "bestanden": {
+    "grijs": "kadewijk_s8_deurrechts_grijs.png",
+    "half": "kadewijk_s8_deurrechts_half.png",
+    "kleur": "kadewijk_s8_deurrechts_kleur.png",
+    "index": "kadewijk_s8_deurrechts_index.png"
+   }
+  },
+  "S9/Hoogwater": {
+   "plaatsing": "Sprite2D linksboven op het blok met dezelfde naam, z -10; tot s = 2: zichtbaar zolang het blok collision heeft (`set_door(&\"S9\", \"Hoogwater\", false)`)",
+   "bestanden": {
+    "grijs": "kadewijk_s9_hoogwater_grijs.png",
+    "half": "kadewijk_s9_hoogwater_half.png",
+    "kleur": "kadewijk_s9_hoogwater_kleur.png",
+    "index": "kadewijk_s9_hoogwater_index.png"
    }
   }
  },
@@ -948,8 +1217,9 @@
     ]
    ],
    "fps": 10,
+   "fps_vol": 6,
    "z_index": -19,
-   "plaatsing": "S6, middelpunt op S6/Gemaal (4600, 140): staat stil (frame 0) tot de eerste pompslag, draait als het gemaal pompt"
+   "plaatsing": "S6, middelpunt op S6/Gemaal (4600, 140): staat stil (frame 0) tot de eerste pompslag, draait op `fps` zolang het gemaal vult en daarna op `fps_vol` (vol = het gemaal houdt de wijk droog; besluit AD #244)"
   }
  }
 }
