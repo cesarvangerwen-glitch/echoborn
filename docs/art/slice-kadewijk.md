@@ -364,7 +364,7 @@ De loopvlakken zijn alle blokken waar je op kunt staan, ook de pijlerkop, de bol
 | Object | Frames | Waarvoor |
 |---|---|---|
 | `luik` (40 × 16) | 0 dicht met scheur (L-03), 1–2 breuk, 3 open | `scripts/objects/luik.gd` in **S7 en S9**. De sponning bovenaan is licht, zodat het loopvlak leest (ΔL\* zoals het snelluik) |
-| `schaduwklep` (40 × 16) | 0 vol, 1–2 oplossen | **Nu hol** (punt van de CD in #227): alleen een rand en een arcering om de 3 px, zoals de echo. "Vol = levend, hol = echo": je leest dat de echo op zijn eigen klep staat |
+| `schaduwklep` (40 × 16) | 0 vol, 1–2 oplossen | **Nu hol** (punt van de CD in #227): alleen een rand en een arcering om de 3 px, zoals de echo. "Vol = levend, hol = echo": je leest dat de echo op zijn eigen klep staat. De bovenrand is een rechte, doorlopende rij (rij 1). Daar staat de echo, en de test van #241 eist hem |
 | `pompschoep` (32 × 48) | 0 rust, 1–4 slag | De vier `Pomprad`-objecten in S6 |
 | `pompslag` (48 × 48) | 5 frames, een warme ring die in de as stroomt | Bij elke pompslag. **P1 en de echo gebruiken dezelfde schoep-frames, hetzelfde effect en dezelfde timing, 100 % dekkend.** Geen transparantie en geen kleinere versie voor de echo: zijn slag moet even zwaar ogen als die van P1 (CD, #227), anders leest hij als nagalm |
 | `sluisklep` (60 × 10, in een cel van 64 × 16) | dicht, open | `S6/Sluis` |

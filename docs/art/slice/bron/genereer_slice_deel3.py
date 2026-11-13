@@ -142,7 +142,7 @@ def schaduwklep(fase):
     t = T(40, 16)
     yy, xx = np.mgrid[0:16, 0:40]
     r = rng(232)
-    rand_b = 1 + (r.random(40) < 0.3).astype(int)
+    rand_b = np.ones(40, int)       # deel 4: een rechte, doorlopende bovenrand op rij 1 (daar staat de echo; test #241)
     lijf = (yy >= rand_b[xx]) & (yy < 12 + (r.random(40) < 0.4).astype(int)[xx])
     # deel 4, punt van de CD (#227): **hol**, zoals de echo (vol = levend, hol = echo): alleen een rand
     # en een diagonale arcering om de 3 px, geen vulling; de naden van de planken als onderbroken lijnen.
