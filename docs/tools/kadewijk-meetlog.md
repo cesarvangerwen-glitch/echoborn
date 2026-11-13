@@ -54,11 +54,10 @@ F4 en de D-toetsen herladen de scène, dus die run staat daarna als `_afgebroken
 
 `game/tests/test_kadewijk_meetlog.gd`, in de groep `kort`:
 - de MT1-start is ongewijzigd, en de start gebruikt D = 60 met de echo aan;
-- een korte bot-run S1 → S2 schrijft één CSV, met de juiste naam, de kop, 7 kolommen per regel en dezelfde inhoud als het meetlog;
+- een korte bot-run S1 → S2 schrijft één CSV, met de juiste naam, de kop, 7 kolommen per regel, precies één `RUN_EIND` en dezelfde inhoud als het meetlog;
 - het venster sluiten geeft `_afgebroken`;
 - `DEBUG` voor F8 (via het debugmenu), F4 en F2, en de regel `DEBUG` staat ook in de afgebroken CSV.
 
 ## Open punten
 
-- `_end_run` in `kadewijk.gd` schrijft `RUN_EIND` zelf en `meetlog.finish()` schrijft het nog eens. Bij een gewone run staan er dus twee `RUN_EIND`-regels in de CSV. Punt voor de GP. De flow-kamer roept alleen `finish()` aan.
 - Op de kaart en in V-5 staat nog "F5 in de editor". Tot de hoofdscène omgaat, is het "kadewijk.tscn openen, F6" (§1). Punt voor QA, in `ceo-kaart-mt2.md`.

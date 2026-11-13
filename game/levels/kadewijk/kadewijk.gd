@@ -622,7 +622,7 @@ func _on_tick(tick: int) -> void:
 func _end_run(tick: int) -> void:
 	run_over = true
 	end_tick = tick
-	meetlog.add_row(tick, "RUN_EIND", "", "", p1.position)
+	# `finish()` schrijft de enige `RUN_EIND` (zoals in de flow-kamer, #250).
 	meetlog.finish()
 	run_finished.emit(tick)
 

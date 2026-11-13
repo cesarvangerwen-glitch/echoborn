@@ -110,7 +110,7 @@ func test_start_d60_echo_aan_geen_csv_in_tests(t) -> void:
 
 ## Een korte bot-run S1 → S2 (`run_end` = S2): bij `RUN_EIND` staat er één CSV
 ## met de naam van V-6, de kop van het meetlog, 7 kolommen per regel, en
-## dezelfde inhoud als het meetlog in het geheugen.
+## dezelfde inhoud als het meetlog in het geheugen, met precies één `RUN_EIND`.
 func test_csv_na_korte_bot_run(t) -> void:
 	var parts := _wijk(t, 1, null, &"S2")
 	var wijk = parts[0]
@@ -135,6 +135,11 @@ func test_csv_na_korte_bot_run(t) -> void:
 		t.check(lines[1].split(",")[2] == "RUN_START" and lines[1].split(",")[1] == "S1", "eerste regel %s" % lines[1])
 		t.check(text.contains(",S2,KAMER,,S2,"), "geen KAMER S2")
 		t.check(lines[lines.size() - 1].split(",")[2] == "RUN_EIND", "laatste regel %s" % lines[lines.size() - 1])
+		var run_eind := 0
+		for line in lines:
+			if line.split(",")[2] == "RUN_EIND":
+				run_eind += 1
+		t.check(run_eind == 1, "%d regels RUN_EIND in de CSV (verwacht 1)" % run_eind)
 		t.check(not text.contains("DEBUG"), "DEBUG in een run zonder debugtoets")
 	await _free(t, parts)
 
