@@ -1,6 +1,6 @@
 # Testplan MT2: mijlpaaltest Kadewijk S1–S9 met de Gemaalmeester (T11, F4, F4b(a) solo)
 
-Versie 0.1.4 · 2026-11-13 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250) (deel van T11, [#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88)) · Lead-review: Executive Producer
+Versie 0.1.5 · 2026-11-13 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250) (deel van T11, [#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88)) · Lead-review: Executive Producer
 
 Basis: fasekader v0.4 (`docs/productie/fase-2-kader.md`: §3 F4 en F4b, §4 mijlpaaltest MT2, regel tegen weggooiwerk, T11); besluiten van 2026-11-12 in `docs/beslissingen.md` (D = 60 als werkaanname, fase 2 parallel, **de CEO test alleen bij mijlpalen**, kaart ± 10–15 min); kamerdoc `docs/design/kamers/kadewijk.md` v0.4.4 (§3–§9); `docs/design/gemaalmeester.md` v0.2.2 §8 (GM-a–GM-d); `docs/design/combat/slice-vijanden-en-boss.md` v0.1.4 (§2.6, open punt 15); gdd §3.5 (V-01) en **§5.1** (grens F4b(b)); `docs/audio/bible.md` §9.4 (luistercheck F2); `docs/art/slice-kadewijk.md` §9.7; testplan MT1 v0.1.3 (`docs/qa/testplan-mt1.md`, W25–W30).
 
@@ -56,7 +56,7 @@ De Producer geeft de CEO de kaart pas als alle regels hieronder ✅ zijn. Ontbre
 | V-7 | **Geen valkuil-toetsen**: F8, de D-toetsen en F4 loggen eerst een regel `DEBUG` (waarde de toets, bron de kamer, de nieuwe D of `echo_uit`/`echo_aan`), zodat QA een run met een sprong herkent | De kaart verbiedt ze, maar een misdruk moet zichtbaar zijn | Tools Programmer | ✅ via PR [#257](https://github.com/cesarvangerwen-glitch/echoborn/pull/257) (`f18dff2`) |
 | V-8 | **Respawn werkt in elke kamer** en kost geen vastloper: bij 0 levenspunten terug op het checkpoint (S1, na de eerste pompslag S6), `RESPAWN` in het log | GM-11, SL-03 | GP | ✅ in code en tests (`kadewijk.md` §5, §3e); controle in de doorloop van V-10 |
 | V-9 | **Kleurtoestand van S3** (voor RV-5): de verlichte wijk met de verlichte ramen in kleur in de build, en de echo in zijn eindweergave (rand + buitencontour, F-07/S-10) | Zonder kleur is RV-5 niet te vragen | TA, AD | ☐ **geen harde voorwaarde**: ontbreekt het, dan schrapt QA vraag 13 en schuift RV-5 naar MT3 |
-| V-10 | **Luistercheck klaar**: het luisterfragment voor MT2, `docs/audio/luistercheck-mt2/luistercheck_mt2_placeholder.ogg` (66,6 s; 0,0–15,5 s is het F2-fragment v2 sample voor sample, daarna L1–L3 per vraag naast elkaar; PR [#260](https://github.com/cesarvangerwen-glitch/echoborn/pull/260) van de Composer/Sound Designer, nog in review), staat op `main`, met de link in de kaart §4 | Audio bible §9.4 | Composer/Sound Designer, Audio Director | ☐ wacht op de merge van #260; daarna de link in de kaart |
+| V-10 | **Luistercheck klaar**: het luisterfragment voor MT2, `docs/audio/luistercheck-mt2/luistercheck_mt2_placeholder.ogg` (66,6 s; 0,0–15,5 s is het F2-fragment v2 sample voor sample, daarna L1–L3 per vraag naast elkaar) staat op `main` (PR [#260](https://github.com/cesarvangerwen-glitch/echoborn/pull/260)), met de link in de kaart §4 | Audio bible §9.4 | Composer/Sound Designer, Audio Director | ✅ via #260; link in de kaart, vast op `85c6650` |
 
 ### 2.2 Bots groen op de build
 
@@ -77,7 +77,7 @@ Gedraaid door QA op de build van §2.3, met de suite (`godot --headless --path g
 | 11 | Suite | volledig groen, ook D = 90 / 120 / 180 als regressie | **437 geslaagd, 0 mislukt** (271,7 s) op `de037be`, Godot 4.6.3 headless | ✅ |
 | 12 | Start, D en meetlog (V-5, V-6) | test: de build start de Kadewijk op D = 60; het meetlog schrijft een CSV met de naam van V-6 | `test_kadewijk_meetlog.gd` (PR #257): MT1-start ongewijzigd, D = 60 met echo aan, één CSV met de juiste naam en kop, `_afgebroken`, `DEBUG` | ✅ |
 
-**Stand op `de037be` (2026-11-13): niet groen.** ✅: V-2–V-8; bot-punten 1–12 (punt 3 met bevinding B-1, geen voorwaarde). Open: V-1 (MT1 wacht op de CEO) en V-10 (het luisterfragment, PR #260 in review). V-9 is geen harde voorwaarde.
+**Stand op `85c6650` (2026-11-13): groen op één voorwaarde na.** ✅: V-2–V-8 en V-10; bot-punten 1–12 (punt 3 met bevinding B-1, geen voorwaarde). Open: alleen **V-1** (MT1 wacht op de CEO, #80). V-9 is geen harde voorwaarde. Vóór de sessie vult QA nog de build-commit en de zip-link in (§2.3, kaart).
 
 ### 2.4 Uitkomst van de MT2-tooling op de lus (QA, `de037be`)
 
@@ -268,6 +268,7 @@ D = 60 is een CEO-besluit **als werkaanname** (nog niet gespeeld, `beslissingen.
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.1.5 | 2026-11-13 | V-10 ✅ (luisterfragment op `main`, #260), link in de kaart §4; stand op `85c6650`: open alleen V-1 |
 | 0.1.4 | 2026-11-13 | Na Lead-review EP (#261): bot-punt 3 ✅ voor de MT2-norm, B-1 bevinding en geen voorwaarde; besluit LGD over B-1 ([besluit LGD in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429)): `POMP` van de echo telt voor gaten en rustpunt (niet voor MP-2), `rekenen.gd` aangepast (na trap 2: 1202 ticks, 20,0 s); RV-6 en vraag 9b; V-10 met het luisterfragment uit PR #260 |
 | 0.1.3 | 2026-11-13 | MT2-tooling gebouwd (`docs/qa/mt2-meetlogs/botlogs.gd`, `rekenen.gd`; MT1-scripts ongewijzigd) en gedraaid op de lus bij D = 60/90/120/180; suite 437/0. Bot-punten 4, 9, 10, 11 ✅, punt 3 ☐ (S9-rustpunt in de lus 932 > 720, B-1); §2.4 met de uitkomst, de hangtijd (D = 60: 9–10 ticks op elk keerpunt) en de bevindingen B-1–B-4; open punt 3 gesloten |
 | 0.1.2 | 2026-11-13 | Stand bijgewerkt: V-2 (a)–(c) ✅ (CD past, boss 97,9 s / fase 2 63,5 s en vaste arena-camera via #253), V-3 (a) ✅ (CD past), V-4 ✅ (lus, 0 echo-breuken via #252/#254), bot-punten 1, 2, 7 ✅; V-5–V-7 naar PR #257 (start: `kadewijk.tscn` + F6 tot MT1 klaar is; spelvenster sluiten, niet de stopknop, anders geen CSV); stopregel ± 8 min, spelen ± 6–8 min (SM-review #251). Na Lead-review EP (#258): open punt 1 op ± 8 min; V-2 (d) en V-3 (b) ✅ (S8 en S9 maatvast, LGD in #83). Na SM-review #258: V-5–V-7 en bot-punt 12 ✅ via #257 (`f18dff2`), stand-regel op `f18dff2`, open punt 2 gesloten |
