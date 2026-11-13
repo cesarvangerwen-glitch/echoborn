@@ -5,9 +5,11 @@ extends RefCounted
 ##
 ## Headless draait Godot met de Dummy-driver: er klinkt niets en `SimSfx` roept
 ## `play()` niet aan (anders telt een afspeling bij het afsluiten als lek), maar
-## de spelers, bussen en starts bestaan gewoon. De test controleert daarom wat elke
+## de spelers, bussen en starts bestaan gewoon (`gespeeld` is dan `false`). De test controleert daarom wat elke
 ## `AudioStreamPlayer2D` krijgt (stream-object, `volume_db`, bus, send,
-## `pitch_scale`, plek) en wanneer hij start, niet het geluid zelf.
+## `pitch_scale`, plek) en wanneer hij start, niet het geluid zelf. De echte
+## afspeling (P1 en de echo even luid en van dezelfde soort) wordt pas
+## gecontroleerd bij de opname van een doorloop van S6 (D = 60, "Klaar als" van #243).
 
 const Fx = preload("res://tests/echo_fixture.gd")
 const InputBits = preload("res://scripts/input/input_bits.gd")
@@ -148,6 +150,10 @@ func test_pompslag_p1_en_echo_gelijk_d60(t) -> void:
 	t.check(is_equal_approx(a["pitch"], 1.0), "pitch P1 %.4f (verwacht 1,0)" % a["pitch"])
 	t.check(absf(b["pitch"] - ECHO_PITCH) <= 0.001, "pitch echo %.4f (verwacht 0,944 ± 0,001)" % b["pitch"])
 	t.check(is_zero_approx(a["from"]) and is_zero_approx(b["from"]), "beginpunt niet 0")
+	# Headless (Dummy-driver) zet SimSfx alles klaar maar speelt niet af.
+	var dummy := AudioServer.get_driver_name() == SimSfx.DUMMY_DRIVER
+	t.check(a["gespeeld"] == (not dummy) and b["gespeeld"] == (not dummy),
+		"gespeeld %s / %s bij driver %s" % [a["gespeeld"], b["gespeeld"], AudioServer.get_driver_name()])
 	# Op de Sim-tick van `pumped`, in die aanroep en in een physics-frame (niet uit `_process`).
 	for i in 2:
 		var p: Dictionary = pumps[i]

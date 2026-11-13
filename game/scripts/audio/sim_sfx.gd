@@ -20,13 +20,15 @@ extends Node
 ##
 ## **Log.** `starts` houdt de laatste `MAX_LOG` starts bij (tick, stream, bus,
 ## send, volume, pitch, beginpunt, wie, plek, of het in een physics-frame
-## was), voor tests en later de meetlog. Alleen audio, nooit Sim-stand.
+## was, en `gespeeld`: of `play()` echt werd aangeroepen), voor tests en later de meetlog. Alleen audio, nooit Sim-stand.
 
 const AudioBuses = preload("res://scripts/audio/audio_buses.gd")
 
 ## Waarden van de audio (designers en de Audio Director tunen zonder code).
 const DATA_PATH := "res://data/audio.json"
 const MAX_LOG := 64
+## Naam van de audiodriver zonder uitvoer (headless: tests, bots).
+const DUMMY_DRIVER := "Dummy"
 
 static var _data: Dictionary = {}
 
@@ -76,7 +78,7 @@ static func place_of(node: Node2D) -> Vector2:
 ## CI als lek. Dan zet `SimSfx` de speler wel klaar (stream, bus, volume,
 ## pitch, plek, log), maar roept hij `play()` niet aan.
 static func silent_driver() -> bool:
-	return AudioServer.get_driver_name() == "Dummy"
+	return AudioServer.get_driver_name() == DUMMY_DRIVER
 
 
 ## `2^(halftonen / 12)`.
@@ -99,12 +101,13 @@ func play_on_tick(tick: int, sfx: AudioStream, at: Vector2, bus: StringName,
 	player.pitch_scale = pitch
 	# De ouder (`SimSfx`) is geen CanvasItem: `position` is de plek in de wereld.
 	player.position = at
-	if player.is_inside_tree() and not silent_driver():
+	var played := player.is_inside_tree() and not silent_driver()
+	if played:
 		player.play(from)
 	starts.append({"tick": tick, "stream": player.stream, "bus": player.bus,
 		"send": AudioBuses.send_of(player.bus), "area_mask": player.area_mask,
 		"volume_db": player.volume_db, "pitch": player.pitch_scale, "from": from,
-		"who": who, "at": at, "physics": Engine.is_in_physics_frame(), "player": player})
+		"who": who, "at": at, "physics": Engine.is_in_physics_frame(), "gespeeld": played, "player": player})
 	if starts.size() > MAX_LOG:
 		starts.pop_front()
 	return player
