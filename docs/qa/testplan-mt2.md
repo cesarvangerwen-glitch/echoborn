@@ -1,6 +1,6 @@
 # Testplan MT2: mijlpaaltest Kadewijk S1–S9 met de Gemaalmeester (T11, F4, F4b(a) solo)
 
-Versie 0.1.5 · 2026-11-13 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250) (deel van T11, [#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88)) · Lead-review: Executive Producer
+Versie 0.1.6 · 2026-11-13 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250) (deel van T11, [#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88)) · Lead-review: Executive Producer
 
 Basis: fasekader v0.4 (`docs/productie/fase-2-kader.md`: §3 F4 en F4b, §4 mijlpaaltest MT2, regel tegen weggooiwerk, T11); besluiten van 2026-11-12 in `docs/beslissingen.md` (D = 60 als werkaanname, fase 2 parallel, **de CEO test alleen bij mijlpalen**, kaart ± 10–15 min); kamerdoc `docs/design/kamers/kadewijk.md` v0.4.4 (§3–§9); `docs/design/gemaalmeester.md` v0.2.2 §8 (GM-a–GM-d); `docs/design/combat/slice-vijanden-en-boss.md` v0.1.4 (§2.6, open punt 15); gdd §3.5 (V-01) en **§5.1** (grens F4b(b)); `docs/audio/bible.md` §9.4 (luistercheck F2); `docs/art/slice-kadewijk.md` §9.7; testplan MT1 v0.1.3 (`docs/qa/testplan-mt1.md`, W25–W30).
 
@@ -23,7 +23,9 @@ MT2 is de tweede mijlpaaltest: de CEO speelt de **Kadewijk van begin tot eind, s
 2. **F4 bij een mens, solo**: de normen (1)–(3) van P1 in de slice (MP-1, MP-2 per kamer, MP-5), echo ≤ 40 % Leeg (MP-4), MP-3, MP-6. De bots tonen dat de slice het *kán* (§2), MT2 meet of de CEO het *doet*.
 3. **F4b(b) solo** (gdd §5.1): de echo ook buiten de boss-arena, uit het meetlog. Een eerste meting; het oordeel F4b(b) vraagt ook co-op (MT3).
 4. **De Gemaalmeester** (gemaalmeester.md §8): GM-a (schot), GM-b (springplank in fase 2), GM-c (finisher), GM-d (stilstand); V-01 (gdd §3.5: stuit per gevecht).
-5. **Vijf meetvragen uit de reviews** (§1.1).
+5. **Zes meetvragen uit de reviews** (§1.1).
+
+Het overkoepelende plan voor T11 (alle kamers en de boss, solo en co-op, met wat de bots al dekken en wat nog ontbreekt) is `docs/qa/testplan-t11-slice.md`; dit plan is het deel MT2.
 6. **Luistercheck F2** (audio bible §9.4): drie ja/nee-vragen op het F2-fragment, **alleen op koptelefoon, ± 2 min** (EP-besluit, [Lead-review PR #251](https://github.com/cesarvangerwen-glitch/echoborn/pull/251#issuecomment-6842638354); de bible volgt in #249). Afgesproken op de kaart van MT2 (EP, PR #199), geen aparte sessie; niet naar MT3, want F2 is een voorwaarde voor T8d deel 2.
 
 Niet in MT2: co-op en P2 (MT3, F4b(c)); eindkwaliteit van art en audio als oordeel (MT3, F7); de sterke *Nine Sols*-check (F4b(c)); een tweede D (D = 90, 120 en 180 alleen als regressie in de bots).
@@ -166,7 +168,7 @@ Zoals MT1 §4.2 en W26, nu per keerpunt van de slice: **S1-B1, S2-B3, S2-B1, S4-
 | RV-3 S5 | kamertijd S5 tegen 1304; A–D voor B2a–d; MP-1 en MP-2 in S5 | bot 1304 ticks, 4 × A | vraag 7 = C ("te lang, saai"): bevinding voor de LGD en CD (besluit 3 opnieuw: variatie, niet per se een vijand) |
 | RV-4 lege loop | ticks van de laatste `ONTPLOFFING` in S3 tot de volgende echo-actie (S4) | bot 540 (9,0 s) | > 600 ticks (± 10 s) **of** vraag 9 = B: punt 15 voor de Combat Designer (de Kadeloper naar het begin van de aanloop, of de aanloop korter) |
 | RV-5 raam | niets uit het log; alleen vraag 13 (als V-9 ✅) | AD: ΔL\* 35 tegen ≥ 40 | vraag 13 = B of C: de buitencontour van 1 px in kleur voor de TA (F-07/S-10) |
-| RV-6 na trap 2 | ticks van de laatste `POMP` van de echo bij trap 2 tot de eerste echo-actie in S9; gaten en rustpunt met `POMP` van de echo als echo-moment (LGD, B-1) | bot 1202 (20,0 s) | vraag 9b = B ("leeg lopen"): de WLD kiest een echo-moment op of onder de trap terug (LGD, #83). A = beloning: zo laten |
+| RV-6 na trap 2 | ticks van de laatste `POMP` van de echo bij trap 2 tot de eerste echo-actie in S9; gaten en rustpunt met `POMP` van de echo als echo-moment (LGD, B-1) | bot 1202 (20,0 s) | vraag 9b = B ("leeg lopen"): de WLD kiest een echo-moment op of onder de trap terug (LGD, #83). A = beloning: zo laten. Pompte de echo bij trap 2 niet (echo Leeg of gebroken), dan rekent QA vanaf de laatste `POMP` van P1 en zegt dat erbij (`rekenen.gd` doet dat nog niet, T11 §6 punt Q-2) |
 
 ### 4.4 Tooling (`docs/qa/mt2-meetlogs/`)
 
@@ -226,14 +228,14 @@ Het rapport noemt bij elk oordeel hoeveel het draagt: één speler, één doorlo
 
 | Uitkomst | QA-advies en gevolg |
 |---|---|
-| Vraag 1 = A/B, vraag 2 ≠ I, vraag 3 = A; MP-5 ≥ 4,0 en geen deel < 3,0; MP-1 ≤ 300 in elke kamer; MP-4 ≤ 40 %; geen `BREEK` | **F4b(a) solo positief, F4 solo bij een mens bevestigd.** Op naar T8c/T8d op de maatvaste kamers en MT3 (solo én co-op). De meetvragen RV-1–RV-5 gaan als bevindingen naar hun eigenaar (§4.3) |
+| Vraag 1 = A/B, vraag 2 ≠ I, vraag 3 = A; MP-5 ≥ 4,0 en geen deel < 3,0; MP-1 ≤ 300 in elke kamer; MP-4 ≤ 40 %; geen `BREEK` | **F4b(a) solo positief, F4 solo bij een mens bevestigd.** Op naar T8c/T8d op de maatvaste kamers en MT3 (solo én co-op). De meetvragen RV-1–RV-6 gaan als bevindingen naar hun eigenaar (§4.3) |
 | F4b(a) solo negatief (vraag 1 = C/D, of 2 = I, of 3 = C) | **Geen go voor MT3 op deze basis.** QA zet de plek en de oorzaak (§4.1–§4.3) op een rij; de CD en LGD stellen een herzien voorstel op (fasekader F4b: "anders geen gate maar een herzien voorstel"). Raakt het de echo of een kernregel: stopregel voor eindkwaliteit op de geraakte kamers (fasekader §4). Of er een extra mijlpaaltest komt, beslist de EP |
 | MP-5 < 4,0 of een deel < 3,0, de rest positief | **Geen go op norm (3).** De LGD stelt per deel een aanpassing voor, getest met de bots; de CEO speelt het in MT3 |
 | Een kamer met MP-1 > 300 of MP-2 < 3,0, of een verdwaalpunt (> 3× de bot) | **Bevinding met plek** voor de WLD/LGD, aanpassing met de bots, zonder CEO. Geen no-go op zichzelf (§3, eerste doorloop); wel als het de kamer van een *klikmoment* tegenspreekt of in meer dan twee kamers gebeurt |
 | MP-4 > 40 %, of een `BREEK` | Bevinding voor de LGD en GP (R12, E-08); aanpassing met de bots |
 | F4b(b) solo onder een grens | **Signaal**, nog geen oordeel (F4b(b) vraagt beide modi): de waarden per kamer naar de LGD; telt mee in MT3 |
 | GM-a > 60 s of vraag 10 = C/D; GM-b < 2 per min; vraag 11 = C | Bevinding voor de Combat Designer en GP (T8b), met de boss-events per fase |
-| RV-1–RV-5 | Zoals §4.3: naar LGD, CD, Combat Designer of TA; geen invloed op go/no-go, behalve als de CEO het zelf noemt bij vraag 14 of het klikmoment erop stuk loopt |
+| RV-1–RV-6 | Zoals §4.3: naar LGD, CD, Combat Designer, WLD of TA; geen invloed op go/no-go, behalve als de CEO het zelf noemt bij vraag 14 of het klikmoment erop stuk loopt |
 | *Nine Sols* bij vraag 12 | Terug naar afwijkpunt 2 (gdd §2.13); LGD en Combat Designer |
 | Luistercheck: drie keer ja | F2: de luisterhelft gehaald (samen met SM-Kwaliteit ≥ 7, bible §0) |
 | Luistercheck: een nee | Bible §9.3: vraag 1 → klokken, 2 → `echo_versie`, 3 → water, harmonium, galm; de Audio Director opent zo nodig een `brainstorm` |
@@ -268,6 +270,7 @@ D = 60 is een CEO-besluit **als werkaanname** (nog niet gespeeld, `beslissingen.
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.1.6 | 2026-11-13 | T11 ([#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88)): besluit LGD over B-1 nagelopen (vraag 9b en de meting staan sinds 0.1.4); telling naar zes meetvragen (§1), RV-6 ook in §6; RV-6 zonder pompslag van de echo vanaf de laatste `POMP` van P1 (§4.3); verwijzing naar `testplan-t11-slice.md` |
 | 0.1.5 | 2026-11-13 | V-10 ✅ (luisterfragment op `main`, #260), link in de kaart §4; stand op `85c6650`: open alleen V-1 |
 | 0.1.4 | 2026-11-13 | Na Lead-review EP (#261): bot-punt 3 ✅ voor de MT2-norm, B-1 bevinding en geen voorwaarde; besluit LGD over B-1 ([besluit LGD in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429)): `POMP` van de echo telt voor gaten en rustpunt (niet voor MP-2), `rekenen.gd` aangepast (na trap 2: 1202 ticks, 20,0 s); RV-6 en vraag 9b; V-10 met het luisterfragment uit PR #260 |
 | 0.1.3 | 2026-11-13 | MT2-tooling gebouwd (`docs/qa/mt2-meetlogs/botlogs.gd`, `rekenen.gd`; MT1-scripts ongewijzigd) en gedraaid op de lus bij D = 60/90/120/180; suite 437/0. Bot-punten 4, 9, 10, 11 ✅, punt 3 ☐ (S9-rustpunt in de lus 932 > 720, B-1); §2.4 met de uitkomst, de hangtijd (D = 60: 9–10 ticks op elk keerpunt) en de bevindingen B-1–B-4; open punt 3 gesloten |
