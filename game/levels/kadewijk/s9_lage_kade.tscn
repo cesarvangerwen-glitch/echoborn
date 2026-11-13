@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
 [ext_resource type="Script" path="res://scripts/combat/slice_enemy.gd" id="2_enemy"]
@@ -6,11 +6,46 @@
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_schaduwklep.gd" id="20_schaduwklep"]
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_luikbeeld.gd" id="21_luikbeeld"]
 [ext_resource type="Script" path="res://scripts/objects/pickup.gd" id="30_pickup"]
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_art.gd" id="10_art"]
+[ext_resource type="Texture2D" uid="uid://br1f53l7mpyvo" path="res://art/wereld/kadewijk/s9_lage_kade_achter_grijs.png" id="11_achter"]
+[ext_resource type="Texture2D" uid="uid://caae1senu8ci6" path="res://art/wereld/kadewijk/s9_lage_kade_midden_grijs.png" id="12_midden"]
+[ext_resource type="Texture2D" uid="uid://blv1jlq5q641t" path="res://art/wereld/kadewijk/s9_lage_kade_speelvlak_grijs.png" id="13_speelvlak"]
+[ext_resource type="Texture2D" uid="uid://dyisdf18pyacu" path="res://art/wereld/kadewijk/s9_lage_kade_licht_grijs.png" id="14_licht"]
 
 [node name="S9Inhoud" type="Node2D"]
 position = Vector2(-2080, -540)
 script = ExtResource("1_inhoud")
 kamer_id = &"S9"
+
+[node name="Art" type="Node2D" parent="."]
+texture_filter = 1
+script = ExtResource("10_art")
+kamer_id = &"S9"
+naam = "s9_lage_kade"
+
+[node name="Achter" type="Sprite2D" parent="Art"]
+z_index = -30
+position = Vector2(0, 360)
+texture = ExtResource("11_achter")
+centered = false
+
+[node name="Midden" type="Sprite2D" parent="Art"]
+z_index = -20
+position = Vector2(0, 360)
+texture = ExtResource("12_midden")
+centered = false
+
+[node name="Speelvlak" type="Sprite2D" parent="Art"]
+z_index = -10
+position = Vector2(0, 360)
+texture = ExtResource("13_speelvlak")
+centered = false
+
+[node name="Licht" type="Sprite2D" parent="Art"]
+z_index = -5
+position = Vector2(0, 360)
+texture = ExtResource("14_licht")
+centered = false
 
 [node name="Paar1A" type="Node2D" parent="."]
 position = Vector2(1060, 623)

@@ -9,6 +9,8 @@ extends Sprite2D
 ## - `speel(reeks, na)`: de frames van `reeks` op `fps` uit het manifest, daarna
 ##   frame `na` (of weg bij `na < 0`).
 ## - `lus(aan)`: alle frames rond, op `fps` (het rad).
+## - `set_vol(vol)`: op `fps_vol` uit het manifest in plaats van `fps` (het rad
+##   als het gemaal vol is, deel 5 §12.2); zonder `fps_vol` verandert er niets.
 ## - `set_staat()`: `grijs` / `half` / `kleur`, zoals `KadewijkArt.set_staat`
 ##   (die roept dit aan voor alle objecten in de groep `GROEP` onder zijn kamer).
 ##
@@ -32,6 +34,10 @@ var staat := "grijs"
 var frame_nu := -1
 var _frames: Array = []
 var _frametijd := 1.0 / 12.0
+var _fps := 12.0
+var _fps_vol := 12.0
+## Draait het object op `fps_vol` (`set_vol`)?
+var vol := false
 var _klok := 0.0
 var _reeks: Array = []
 var _na := -1
@@ -50,7 +56,9 @@ func _ready() -> void:
 	if obj.is_empty():
 		push_error("KadewijkObject: onbekende soort '%s'" % soort)
 	_frames = obj.get("frames", [])
-	_frametijd = 1.0 / float(obj.get("fps", 12))
+	_fps = float(obj.get("fps", 12))
+	_fps_vol = float(obj.get("fps_vol", _fps))
+	_frametijd = 1.0 / (_fps_vol if vol else _fps)
 	z_index = int(obj.get("z_index", 0))
 	centered = false
 	region_enabled = true
@@ -71,6 +79,16 @@ func set_staat(nieuw: String) -> void:
 		return
 	staat = nieuw
 	texture = load(KadewijkArt.DIR + bestand)
+
+
+func set_vol(p_vol: bool) -> void:
+	vol = p_vol
+	_frametijd = 1.0 / (_fps_vol if vol else _fps)
+
+
+## Frames per seconde nu (`fps` of `fps_vol`).
+func fps_nu() -> float:
+	return 1.0 / _frametijd
 
 
 func aantal_frames() -> int:
