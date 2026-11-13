@@ -469,6 +469,7 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 **World & Level Designer (na de lus, #83):**
 - **De echo breekt op de trap terug van het plein** bij D ≥ 120 (§6d): S6 en S9 zijn geen buren. Voorstel: S6 als buur van S9 (laadt mee; de vijanden slapen tot P1 er is), of de trap zo dat P1 langer in S5 is.
 - **Afwijking 20** (de drempel onder `DeurLinks`) ter bevestiging.
+- **TD/WLD: de echo-breuk op de trap terug** (D ≥ 120) is architectuur: de AreaLoader ontlaadt S6 terwijl de echo er nog afspeelt. De WLD past buren of trap aan; kan dat niet, dan neemt de TD "geladen houden zolang de echo erin speelt" op in de AreaLoader. `test_kadewijk_lus.gd` eist nu hard: bij 120 en 180 hooguit 1 breuk, alleen in S6 op de trap terug.
 
 **Technical Artist / Art (deel 3):** het snelluik in de gang van S1 (x 460–500, afwijking 14) in de art van S1 (#226); S9 heeft nog geen art.
 

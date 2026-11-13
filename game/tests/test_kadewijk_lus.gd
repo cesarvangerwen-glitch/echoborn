@@ -425,10 +425,17 @@ func _lus(t, d: int) -> void:
 	t.check(wijk.most_at_once <= 5, "%s: %d vijanden tegelijk (L-13 f)" % [name, wijk.most_at_once])
 	t.check(boss_bots.size() == 1, "%s: %d keer een boss-bot (verwacht 1: één poging)" % [name, boss_bots.size()])
 	t.check(hits.size() <= 4, "%s: %d treffers op P1 (≤ 4, zoals de boss-runs)" % [name, hits.size()])
-	# De echo breekt nergens bij D = 60 (V-01d, #227); bij 120 en 180 rapport: op de
-	# trap terug van het plein naar S9 ontlaadt S6 terwijl de echo er nog loopt (kamerdoc §9).
+	# De echo breekt nergens bij D = 60 (V-01d, #227). Bij 120 en 180 hooguit één keer,
+	# en alleen in S6 na trap 2: op de trap terug naar S9 ontlaadt S6 terwijl de echo
+	# er nog loopt (kamerdoc §9, TD/WLD). Een breuk elders maakt de test rood (Lead-review TD #252).
 	if d == 60:
 		t.check(breaks.is_empty(), "%s: de echo brak %d× (%s)" % [name, breaks.size(), breaks])
+	else:
+		var elsewhere := breaks.filter(func(b: Array) -> bool:
+			return Layout.room_of(b[2]) != &"S6" or int(b[0]) <= int(at["trap2"]) or int(b[0]) >= int(at["af"]))
+		t.check(breaks.size() <= 1 and elsewhere.is_empty(),
+			"%s: de echo brak %d× (≤ 1, alleen in S6 op de trap terug, tussen trap 2 op %d en S9 op %d): %s" % [
+			name, breaks.size(), at["trap2"], at["af"], breaks])
 	var seg := func(a: int, b: int) -> String: return "%d" % (b - a) if a >= 0 and b >= 0 else "?"
 	t.note(("%s: run %d ticks (%.1f s) · S1 → S8 %s · S8 → BOSS_START %s · boss %s · → plein %s · trap 2 %s · → S9 (trap af) %s · " +
 		"S9 → SLICE_EIND %s · per kamer %s · MP-1 %d · MP-2 %.1f per min, langste gat %d · LP %d · treffers %d (%s) · echo-breuken %d %s · " +
