@@ -123,13 +123,13 @@ func test_b11_slice_csv_complete_and_consistent(t) -> void:
 	t.check(e_pair <= float(c["explosion_radius_px"]), "E-paar %.0f px buiten E" % e_pair)
 	t.check(k_pair >= 40.0 and k_pair <= 44.0 and k_pair > float(c["explosion_radius_px"])
 		and k_pair <= float(c["chain_radius_px"]), "K-paar %.0f px niet in 40–44" % k_pair)
-	# Gemaalmeester (voor B-5–B-10): dalende drempels, 150 SE per opening, Wankel op 300.
+	# Gemaalmeester (voor B-5–B-10; v0.1.5, #247): dalende drempels, 100 SE per opening, Wankel op 350 (20 %).
 	var gm: Dictionary = all.get("gemaalmeester", {})
 	var thresholds: Array = []
 	for i in int(gm.get("openingen", 0)):
 		thresholds.append(int(gm.get("drempel_%d" % (i + 1), -1)))
-	t.check(thresholds == [1350, 1200, 1050, 900] and int(gm.get("se", 0)) == 1500
-		and int(gm.get("wankel_se", 0)) == 300, "boss-drempels %s, SE %s" % [thresholds, gm.get("se")])
+	t.check(thresholds == [1650, 1550, 1450, 1350, 1250, 1150, 1050] and int(gm.get("se", 0)) == 1750
+		and int(gm.get("wankel_se", 0)) == 350, "boss-drempels %s, SE %s" % [thresholds, gm.get("se")])
 
 
 # --- B-1: gedeelde regels -------------------------------------------------------

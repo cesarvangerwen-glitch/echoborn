@@ -30,6 +30,18 @@ const R := InputBits.RIGHT
 const J := InputBits.JUMP
 const A := InputBits.ATTACK
 const ALL_D := [60, 120, 180, 90]
+
+
+## GMB-10, GMB-11 uit `slice.csv` (#247: de getallen staan in de data, niet vast in de test).
+static func _se() -> int:
+	return EnemyData.ticks("gemaalmeester", "se")
+
+
+static func _thresholds() -> Array:
+	var out: Array = []
+	for i in EnemyData.ticks("gemaalmeester", "openingen"):
+		out.append(EnemyData.ticks("gemaalmeester", "drempel_%d" % (i + 1)))
+	return out
 ## Arena: de boss-node op x = 0, op de bovenkant van de vloer; arena-x = wereld-x.
 const ORIGIN := Vector2(0, Fx.FLOOR_TOP)
 ## Middelpunt van de testboss (hurtbox 32 breed: 129–161).
@@ -188,7 +200,12 @@ func test_b5_boss_data_consistent(t) -> void:
 	var thresholds: Array = []
 	for i in EnemyData.ticks(g, "openingen"):
 		thresholds.append(EnemyData.ticks(g, "drempel_%d" % (i + 1)))
-	t.check(se == 1500 and thresholds == [1350, 1200, 1050, 900], "SE %d, drempels %s" % [se, thresholds])
+	# v0.1.5 (#247, LGD): 7 openingen van 100 SE, fase 2 700 SE (10 kanten van 2 × 33).
+	t.check(se == 1750 and thresholds == [1650, 1550, 1450, 1350, 1250, 1150, 1050], "SE %d, drempels %s" % [se, thresholds])
+	var steps_equal := true
+	for i in thresholds.size():
+		steps_equal = steps_equal and (thresholds[i - 1] if i > 0 else se) - thresholds[i] == (se - thresholds[-1]) / thresholds.size()
+	t.check(steps_equal, "GMB-11: openingen niet even groot: %s" % [thresholds])
 	# GMB-10: fase 1 tot 60 %, Wankel op 20 %.
 	t.check(thresholds[-1] * 10 == se * 6 and EnemyData.ticks(g, "wankel_se") * 5 == se, "60 % / 20 % kloppen niet")
 	# GMB-02: de merkplek is het middelpunt van het schot, op 24–48 px (GM-06).
@@ -507,7 +524,7 @@ func test_c14_gemaalmeester_wankel_finisher(t) -> void:
 
 
 ## B-5 / GM-01 en GM-11: BOSS_START als P1 de arena in komt, de deur dicht; bij 0 levenspunten
-## respawnt P1 (buiten de arena) en begint de boss opnieuw: 1500 SE, fase 1, adds weg, arena open.
+## respawnt P1 (buiten de arena) en begint de boss opnieuw: vol (`se`), fase 1, adds weg, arena open.
 ## Komt P1 weer binnen, dan opnieuw BOSS_START.
 func test_b5_arena_and_reset_on_respawn(t) -> void:
 	var w := _world(t, -40.0)
@@ -527,7 +544,7 @@ func test_b5_arena_and_reset_on_respawn(t) -> void:
 	var start: int = log["started"][0]
 	# Een opening tot de drempel (debug), adds uit de spuigaten, en P1 op 1 levenspunt.
 	boss.ketel.break_armor(sim.tick)
-	boss.set_health(sim.tick, 1350)
+	boss.set_health(sim.tick, _thresholds()[0])
 	await t.run_ticks(sim, 35)
 	t.check(boss.opening_index == 1 and boss.adds.size() == 2, "opening %d, adds %d" % [boss.opening_index, boss.adds.size()])
 	var adds: Array = boss.adds.duplicate()
@@ -535,7 +552,7 @@ func test_b5_arena_and_reset_on_respawn(t) -> void:
 	await _run_until(t, sim, func() -> bool: return not log["reset"].is_empty(), 400, 1)
 	t.check(log["reset"].size() == 1 and p1.died, "geen reset op de respawntick: %s" % [log["reset"]])
 	await t.run_ticks(sim, 2)
-	t.check(boss.se == 1500 and boss.phase == Gemaalmeester.Phase.ONE and boss.opening_index == 0
+	t.check(boss.se == _se() and boss.phase == Gemaalmeester.Phase.ONE and boss.opening_index == 0
 		and boss.state == Boss.State.IDLE and not boss.arena_closed and door.collision_layer == 0,
 		"na reset: %d SE, fase %d, opening %d, staat %d, deur %d" % [boss.se, boss.phase, boss.opening_index,
 			boss.state, door.collision_layer])
@@ -779,7 +796,7 @@ func test_b7_strike_once_and_walk_away(t) -> void:
 		await _play(t, sim, w["p1"], L, 40)
 		await _run_to(t, sim, x + d + 10)
 		t.check(broke == [x + d + 3], "D = %d: schot brak op %s (verwacht %d)" % [d, broke, x + d + 3])
-		t.check(log["damage"].is_empty() and boss.se == 1500 and boss.core_open, "D = %d: schade %s" % [d, log["damage"]])
+		t.check(log["damage"].is_empty() and boss.se == _se() and boss.core_open, "D = %d: schade %s" % [d, log["damage"]])
 		t.check(boss.shake_at(x + d + 3) == 2.0 and boss.shake_at(x + d + 9) == 0.0, "D = %d: schermschok" % d)
 		await t.cleanup()
 
@@ -798,7 +815,7 @@ func test_b7_echo_off_never_breaks(t) -> void:
 	var tinks := []
 	boss.ketel.armor_tinked.connect(func(tick: int) -> void: tinks.append(tick))
 	await t.run_ticks(sim, 6000)
-	t.check(broke.is_empty() and boss.se == 1500 and log["damage"].is_empty(), "echo uit: breuk %s, %d SE" % [broke, boss.se])
+	t.check(broke.is_empty() and boss.se == _se() and log["damage"].is_empty(), "echo uit: breuk %s, %d SE" % [broke, boss.se])
 	t.check(tinks.size() >= 290, "%d tinks (elke slag)" % tinks.size())
 	await t.cleanup()
 
@@ -813,7 +830,7 @@ func test_b7_coop_p2_never_hits_never_breaks(t) -> void:
 	var broke := []
 	boss.shot_broken.connect(func(tick: int) -> void: broke.append(tick))
 	await t.run_ticks(sim, 6000)
-	t.check(broke.is_empty() and boss.se == 1500, "P2 slaat nooit: breuk %s" % [broke])
+	t.check(broke.is_empty() and boss.se == _se(), "P2 slaat nooit: breuk %s" % [broke])
 	await t.cleanup()
 
 
@@ -860,11 +877,12 @@ func test_b7_core_damage_and_clamp(t) -> void:
 	await t.run_ticks(sim, 90)
 	var got: Array = log["damage"].map(func(e: Array) -> Array: return [e[1], e[2]])
 	t.check(got == [[10, "p1"], [10, "p1"], [20, "ontploffing"], [5, "echo"]], "kern-schade %s" % [got])
-	t.check(boss.se == 1455 and closed.is_empty(), "%d SE, dicht %s" % [boss.se, closed])
-	# Klem: op 1355 doet de slag van 10 er nog 5, dan sluit het schot op de drempel.
-	boss.set_health(sim.tick, 1355)
+	t.check(boss.se == _se() - 45 and closed.is_empty(), "%d SE, dicht %s" % [boss.se, closed])
+	# Klem: 5 boven de drempel doet de slag van 10 er nog 5, dan sluit het schot op de drempel.
+	var first: int = _thresholds()[0]
+	boss.set_health(sim.tick, first + 5)
 	await _play(t, sim, w["p1"], A)
-	t.check(boss.se == 1350 and boss.opening_index == 1, "%d SE, opening %d (klem op 1350)" % [boss.se, boss.opening_index])
+	t.check(boss.se == first and boss.opening_index == 1, "%d SE, opening %d (klem op %d)" % [boss.se, boss.opening_index, first])
 	t.check(closed.size() == 1 and closed[0][1] == "drempel" and boss.ketel.armor_intact and not boss.core_open,
 		"dicht %s" % [closed])
 	t.check(log["damage"].slice(4).map(func(e: Array) -> int: return e[1]) == [5], "na de klem: %s" % [log["damage"].slice(4)])
@@ -980,7 +998,8 @@ func test_b7_phase_switch(t) -> void:
 
 
 ## B-7 / GMB-11 (D = 60, 120 en 180): een run die elke opening tot de drempel slaat (P1 slaat om de 20
-## ticks bij de kern, de echo herhaalt): precies 4 openingen, 3 keer "drempel", dan de fasewissel;
+## ticks bij de kern, de echo herhaalt): precies `openingen` openingen (v0.1.5: 7), elke opening op
+## "drempel" behalve de laatste, dan de fasewissel;
 ## de SE staat na elke opening precies op zijn drempel; adds pas na opening 1.
 func test_b7_four_openings(t) -> void:
 	for d: int in [60, 120, 180]:
@@ -999,10 +1018,12 @@ func test_b7_four_openings(t) -> void:
 		await _run_until(t, sim, func() -> bool: return boss.phase != Gemaalmeester.Phase.ONE, 3000, 50)
 		t.check(boss.phase == Gemaalmeester.Phase.SWITCH or boss.phase == Gemaalmeester.Phase.TWO,
 			"D = %d: geen fasewissel in 3000 ticks (%d SE, %d openingen)" % [d, boss.se, broke.size()])
-		t.check(broke.size() == 4, "D = %d: %d openingen (4): %s" % [d, broke.size(), broke])
-		t.check(closed.map(func(c: Array) -> Array: return [c[1], c[2]]) == [["drempel", 1350], ["drempel", 1200], ["drempel", 1050]],
-			"D = %d: sluitingen %s" % [d, closed])
-		t.check(boss.se == 900, "D = %d: %d SE bij de fasewissel (900)" % [d, boss.se])
+		var th := _thresholds()
+		t.check(broke.size() == th.size(), "D = %d: %d openingen (%d): %s" % [d, broke.size(), th.size(), broke])
+		var want: Array = th.slice(0, th.size() - 1).map(func(x: int) -> Array: return ["drempel", x])
+		t.check(closed.map(func(c: Array) -> Array: return [c[1], c[2]]) == want,
+			"D = %d: sluitingen %s (verwacht %s)" % [d, closed, want])
+		t.check(boss.se == th[-1], "D = %d: %d SE bij de fasewissel (%d)" % [d, boss.se, th[-1]])
 		t.check(not spawned.is_empty() and spawned[0] > broke[0], "D = %d: adds %s vóór opening 1 (%s)" % [d, spawned, broke])
 		t.note("D = %d: openingen op %s, fasewissel op %s" % [d, broke, log["phase"]])
 		await t.cleanup()

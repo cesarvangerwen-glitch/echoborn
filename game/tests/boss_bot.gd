@@ -56,6 +56,11 @@ const KETEL_WINDOW := 6.0
 ## Pompslag fase 1 ontwijken: afzet zo veel ticks vóór het actieve vlak (voeten > 24 px op 6–34
 ## ticks na de afzet; §3.4: venster 24 ticks).
 const DODGE_LEAD := 16
+## Fase 1, solo (#247): een sprong over de pompslag landt zo veel ticks na de afzet (40, gdd §2.5a).
+const JUMP_TICKS := 40
+## Fase 1, solo (#247): P1 springt naar een plek zo ver naar de ketel toe als hij anders op zijn echo
+## landt (de echo staat op de landingstick waar P1 D ticks eerder stond; een lichaam is 16 breed).
+const DODGE_SHIFT := 20.0
 ## Afstand tot de echo waarop P1 na het keren afzet (gdd §4.3: ± 130 px).
 const JUMP_ON_ECHO_PX := 130.0
 ## Slaan op het rad vanaf deze hoogte van de voeten (vlak boven 100 px vanaf 77, §3.5).
@@ -142,6 +147,10 @@ var _stance_x := 0.0
 var _wander := 1
 var _echo_last_x := NAN
 var _since := 0
+## Fase 1 (#247): de x van P1 per tick (arena-x), om te weten waar de echo straks staat.
+var _x_hist := {}
+## Fase 1 (#247): verschuiving van de staplek (0 of DODGE_SHIFT).
+var _stand_shift := 0.0
 var _hold_ticks := 0
 var _turn_tick := -1
 var _jump_tick := -1
@@ -258,7 +267,9 @@ func _phase1_p1(p: CharacterBody2D) -> int:
 	var x := _ax(p)
 	var bits := 0
 	var mid := _boss.middle()
-	var stand := mid - KETEL_OFFSET
+	_x_hist[_tick] = x
+	_x_hist.erase(_tick - 400)
+	var stand := mid - KETEL_OFFSET + _stand_shift
 	var face := 1
 	# Een add vlak achter P1 (die de ketel niet raakt): omdraaien en slaan.
 	for add in _boss.adds:
@@ -271,7 +282,24 @@ func _phase1_p1(p: CharacterBody2D) -> int:
 		bits |= A
 	if dodge and _should_dodge(p):
 		bits |= _tap(1, J)
+		_choose_landing(x, mid)
 	return bits
+
+
+## #247, D = 90: sprong P1 op zijn plek, dan landde hij op zijn echo (die staat op de landingstick
+## waar P1 D ticks eerder stond), en tilde de echo hem bij de volgende pompslag op en zakte hij er
+## met hem in. Dan springt hij nu naar de andere staplek (20 px verder, naar de ketel; links komen
+## de adds), en de keer erna weer terug als de echo daar staat.
+func _choose_landing(x: float, mid: float) -> void:
+	if _coop() or _echo() == null:
+		return
+	var back := _tick + JUMP_TICKS - _d()
+	if back > _tick or not _x_hist.has(back):
+		return
+	var echo_x: float = _x_hist[back]
+	var here := mid - KETEL_OFFSET + _stand_shift
+	if absf(echo_x - here) < 17.0:
+		_stand_shift = DODGE_SHIFT if _stand_shift == 0.0 else 0.0
 
 
 ## Naar `stand` ± KETEL_WINDOW met de kijkrichting `face`; 0 = staat goed. Een stap om te draaien
@@ -290,9 +318,11 @@ func _approach(p: CharacterBody2D, stand: float, face: int) -> int:
 	return _walk(-face)
 
 
-## Pompslag (B-6): afzetten `DODGE_LEAD` ticks vóór het actieve vlak, als het vlak P1 raakt.
+## Pompslag (B-6): afzetten `DODGE_LEAD` ticks vóór het actieve vlak, als het vlak P1 raakt. Ook
+## vanaf de echo (een bounce, #247): bij D = 90 staat P1 in fase 1 om de maat op de echo die zijn
+## vorige sprong naspeelt; bleef hij daar staan, dan zakte hij met de echo het vlak in (1 treffer per 2 maten).
 func _should_dodge(p: CharacterBody2D) -> bool:
-	if _boss.attack_kind != "pomp" or not _boss.is_telling() or not _on_floor(p):
+	if _boss.attack_kind != "pomp" or not _boss.is_telling() or not p.motor.on_floor:
 		return false
 	if _boss.windup_end_tick() - _tick != DODGE_LEAD:
 		return false

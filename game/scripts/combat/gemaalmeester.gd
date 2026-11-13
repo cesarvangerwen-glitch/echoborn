@@ -10,7 +10,7 @@ extends "res://scripts/combat/boss.gd"
 ## Fase 2, het grote rad (GMB-04, §3.5, B-8): een tweede deel (96 × 40 op y 100–140, middelpunt
 ## `x_rad = D + rad_offset` van de muur aan zijn kant; volgt D, ook bij een wissel van D in het
 ## debugmenu, SL-05; in co-op vast op `rad_coop_muur` (94 px), los van D, B-13). Niet `Merkbaar`;
-## P1/P2 doen `rad_treffer` (18) SE, in co-op gedeeld door `coop_schaal` (1,0: ook 18), de echo 5. Na
+## P1/P2 doen `rad_treffer` (33) SE, in co-op gedeeld door `coop_schaal` (1,32: 25), de echo 5 (v0.1.5, #247). Na
 ## `kant_treffers` treffers van P1 en P2 samen (de echo telt niet) of `kant_ticks` (480) ticks trilt
 ## het `rad_tril` ticks en draait het in `rad_draai` ticks naar de andere muur; dan niet raakbaar.
 ## Wisselt de modus in fase 2 (drop-in/out) en verandert daardoor de plek, dan trilt en draait het
@@ -270,8 +270,8 @@ func damage_floor(part: BossPart) -> int:
 	return se
 
 
-## §3.5: op het rad doen P1 en P2 `rad_treffer` (18), de echo `rad_echo` (5). In co-op deelt
-## `coop_schaal` de schade (v0.1.3 na PR #219: 1,0, dus ook 18 SE; §3.8).
+## §3.5: op het rad doen P1 en P2 `rad_treffer` (v0.1.5: 33), de echo `rad_echo` (5). In co-op deelt
+## `coop_schaal` de schade (v0.1.5, #247: 1,32, dus 25 SE; §3.8).
 func damage_for(part: BossPart, amount: int, source: String) -> int:
 	if part != rad:
 		return amount

@@ -101,6 +101,8 @@ const BOSS_START_INSET := 24.0
 ## geladen is (in de save: `<gebied>/<kamer>/<pad>`, `AreaLoader.object_flag`).
 const BOSS_FLAG := [&"S8", ^"BossVerslagen"]
 const LAMPGLAS_FLAG := [&"S5", ^"Lampglas"]
+## De Neerslag op de sokkel (S7): de vlag is de vaardigheid V-01 (besluit LGD in #252).
+const NEERSLAG_FLAG := [&"S7", ^"Neerslag"]
 ## Het gemaal van de wijk (S6), zoals in `state.gemalen`.
 const GEMAAL_PATH := [&"S6", ^"Gemaal"]
 
@@ -220,7 +222,9 @@ func _ready() -> void:
 	start_errors.append_array(loader.start(sim.tick, p1.position))
 	room = loader.huidige
 	respawn = Respawn.new(p1, func() -> Vector2: return Layout.ROOM_START.get(loader.huidige, Layout.RUN_START), progress)
-	# Uit de save (LM-12): het lampglas (WS-08 a) en de waterstand (LM-10).
+	# Uit de save (LM-12): de Neerslag (V-01; zonder is AANVAL + DOWN een gewone aanval), het lampglas
+	# (WS-08 a) en de waterstand (LM-10).
+	sim.neerslag_unlocked = _saved_flag(NEERSLAG_FLAG)
 	if _saved_flag(LAMPGLAS_FLAG):
 		p1.max_health = mini(p1.max_health + 1, PlayerActor.HEALTH_CAP)
 		p1.health = p1.max_health
@@ -266,8 +270,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if _camera and is_instance_valid(p1):
-		var with_p2 := p2 != null and is_instance_valid(p2) and not p2.dissolved
-		var view := FlowRoom.camera_view(p1.position, p2.position if with_p2 else p1.position)
+		var view := camera_view()
 		var size := get_viewport().get_visible_rect().size
 		var zoom := FlowRoom.camera_zoom(view, size if size.x > 0.0 else FlowRoom.BASE_VIEW_PX)
 		_camera.zoom = Vector2(zoom, zoom)
@@ -282,6 +285,28 @@ func _process(delta: float) -> void:
 			echo_state = tr("HUD_ECHO_ACTIVE") if echo.is_present() else tr("HUD_ECHO_EMPTY")
 		_hud_label.text = "\n".join(PackedStringArray([tr("HUD_STATUS") % [meter.value, gemaal.fill if gemaal else 0, p1.health],
 			tr("HUD_ROOM") % [room, tail, echo_state, run_ticks() / 60.0]]))
+
+
+## Wat de camera laat zien (wereldpixels). Van `BOSS_START` tot `BOSS_VERSLAGEN` staat hij vast op
+## de arena (GM-01, besluit LGD in #247): één scherm, beide muren, het rad en de echo altijd in
+## beeld, solo en co-op; na een respawn en een nieuwe `BOSS_START` weer. Anders de camera van de
+## flow-kamer (P1, in co-op P1 en P2).
+func camera_view() -> Rect2:
+	if is_arena_camera():
+		return arena_view()
+	var with_p2 := p2 != null and is_instance_valid(p2) and not p2.dissolved
+	return FlowRoom.camera_view(p1.position, p2.position if with_p2 else p1.position)
+
+
+## Staat de camera vast op de arena: de boss vecht (na `BOSS_START`, nog niet verslagen)?
+func is_arena_camera() -> bool:
+	return boss != null and is_instance_valid(boss) and boss.state != Gemaalmeester.State.IDLE and not boss.is_defeated()
+
+
+## De arena als beeld: de rechthoek van S8 uit de layout (de arena met zijn muren, 640 × 360, precies
+## één scherm, GM-01).
+static func arena_view() -> Rect2:
+	return Layout.ROOMS[&"S8"]
 
 
 func run_ticks() -> int:
@@ -415,6 +440,17 @@ func is_boss_defeated() -> bool:
 	return _saved_flag(BOSS_FLAG)
 
 
+## De vlag van de Neerslag in de save (V-01): wie in S8 of S9 begint (tests, het debugmenu), zet
+## hem in zijn opzet, want de sokkel staat in S7 (besluit LGD in #252).
+static func neerslag_flag() -> StringName:
+	return AreaLoader.object_flag(NEERSLAG_FLAG[0], NEERSLAG_FLAG[1], GEBIED)
+
+
+## Zet de Neerslag in `state` (een `GameState`), zoals na de pick-up.
+static func give_neerslag(state: RefCounted) -> void:
+	state.set_flag(neerslag_flag())
+
+
 ## Een node in de inhoud van een geladen kamer (`[kamer, pad]`), of null.
 func _loaded_node(spec: Array) -> Node:
 	var kamer = loader.kamers.get(spec[0]) if loader != null else null
@@ -477,6 +513,7 @@ func _on_picked_up(pickup: Pickup, tick: int, who: String) -> void:
 				logblad_3_tick = tick
 		Pickup.Soort.VAARDIGHEID:
 			neerslag_tick = tick
+			sim.neerslag_unlocked = true
 			var kamer = loader.kamers.get(&"S7")
 			if kamer != null and kamer.inhoud_node != null:
 				_sokkel_uit(kamer.inhoud_node)
@@ -686,4 +723,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif key == KEY_F8:
 		var i := Layout.ORDER.find(room)
 		var next: StringName = Layout.ORDER[(i + 1) % Layout.ORDER.size()]
+		# Voorbij de sokkel (S8, S9): de Neerslag erbij, zoals in de opzet van de runs (V-01).
+		if next == &"S8" or next == &"S9":
+			sim.neerslag_unlocked = true
+			if progress != null:
+				give_neerslag(progress.state)
 		p1.respawn_at(Layout.ROOM_START[next])
