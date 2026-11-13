@@ -1,6 +1,6 @@
 # Kamers: de Kadewijk (wijk 1.3, de slice): S1–S9
 
-Versie 0.4.7 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8, deel 3 S9) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
+Versie 0.4.8 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8, deel 3 S9) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
 
 Bronnen: `docs/design/wereld.md` v0.2 §2 (kamerlijst §2.2, SL-regels §2.3, vijandtypes §2.4, T8a §2.5, acceptatie §2.6), `docs/design/gdd.md` v0.8.2 (§4.3 bouwstenen met D in formules, L-08–L-14, §4.5 normen, §4.8.5 vaste basis, §4.8.7 de langzame lijn met dash), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.3 (§2.6 plaatsing, VJ-01–VJ-08, §3.2 arena), `docs/design/gemaalmeester.md` v0.2.2 (GM-01, GM-07, GM-10, GM-11), `docs/productie/fase-2-kader.md` v0.4 §4, `docs/tech/ontwerp.md` v0.3 (§3a, §7, §12 "naar T8a"), de visie-review van de CD ([comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), `docs/concept/visie-review/kadewijk/`).
 
@@ -440,8 +440,8 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 | S4 | **Maatvast** ([Lead-review #223](https://github.com/cesarvangerwen-glitch/echoborn/pull/223#issuecomment-6834676160)): bots groen, `Visie-review: past` (#212), afwijking 7 akkoord (#220) |
 | S5, S6 | **Maatvast** (#228 gemerged; LGD, #227): bots groen, `Visie-review: past`, besluiten 2 en 3 |
 | S7 | **Maatvast** ([Lead-review #239](https://github.com/cesarvangerwen-glitch/echoborn/pull/239#issuecomment-6840184277)): de schaduwklep is er (#232), `Visie-review: past` na de her-review (#227), bots groen |
-| S8 | **Kandidaat voor de maten**: de arena volgt GM-01 en §3.2; maatvast pas met de boss erin (GP, B-9 in de arena) |
-| S9 | **Kandidaat**: bots groen (§6c), afwijking 14–18 akkoord (#231); de CD gaf "past niet" (#227), aangepast volgens voorstel A (afwijking 19), wacht op de her-review van de doorloop |
+| S8 | **Maatvast** (LGD, [comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6844964137)): `Visie-review: past` (CD, #247/#248); bots groen op `main` (boss verslagen zonder dood, GM-03 bij D = 60: 97,9 s, fase 2 63,5 s, fase 1 28,4 s, co-op 85 s met MP-7 0,87–0,95, #253); vaste arena-camera van `BOSS_START` tot `BOSS_VERSLAGEN` (#253); de arena volgt GM-01, afwijking 20 akkoord. Fase 2 inkorten is data, geen layout |
+| S9 | **Maatvast** (LGD, [comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6844964137)): `Visie-review: past` na de her-review van voorstel A (CD, #227, contactbladen #240); bots groen (zonder echo 1,07×, rustpunt ≤ 12 s en daarna geen gat > 10 s bij D = 60, de lus 0 echo-breuken bij elke D, #254), de schaduwklep op het luik (#232); geen open herontwerp, afwijking 14–20 akkoord |
 
 ## 9. Open punten
 
@@ -482,6 +482,7 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 **Technical Artist / Art (deel 3):** het snelluik in de gang van S1 (x 460–500, afwijking 14) in de art van S1 (#226); S9 heeft nog geen art.
 
 **Volgende WLD-run:**
+- **Na MT2, B-1** (LGD, [comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429)): na de pomp van trap 2 de trap af en over de kade tot de pijler is ± 20 s zonder echo-moment (de pompslag van de echo telt voor de gaten wel mee, voor MP-2 niet). `test_kadewijk_lus.gd` rapporteert het (note: laatste `POMP` van de echo → eerste echo-actie in S9), geen check. Is het in MT2 "leeg": eerst **een keerpunt aan de voet van de trap terug** (een echo-moment op of onder de trap, de maatvaste kamers blijven heel); de kade inkorten raakt de gaten van voorstel A en komt pas als tweede keuze. S9 blijft maatvast tot er een herontwerp is (stopregel).
 - ~~S9 de lage kade~~ gebouwd (deel 3, §3f, §6c).
 - Co-op door alle kamers (C-15 d, MP-7, SL-01 co-op), ook S9 (het snelluik en de trap in co-op).
 - **Na de schaduwklep van de GP** (besluit 1, #227): in `test_kadewijk_deel2.gd` en `test_kadewijk_s9.gd` de check "de echo breekt 0×" in de run S1 → S8 en in S9, en het luik opnieuw naar de CD.
@@ -523,6 +524,7 @@ Besluiten: D = 60 als werkaanname, bereik 1–3 s, en fase 2 parallel, ook bouwe
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie: S1–S4 als grijze kamers, bot en tests bij D = 60 (120/180 regressie) |
 | 0.1.1 | 2026-11-12 | Lead-review #208: langzame lijn met dash gemeten bij 60/90/120 (§6), besluiten van de LGD per afwijking en maatvast-stand per kamer (§8), open punten bijgewerkt (§9) |
+| 0.4.8 | 2026-11-13 | §8: S8 en S9 maatvast (LGD, [comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6844964137)): S1–S9 alle negen maatvast. B-1 (LGD, [comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429)): het gat na trap 2 als rapport in `test_kadewijk_lus.gd`, de terugvaloptie (keerpunt aan de voet van de trap) in §9 als na-MT2-punt |
 | 0.4.7 | 2026-11-13 | GP, [#247](https://github.com/cesarvangerwen-glitch/echoborn/issues/247): de boss op de data van v0.1.5 (§6b en §6d opnieuw gemeten), de vaste arena-camera, de Neerslag vergrendeld tot de sokkel (§9); merge met 0.4.6 van de WLD (S6 en S9 buren); co-op-norm van de boss na de review van de LGD (#253) |
 | 0.4.6 | 2026-11-13 | WLD, [comment in #252](https://github.com/cesarvangerwen-glitch/echoborn/pull/252#issuecomment-6842692883) besluit 4: **S6 en S9 buren** (§2, §5), de echo breekt in de lus bij elke D 0× (§6d, test strakker); afwijking 20 akkoord LGD en de besluiten 1–4 van #252 in §8; open punten (§9) |
 | 0.4.5 | 2026-11-13 | GP, [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83): de laatste placeholders echt: het gemaal met twee trappen en de grens van de boss (§3c), `s = 2` opent het hoogwater (§3f, §5), de pick-ups (lampglas, logbladzijde 1–3, de Neerslag op de sokkel) en `SLICE_EIND` als objecten, de boss verslagen in de save (§3e); de lus S1 → S9 → S1 door de arena gemeten (§6d); de motorfix tegen een muur (#231, §9) en de cijfers zonder echo die daardoor 3 ticks lager zijn (§6, §6b); afwijking 20 (de drempel onder `DeurLinks`, §8); open punten (§9) |

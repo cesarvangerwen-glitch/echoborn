@@ -468,6 +468,19 @@ func _lus(t, d: int) -> void:
 	# De echo breekt nergens, bij elke D (V-01d, #227; LGD #252: S6 en S9 zijn buren,
 	# dus het plein blijft geladen zolang de echo er op de trap terug nog loopt).
 	t.check(breaks.is_empty(), "%s: de echo brak %d× (%s)" % [name, breaks.size(), breaks])
+	# B-1 (LGD, #83): van de laatste pompslag van de echo bij trap 2 tot de eerste
+	# echo-actie in S9. Rapport, geen norm vóór MT2 (kamerdoc §9).
+	var last_pomp := -1
+	for row in rows:
+		if row[2] == "POMP" and row[4] == "echo" and int(row[0]) > at["verslagen"]:
+			last_pomp = int(row[0])
+	var first_s9 := -1
+	for a: Array in rep.actions:
+		if a[1] == "S9" and int(a[0]) > last_pomp:
+			first_s9 = int(a[0])
+			break
+	t.note("%s: B-1, laatste pomp van de echo (trap 2) op %d → eerste echo-actie in S9 op %d: %s ticks (%s s; rapport, MT2)" % [
+		name, last_pomp, first_s9, ("%d" % (first_s9 - last_pomp) if last_pomp >= 0 and first_s9 >= 0 else "?"), "%.1f" % ((first_s9 - last_pomp) / 60.0) if last_pomp >= 0 and first_s9 >= 0 else "?"])
 	var seg := func(a: int, b: int) -> String: return "%d" % (b - a) if a >= 0 and b >= 0 else "?"
 	t.note(("%s: run %d ticks (%.1f s) · S1 → S8 %s · S8 → BOSS_START %s · boss %s · → plein %s · trap 2 %s · → S9 (trap af) %s · " +
 		"S9 → SLICE_EIND %s · per kamer %s · MP-1 %d · MP-2 %.1f per min, langste gat %d · LP %d · treffers %d (%s) · echo-breuken %d %s · " +
