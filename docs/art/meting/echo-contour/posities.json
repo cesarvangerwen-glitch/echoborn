@@ -1,0 +1,57 @@
+{
+ "maten": {
+  "p1_run0": [
+   18,
+   28
+  ],
+  "echo_run0_grijs": [
+   18,
+   28
+  ],
+  "echo_run0_kleur": [
+   18,
+   28
+  ],
+  "p1_run1": [
+   18,
+   28
+  ],
+  "echo_run1_grijs": [
+   18,
+   28
+  ],
+  "echo_run1_kleur": [
+   18,
+   28
+  ],
+  "p1_run2": [
+   18,
+   28
+  ],
+  "echo_run2_grijs": [
+   18,
+   28
+  ],
+  "echo_run2_kleur": [
+   18,
+   28
+  ],
+  "p1_jump": [
+   20,
+   23
+  ],
+  "echo_jump_grijs": [
+   20,
+   23
+  ],
+  "echo_jump_kleur": [
+   20,
+   23
+  ],
+  "boss_fase1": [
+   600,
+   200
+  ]
+ },
+ "boss_av": 180
+}
