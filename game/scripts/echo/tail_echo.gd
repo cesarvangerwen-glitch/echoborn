@@ -19,6 +19,7 @@ signal merksprong_started(tick: int, mark_id: int)
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
 const BodyBuilder = preload("res://scripts/echo/body_builder.gd")
+const EchoContour = preload("res://art/shaders/echo_contour.gd")
 const GameEvents = preload("res://scripts/events/game_events.gd")
 const Layers = preload("res://scripts/world/layers.gd")
 const Tuning = preload("res://scripts/echo/tuning.gd")
@@ -104,6 +105,8 @@ func setup(p_source: PlayerActor, color: Color, p_tail_ticks: int = -1, start_ti
 	collision_mask = 0
 	_body_size = Tuning.body_size()
 	BodyBuilder.add_box(self, color, _body_size)
+	# R2 (TA, #226): de donkere buitencontour van 1 px, in elke toestand.
+	EchoContour.op(self)
 	_build_plank()
 	_build_checks()
 	var c: Dictionary = Tuning.combat()

@@ -1,0 +1,260 @@
+[
+ {
+  "contour": true,
+  "figuren": [
+   {
+    "A": 61.6,
+    "B": 16.4,
+    "lees": 61.6,
+    "ring_L": 18.1,
+    "soort": "echo"
+   },
+   {
+    "A": 87.6,
+    "B": 1.3,
+    "lees": 87.6,
+    "ring_L": 2.4,
+    "soort": "p1"
+   }
+  ],
+  "norm": true,
+  "plek": "S3 voor het verlichte winkelraam",
+  "staat": "grijs"
+ },
+ {
+  "contour": false,
+  "figuren": [
+   {
+    "A": 61.6,
+    "B": -1.0,
+    "lees": 61.6,
+    "ring_L": 18.1,
+    "soort": "echo"
+   },
+   {
+    "A": 87.6,
+    "B": 1.3,
+    "lees": 87.6,
+    "ring_L": 2.4,
+    "soort": "p1"
+   }
+  ],
+  "plek": "S3 voor het verlichte winkelraam",
+  "staat": "grijs"
+ },
+ {
+  "contour": true,
+  "figuren": [
+   {
+    "A": 35.1,
+    "B": 34.2,
+    "lees": 35.1,
+    "ring_L": 35.9,
+    "soort": "echo"
+   },
+   {
+    "A": 79.3,
+    "B": 7.1,
+    "lees": 79.3,
+    "ring_L": 10.8,
+    "soort": "p1"
+   }
+  ],
+  "norm": false,
+  "plek": "S3 voor het verlichte winkelraam",
+  "staat": "kleur"
+ },
+ {
+  "contour": false,
+  "figuren": [
+   {
+    "A": 35.1,
+    "B": -1.0,
+    "lees": 35.1,
+    "ring_L": 35.9,
+    "soort": "echo"
+   },
+   {
+    "A": 79.3,
+    "B": 7.1,
+    "lees": 79.3,
+    "ring_L": 10.8,
+    "soort": "p1"
+   }
+  ],
+  "plek": "S3 voor het verlichte winkelraam",
+  "staat": "kleur"
+ },
+ {
+  "contour": true,
+  "figuren": [
+   {
+    "A": 71.5,
+    "B": 6.6,
+    "lees": 71.5,
+    "ring_L": 8.2,
+    "soort": "echo"
+   },
+   {
+    "A": 83.9,
+    "B": 2.5,
+    "lees": 83.9,
+    "ring_L": 6.2,
+    "soort": "p1"
+   }
+  ],
+  "norm": true,
+  "plek": "S9 rustpunt bij de bootjes",
+  "staat": "grijs"
+ },
+ {
+  "contour": false,
+  "figuren": [
+   {
+    "A": 71.5,
+    "B": -1.0,
+    "lees": 71.5,
+    "ring_L": 8.2,
+    "soort": "echo"
+   },
+   {
+    "A": 83.9,
+    "B": 2.5,
+    "lees": 83.9,
+    "ring_L": 6.2,
+    "soort": "p1"
+   }
+  ],
+  "plek": "S9 rustpunt bij de bootjes",
+  "staat": "grijs"
+ },
+ {
+  "contour": true,
+  "figuren": [
+   {
+    "A": 34.6,
+    "B": 34.7,
+    "lees": 34.7,
+    "ring_L": 36.4,
+    "soort": "echo"
+   },
+   {
+    "A": 77.9,
+    "B": 8.5,
+    "lees": 77.9,
+    "ring_L": 12.2,
+    "soort": "p1"
+   }
+  ],
+  "norm": false,
+  "plek": "S9 rustpunt bij de bootjes",
+  "staat": "kleur"
+ },
+ {
+  "contour": false,
+  "figuren": [
+   {
+    "A": 34.6,
+    "B": -1.0,
+    "lees": 34.6,
+    "ring_L": 36.4,
+    "soort": "echo"
+   },
+   {
+    "A": 77.9,
+    "B": 8.5,
+    "lees": 77.9,
+    "ring_L": 12.2,
+    "soort": "p1"
+   }
+  ],
+  "plek": "S9 rustpunt bij de bootjes",
+  "staat": "kleur"
+ },
+ {
+  "contour": true,
+  "figuren": [
+   {
+    "A": 84.2,
+    "B": 2.1,
+    "lees": 84.2,
+    "ring_L": 5.8,
+    "soort": "p1"
+   },
+   {
+    "A": 73.8,
+    "B": 4.2,
+    "lees": 73.8,
+    "ring_L": 5.8,
+    "soort": "echo"
+   }
+  ],
+  "norm": true,
+  "plek": "S8 bij de ketel naast P1 (concept-boss)",
+  "staat": "grijs"
+ },
+ {
+  "contour": false,
+  "figuren": [
+   {
+    "A": 84.2,
+    "B": 2.1,
+    "lees": 84.2,
+    "ring_L": 5.8,
+    "soort": "p1"
+   },
+   {
+    "A": 73.8,
+    "B": -1.0,
+    "lees": 73.8,
+    "ring_L": 5.8,
+    "soort": "echo"
+   }
+  ],
+  "plek": "S8 bij de ketel naast P1 (concept-boss)",
+  "staat": "grijs"
+ },
+ {
+  "contour": true,
+  "figuren": [
+   {
+    "A": 83.4,
+    "B": 2.9,
+    "lees": 83.4,
+    "ring_L": 6.6,
+    "soort": "p1"
+   },
+   {
+    "A": 64.3,
+    "B": 5.0,
+    "lees": 64.3,
+    "ring_L": 6.6,
+    "soort": "echo"
+   }
+  ],
+  "norm": true,
+  "plek": "S8 bij de ketel naast P1 (concept-boss)",
+  "staat": "kleur"
+ },
+ {
+  "contour": false,
+  "figuren": [
+   {
+    "A": 83.4,
+    "B": 2.9,
+    "lees": 83.4,
+    "ring_L": 6.6,
+    "soort": "p1"
+   },
+   {
+    "A": 64.3,
+    "B": -1.0,
+    "lees": 64.3,
+    "ring_L": 6.6,
+    "soort": "echo"
+   }
+  ],
+  "plek": "S8 bij de ketel naast P1 (concept-boss)",
+  "staat": "kleur"
+ }
+]
