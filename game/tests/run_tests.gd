@@ -71,6 +71,7 @@ const TEST_SCRIPTS := [
 	"res://tests/test_kadewijk_art.gd",
 	"res://tests/test_kadewijk_boss.gd",
 	"res://tests/test_kadewijk_lus.gd",
+	"res://tests/test_kadewijk_meetlog.gd",
 ]
 
 ## De scripted runs die het langst duren (CI windows, #233: samen ± 200 van de 330 s). Ze draaien
