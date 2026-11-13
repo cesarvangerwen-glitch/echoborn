@@ -38,24 +38,14 @@ signal rad_turning(tick: int, reason: String, to_side: int)
 
 const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
+const GemaalmeesterBeeld = preload("res://art/animatie/gemaalmeester/gemaalmeester_beeld.gd")
 
 enum Phase { ONE, SWITCH, TWO }
 ## Het rad (§3.5): weg (fase 1), hangt (raakbaar), trilt, draait naar de andere muur.
 enum RadState { HIDDEN, HANGING, SHAKING, TURNING }
 
-## Placeholder-kleuren (§9: leesbaar in silhouet; Animator en Art vervangen ze).
-const BODY_COLOR := Color(0.32, 0.33, 0.36)
-const SHOT_COLOR := Color(0.6, 0.6, 0.66)
-const CORE_COLOR := Color(1.0, 0.55, 0.2)
-const MARK_SPOT_COLOR := Color(1.0, 0.85, 0.4)
-const POMP_TELL := Color(0.85, 0.75, 0.55)
-const ZWIEP_TELL := Color(0.7, 0.9, 1.0)
-const SPOUT_COLOR := Color(1.0, 0.6, 0.3)
-const ACTIVE_COLOR := Color(1.0, 0.4, 0.3, 0.8)
-const TINK_COLOR := Color(1.0, 1.0, 0.9)
+## De tink-vonk duurt zo lang (ketel `tink`, 4 ticks). Het vloerteken is nog een placeholder.
 const TINK_TICKS := 4
-const RAD_COLOR := Color(0.45, 0.5, 0.58)
-const RAD_SHAKE_COLOR := Color(0.75, 0.7, 0.6)
 const FLOOR_MARK_COLOR := Color(1.0, 0.85, 0.45, 0.35)
 
 var phase: Phase = Phase.ONE
@@ -100,6 +90,8 @@ var _air_action := {}
 var _noted_tick := -1
 ## B-13: de modus (co-op of niet) waarin het rad nu hangt.
 var _rad_coop := false
+## Het beeld (sprites), alleen beeld (TA, #265).
+var _beeld: GemaalmeesterBeeld
 
 
 ## De boss op `origin`: de linkermuur van de arena, op de bovenkant van de vloer.
@@ -582,30 +574,13 @@ func _set_ketel(armor: bool, hittable: bool, markable: bool) -> void:
 	ketel.markable = markable
 
 
-# --- placeholder-beeld (B-11) ---------------------------------------------------
+# --- beeld (B-11; sprites van de Animator, #265, gekoppeld door de TA) -------------
 
+## Het beeld van de boss: `GemaalmeesterBeeld` (sprites uit `gemaalmeester.json`). Alleen het
+## vloerteken (GMB-04) blijft een polygon: daar is (nog) geen sprite voor.
 func _build_visual() -> void:
-	var g := data_group
-	var x1 := EnemyData.value(g, "lichaam_x1")
-	var x2 := EnemyData.value(g, "lichaam_x2")
-	_add_rect("Lichaam", Rect2(x1, -160.0, x2 - x1, 160.0), BODY_COLOR)
-	var shot := Rect2(EnemyData.value(g, "schot_x1"), -EnemyData.value(g, "schot_y2"),
-		EnemyData.value(g, "schot_x2") - EnemyData.value(g, "schot_x1"),
-		EnemyData.value(g, "schot_y2") - EnemyData.value(g, "schot_y1"))
-	_add_rect("Kern", shot, CORE_COLOR)
-	_add_rect("Schot", shot, SHOT_COLOR)
-	_add_rect("Merkplek", shot.grow(-14.0), MARK_SPOT_COLOR)
-	for key: String in ["spuigat_links", "spuigat_rechts"]:
-		var x := EnemyData.value(g, key)
-		_add_rect("Spuigat_" + key.get_slice("_", 1), Rect2(x - 8.0, -6.0, 16.0, 6.0), SPOUT_COLOR)
-	var rad_w := EnemyData.value(g, "rad_breedte")
-	var rad_h := EnemyData.value(g, "rad_y2") - EnemyData.value(g, "rad_y1")
-	_add_rect("RadBeeld", Rect2(-rad_w * 0.5, -rad_h * 0.5, rad_w, rad_h), RAD_COLOR)
+	_beeld = GemaalmeesterBeeld.new(self)
 	_add_rect("Vloerteken", Rect2(0.0, -3.0, 1.0, 3.0), FLOOR_MARK_COLOR)
-	var tell := Polygon2D.new()
-	tell.name = "Tell"
-	tell.visible = false
-	add_child(tell)
 
 
 func _add_rect(node_name: String, r: Rect2, color: Color) -> void:
@@ -617,25 +592,12 @@ func _add_rect(node_name: String, r: Rect2, color: Color) -> void:
 	add_child(poly)
 
 
-## Tells (stofstrook van de pompslag, lichtstreep van de zwiep, gloeiende spuigaten), schot/kern,
-## merkplek bij Wankel, tink-vonk. Alleen beeld: tests lezen de vlaggen (`is_telling`,
-## `is_attack_active`, `attack_box`, `spout_glowing`, `shake_at`, `ketel.tink_tick`).
+## Het beeld volgt de vlaggen (`GemaalmeesterBeeld.update`: lichaam, ketel, rad, tell en
+## effect op `attack_box`, spuigaten) en het vloerteken. Alleen beeld: tests lezen de vlaggen
+## (`is_telling`, `is_attack_active`, `attack_box`, `spout_glowing`, `shake_at`, `ketel.tink_tick`).
 func update_visual(tick: int) -> void:
 	var shown := not is_defeated()
-	(get_node(^"Lichaam") as CanvasItem).visible = shown
-	var shot := get_node(^"Schot") as Polygon2D
-	shot.visible = shown and ketel.armor_intact and ketel.hittable and state != State.WANKEL
-	shot.color = TINK_COLOR if tick - ketel.tink_tick < TINK_TICKS else SHOT_COLOR
-	(get_node(^"Kern") as CanvasItem).visible = shown and core_open
-	(get_node(^"Merkplek") as CanvasItem).visible = state == State.WANKEL
-	(get_node(^"Spuigat_links") as CanvasItem).visible = spout_glowing
-	(get_node(^"Spuigat_rechts") as CanvasItem).visible = spout_glowing
-	# Het rad (GMB-04): hangt, trilt (flikkert) of draait; het vloerteken onder de hangende kant.
-	var rad_visual := get_node(^"RadBeeld") as Polygon2D
-	rad_visual.visible = shown and rad_state != RadState.HIDDEN
-	var jitter := 1.0 if rad_state == RadState.SHAKING and tick % 4 < 2 else 0.0
-	rad_visual.position = rad.position + Vector2(jitter, 0.0)
-	rad_visual.color = RAD_SHAKE_COLOR if rad_state == RadState.SHAKING else RAD_COLOR
+	_beeld.update(tick)
 	var mark := get_node(^"Vloerteken") as Polygon2D
 	mark.visible = shown and phase == Phase.TWO and rad_state == RadState.HANGING \
 		and state == State.FIGHT
@@ -643,11 +605,3 @@ func update_visual(tick: int) -> void:
 		var span := floor_mark(rad_side)
 		mark.polygon = PackedVector2Array([Vector2(span.x, -3.0), Vector2(span.y, -3.0), Vector2(span.y, 0.0),
 			Vector2(span.x, 0.0)])
-	var tell := get_node(^"Tell") as Polygon2D
-	tell.visible = is_telling() or is_attack_active()
-	if tell.visible:
-		var r := Rect2(attack_box.position - global_position, attack_box.size)
-		tell.polygon = PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end,
-			Vector2(r.position.x, r.end.y)])
-		var base := POMP_TELL if attack_kind == "pomp" else ZWIEP_TELL
-		tell.color = Color(base, 0.15 + 0.45 * windup_progress(tick)) if is_telling() else ACTIVE_COLOR

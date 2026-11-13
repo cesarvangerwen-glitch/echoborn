@@ -110,7 +110,11 @@ func test_b8_rad_place_per_d(t) -> void:
 	b1.setup_gemaalmeester(Vector2(0, Fx.FLOOR_TOP))
 	b1.attach(sim)
 	await t.run_ticks(sim, 3)
-	t.check(not b1.is_rad_hittable() and not (b1.get_node("RadBeeld") as CanvasItem).visible, "rad in fase 1")
+	# Fase 1 (#265, animatie-timing §1.2): het rad hangt stil op de rug van het lichaam (middle(), 120),
+	# draai_s0 frame 0, niet raakbaar.
+	var rad_beeld = b1.get_node("RadBeeld")
+	t.check(not b1.is_rad_hittable() and rad_beeld.visible and rad_beeld.anim == "draai_s0" and rad_beeld.frame_nr == 0
+		and rad_beeld.position == Vector2(b1.middle() - 57.0, -120.0 - 45.0), "rad in fase 1: %s %s %d op %s" % [rad_beeld.visible, rad_beeld.anim, rad_beeld.frame_nr, rad_beeld.position])
 	await t.cleanup()
 
 
