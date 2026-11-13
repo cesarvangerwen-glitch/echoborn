@@ -1,12 +1,47 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
 [ext_resource type="Script" path="res://scripts/combat/slice_enemy.gd" id="2_enemy"]
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_art.gd" id="10_art"]
+[ext_resource type="Texture2D" uid="uid://byvx2ayyex2jg" path="res://art/wereld/kadewijk/s4_brugkloof_achter_grijs.png" id="11_achter"]
+[ext_resource type="Texture2D" uid="uid://ck8mqud5jqrxx" path="res://art/wereld/kadewijk/s4_brugkloof_midden_grijs.png" id="12_midden"]
+[ext_resource type="Texture2D" uid="uid://bakc3tiy048mf" path="res://art/wereld/kadewijk/s4_brugkloof_speelvlak_grijs.png" id="13_speelvlak"]
+[ext_resource type="Texture2D" uid="uid://cbaxf4xs0dhwp" path="res://art/wereld/kadewijk/s4_brugkloof_licht_grijs.png" id="14_licht"]
 
 [node name="S4Inhoud" type="Node2D"]
 position = Vector2(-3040, -180)
 script = ExtResource("1_inhoud")
 kamer_id = &"S4"
+
+[node name="Art" type="Node2D" parent="."]
+texture_filter = 1
+script = ExtResource("10_art")
+kamer_id = &"S4"
+naam = "s4_brugkloof"
+
+[node name="Achter" type="Sprite2D" parent="Art"]
+z_index = -30
+position = Vector2(2560, 0)
+texture = ExtResource("11_achter")
+centered = false
+
+[node name="Midden" type="Sprite2D" parent="Art"]
+z_index = -20
+position = Vector2(2560, 0)
+texture = ExtResource("12_midden")
+centered = false
+
+[node name="Speelvlak" type="Sprite2D" parent="Art"]
+z_index = -10
+position = Vector2(2560, 0)
+texture = ExtResource("13_speelvlak")
+centered = false
+
+[node name="Licht" type="Sprite2D" parent="Art"]
+z_index = -5
+position = Vector2(2560, 0)
+texture = ExtResource("14_licht")
+centered = false
 
 [node name="Overkant" type="Node2D" parent="."]
 position = Vector2(3260, 248)

@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://levels/kadewijk/kadewijk_inhoud.gd" id="1_inhoud"]
 [ext_resource type="Script" path="res://scripts/combat/slice_enemy.gd" id="2_enemy"]
 [ext_resource type="Script" path="res://scripts/objects/luik.gd" id="3_luik"]
+[ext_resource type="Script" path="res://levels/kadewijk/kadewijk_schaduwklep.gd" id="20_schaduwklep"]
 
 [node name="S7Inhoud" type="Node2D"]
 position = Vector2(-5280, -540)
@@ -17,6 +18,9 @@ polygon = PackedVector2Array(-8, -14, 8, -14, 8, 0, -8, 0)
 [node name="Luik" type="Node2D" parent="."]
 position = Vector2(5280, 444)
 script = ExtResource("3_luik")
+
+[node name="Schaduwklep" type="Sprite2D" parent="."]
+script = ExtResource("20_schaduwklep")
 
 [node name="Dwaallicht1" type="Node2D" parent="."]
 position = Vector2(5013, 572)

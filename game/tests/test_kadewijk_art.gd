@@ -4,7 +4,7 @@ extends RefCounted
 ## `res://art/wereld/kadewijk/kadewijk_kamers.json`, `kadewijk_art.gd`).
 ##
 ## Via de echte gebiedsscène en de AreaLoader, bij D = 60, 90, 120 en 180:
-## - de lagen van S1 en S3 zijn geladen: per laag uit het manifest een
+## - de lagen van S1, S2, S3 en S4 zijn geladen: per laag uit het manifest een
 ##   `Sprite2D` met texture, zo groot als de kamer, linksboven op de kamer, met
 ##   de z-index van het manifest en filter Nearest, en geen vlak dat de hele
 ##   kamer bedekt (de `Achtergrond` van de wijk) ligt erboven;
@@ -14,8 +14,15 @@ extends RefCounted
 ##   AreaLoader ze bouwde, niet de layout); de eenrichtingsstukken (galerij,
 ##   treden van B1) liggen met hun loopvlak (rij 0 van het stuk, dekkend) op
 ##   de bovenkant van hun blok en zijn even breed, dus ze schuiven mee met D;
+## - de vaste stukken per D (S2: `B3Wand`, `B3Blok`; manifest `vaste_stukken`)
+##   staan linksboven op hun blok, zo groot als het blok (begrensd tot de
+##   texture), z −10 na `Speelvlak`, met een dekkende bovenrij en linkerkolom;
+##   zonder blok (B3-blok bij D = 60) is er geen stuk;
 ## - de grijze placeholders zijn uit, de collision blijft aan;
 ## - `set_staat()` wisselt naar half en kleur en terug.
+## - De schaduwklep (V-01d, deel 3 §10.4) naast het luik in S7 en S9: weg tot
+##   het luik met schaduwklep breekt, dan frame 0 op de klep; bij
+##   `schaduwklep_weg` frame 1 en 2 op 12 fps, dan weg; zonder schaduwklep nooit.
 ##
 ## Leest de PNG's voor de pixelcontrole met `Image.load_from_file` (de bron,
 ## niet de importcache); de sprites zelf laden via de import (CI: `--import`).
@@ -27,7 +34,17 @@ const Progress = preload("res://scripts/save/progress.gd")
 const KadewijkArt = preload("res://levels/kadewijk/kadewijk_art.gd")
 
 const DS := [60, 90, 120, 180]
-const KAMERS := {&"S1": "s1_kade_ingang", &"S3": "s3_vismarkt"}
+const KAMERS := {&"S1": "s1_kade_ingang", &"S2": "s2_kadegang", &"S3": "s3_vismarkt", &"S4": "s4_brugkloof"}
+const Schaduwklep = preload("res://levels/kadewijk/kadewijk_schaduwklep.gd")
+const LUIK_KAMERS := {&"S7": "res://levels/kadewijk/s7_sluiskelder.tscn", &"S9": "res://levels/kadewijk/s9_lage_kade.tscn"}
+
+
+## Combat voor een los luik: P1 solo met de echo aan geeft een schaduwklep.
+class NepCombat:
+	extends RefCounted
+	var coop := false
+	var echo_on := true
+	var tail_ticks := 60
 
 
 func _wijk(t, d: int, start: StringName) -> Array:
@@ -140,6 +157,42 @@ func _check_kamer(t, wijk, id: StringName, d: int) -> void:
 		t.check(body.collision_layer != 0, "%s: collision van %s is uit" % [tag, body.name])
 	t.check(n_bodies == Layout.blocks(id, d).size(), "%s: %d blokken, layout %d" % [tag, n_bodies, Layout.blocks(id, d).size()])
 
+	# 2b. Vaste stukken per D liggen op hun blok.
+	var vaste_m: Dictionary = KadewijkArt.manifest().get("vaste_stukken", {})
+	var vaste_map := art.get_node_or_null(^"VasteStukken")
+	var n_vast := 0
+	for key: String in vaste_m:
+		if not key.begins_with(String(id) + "/"):
+			continue
+		var blok := key.get_slice("/", 1)
+		var body := inhoud.get_node_or_null("Blokken/" + blok) as StaticBody2D
+		var sprite := vaste_map.get_node_or_null(blok) as Sprite2D if vaste_map else null
+		if body == null:
+			t.check(sprite == null, "%s: stuk %s zonder blok" % [tag, blok])
+			continue
+		n_vast += 1
+		var rect := _body_rect(body)
+		t.check(sprite != null, "%s: geen vast stuk op %s" % [tag, blok])
+		if sprite == null:
+			continue
+		var bestand: String = vaste_m[key]["bestanden"]["grijs"]
+		var img := _image(bestand)
+		var want := Rect2(Vector2.ZERO, rect.size.min(Vector2(img.get_size())))
+		t.check(sprite.texture != null and sprite.texture.resource_path == KadewijkArt.DIR + bestand, "%s %s: texture %s" % [tag, blok, sprite.texture.resource_path if sprite.texture else null])
+		t.check(sprite.global_position.is_equal_approx(rect.position) and not sprite.centered, "%s %s: stuk op %s, blok op %s" % [tag, blok, sprite.global_position, rect.position])
+		t.check(sprite.region_enabled and sprite.region_rect == want, "%s %s: region %s, verwacht %s" % [tag, blok, sprite.region_rect, want])
+		t.check(_z(sprite) == -10 and vaste_map.get_index() > art.get_node(^"Speelvlak").get_index(), "%s %s: z %d of niet na Speelvlak" % [tag, blok, _z(sprite)])
+		var boven := 0
+		for x in int(want.size.x):
+			boven += 1 if img.get_pixel(x, 0).a > 0.0 else 0
+		var links := 0
+		for y in int(want.size.y):
+			links += 1 if img.get_pixel(0, y).a > 0.0 else 0
+		t.check(boven == int(want.size.x) and links == int(want.size.y), "%s %s: bovenrij %d/%d en linkerkolom %d/%d dekkend" % [tag, blok, boven, want.size.x, links, want.size.y])
+	t.check((vaste_map.get_child_count() if vaste_map else 0) == n_vast, "%s: %d vaste stukken voor %d blokken" % [tag, vaste_map.get_child_count() if vaste_map else -1, n_vast])
+	if id == &"S2":
+		t.check(n_vast == (2 if Layout.b3_width(d) > 0.0 else 1), "%s: %d vaste stukken (B3Wand, en B3Blok bij D > 60)" % [tag, n_vast])
+
 	# 3. `speelvlak` valt per kolom precies op de bovenkant van de vaste blokken.
 	for st: String in KadewijkArt.STATEN:
 		var speelvlak: Dictionary = (kamer_m["lagen"] as Array).filter(func(l: Dictionary) -> bool: return l["naam"] == "speelvlak")[0]
@@ -198,7 +251,7 @@ func _check_kamer(t, wijk, id: StringName, d: int) -> void:
 		t.check(z > -10 and z < -5, "%s %s: z %d, verwacht tussen speelvlak (−10) en licht (−5)" % [tag, blok, z])
 
 
-## S1 (start) en S3 (start in S3) bij elke D: lagen geladen, op de collision.
+## S1–S4 (start in die kamer) bij elke D: lagen geladen, op de collision.
 func test_kadewijk_art_op_collision(t) -> void:
 	for d: int in DS:
 		for id: StringName in KAMERS:
@@ -245,3 +298,97 @@ func test_kadewijk_art_staten(t) -> void:
 			var want_atlas := KadewijkArt.DIR + String(KadewijkArt.manifest()["eenrichting"]["atlas"][st])
 			t.check(np.texture != null and np.texture.resource_path == want_atlas, "%s %s: atlas %s" % [st, np.name, np.texture.resource_path if np.texture else null])
 	await _free(t, parts)
+
+
+## In S2 schuiven de kopse kant van het pakhuis en het B3-blok mee met `b3_width(D)`.
+func test_kadewijk_art_b3_schuift_mee(t) -> void:
+	for d: int in [60, 120, 180]:
+		var parts := _wijk(t, d, &"S2")
+		await t.tree.physics_frame
+		var art: Node = parts[0].loader.kamers[&"S2"].inhoud_node.get_node(^"Art")
+		var b := Layout.b3_width(d)
+		var wand := art.get_node_or_null(^"VasteStukken/B3Wand") as Sprite2D
+		var blok := art.get_node_or_null(^"VasteStukken/B3Blok") as Sprite2D
+		t.check(wand != null and is_equal_approx(wand.position.x, Layout.B3_BLOCK_LEFT + b), "D=%d: wand op %s, verwacht x %s" % [d, wand.position if wand else null, Layout.B3_BLOCK_LEFT + b])
+		if b > 0.0:
+			t.check(blok != null and is_equal_approx(blok.region_rect.size.x, b), "D=%d: blok %s breed, verwacht %s" % [d, blok.region_rect.size.x if blok else -1.0, b])
+		else:
+			t.check(blok == null, "D=%d: B3-blok-stuk zonder blok" % d)
+		art.set_staat("kleur")
+		t.check(wand != null and wand.texture.resource_path.ends_with("s2_kadegang_b3_wand_kleur.png"), "D=%d: wand niet in kleur" % d)
+		await _free(t, parts)
+
+
+## De schaduwklep naast het luik van S7 en S9 (de kamerscène zelf, met een los luik).
+func test_kadewijk_art_schaduwklep(t) -> void:
+	var objecten: Dictionary = KadewijkArt.manifest()["objecten"]
+	var frames: Array = objecten["schaduwklep"]["frames"]
+	var atlas := _image(objecten["atlas"]["grijs"])
+	var dekking: Array[int] = []
+	for f: Array in frames:
+		var n := 0
+		for x in int(f[2]):
+			for y in int(f[3]):
+				n += 1 if atlas.get_pixel(int(f[0]) + x, int(f[1]) + y).a > 0.0 else 0
+		dekking.append(n)
+	t.check(frames.size() == 3 and dekking[0] > dekking[1] and dekking[1] > dekking[2] and dekking[2] > 0, "frames vol → oplossen: dekking %s" % [dekking])
+	# De lichte bovenrand (daar staat de echo): de eerste volle rij van frame 0. In de art van
+	# deel 3 is dat rij 2 (rij 0 leeg, rij 1 met naden); open punt AD in de PR: 2 px onder de
+	# bovenkant van de klep. Hier: hij ligt in de bovenste 3 rijen.
+	var eerste_vol := -1
+	for y in int(frames[0][3]):
+		var n := 0
+		for x in int(frames[0][2]):
+			n += 1 if atlas.get_pixel(int(frames[0][0]) + x, int(frames[0][1]) + y).a > 0.0 else 0
+		if n == int(frames[0][2]):
+			eerste_vol = y
+			break
+	t.check(eerste_vol >= 0 and eerste_vol <= 2, "frame 0: eerste volle rij %d, verwacht ≤ 2 (bovenrand van de klep)" % eerste_vol)
+	var stap := int(round(60.0 / float(objecten["schaduwklep"]["fps"])))
+	for id: StringName in LUIK_KAMERS:
+		for coop: bool in [false, true]:
+			var houder := Node2D.new()
+			houder.position = Layout.ROOMS[id].get_center()
+			t.tree.root.add_child(houder)
+			var inhoud: Node = load(LUIK_KAMERS[id]).instantiate()
+			houder.add_child(inhoud)
+			var luik = inhoud.get_node(^"Luik")
+			var klep := inhoud.get_node_or_null(^"Schaduwklep") as Sprite2D
+			t.check(klep != null and klep.get_script() == Schaduwklep, "%s: geen Schaduwklep naast het luik" % id)
+			if klep == null:
+				houder.queue_free()
+				continue
+			var tag := "%s %s" % [id, "co-op" if coop else "solo"]
+			t.check(not klep.visible, "%s: schaduwklep zichtbaar vóór de breuk" % tag)
+			var nep := NepCombat.new()
+			nep.coop = coop
+			luik.combat = nep
+			luik.apply_damage(100, 1, "p1")
+			t.check(luik.schaduwklep == not coop, "%s: luik.schaduwklep %s" % [tag, luik.schaduwklep])
+			if coop:
+				for i in stap * 3:
+					await t.tree.process_frame
+				t.check(not klep.visible, "%s: schaduwklep zichtbaar zonder schaduwklep" % tag)
+				houder.queue_free()
+				continue
+			var hoek: Vector2 = luik.global_position + Vector2(-luik.size.x * 0.5, -4.0)
+			t.check(klep.visible and klep.frame_nu == 0 and klep.region_rect == Rect2(frames[0][0], frames[0][1], frames[0][2], frames[0][3]),
+				"%s: na de breuk frame %d zichtbaar %s" % [tag, klep.frame_nu, klep.visible])
+			t.check(klep.global_position.is_equal_approx(hoek) and is_equal_approx(klep.region_rect.size.x, luik.size.x),
+				"%s: schaduwklep op %s, klep linksboven op %s" % [tag, klep.global_position, hoek])
+			t.check(_z(klep) == int(objecten["schaduwklep"]["z_index"]) and klep.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "%s: z %d of filter" % [tag, _z(klep)])
+			for i in stap * 2:
+				await t.tree.process_frame
+			t.check(klep.visible and klep.frame_nu == 0, "%s: vol blijft staan tot schaduwklep_weg (frame %d)" % [tag, klep.frame_nu])
+			luik.apply_damage(130, 1, "echo")
+			t.check(not luik.schaduwklep and klep.visible and klep.frame_nu == 1, "%s: na schaduwklep_weg frame %d" % [tag, klep.frame_nu])
+			var gezien: Array[int] = [klep.frame_nu]
+			for i in stap * 3:
+				await t.tree.process_frame
+				if klep.frame_nu != gezien[-1]:
+					gezien.append(klep.frame_nu)
+			t.check(gezien == [1, 2, -1] and not klep.visible, "%s: frames na weg %s, verwacht [1, 2, -1] en weg" % [tag, gezien])
+			klep.set_staat("kleur")
+			t.check(klep.texture.resource_path == KadewijkArt.DIR + String(objecten["atlas"]["kleur"]), "%s: staat kleur" % tag)
+			houder.queue_free()
+			await t.tree.process_frame
