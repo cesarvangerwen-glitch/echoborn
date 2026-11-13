@@ -10,8 +10,9 @@ extends Node
 ##
 ## **Determinisme.** Audio leest alleen de argumenten van het signaal en de
 ## plek van een node; hij schrijft nooit naar de Sim, gebruikt geen toeval en
-## geen tijd van de klok. Headless (tests, bots; Dummy-driver) speelt hij
-## gewoon mee; buiten de boom slaat hij alleen het afspelen over.
+## geen tijd van de klok. Headless (tests, bots; Dummy-driver) en buiten de
+## boom zet hij alles klaar en logt hij de start, maar slaat hij `play()` over
+## (`silent_driver`).
 ##
 ## **Stemmen.** `max_voices` spelers, om de beurt gebruikt: een nieuw geluid
 ## neemt de speler die het langst geleden startte (de oudste valt weg, bible
@@ -70,6 +71,14 @@ static func place_of(node: Node2D) -> Vector2:
 	return node.global_position if node.is_inside_tree() else node.position
 
 
+## Headless (tests, bots) draait Godot met de Dummy-driver: er is geen uitvoer,
+## en een afspeling die bij het afsluiten nog in de AudioServer zit, telt in
+## CI als lek. Dan zet `SimSfx` de speler wel klaar (stream, bus, volume,
+## pitch, plek, log), maar roept hij `play()` niet aan.
+static func silent_driver() -> bool:
+	return AudioServer.get_driver_name() == "Dummy"
+
+
 ## `2^(halftonen / 12)`.
 static func pitch_for(semitones: float) -> float:
 	return pow(2.0, semitones / 12.0)
@@ -90,7 +99,7 @@ func play_on_tick(tick: int, sfx: AudioStream, at: Vector2, bus: StringName,
 	player.pitch_scale = pitch
 	# De ouder (`SimSfx`) is geen CanvasItem: `position` is de plek in de wereld.
 	player.position = at
-	if player.is_inside_tree():
+	if player.is_inside_tree() and not silent_driver():
 		player.play(from)
 	starts.append({"tick": tick, "stream": player.stream, "bus": player.bus,
 		"send": AudioBuses.send_of(player.bus), "area_mask": player.area_mask,
@@ -99,6 +108,17 @@ func play_on_tick(tick: int, sfx: AudioStream, at: Vector2, bus: StringName,
 	if starts.size() > MAX_LOG:
 		starts.pop_front()
 	return player
+
+
+## Ontlaadt de kamer of het object: alle stemmen stil (geen afspeling die in de
+## AudioServer blijft hangen na het vrijgeven).
+func _exit_tree() -> void:
+	stop_all()
+
+
+func stop_all() -> void:
+	for player in _voices:
+		player.stop()
 
 
 ## De speler die het langst geleden startte (of een nieuwe, tot `max_voices`).

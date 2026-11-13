@@ -3,8 +3,9 @@ extends RefCounted
 ## de pompslag van P1 en van de echo, het breekgeluid van het luik en de
 ## rad-treffer van de echo, plus de basis (bussen, `SimSfx`).
 ##
-## Headless draait Godot met de Dummy-driver: er klinkt niets, maar de spelers,
-## bussen en starts bestaan gewoon. De test controleert daarom wat elke
+## Headless draait Godot met de Dummy-driver: er klinkt niets en `SimSfx` roept
+## `play()` niet aan (anders telt een afspeling bij het afsluiten als lek), maar
+## de spelers, bussen en starts bestaan gewoon. De test controleert daarom wat elke
 ## `AudioStreamPlayer2D` krijgt (stream-object, `volume_db`, bus, send,
 ## `pitch_scale`, plek) en wanneer hij start, niet het geluid zelf.
 
@@ -249,7 +250,7 @@ func test_luik_zelfde_breekgeluid(t) -> void:
 # --- rad -------------------------------------------------------------------
 
 ## Bible §4.1: de rad-treffer van P1 is `gm_rad_treffer_1`, op de treffer die
-## `kant_treffers` haalt `_2` (bus SFX). De echo krijgt altijd de holle
+## `kant_treffers` haalt `_2` (bus SFX), ook in co-op maar één keer per kant. De echo krijgt altijd de holle
 ## `echo_gm_rad_treffer_1` op bus Echo met `play(0.2)`, en **nooit** `_2`, ook
 ## niet als de kant op dat moment vol is.
 func test_rad_echo_nooit_treffer_2(t) -> void:
@@ -291,4 +292,16 @@ func test_rad_echo_nooit_treffer_2(t) -> void:
 				% [s["tick"], s["stream"], s["bus"], s["from"]])
 	t.check(starts.all(func(s: Dictionary) -> bool: return not (s["who"] == "echo" and is_same(s["stream"], s2))),
 		"de echo startte gm_rad_treffer_2")
+	# Co-op: P1 en P2 op dezelfde tick als de kant vol raakt (`on_damage` telt per treffer, dan
+	# `rad_hit`): `_2` klinkt maar één keer, de tweede treffer krijgt `_1`.
+	var before: int = starts.size()
+	boss.rad_side_hits = kant - 1
+	for source: String in ["p1", "p2"]:
+		boss.rad_side_hits += 1
+		boss.rad_hit.emit(200, source, "sprong", 25)
+	var coop: Array = audio.starts.slice(before)
+	t.check(coop.size() == 2 and is_same(coop[0]["stream"], s2) and is_same(coop[1]["stream"], s1)
+		and coop.filter(func(s: Dictionary) -> bool: return is_same(s["stream"], s2)).size() == 1,
+		"co-op, P1 en P2 op dezelfde tick: %s (verwacht één keer _2, dan _1)"
+		% [coop.map(func(s: Dictionary) -> String: return "%s:%s" % [s["who"], "_2" if is_same(s["stream"], s2) else "_1"])])
 	await t.cleanup()

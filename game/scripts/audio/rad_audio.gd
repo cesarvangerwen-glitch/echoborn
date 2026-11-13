@@ -4,8 +4,8 @@ extends "res://scripts/audio/sim_sfx.gd"
 ## `rad_hit(tick, source, action, amount)` een `AudioStreamPlayer2D` op het rad.
 ##
 ## - **P1/P2** (telt mee voor `kant_treffers`): `gm_rad_treffer_1`, en
-##   `gm_rad_treffer_2` (een kwart hoger, "deze kant is klaar") op de treffer
-##   die `kant_treffers` haalt; bus `SFX`.
+##   `gm_rad_treffer_2` (een kwart hoger, "deze kant is klaar") alleen op de
+##   treffer die `kant_treffers` precies haalt (één keer per kant); bus `SFX`.
 ## - **De echo** doet minder (5 SE, telt niet mee): **altijd** de holle
 ##   `echo_gm_rad_treffer_1` op bus `Echo`, met `play(0.2)` op de treffer-tick
 ##   (zonder aanloop, `slice-audio.md` §7.2), en **nooit** `_2`: die belooft
@@ -47,7 +47,9 @@ func _on_rad_hit(tick: int, source: String, _action: String, _amount: int) -> vo
 		play_on_tick(tick, sfx_echo, at, AudioBuses.ECHO, float(c.get("echo_volume_db", 0.0)), 1.0,
 			source, float(c.get("echo_start_s", 0.2)))
 		return
-	# `rad_side_hits` telt deze treffer al mee (`on_damage` vóór `rad_hit`).
-	var last := int(boss.rad_side_hits) >= EnemyData.ticks(boss.data_group, "kant_treffers")
+	# `rad_side_hits` telt deze treffer al mee (`on_damage` vóór `rad_hit`). `==`, niet `>=`:
+	# slaan P1 en P2 op dezelfde tick als de kant vol raakt (co-op), dan klinkt `_2` maar één
+	# keer (de eerste die de kant vol maakt); de tweede krijgt `_1` (Lead-review TD, PR #282).
+	var last := int(boss.rad_side_hits) == EnemyData.ticks(boss.data_group, "kant_treffers")
 	play_on_tick(tick, sfx_2 if last else sfx_1, at, AudioBuses.SFX, float(c.get("volume_db", 0.0)),
 		1.0, source)
