@@ -13,14 +13,19 @@ on:
     paths: ["game/**", ".github/workflows/tests.yml", ".github/ci/**"]
   pull_request:
     paths: ["game/**", ".github/workflows/tests.yml", ".github/ci/**"]
+  # CEO-besluit 2026-11-13 "CI zuiniger": elke nacht de volledige matrix op main.
+  schedule:
+    - cron: "17 2 * * *"
   workflow_dispatch:
 
 permissions:
   contents: read
 
+# Een nieuwe push op dezelfde PR breekt de vorige PR-run af. Runs op main
+# (push, nacht, met de hand) breken niets af: elke merge krijgt zijn eigen run.
 concurrency:
-  group: tests-${{ github.ref }}
-  cancel-in-progress: true
+  group: tests-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   GODOT_VERSION: "4.6.3"
@@ -30,27 +35,20 @@ env:
 
 jobs:
   tests:
-    # #233 (TD): per OS twee jobs naast elkaar. `kort` = alle testscripts
-    # behalve LANG_SCRIPTS (run_tests.gd) plus de meta-run; `lang` = de lange
-    # scripted runs. Samen draaien ze precies TEST_SCRIPTS.
+    # #233 (TD): `kort` = alle testscripts behalve LANG_SCRIPTS (run_tests.gd)
+    # plus de meta-run; `lang` = de lange scripted runs. Samen draaien ze
+    # precies TEST_SCRIPTS.
+    # CEO-besluit 2026-11-13 "CI zuiniger" (setup.md §6, besluit TD (a)):
+    # - pull_request: alleen (linux, kort);
+    # - push naar main, de nacht (schedule) en met de hand: alle vier
+    #   (linux/windows x kort/lang). Geen test valt weg, alleen het moment.
+    # De Windows-zip draait de console-variant: die geeft stdout en de
+    # exitcode door.
     name: tests (${{ matrix.os }}, ${{ matrix.groep }})
     strategy:
       fail-fast: false
       matrix:
-        os: [linux, windows]
-        groep: [kort, lang]
-        include:
-          - os: linux
-            runner: ubuntu-24.04
-            zip: linux.x86_64.zip
-            exe: linux.x86_64
-            sha_var: SHA512_LINUX
-          - os: windows
-            runner: windows-2022
-            zip: win64.exe.zip
-            # De console-variant geeft stdout en de exitcode door.
-            exe: win64_console.exe
-            sha_var: SHA512_WINDOWS
+        include: ${{ fromJSON(github.event_name == 'pull_request' && '[{"os":"linux","groep":"kort","runner":"ubuntu-24.04","zip":"linux.x86_64.zip","exe":"linux.x86_64","sha_var":"SHA512_LINUX"}]' || '[{"os":"linux","groep":"kort","runner":"ubuntu-24.04","zip":"linux.x86_64.zip","exe":"linux.x86_64","sha_var":"SHA512_LINUX"},{"os":"linux","groep":"lang","runner":"ubuntu-24.04","zip":"linux.x86_64.zip","exe":"linux.x86_64","sha_var":"SHA512_LINUX"},{"os":"windows","groep":"kort","runner":"windows-2022","zip":"win64.exe.zip","exe":"win64_console.exe","sha_var":"SHA512_WINDOWS"},{"os":"windows","groep":"lang","runner":"windows-2022","zip":"win64.exe.zip","exe":"win64_console.exe","sha_var":"SHA512_WINDOWS"}]') }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 15
     defaults:
