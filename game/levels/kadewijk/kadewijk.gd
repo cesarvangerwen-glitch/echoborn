@@ -55,7 +55,12 @@ extends Node2D
 ##
 ## Debugmenu (SL-05, placeholder): F1/F2/F3/F7 = D 60/90/120/180 (uit
 ## `echo.tail_options`; de kamers worden opnieuw gebouwd), F4 = echo aan/uit,
-## F6 = opnieuw, F8 = naar het begin van de volgende kamer.
+## F6 = opnieuw, F8 = naar het begin van de volgende kamer. F8, F4 en de
+## D-toetsen zetten een regel `DEBUG` in het meetlog (V-7, #250).
+##
+## Meetlog naar schijf (V-6, #250): als deze scène de hoofdscène van de run is
+## (de start voor de CEO, `docs/tools/kadewijk-meetlog.md`), schrijft
+## `kadewijk_meetlog_csv.gd` de CSV bij `RUN_EIND` en bij afbreken.
 
 signal run_finished(tick: int)
 
@@ -78,6 +83,7 @@ const Gemaalmeester = preload("res://scripts/combat/gemaalmeester.gd")
 const Pickup = preload("res://scripts/objects/pickup.gd")
 const StaatVlag = preload("res://scripts/objects/staat_vlag.gd")
 const SliceEind = preload("res://levels/kadewijk/kadewijk_slice_eind.gd")
+const MeetlogCsv = preload("res://levels/kadewijk/kadewijk_meetlog_csv.gd")
 ## Meetlog en camera van de flow-kamer, ongewijzigd hergebruikt (alleen gelezen).
 const FlowMeetlog = preload("res://levels/flowkamer/flow_meetlog.gd")
 const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
@@ -124,6 +130,12 @@ var progress: Node = null
 var run_end: StringName = &"S4"
 ## `run_end` voor de lus (deel 3): `RUN_EIND` op `SLICE_EIND` (door S9 terug in S1).
 const RUN_END_LUS := &"SLICE_EIND"
+
+## Meetlog als CSV naar schijf (V-6): -1 = alleen als deze scène de
+## `current_scene` is (F6 in de editor, de commandline), 0 = uit, 1 = aan.
+var save_csv := -1
+## Map voor de CSV.
+var log_dir := "user://"
 
 ## --- Toestand ---
 var sim: Sim
@@ -184,6 +196,8 @@ var _wave_1: Array = []
 var _wave_2: Array = []
 var _camera: Camera2D
 var _hud_label: Label
+## De CSV-schrijver (V-6), of null als de CSV uit staat.
+var meetlog_csv: MeetlogCsv = null
 
 
 func _ready() -> void:
@@ -241,6 +255,9 @@ func _ready() -> void:
 	sim.partner_returned.connect(func(t: int, at: Vector2) -> void:
 		meetlog.add_row(t, "P2_TERUG", "", "", at))
 	sim.tick_finished.connect(_on_tick)
+	if save_csv == 1 or (save_csv < 0 and get_tree().current_scene == self):
+		meetlog_csv = MeetlogCsv.new(self, log_dir)
+		add_child(meetlog_csv)
 	hints = EchoHints.new(sim, p1, func() -> Node2D: return echo)
 	var router := get_node_or_null(^"/root/InputRouter")
 	if router and input_override == null:
@@ -605,7 +622,7 @@ func _on_tick(tick: int) -> void:
 func _end_run(tick: int) -> void:
 	run_over = true
 	end_tick = tick
-	meetlog.add_row(tick, "RUN_EIND", "", "", p1.position)
+	# `finish()` schrijft de enige `RUN_EIND` (zoals in de flow-kamer, #250).
 	meetlog.finish()
 	run_finished.emit(tick)
 
@@ -712,6 +729,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not (event is InputEventKey) or not event.pressed or event.echo:
 		return
 	var key: int = (event as InputEventKey).physical_keycode
+	debug_key(key)
 	if DEBUG_TAIL_KEYS.has(key):
 		chosen_tail = int(Tuning.echo()["tail_options"][DEBUG_TAIL_KEYS[key]])
 		get_tree().reload_current_scene()
@@ -729,3 +747,23 @@ func _unhandled_input(event: InputEvent) -> void:
 			if progress != null:
 				give_neerslag(progress.state)
 		p1.respawn_at(Layout.ROOM_START[next])
+
+
+## V-7 (#250): een regel `DEBUG` (waarde = de toets, bron = de nieuwe kamer of
+## D, of `echo_aan`/`echo_uit`) voor F8, de D-toetsen en F4. Herlaadt de toets
+## de scène (alles behalve F8), dan schrijft de CSV-schrijver het log nu als
+## `_afgebroken` (V-6). In een gesloten log (na `RUN_EIND`) komt er niets meer bij.
+func debug_key(key: int) -> void:
+	var source := ""
+	if key == KEY_F8:
+		source = String(Layout.ORDER[(Layout.ORDER.find(room) + 1) % Layout.ORDER.size()])
+	elif DEBUG_TAIL_KEYS.has(key):
+		source = "D%d" % int(Tuning.echo()["tail_options"][DEBUG_TAIL_KEYS[key]])
+	elif key == KEY_F4:
+		source = "echo_uit" if chosen_echo_on else "echo_aan"
+	elif key != KEY_F6:
+		return
+	if key != KEY_F6 and not meetlog.is_closed():
+		meetlog.add_row(sim.tick, "DEBUG", OS.get_keycode_string(key), source, p1.position)
+	if key != KEY_F8 and meetlog_csv != null:
+		meetlog_csv.abort()
