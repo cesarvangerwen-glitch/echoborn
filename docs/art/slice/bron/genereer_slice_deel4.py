@@ -249,7 +249,7 @@ def bouw_s5():
     k.tegels(lambda i, j, xx_, yy_: "baksteen_donker_m1" if (i + j) % 2 else "baksteen_donker_m2", 580, int(hoek.nonzero()[0].min()), w, h, "midden", dt=-1)
     for b in blokken("S5"):
         if b[0].startswith("Trap9"):
-            st = D2.ninepatch(D2.trede_stuk(), 32)
+            st = D2.ninepatch(D2.trede_stuk(), int(b[3]))      # zo breed als het blok (30), niet 32
             k.stamp(st, int(b[1]), int(b[2]), "speelvlak")
     return k
 

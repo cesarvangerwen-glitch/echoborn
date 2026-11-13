@@ -419,9 +419,15 @@ def snelluik_stuk():
 
 def ninepatch(t_full, w):
     """Zet een NinePatch-stuk uit op breedte w (links 16, midden herhaald, rechts 16), als de engine doet."""
-    assert w >= 32, "eenrichtingsblokken zijn minstens 40 px breed"
+    assert w >= 2, "een stuk is minstens 2 px breed"
     out = T(w, 16)
-    src = np.r_[np.arange(16), 16 + (np.arange(w - 32) % 16), np.arange(32, 48)]
+    if w >= 32:
+        src = np.r_[np.arange(16), 16 + (np.arange(w - 32) % 16), np.arange(32, 48)]
+    else:
+        # Smaller dan de twee koppen samen (bv. de treden van 30 px van de trap van S9): de koppen
+        # schuiven over elkaar en de middelste kolommen vallen weg. Zo is het stuk nooit breder dan
+        # zijn blok (fix van de TA in 962105a, hier voor alle generatoren).
+        src = np.r_[np.arange(16 - (32 - w) // 2), np.arange(32 + (32 - w + 1) // 2, 48)]
     out.mat[:] = t_full.mat[:, src]
     out.t[:] = t_full.t[:, src]
     return out
