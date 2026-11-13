@@ -1,6 +1,6 @@
 # Slice-art Kadewijk: kleurscript, lichtovergang, tileset, stijlregels vijanden (deel 1) en eindkwaliteit S1–S9 (deel 2–5)
 
-Versie 0.5.1 · Eigenaar: Art Director · Issue [#85](https://github.com/cesarvangerwen-glitch/echoborn/issues/85) (T8c, deel 1–5) · Hoort bij `docs/art/bible.md` v0 en `docs/art/assetlijst.md`
+Versie 0.5.2 · Eigenaar: Art Director · Issue [#85](https://github.com/cesarvangerwen-glitch/echoborn/issues/85) (T8c, deel 1–5) · Hoort bij `docs/art/bible.md` v0 en `docs/art/assetlijst.md`
 Bronnen: `docs/design/wereld.md` v0.2 §2 (slice Kadewijk), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.1 (§2, §3, §9), `docs/narrative/verhaal-v2.md` §4.3 en §6, `docs/art/ui-stijlgids.md` (merk, klokring, `#ff475c`), fasekader fase 2 v0.4 §2 (T8c) en §4.
 
 ## 0. Werkaanname (kader §5)
@@ -201,6 +201,7 @@ Deel 1: alles in `docs/art/slice/` (behalve `eindkwaliteit/`) wordt gemaakt door
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.5.2 | 2026-11-13 | S8: de vaste loopkat en ketting zijn uit `midden`, want het rad van de Animator heeft een eigen loopkat (besluit AD, #266); de balk blijft. `controleer_stukbreedte.py` is nu de laatste stap van `genereer_slice_deel5.py`, en de run faalt bij een uitstekend loopvlak (EP/SM, #268). De norm voor de holle echo staat in bible v0.2 §6 regel 4a (besluit CD, #226). |
 | 0.5.1 | 2026-11-13 | Stukbreedte (#85, na Lead-review #262): `ninepatch` laat bij een blok smaller dan 32 px de middelste kolommen vallen (de fix van de TA in 962105a, nu voor alle generatoren). Daarmee zijn de treden van de trap van S9 in S5 30 px breed in plaats van 32: alleen `s5_sluiswachtershuis_speelvlak_*` wijzigt, S9 blijft bit voor bit gelijk. Nieuw: `bron/controleer_stukbreedte.py` zoekt in alle kamers naar loopvlakken die buiten hun blok steken (op main 4 pixels in S5, nu 0). |
 | 0.5 | 2026-11-13 | Deel 5 van T8c (#85): **S8 Machinehal en S9 Lage kade op eindkwaliteit** (maatvast, LGD in #83), de deuren van S8 en het hoogwater van S9 als vaste stukken, `fps_vol` = 6 voor het rad (besluit #244), `godot_controle.gd` generiek voor vaste stukken (§12). |
 | 0.4 | 2026-11-13 | Deel 4 van T8c (#85): **S5, S6 en S7 op eindkwaliteit** (S5 met variatie per verdieping, LGD #227), de laag `gemaal_aan` voor trap 1 in S6, de objecten (breekbaar luik voor S7 en S9, **holle** schaduwklep, pompschoep en pompslag gelijk voor P1 en de echo, sluisklep, sokkel, rad), de geometrie uit `kadewijk_blokken.json`, het gemaal voor de kleurgolf op `S6/Gemaal` (§11). |
