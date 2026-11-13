@@ -292,7 +292,13 @@ def bouw_s9():
     # trap naar het plein (treden van de trap van S9) tussen de trapwanden
     for b in blokken("S9"):
         if b[0].startswith("Trap9"):
-            k.stamp(D2.ninepatch(D2.trede_stuk(), 32), b[1], b[2], "speelvlak")
+            # Zo breed als het blok (30), niet 32: anders steekt de bovenste trede 2 px over de
+            # collision (TA, #226, kolomtest S9). Het stuk van 32 zonder de 2 middelste kolommen.
+            st = D2.ninepatch(D2.trede_stuk(), 32)
+            keep = np.r_[0:16 - (32 - int(b[3])) // 2, 16 + (32 - int(b[3]) + 1) // 2:32]
+            smal = D2.T(int(b[3]), 16)
+            smal.mat[:], smal.t[:] = st.mat[:, keep], st.t[:, keep]
+            k.stamp(smal, b[1], b[2], "speelvlak")
     k.tegels(lambda i, j, x_, y_: "baksteen_donker_m1" if (i + j) % 2 else "baksteen_donker_m2", 4100, 0, 4150, 320, "midden", dt=-1)
     # lampen op de lage kade (aan na trap 2), één per ± 500 px
     su, sa = D2.straatlamp()
