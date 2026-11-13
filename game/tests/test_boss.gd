@@ -19,6 +19,7 @@ const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
 const EnemyData = preload("res://scripts/combat/enemy_data.gd")
 const Boss = preload("res://scripts/combat/boss.gd")
 const Testboss = preload("res://scripts/combat/testboss.gd")
+const GemaalmeesterBeeld = preload("res://art/animatie/gemaalmeester/gemaalmeester_beeld.gd")
 const Gemaalmeester = preload("res://scripts/combat/gemaalmeester.gd")
 const LightMeter = preload("res://scripts/light/light_meter.gd")
 const Respawn = preload("res://scripts/save/respawn.gd")
@@ -623,9 +624,13 @@ func test_b6_attack_boxes(t) -> void:
 		var boss := _gemaalmeester(sim)
 		var log := _watch(boss)
 		await t.run_ticks(sim, 1)
-		# B-11: de tell (stofstrook) staat in beeld zolang de aanloop loopt, op het vlak.
-		var tell := boss.get_node("Tell") as Polygon2D
-		t.check(boss.is_telling() and tell.visible and tell.polygon[0] + boss.global_position == boss.attack_box.position,
+		# B-11: de tell (stofstrook) staat in beeld zolang de aanloop loopt, op het vlak (de sprite heeft
+		# 1 px rand: `offset` van het blad in het manifest, #265).
+		var tell := boss.get_node("Tell") as Sprite2D
+		var tell_blad: Dictionary = GemaalmeesterBeeld.lees_manifest()["bladen"]["tell_pomp"]
+		var tell_rand := Vector2(tell_blad["offset"][0], tell_blad["offset"][1])
+		t.check(boss.is_telling() and tell.visible and tell.position - tell_rand + boss.global_position == boss.attack_box.position
+			and tell.region_rect.size == boss.attack_box.size + Vector2(2, 2),
 			"x = %s: geen tell op het vlak" % x)
 		var box := boss.attack_box
 		var left := x < 300.0
@@ -906,7 +911,8 @@ func test_b7_core_timeout_and_adds(t) -> void:
 	sim.tick_finished.connect(func(tick: int) -> void:
 		if boss.spout_glowing:
 			glow.append(tick)
-		if boss.get_node("Spuigat_links").visible != boss.spout_glowing:
+		var spuigat = boss.get_node("Spuigat_links")
+		if (spuigat.visible and spuigat.anim == "gloei") != boss.spout_glowing:
 			glow.append(-1))
 	await t.run_ticks(sim, 200)
 	t.check(spawned.is_empty(), "adds vóór opening 1")
