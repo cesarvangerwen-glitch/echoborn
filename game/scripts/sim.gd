@@ -62,6 +62,10 @@ var tick := 0
 var players: Array[PlayerActor] = []
 var echoes: Array[EchoBody] = []
 var objects: Array[SimObject] = []
+## V-01 (besluit LGD in #252, #247): heeft de speler de Neerslag? Zonder is AANVAL + `DOWN` in de
+## lucht een gewone aanval in de lucht (E-10a), voor P1, P2 en de echo. Standaard aan (de flow-kamer,
+## tests); de Kadewijk zet hem uit tot de pick-up op de sokkel (de vlag in de save is de vaardigheid).
+var neerslag_unlocked := true
 ## Aanval, schaduwmerk en kettingen (E-10a, E-14, E-02m, C-12).
 var combat := Combat.new()
 ## Optioneel: de AreaLoader van het gebied (E-04a, E-04e; ontwerp.md §3a).
@@ -602,6 +606,7 @@ func _execute(kind: int, actor: Node2D) -> void:
 				facing = actor.facing
 			if "neerslag" in actor:
 				down = actor.neerslag
+		down = down and neerslag_unlocked
 		attack_executed.emit(tick, actor)
 		var struck := combat.attack(tick, attacker, (actor as CollisionObject2D).collision_layer,
 			actor.global_position, facing, down)

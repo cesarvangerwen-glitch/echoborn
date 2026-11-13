@@ -6,7 +6,8 @@ extends RefCounted
 ## B-9b: de bot ontwijkt in fase 2 (keren op de maat, sprong over de pompslag) en P1 speelt met
 ## `p1_health` = 5 LP, zonder genezing van buiten het spel. Elke run: verslagen zonder dood (geen
 ## RESPAWN, ≤ 4 treffers op P1 in de hele run; doel 0 in fase 2), MP-1 ≤ 300. Solo en co-op bij D = 60
-## 90–150 s, ook de realistische speler; MP-7 (co-op ÷ solo) ≥ 0,5 bij 60 / 90 / 120 (180 als note);
+## 95–150 s (v0.1.5, #247, LGD: doel ± 100 s), fase 1 ≥ 24 s en fase 2 ≤ 65 s, ook de realistische speler
+## (duur); co-op bij D = 60 75–150 s (LGD, PR #253); MP-7 (co-op ÷ solo) 0,5 … 1,0 bij 60 / 90 / 120 (180 als note);
 ## `RAD_DRAAI` reden `tijd` hooguit 1 per solo-run bij D ≤ 120. Rapport: lopend wachten per keer-run en
 ## de beginner-run met 1 slag per bounce.
 ##
@@ -40,6 +41,13 @@ const MAX_FRAMES := {
 }
 ## B-9b: totale duur (ticks) van de solo-run per D, voor MP-7 in de co-op-run.
 static var _solo_ticks := {}
+## v0.1.5 (#247, LGD-besluit in #247): de normen van de solo-run bij D = 60, in seconden.
+const TOTAL_MIN_S := 95.0
+const TOTAL_MAX_S := 150.0
+const PHASE1_MIN_S := 24.0
+const PHASE2_MAX_S := 65.0
+## Co-op bij D = 60 (besluit LGD in PR #253).
+const COOP_MIN_S := 75.0
 
 
 # --- arena en run -------------------------------------------------------------
@@ -195,9 +203,19 @@ func _solo(t, d: int) -> void:
 	if d <= 120:
 		t.check(int(m["turns"].get("tijd", 0)) <= 1, "%s: %d keer RAD_DRAAI reden tijd (≤ 1)" % [name, m["turns"].get("tijd", 0)])
 	if d == 60:
-		var s := float(m.get("total", 0)) / 60.0
-		t.check(s >= 90.0 and s <= 150.0, "%s: %.1f s (90–150, §3.9)" % [name, s])
+		_check_duration(t, name, m)
 	await t.cleanup()
+
+
+## v0.1.5 (#247, LGD): totaal 95–150 s, fase 1 ≥ 24 s, fase 2 ≤ 65 s (de solo-run bij D = 60).
+func _check_duration(t, name: String, m: Dictionary) -> void:
+	var s := float(m.get("total", 0)) / 60.0
+	t.check(s >= TOTAL_MIN_S and s <= TOTAL_MAX_S, "%s: %.1f s (%.0f–%.0f, §3.9 v0.1.5)" % [name, s, TOTAL_MIN_S, TOTAL_MAX_S])
+	var at: Dictionary = m["at"]
+	var p1 := float(int(at.get("wissel", 0)) - int(at.get("start", 0))) / 60.0 if at.has("wissel") and at.has("start") else -1.0
+	var p2 := float(int(at.get("wankel", 0)) - int(at.get("2", 0))) / 60.0 if at.has("wankel") and at.has("2") else INF
+	t.check(p1 >= PHASE1_MIN_S, "%s: fase 1 %.1f s (≥ %.0f)" % [name, p1, PHASE1_MIN_S])
+	t.check(p2 <= PHASE2_MAX_S, "%s: fase 2 %.1f s (≤ %.0f)" % [name, p2, PHASE2_MAX_S])
 
 
 ## B-9b: verslagen zonder dood (geen RESPAWN, P1 leeft, ≤ 4 treffers in de hele run); de treffers in
@@ -212,7 +230,7 @@ func _check_run(t, name: String, m: Dictionary) -> void:
 	t.check(int(m["first_break"]) >= 0, "%s: geen SCHOT_BREUK" % name)
 
 
-## B-9b: co-op met 5 LP; bij D = 60 90–150 s; MP-7 (co-op ÷ solo bij dezelfde D) ≥ 0,5 bij 60 / 90 / 120,
+## B-9b: co-op met 5 LP; bij D = 60 75–150 s; MP-7 (co-op ÷ solo bij dezelfde D) ≥ 0,5 bij 60 / 90 / 120,
 ## bij 180 een note als het niet haalt. Co-op duurt niet langer dan solo (MP-7 ≤ 1,0; v0.1.3 §3.9
 ## besluit 1, na PR #219), ook bij 60 / 90 / 120; bij 180 een note.
 func _coop(t, d: int) -> void:
@@ -224,8 +242,10 @@ func _coop(t, d: int) -> void:
 	t.note(_table_row(name, m) + " · MP-7 %.2f (solo %d ticks)" % [mp7, solo])
 	_check_run(t, name, m)
 	if d == 60:
+		# v0.1.5 (besluit LGD in PR #253): co-op bij D = 60 duurt 75–150 s; de oude ondergrens van 90 s
+		# vervalt (die paste niet met co-op ≤ solo bij D = 90 en fase 2 ≤ 65 s solo).
 		var s := float(m.get("total", 0)) / 60.0
-		t.check(s >= 90.0 and s <= 150.0, "%s: %.1f s (90–150, §3.9)" % [name, s])
+		t.check(s >= COOP_MIN_S and s <= TOTAL_MAX_S, "%s: %.1f s (%.0f–%.0f)" % [name, s, COOP_MIN_S, TOTAL_MAX_S])
 	if d <= 120:
 		t.check(mp7 >= 0.5 and mp7 <= 1.0, "%s: MP-7 %.2f (0,5 … 1,0; solo %d ticks)" % [name, mp7, solo])
 	elif mp7 < 0.5 or mp7 > 1.0:
@@ -278,7 +298,7 @@ func test_b9_one_strike_per_bounce(t) -> void:
 
 
 ## B-9b: de realistische speler, solo D = 60 (2 slagen per bounce, geen dash in fase 2, 40 ticks
-## aarzelen vóór elke oversteek, 5 LP): verslagen zonder dood, 90–150 s, MP-1 ≤ 300.
+## aarzelen vóór elke oversteek, 5 LP): verslagen zonder dood, 95–150 s (v0.1.5), MP-1 ≤ 300.
 func test_b9b_realistic_solo_d60(t) -> void:
 	var name := "realistische speler: solo D = 60 (2 slagen per bounce, geen dash in fase 2, 40 ticks aarzelen, 5 LP)"
 	var run := _arena(t, 60, false)
@@ -287,7 +307,7 @@ func test_b9b_realistic_solo_d60(t) -> void:
 	t.note(_table_row(name, m))
 	_check_run(t, name, m)
 	var s := float(m.get("total", 0)) / 60.0
-	t.check(s >= 90.0 and s <= 150.0, "%s: %.1f s (90–150, §3.9)" % [name, s])
+	t.check(s >= TOTAL_MIN_S and s <= TOTAL_MAX_S, "%s: %.1f s (%.0f–%.0f, §3.9 v0.1.5)" % [name, s, TOTAL_MIN_S, TOTAL_MAX_S])
 	await t.cleanup()
 
 
@@ -341,7 +361,7 @@ func test_b9_c16_solo_echo_off(t) -> void:
 	var boss: Gemaalmeester = run["boss"]
 	await t.run_ticks(sim, 6000)
 	run["log"].finish()
-	t.check(run["log"].count("FINISHER_START") == 0 and not boss.is_defeated() and boss.se == 1500,
+	t.check(run["log"].count("FINISHER_START") == 0 and not boss.is_defeated() and boss.se == EnemyData.ticks("gemaalmeester", "se"),
 		"echo uit: finisher %d, %d SE" % [run["log"].count("FINISHER_START"), boss.se])
 	t.check(run["log"].count("SCHOT_BREUK") == 0, "echo uit: het schot brak")
 	await t.cleanup()
@@ -355,7 +375,7 @@ func test_b9_c16_coop_p2_never_hits(t) -> void:
 	var boss: Gemaalmeester = run["boss"]
 	await t.run_ticks(sim, 6000)
 	run["log"].finish()
-	t.check(run["log"].count("FINISHER_START") == 0 and not boss.is_defeated() and boss.se == 1500,
+	t.check(run["log"].count("FINISHER_START") == 0 and not boss.is_defeated() and boss.se == EnemyData.ticks("gemaalmeester", "se"),
 		"P2 slaat nooit: finisher %d, %d SE" % [run["log"].count("FINISHER_START"), boss.se])
 	await t.cleanup()
 
@@ -386,8 +406,10 @@ func test_b10_meetlog_events(t) -> void:
 	# Elke opening sluit weer (drempel of tijd), behalve de laatste: die geeft de fasewissel.
 	var closes: Array = log.rows.filter(func(r: PackedStringArray) -> bool: return r[2] == "KERN_DICHT") \
 		.map(func(r: PackedStringArray) -> String: return r[3])
-	t.check(log.count("SCHOT_BREUK") >= 4 and closes.size() == log.count("SCHOT_BREUK") - 1
-		and closes.count("drempel") == 3, "SCHOT_BREUK %d, KERN_DICHT %s" % [log.count("SCHOT_BREUK"), closes])
+	# GMB-11: elke drempel behalve de laatste sluit één keer op "drempel" (v0.1.5: 7 openingen).
+	var openings := EnemyData.ticks("gemaalmeester", "openingen")
+	t.check(log.count("SCHOT_BREUK") >= openings and closes.size() == log.count("SCHOT_BREUK") - 1
+		and closes.count("drempel") == openings - 1, "SCHOT_BREUK %d, KERN_DICHT %s" % [log.count("SCHOT_BREUK"), closes])
 	t.note("SCHOT_BREUK %d, KERN_DICHT %s" % [log.count("SCHOT_BREUK"), closes])
 	var verslagen: Array = log.rows.filter(func(r: PackedStringArray) -> bool: return r[2] == "BOSS_VERSLAGEN")
 	t.check(int(verslagen[0][3]) == boss.finisher_count and log.count("FINISHERSLAG") == boss.finisher_count,

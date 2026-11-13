@@ -52,6 +52,9 @@ func _wijk(t, d: int, start: StringName, run_end: StringName, input: RefCounted,
 	t.tree.root.add_child(progress)
 	if state != null:
 		progress.adopt(state, -1)
+	# V-01 (besluit LGD #252): wie voorbij de sokkel (S7) begint, heeft de Neerslag al.
+	if start == &"S8" or start == &"S9":
+		Kadewijk.give_neerslag(progress.state)
 	var wijk = Scene.instantiate()
 	wijk.tail = d
 	wijk.echo_on = true
@@ -301,6 +304,43 @@ func test_boss_verslagen_in_de_save(t) -> void:
 	await _free(t, parts)
 
 
+# --- De Neerslag vergrendeld tot de sokkel (V-01, besluit LGD in #252) ------------------
+
+## Zonder de vlag van de Neerslag (vóór de sokkel in S7) is AANVAL + DOWN in de lucht een gewone
+## aanval: geen stuit, het luik blijft dicht. Met de vlag (de pick-up, of de opzet van een run die
+## in S8/S9 begint) opent dezelfde input het luik. P1 begint boven het luik, dus niet langs de sokkel.
+func test_neerslag_vergrendeld_tot_de_sokkel(t) -> void:
+	for unlocked in [false, true]:
+		var state := GameState.new()
+		if unlocked:
+			Kadewijk.give_neerslag(state)
+		var input := ScriptedInput.new([[10, 0], [1, InputBits.JUMP], [1, 0], [1, InputBits.DOWN | InputBits.ATTACK], [80, 0]])
+		var parts := _wijk(t, 60, &"S7", &"S4", input, state)
+		var wijk = parts[0]
+		wijk.p1.respawn_at(Vector2(Layout.LUIK.get_center().x, Layout.S7_UP - Layout.HALF_H))
+		await _ticks(t, 90)
+		var luik = wijk.loader.kamers[&"S7"].inhoud_node.get_node("Luik")
+		var neerslag: Pickup = wijk.loader.kamers[&"S7"].inhoud_node.get_node(^"Neerslag")
+		var label := "met de Neerslag" if unlocked else "zonder de Neerslag"
+		# De vlag is die van de pick-up: met de vlag is hij dus ook weg van de sokkel.
+		t.check(neerslag.opgepakt == unlocked and wijk.sim.neerslag_unlocked == unlocked, "%s: opgepakt %s, ontgrendeld %s" % [
+			label, neerslag.opgepakt, wijk.sim.neerslag_unlocked])
+		if unlocked:
+			t.check((luik.opened_tick >= 0) and wijk.meetlog.count("STUIT") == 1, "%s: luik %s, %d stuits" % [label, (luik.opened_tick >= 0), wijk.meetlog.count("STUIT")])
+		else:
+			t.check(not (luik.opened_tick >= 0) and wijk.meetlog.count("STUIT") == 0 and wijk.meetlog.count("LUIK") == 0
+				and wijk.p1.position.y <= Layout.S7_UP - Layout.HALF_H + 1.0,
+				"%s: luik open %s, %d stuits, P1 op %s (verwacht op de klep)" % [label, (luik.opened_tick >= 0), wijk.meetlog.count("STUIT"), wijk.p1.position])
+		await _free(t, parts)
+	# De pick-up ontgrendelt hem in dezelfde scène.
+	var parts2 := _wijk(t, 60, &"S7", &"S4", ScriptedInput.new([[200, InputBits.RIGHT]]))
+	var wijk2 = parts2[0]
+	t.check(not wijk2.sim.neerslag_unlocked, "S7 zonder vlag: de Neerslag is al vrij")
+	await _ticks(t, 120)
+	t.check(wijk2.neerslag_tick > 0 and wijk2.sim.neerslag_unlocked, "na de sokkel: opgepakt op %d, vrij %s" % [wijk2.neerslag_tick, wijk2.sim.neerslag_unlocked])
+	await _free(t, parts2)
+
+
 # --- De waterstand s = 2 (LM-10) ---------------------------------------------------------
 
 ## Trap 2 vol: 180 ticks later (het water zakt, LM-10) gaat het hoogwater open,
@@ -425,17 +465,9 @@ func _lus(t, d: int) -> void:
 	t.check(wijk.most_at_once <= 5, "%s: %d vijanden tegelijk (L-13 f)" % [name, wijk.most_at_once])
 	t.check(boss_bots.size() == 1, "%s: %d keer een boss-bot (verwacht 1: één poging)" % [name, boss_bots.size()])
 	t.check(hits.size() <= 4, "%s: %d treffers op P1 (≤ 4, zoals de boss-runs)" % [name, hits.size()])
-	# De echo breekt nergens bij D = 60 (V-01d, #227). Bij 120 en 180 hooguit één keer,
-	# en alleen in S6 na trap 2: op de trap terug naar S9 ontlaadt S6 terwijl de echo
-	# er nog loopt (kamerdoc §9, TD/WLD). Een breuk elders maakt de test rood (Lead-review TD #252).
-	if d == 60:
-		t.check(breaks.is_empty(), "%s: de echo brak %d× (%s)" % [name, breaks.size(), breaks])
-	else:
-		var elsewhere := breaks.filter(func(b: Array) -> bool:
-			return Layout.room_of(b[2]) != &"S6" or int(b[0]) <= int(at["trap2"]) or int(b[0]) >= int(at["af"]))
-		t.check(breaks.size() <= 1 and elsewhere.is_empty(),
-			"%s: de echo brak %d× (≤ 1, alleen in S6 op de trap terug, tussen trap 2 op %d en S9 op %d): %s" % [
-			name, breaks.size(), at["trap2"], at["af"], breaks])
+	# De echo breekt nergens, bij elke D (V-01d, #227; LGD #252: S6 en S9 zijn buren,
+	# dus het plein blijft geladen zolang de echo er op de trap terug nog loopt).
+	t.check(breaks.is_empty(), "%s: de echo brak %d× (%s)" % [name, breaks.size(), breaks])
 	var seg := func(a: int, b: int) -> String: return "%d" % (b - a) if a >= 0 and b >= 0 else "?"
 	t.note(("%s: run %d ticks (%.1f s) · S1 → S8 %s · S8 → BOSS_START %s · boss %s · → plein %s · trap 2 %s · → S9 (trap af) %s · " +
 		"S9 → SLICE_EIND %s · per kamer %s · MP-1 %d · MP-2 %.1f per min, langste gat %d · LP %d · treffers %d (%s) · echo-breuken %d %s · " +
