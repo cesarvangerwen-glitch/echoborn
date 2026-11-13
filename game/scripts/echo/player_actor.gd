@@ -43,6 +43,11 @@ var motor := Motor.State.new()
 var echo_reset: EchoReset = EchoReset.NONE
 ## Levenspunten (LM-05: 5 in de flow-kamer). P2 heeft er geen (C-02).
 var health := 5
+## LM-07, WS-08 a: het maximum, 5 plus 1 per gevonden lampglas (tot `HEALTH_CAP`).
+## Een respawn na een dood vult tot hier.
+var max_health := 5
+## LM-07: hooguit 9 levenspunten.
+const HEALTH_CAP := 9
 ## `geldig_vanaf` van de echo van deze speler (E-03). Hoort bij P1, niet bij
 ## de echo-node: Loslaten en respawn zetten hem ook in co-op (E-09, C-04),
 ## en de echo van een drop-out neemt hem over (C-05).
@@ -90,6 +95,7 @@ func setup(p_player_index: int, p_input_source: RefCounted, color: Color,
 	player_index = p_player_index
 	input_source = p_input_source
 	health = int(Tuning.combat()["p1_health"])
+	max_health = health
 	_hit_damage = int(Tuning.combat()["p1_hit_damage"])
 	_invulnerable_ticks = int(Tuning.combat()["p1_invulnerable_ticks"])
 	_respawn_invulnerable_ticks = int(Tuning.combat()["p1_respawn_invulnerable_ticks"])
@@ -192,7 +198,7 @@ func sim_step(tick: int, _delta: float) -> void:
 		# vanaf de respawntick (`r … r + 44`; VJ-02, gdd v0.8.1), zodat een aanloop die bij het
 		# respawnpunt al liep hem niet raakt. De dodelijke treffer zelf gaf geen onkwetsbaarheid.
 		if died and player_index == 1:
-			health = int(Tuning.combat()["p1_health"])
+			health = max_health
 			invulnerable_until = tick + _respawn_invulnerable_ticks
 			health_changed.emit(tick, health)
 	var bits: int = input_source.sample(tick)
@@ -254,3 +260,13 @@ func _update_release(bits: int) -> void:
 			echo_reset = EchoReset.RELEASE
 	else:
 		_echo_held = 0
+
+
+## WS-08 a, LM-07: een lampglas geeft +1 maximum levenspunt (tot 9) en vult de
+## levenspunten aan. Alleen P1 heeft levenspunten (C-02).
+func add_lampglas(tick: int) -> void:
+	if player_index != 1:
+		return
+	max_health = mini(max_health + 1, HEALTH_CAP)
+	health = max_health
+	health_changed.emit(tick, health)

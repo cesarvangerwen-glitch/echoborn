@@ -70,6 +70,7 @@ const TEST_SCRIPTS := [
 	"res://tests/test_kadewijk_deel2.gd",
 	"res://tests/test_kadewijk_art.gd",
 	"res://tests/test_kadewijk_boss.gd",
+	"res://tests/test_kadewijk_lus.gd",
 ]
 
 ## De scripted runs die het langst duren (CI windows, #233: samen ± 200 van de 330 s). Ze draaien
@@ -81,6 +82,7 @@ const LANG_SCRIPTS := [
 	"res://tests/test_kadewijk.gd",
 	"res://tests/test_kadewijk_deel2.gd",
 	"res://tests/test_kadewijk_boss.gd",
+	"res://tests/test_kadewijk_lus.gd",
 ]
 
 ## 2 minuten speltijd bij 60 Hz. De langste test duurt ±3000 ticks (C-01).

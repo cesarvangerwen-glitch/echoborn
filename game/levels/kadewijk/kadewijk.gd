@@ -20,9 +20,24 @@ extends Node2D
 ## - **Golven in S3** (L-13): golf 2 doet pas mee als elke Kadeloper van golf 1
 ##   een merk heeft of op is, en er dan hooguit 5 vijanden tegelijk zijn (L-13 f).
 ## - **Meetlog** (gdd §4.5): `RUN_START` in S1, `KAMER`, `LP`, `P2_*`, `POMP`
-##   en `GEMAAL_VOL` (S6), `LUIK` (S7, placeholder), `LAMPGLAS` (S5,
-##   placeholder), en `RUN_EIND`: bij `run_end` = S4 als P1 het einde van
-##   deel 1 haalt (`Layout.END_X`), anders als P1 kamer `run_end` binnenkomt.
+##   en `GEMAAL_VOL` (S6), `LUIK` (S7, S9), de verzamelobjecten (`LAMPGLAS`,
+##   `LOGBLAD` n, `VAARDIGHEID` V-01), `TRAP_VOL` 2 en `WATERSTAND` 2,
+##   `SLICE_EIND`, en `RUN_EIND`: bij `run_end` = S4 als P1 het einde van
+##   deel 1 haalt (`Layout.END_X`), bij `RUN_END_BOSS` op `BOSS_VERSLAGEN`,
+##   bij `RUN_END_LUS` op `SLICE_EIND`, anders als P1 kamer `run_end` binnenkomt.
+## - **Verzamelobjecten en de sokkel** (WS-08, L-12, #83): `Pickup`s in de
+##   inhoud (`scripts/objects/pickup.gd`): het lampglas (S5, +1 maximum
+##   levenspunt, LM-07), logbladzijde 1–3 (S5, S6, S9) en de Neerslag op de
+##   sokkel (S7; daarna `Art/Objecten.set_sokkel_aan(false)`, #244). Opgepakt
+##   blijft opgepakt (een vlag in de save).
+## - **Trap 2 en `s = 2`** (SL-02, LM-08, LM-10, WS-03): het gemaal van S6 heeft
+##   twee trappen en pompt tot `BOSS_VERSLAGEN` niet verder dan G = 100
+##   (`boss_cap`). Is trap 2 vol, dan zakt het water van de wijk in 180 ticks
+##   naar `s = 2` en daarna gaat het `Hoogwater` van S9 open
+##   (`set_door(&"S9", "Hoogwater", false)`; LM-10: een doorgang opent op het
+##   eind van het zakken). Ook na laden uit een save (vulstand 200).
+## - **`SLICE_EIND`** (gdd §4.5): het object `S1/SliceEind` meldt het als P1 van
+##   S9 door het snelluik op de gang van S1 staat.
 ## - **S6**: het gemaal (`S6/Gemaal`, de `wijk_gemaal` van elke kamer), de
 ##   pompgang en het K-paar; **S7**: het luik (de banen van de Dwaallichten
 ##   staan in de scène).
@@ -34,8 +49,8 @@ extends Node2D
 ##   `set_door`; een reset (P1 respawnt in een buurkamer) opent
 ##   `DeurRechts` weer. Bij 0 levenspunten respawnt P1 op het checkpoint (na de
 ##   eerste pompslag dat van het gemaal, S6); S8 ontlaadt dan en de boss begint
-##   opnieuw als P1 terugkomt. Verslagen blijft verslagen zolang de scène loopt
-##   (`boss_defeated_tick`; nog geen vlag in de save). Meetlog: de events van de
+##   opnieuw als P1 terugkomt. Verslagen blijft verslagen: `boss_defeated_tick`
+##   in de scène en de vlag `S8/BossVerslagen` in de save (`staat_vlag.gd`). Meetlog: de events van de
 ##   boss (`watch_boss`); de lichtmeter gaat bij `BOSS_VERSLAGEN` naar 100 LP.
 ##
 ## Debugmenu (SL-05, placeholder): F1/F2/F3/F7 = D 60/90/120/180 (uit
@@ -60,6 +75,9 @@ const Inhoud = preload("res://levels/kadewijk/kadewijk_inhoud.gd")
 const Gemaal = preload("res://scripts/light/gemaal.gd")
 const Luik = preload("res://scripts/objects/luik.gd")
 const Gemaalmeester = preload("res://scripts/combat/gemaalmeester.gd")
+const Pickup = preload("res://scripts/objects/pickup.gd")
+const StaatVlag = preload("res://scripts/objects/staat_vlag.gd")
+const SliceEind = preload("res://levels/kadewijk/kadewijk_slice_eind.gd")
 ## Meetlog en camera van de flow-kamer, ongewijzigd hergebruikt (alleen gelezen).
 const FlowMeetlog = preload("res://levels/flowkamer/flow_meetlog.gd")
 const FlowRoom = preload("res://levels/flowkamer/flow_room.gd")
@@ -79,6 +97,12 @@ const RUN_END_BOSS := &"Gemaalmeester"
 ## BOSS_START als het middelpunt van P1 zo ver binnen de muren staat: het
 ## lichaam (16 px) is dan helemaal binnen als `DeurRechts` dichtgaat.
 const BOSS_START_INSET := 24.0
+## Objecten met een blijvende stand die deze scène ook leest als hun kamer niet
+## geladen is (in de save: `<gebied>/<kamer>/<pad>`, `AreaLoader.object_flag`).
+const BOSS_FLAG := [&"S8", ^"BossVerslagen"]
+const LAMPGLAS_FLAG := [&"S5", ^"Lampglas"]
+## Het gemaal van de wijk (S6), zoals in `state.gemalen`.
+const GEMAAL_PATH := [&"S6", ^"Gemaal"]
 
 static var chosen_tail := int(Tuning.echo()["tail_ticks"])
 static var chosen_echo_on := true
@@ -114,11 +138,22 @@ var run_over := false
 var end_tick := -1
 ## Fouten van `AreaLoader.start` en `Progress.bind_area_loader` (leeg = goed).
 var start_errors := PackedStringArray()
-## S9 (deel 3): tick waarop P1 logbladzijde 3 haalde, of -1 (placeholder, WS-08).
+## S9 (deel 3): tick waarop P1 logbladzijde 3 haalde, of -1 (WS-08).
 var logblad_3_tick := -1
+## Per logbladzijde (nummer): de tick van oppakken in deze scène.
+var logblad_ticks := {}
+## S7: tick waarop de Neerslag (V-01) van de sokkel werd opgepakt, of -1.
+var neerslag_tick := -1
 ## Tick van `SLICE_EIND`: P1 kwam door het snelluik van S9 en staat in de gang
 ## van S1 (de lus is rond, L-14 f), of -1.
 var slice_end_tick := -1
+## SL-02, LM-08: tick waarop trap 2 vol werd, of -1.
+var trap_2_tick := -1
+## LM-10: vanaf deze tick is de wijk op `s = 2` en is het `Hoogwater` van S9
+## open (trap 2 + 180 ticks; 0 na laden uit een save), of -1.
+var hoogwater_open_tick := -1
+## Staat het `Hoogwater` nu open in de geladen S9?
+var hoogwater_open := false
 ## S3: 0 = nog niet begonnen, 1, 2.
 var wave := 0
 var wave_2_tick := -1
@@ -138,6 +173,11 @@ var boss_defeated_tick := -1
 var boss_spawns := 0
 
 var _awake: Dictionary = {}
+## Meetlogrijen uit stap (5) (objecten), geschreven in `_on_tick` (zoals de
+## placeholders van de WLD), als [tick, event, waarde, bron].
+var _pending_rows: Array = []
+var _slice_end_pending := -1
+var _stand_2_logged := false
 var _wave_1: Array = []
 var _wave_2: Array = []
 var _camera: Camera2D
@@ -180,6 +220,13 @@ func _ready() -> void:
 	start_errors.append_array(loader.start(sim.tick, p1.position))
 	room = loader.huidige
 	respawn = Respawn.new(p1, func() -> Vector2: return Layout.ROOM_START.get(loader.huidige, Layout.RUN_START), progress)
+	# Uit de save (LM-12): het lampglas (WS-08 a) en de waterstand (LM-10).
+	if _saved_flag(LAMPGLAS_FLAG):
+		p1.max_health = mini(p1.max_health + 1, PlayerActor.HEALTH_CAP)
+		p1.health = p1.max_health
+	if _saved_vulstand() >= 2 * Gemaal.MAX:
+		hoogwater_open_tick = 0
+		_update_hoogwater(sim.tick)
 	meetlog = FlowMeetlog.new(sim, p1, echo, String(room))
 	if boss != null:
 		meetlog.watch_boss(boss)
@@ -255,6 +302,8 @@ func _on_loaded_changed(_tick: int, id: StringName, geladen: bool) -> void:
 			gemaal = null
 		elif id == &"S8":
 			_remove_boss()
+		elif id == &"S9":
+			hoogwater_open = false
 		return
 	var inhoud: Node = kamer.inhoud_node
 	if inhoud == null:
@@ -265,6 +314,11 @@ func _on_loaded_changed(_tick: int, id: StringName, geladen: bool) -> void:
 		# Wekken: een vijand die net laadt, slaapt tot `_wake` hem ziet (ook in stap 5 van deze tick).
 		if node is SliceEnemy and not _awake.has(node):
 			node.hold_until(sim.tick + 2)
+		if node is Pickup:
+			var pickup: Pickup = node
+			pickup.picked_up.connect(func(t: int, who: String) -> void: _on_picked_up(pickup, t, who))
+		elif node is SliceEind:
+			(node as SliceEind).reached.connect(func(t: int, _at: Vector2) -> void: _slice_end_pending = t)
 	match id:
 		&"S2":
 			_pair(inhoud, ^"Paar1A", ^"Paar1B", "paar_e")
@@ -286,6 +340,10 @@ func _on_loaded_changed(_tick: int, id: StringName, geladen: bool) -> void:
 				meetlog.add_row(t, "POMP", str(amount), who, gemaal.last_vane.position))
 			gemaal.full.connect(func(t: int) -> void:
 				meetlog.add_row(t, "GEMAAL_VOL", "", "", gemaal.last_vane.position))
+			gemaal.trap_full.connect(_on_trap_full)
+			# SL-02: na de boss pompt het gemaal weer tot G_max (ook na laden).
+			if is_boss_defeated():
+				gemaal.release_boss_cap()
 		&"S9":
 			# De lage kade (deel 3): het E-paar (verlicht, VJ-06: `lit` in de
 			# scène tot de waterstand het zet, GP) en het luik (SL-04).
@@ -293,6 +351,7 @@ func _on_loaded_changed(_tick: int, id: StringName, geladen: bool) -> void:
 			var luik_9: Luik = inhoud.get_node(^"Luik")
 			luik_9.opened.connect(func(t: int, by: String) -> void:
 				meetlog.add_row(t, "LUIK", "", by, luik_9.global_position))
+			_update_hoogwater(sim.tick)
 		&"S7":
 			# Dwaallichten: banen van 32 px op 1/3 en 2/3 van het kanaal, 40 px
 			# boven de vloer (§2.6), in de scène (`lane_from`, `lane_to`,
@@ -300,8 +359,12 @@ func _on_loaded_changed(_tick: int, id: StringName, geladen: bool) -> void:
 			var luik: Luik = inhoud.get_node(^"Luik")
 			luik.opened.connect(func(t: int, by: String) -> void:
 				meetlog.add_row(t, "LUIK", "", by, luik.global_position))
+			# #244: de sokkel gaat uit als de Neerslag weg is (ook na laden).
+			var neerslag := inhoud.get_node_or_null(^"Neerslag") as Pickup
+			if neerslag != null and neerslag.opgepakt:
+				_sokkel_uit(inhoud)
 		&"S8":
-			if boss_defeated_tick >= 0:
+			if is_boss_defeated():
 				# GM-10: het gemaal staat er stil, de deur naar S9 is open.
 				set_door(&"S8", "DeurLinks", false)
 			else:
@@ -333,6 +396,97 @@ func _spawn_boss(inhoud: Node) -> void:
 func _on_boss_defeated(tick: int) -> void:
 	boss_defeated_tick = tick
 	set_door(&"S8", "DeurLinks", false)
+	# De vlag in de save (LM-12), en trap 2 is te pompen (SL-02).
+	var vlag := _loaded_node(BOSS_FLAG) as StaatVlag
+	if vlag != null:
+		vlag.aan = true
+	if gemaal != null:
+		gemaal.release_boss_cap()
+
+
+## Is de Gemaalmeester verslagen: in deze scène, of in de save (de vlag
+## `S8/BossVerslagen`, ook als S8 niet geladen is)?
+func is_boss_defeated() -> bool:
+	if boss_defeated_tick >= 0:
+		return true
+	var vlag := _loaded_node(BOSS_FLAG) as StaatVlag
+	if vlag != null:
+		return vlag.aan
+	return _saved_flag(BOSS_FLAG)
+
+
+## Een node in de inhoud van een geladen kamer (`[kamer, pad]`), of null.
+func _loaded_node(spec: Array) -> Node:
+	var kamer = loader.kamers.get(spec[0]) if loader != null else null
+	if kamer == null or kamer.inhoud_node == null:
+		return null
+	return kamer.inhoud_node.get_node_or_null(spec[1])
+
+
+## Staat de vlag van `[kamer, pad]` aan in de save (`Progress.state`)?
+func _saved_flag(spec: Array) -> bool:
+	if progress == null:
+		return false
+	return progress.state.has_flag(AreaLoader.object_flag(spec[0], spec[1], GEBIED))
+
+
+## De vulstand van het gemaal van S6: van het gemaal als S6 geladen is, anders uit de save.
+func _saved_vulstand() -> int:
+	if gemaal != null:
+		return gemaal.fill
+	if progress == null:
+		return 0
+	var id := AreaLoader.object_flag(GEMAAL_PATH[0], GEMAAL_PATH[1], GEBIED)
+	return int(progress.state.gemalen.get(id, {}).get("vulstand", 0))
+
+
+## LM-08, LM-10: trap 1 is het water van de kelderingang (LM-06, in het gemaal);
+## trap 2 laat de wijk naar `s = 2` zakken: na 180 ticks gaat het hoogwater open.
+func _on_trap_full(tick: int, trap: int) -> void:
+	if trap != 2:
+		return
+	trap_2_tick = tick
+	hoogwater_open_tick = tick + Gemaal.DRAIN_TICKS
+	meetlog.add_row(tick, "TRAP_VOL", "2", "", gemaal.last_vane.position if gemaal and gemaal.last_vane else p1.position)
+
+
+## LM-10: op `hoogwater_open_tick` is de wijk op `s = 2` (meetlog `WATERSTAND`,
+## ook als S9 dan niet geladen is); het `Hoogwater` van S9 gaat open zodra S9
+## geladen is.
+func _update_hoogwater(tick: int) -> void:
+	if hoogwater_open_tick < 0 or tick < hoogwater_open_tick:
+		return
+	if not _stand_2_logged and meetlog != null and hoogwater_open_tick > 0:
+		_stand_2_logged = true
+		meetlog.add_row(tick, "WATERSTAND", "2", "", Layout.S9_HOOGWATER.get_center())
+	if not hoogwater_open and set_door(&"S9", "Hoogwater", false):
+		hoogwater_open = true
+
+
+## Een verzamelobject of de Neerslag werd opgepakt (stap 5): het effect nu, de
+## rij in het meetlog in `_on_tick`.
+func _on_picked_up(pickup: Pickup, tick: int, who: String) -> void:
+	_pending_rows.append([tick, pickup.event_name(), pickup.event_value(), who])
+	match pickup.soort:
+		Pickup.Soort.LAMPGLAS:
+			lampglas_tick = tick
+			p1.add_lampglas(tick)
+		Pickup.Soort.LOGBLADZIJDE:
+			logblad_ticks[pickup.nummer] = tick
+			if pickup.nummer == 3:
+				logblad_3_tick = tick
+		Pickup.Soort.VAARDIGHEID:
+			neerslag_tick = tick
+			var kamer = loader.kamers.get(&"S7")
+			if kamer != null and kamer.inhoud_node != null:
+				_sokkel_uit(kamer.inhoud_node)
+
+
+## #244 (TA): de sokkel van V-01 zonder de Neerslag.
+func _sokkel_uit(inhoud: Node) -> void:
+	var objecten := inhoud.get_node_or_null(^"Art/Objecten")
+	if objecten != null and objecten.has_method("set_sokkel_aan"):
+		objecten.set_sokkel_aan(false)
 
 
 ## S8 ontlaadt (P1 respawnt buiten de buurkamers, F8): de boss weg bij de Sim.
@@ -399,9 +553,7 @@ func _on_tick(tick: int) -> void:
 				e.visible = true
 				sim.add_object(e)
 	most_at_once = maxi(most_at_once, _alive_count(room))
-	if lampglas_tick < 0 and room == &"S5" and p1.position.distance_to(Layout.LAMPGLAS) <= 12.0:
-		lampglas_tick = tick
-		meetlog.add_row(tick, "LAMPGLAS", "", "p1", p1.position)
+	_update_hoogwater(tick)
 	if run_over:
 		return
 	var done := room == run_end
@@ -441,19 +593,18 @@ func _wake(tick: int) -> void:
 			enemy.hold_until(tick + 2)
 
 
-## S9 (deel 3): logbladzijde 3 (placeholder, WS-08: P1 binnen 12 px van de
-## plek) en `SLICE_EIND` (placeholder voor de GP, T8a): P1 kwam van S9 S1 in en
-## staat op de vloer van de gang. Met `run_end` = `RUN_END_LUS` eindigt de run daar.
+## De rijen van de objecten van deze tick (opgepakt, `SLICE_EIND`), na de
+## stap van de objecten. Met `run_end` = `RUN_END_LUS` eindigt de run op
+## `SLICE_EIND` (het object `S1/SliceEind`, `kadewijk_slice_eind.gd`).
 func _pick_up(tick: int) -> void:
-	if logblad_3_tick < 0 and room == &"S9" and p1.position.distance_to(Layout.LOGBLAD_3) <= 12.0:
-		logblad_3_tick = tick
-		meetlog.add_row(tick, "LOGBLAD", "3", "p1", p1.position)
-	if slice_end_tick >= 0 or room != &"S1" or room_changes.is_empty() or room_changes[-1][1] != &"S9":
+	for row: Array in _pending_rows:
+		meetlog.add_row(row[0], row[1], row[2], row[3], p1.position)
+	_pending_rows.clear()
+	if _slice_end_pending < 0 or slice_end_tick >= 0:
 		return
-	if not p1.motor.on_floor or absf(p1.position.y - (Layout.S1_FLOOR - Layout.HALF_H)) > 1.5:
-		return
-	slice_end_tick = tick
-	meetlog.add_row(tick, "SLICE_EIND", "", "", p1.position)
+	slice_end_tick = _slice_end_pending
+	_slice_end_pending = -1
+	meetlog.add_row(slice_end_tick, "SLICE_EIND", "", "", p1.position)
 	if run_end == RUN_END_LUS and not run_over:
 		_end_run(tick)
 

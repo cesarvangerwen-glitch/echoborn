@@ -29,24 +29,46 @@ extends "res://scripts/objects/sim_object.gd"
 ##   `y_high` en `y_low` in. De
 ##   AreaLoader geeft het gemaal bij het laden de lichtmeter (via `Progress`),
 ##   verbindt het met `Combat` en bindt zijn stand (`Progress.bind_gemaal`).
+##
+## **Trappen** (LM-08, LM-10, SL-02; #83): `trappen` = 1 of 2, elk 100 G, dus
+## `G_max = 100 × trappen`. Trap *k* is vol zodra `G ≥ 100 × k` (`trap_full`).
+## Wat hierboven "vol" heet (`is_full`, `full`, `t_v`, de sluis en het water
+## van LM-06) is trap 1, zoals in de flow-kamer. `stand()` is de waterstand
+## `s` van de wijk (het aantal volle trappen). **Bosswijk** (`boss_cap`,
+## LM-03, WS-03): tot `release_boss_cap()` (bij `BOSS_VERSLAGEN`) pompt het
+## gemaal niet verder dan G = 100, dus trap 2 kan pas na de boss.
 
 signal pumped(tick: int, amount: int, who: String)
 signal full(tick: int)
 signal sluice_opened(tick: int)
+## LM-08: trap `trap` (1 of 2) werd vol op `tick` (trap 1 op `t_v`, na `full`).
+signal trap_full(tick: int, trap: int)
 
 const Tuning = preload("res://scripts/echo/tuning.gd")
 
 ## LM-03: LP per pompslag (startwaarde 15, testbereik 10–25, gdd §2.9).
 static func per_stroke() -> int:
 	return int(Tuning.light()["pump_per_stroke"])
+## G per trap (LM-08). Bij één trap is dit ook `G_max`.
 const MAX := 100
+## LM-08: hooguit zoveel trappen per gemaal.
+const MAX_TRAPPEN := 2
 const DRAIN_TICKS := 180
 const DROWN_TICKS := 30
 
-## Vulstand G (0–100).
+## LM-08: aantal trappen (1 of 2); `G_max = MAX × trappen`.
+@export_range(1, 2) var trappen := 1
+## LM-03, WS-03, SL-02: het gemaal van een bosswijk. Tot `release_boss_cap()`
+## is de bovengrens G = 100 (trap 1), daarna `G_max`.
+@export var boss_cap := false
+## Vulstand G (0 … `G_max`).
 var fill := 0
-## `t_v`: tick waarop G = 100 werd, of -1.
+## `t_v`: tick waarop G = 100 werd (trap 1), of -1.
 var full_tick := -1
+## Tick waarop trap 2 vol werd (G = 200), of -1; 0 na laden uit een save.
+var trap_2_tick := -1
+## De boss van de wijk is verslagen: de grens van `boss_cap` geldt niet meer.
+var boss_cap_released := false
 var sluice_open := false
 var meter: RefCounted
 ## De pompschoepen (LM-03), in de looprichting. `pomprad` is de eerste.
@@ -131,9 +153,30 @@ func _setup_common() -> void:
 	_update_water_visual(y_high)
 
 
-## Is G = 100 bereikt (LM-03, LM-06)? Dat bewaart de save als `vol`.
+## Is G = 100 bereikt (LM-03, LM-06; trap 1)? Dat bewaart de save als `vol`.
 func is_full() -> bool:
 	return full_tick >= 0 or fill >= MAX
+
+
+## LM-08: G_max = 100 × trappen.
+func g_max() -> int:
+	return MAX * clampi(trappen, 1, MAX_TRAPPEN)
+
+
+## De bovengrens van nu: G = 100 in een bosswijk tot de boss verslagen is
+## (LM-03, SL-02), anders `G_max`.
+func cap() -> int:
+	return MAX if boss_cap and not boss_cap_released else g_max()
+
+
+## LM-10: de waterstand `s` van de wijk = het aantal volle trappen (0 … trappen).
+func stand() -> int:
+	return mini(fill / MAX, clampi(trappen, 1, MAX_TRAPPEN))
+
+
+## `BOSS_VERSLAGEN` (SL-02): vanaf nu pompt het gemaal weer tot `G_max`.
+func release_boss_cap() -> void:
+	boss_cap_released = true
 
 
 ## Zet de bewaarde stand terug na laden (T5b deel 3a, ontwerp.md §7), zonder
@@ -142,7 +185,8 @@ func is_full() -> bool:
 ## `t_v` is na laden onbekend; `full_tick` wordt 0, zodat `full_tick >= 0`
 ## blijft betekenen dat het gemaal vol is.
 func restore_state(vulstand: int, vol: bool) -> void:
-	fill = clampi(vulstand, 0, MAX)
+	fill = clampi(vulstand, 0, g_max())
+	trap_2_tick = 0 if trappen >= 2 and fill >= 2 * MAX else -1
 	_drained = vol
 	if not vol:
 		full_tick = -1
@@ -187,7 +231,7 @@ func in_deep_water(at: Vector2, tick: int) -> bool:
 func _on_hit(tick: int, attacker: String, target: Node2D, _damage: int) -> void:
 	if not vanes.has(target):
 		return
-	var amount := mini(per_stroke(), MAX - fill)
+	var amount := mini(per_stroke(), maxi(cap() - fill, 0))
 	amount = meter.take(amount)
 	fill += amount
 	last_vane = target
@@ -197,6 +241,10 @@ func _on_hit(tick: int, attacker: String, target: Node2D, _damage: int) -> void:
 		full_tick = tick
 		full.emit(tick)
 		_open_sluice(tick)
+		trap_full.emit(tick, 1)
+	if trappen >= 2 and fill >= 2 * MAX and trap_2_tick < 0:
+		trap_2_tick = tick
+		trap_full.emit(tick, 2)
 
 
 ## LM-06: de sluisdoorgang verdwijnt op `t_v`.

@@ -25,7 +25,7 @@ extends Node2D
 ##
 ## S7 (`sokkel` aan): de `sokkel` (32 × 32), onderkant op de bovenvloer op
 ## `Layout.SOKKEL`. Frame 1 (aan, warme gloed) zolang de Neerslag erop ligt;
-## de pick-up (WS-08) is van de GP en roept later `set_sokkel_aan(false)`.
+## de pick-up (WS-08, de `Pickup` `Neerslag`) roept `set_sokkel_aan(false)` via `kadewijk.gd` (#83).
 
 const Layout = preload("res://levels/kadewijk/kadewijk_layout.gd")
 const KadewijkObject = preload("res://levels/kadewijk/kadewijk_object.gd")

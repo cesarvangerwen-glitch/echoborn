@@ -217,20 +217,20 @@ func test_save_crash_leaves_tmp(t) -> void:
 	_clear()
 
 
-## SM-punt (#82): `from_dict` controleert ook het bereik. Grenzen (0, 100)
-## zijn goed; daarbuiten, of een breuk, of een vlag die geen bool is: null.
+## SM-punt (#82): `from_dict` controleert ook het bereik. Grenzen (0, 200:
+## twee trappen, LM-08, #83) zijn goed; daarbuiten, of een breuk, of een vlag die geen bool is: null.
 func test_save_from_dict_checks_range(t) -> void:
 	var edge := _state().to_dict()
 	edge["lichtmeter"] = 0
 	edge["speeltijd_ticks"] = 0
-	edge["gemalen"]["gemaal_k3"]["vulstand"] = 100
+	edge["gemalen"]["gemaal_k3"]["vulstand"] = 200
 	var errors := PackedStringArray()
 	t.check(GameState.from_dict(edge, errors) != null and errors.is_empty(), "grenswaarden geweigerd: %s" % errors)
 	var cases := {
 		"lichtmeter": func(d: Dictionary) -> void: d["lichtmeter"] = -1,
 		"lichtmeter ": func(d: Dictionary) -> void: d["lichtmeter"] = 1.5,
 		"speeltijd_ticks": func(d: Dictionary) -> void: d["speeltijd_ticks"] = -60,
-		"vulstand": func(d: Dictionary) -> void: d["gemalen"]["gemaal_k3"]["vulstand"] = 101,
+		"vulstand": func(d: Dictionary) -> void: d["gemalen"]["gemaal_k3"]["vulstand"] = 201,
 		"vulstand ": func(d: Dictionary) -> void: d["gemalen"]["gemaal_k3"]["vulstand"] = 37.5,
 		"vlag": func(d: Dictionary) -> void: d["vlaggen"]["sluis_k3_open"] = "ja",
 		"lichtmeter  ": func(d: Dictionary) -> void: d["lichtmeter"] = INF,

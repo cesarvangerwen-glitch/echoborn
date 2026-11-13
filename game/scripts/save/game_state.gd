@@ -18,7 +18,8 @@ var checkpoint_kamer: StringName = &""
 var checkpoint_positie := Vector2.ZERO
 ## Lichtmeter in LP (LM-01).
 var lichtmeter := 0
-## Per gemaal (LM-03, LM-06): {id: {"vulstand": int G 0–100, "vol": bool}}.
+## Per gemaal (LM-03, LM-06, LM-08): {id: {"vulstand": int G 0–200, "vol": bool}};
+## `vol` = trap 1 vol, de waterstand `s` volgt uit de vulstand (LM-10).
 ## De stand van een gemaal blijft bewaard (ook bij respawn, LM-06).
 var gemalen: Dictionary = {}
 ## Vlaggen voor alles wat eenmalig verandert: een geopende sluis, een
@@ -68,8 +69,10 @@ func to_dict() -> Dictionary:
 
 
 ## Grenzen per veld (SM-punt #82): LP en speeltijd zijn hele getallen 0–2^53,
-## een vulstand een heel getal 0–100 (LM-03), een positie eindig.
-const VULSTAND_MAX := 100
+## een vulstand een heel getal 0–200 (LM-03, LM-08: `G_max = 100 × trappen`,
+## hooguit 2 trappen; #83), een positie eindig. Een gemaal met één trap klemt
+## een te hoge vulstand bij het laden op 100 (`Gemaal.restore_state`).
+const VULSTAND_MAX := 200
 ## Bovengrens voor hele getallen zonder eigen grens (2^53).
 const WHOLE_MAX := 9007199254740992.0
 

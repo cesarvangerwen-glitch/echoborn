@@ -335,7 +335,7 @@ func _full_run(t, d: int, echo_on: bool) -> Array:
 	t.check(wijk.lampglas_tick > 0, "%s: lampglas niet gehaald" % label)
 	t.note("%s: S1 → S7 %d ticks (%s), MP-1 %s, LP totaal %d, LP vóór de eerste pompslag %d (SL-01), POMP p1/echo %d/%d, GEMAAL_VOL tick %d, terug naar S5 %d×, treffers P1 %d, keerpunten %s" % [
 		label, wijk.run_ticks(), rep.room_time, still, rep.lp_total, lp, _count(rows, "POMP", "p1"), _count(rows, "POMP", "echo"),
-		_first(rows, "GEMAAL_VOL"), bot.s6_returns, 5 - wijk.p1.health, keer])
+		_first(rows, "GEMAAL_VOL"), bot.s6_returns, wijk.p1.max_health - wijk.p1.health, keer])
 	return [parts, rep, lp]
 
 
