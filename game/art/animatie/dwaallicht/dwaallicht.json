@@ -1,0 +1,437 @@
+{
+ "versie": "0.1",
+ "eigenaar": "Animator",
+ "issue": 272,
+ "bron": "docs/art/slice/bron/genereer_vijanden.py",
+ "maten": "uit game/data/vijanden/slice.csv (groep dwaallicht) en game/scripts/combat/slice_enemy.gd",
+ "knoop": "De vijand-node staat in het midden van de hurtbox (slice_enemy.gd: position = (x, vloer - hoogte/2)). `offset` = linksboven van een cel in node-coördinaten (Sprite2D, centered = false), kijkrichting rechts.",
+ "ticks": "per frame, in ticks van 60 per seconde (= frames bij 60 fps); `stuurt` zegt welke vlag het frame kiest, als het niet op tijd loopt",
+ "bladen": {
+  "dwaallicht": {
+   "bestanden": {
+    "grijs": "dwaallicht_grijs.png",
+    "half": "dwaallicht_half.png",
+    "kleur": "dwaallicht_kleur.png",
+    "index": "dwaallicht_index.png"
+   },
+   "cel": [
+    34,
+    50
+   ],
+   "rand_px": 1,
+   "atlas": [
+    272,
+    300
+   ],
+   "animaties": {
+    "zweven": {
+     "frames": [
+      [
+       0,
+       0,
+       34,
+       50
+      ],
+      [
+       34,
+       0,
+       34,
+       50
+      ],
+      [
+       68,
+       0,
+       34,
+       50
+      ],
+      [
+       102,
+       0,
+       34,
+       50
+      ],
+      [
+       136,
+       0,
+       34,
+       50
+      ],
+      [
+       170,
+       0,
+       34,
+       50
+      ]
+     ],
+     "ticks": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+     ],
+     "lus": true,
+     "noot": "heen en weer op zijn baan; dobbert 1 px, de sluier wiegt"
+    },
+    "aanloop": {
+     "frames": [
+      [
+       0,
+       50,
+       34,
+       50
+      ],
+      [
+       34,
+       50,
+       34,
+       50
+      ],
+      [
+       68,
+       50,
+       34,
+       50
+      ],
+      [
+       102,
+       50,
+       34,
+       50
+      ],
+      [
+       136,
+       50,
+       34,
+       50
+      ]
+     ],
+     "ticks": [
+      7,
+      7,
+      7,
+      6,
+      3
+     ],
+     "lus": false,
+     "stuurt": "windup_progress: de kern zwelt in 4 stappen, de spijlen gloeien mee; frame 4 (de laatste 3 ticks): hij trekt zich 2 px op, de sluier strak",
+     "ticks_verlicht": [
+      10,
+      9,
+      9,
+      9,
+      3
+     ]
+    },
+    "duik": {
+     "frames": [
+      [
+       0,
+       100,
+       34,
+       50
+      ],
+      [
+       34,
+       100,
+       34,
+       50
+      ]
+     ],
+     "ticks": [
+      4,
+      4
+     ],
+     "lus": false,
+     "noot": "zijn lichaam is het vlak (16 x 16): de code verschuift de node; de sluier sleept omhoog"
+    },
+    "terug": {
+     "frames": [
+      [
+       0,
+       150,
+       34,
+       50
+      ],
+      [
+       34,
+       150,
+       34,
+       50
+      ],
+      [
+       68,
+       150,
+       34,
+       50
+      ],
+      [
+       102,
+       150,
+       34,
+       50
+      ]
+     ],
+     "ticks": [
+      10,
+      10,
+      10,
+      10
+     ],
+     "lus": false,
+     "volgt": "zweven",
+     "noot": "terug naar zijn baan, zonder schade: de kern gedimd, de sluier slap"
+    },
+    "stil": {
+     "frames": [
+      [
+       0,
+       200,
+       34,
+       50
+      ],
+      [
+       34,
+       200,
+       34,
+       50
+      ],
+      [
+       68,
+       200,
+       34,
+       50
+      ],
+      [
+       102,
+       200,
+       34,
+       50
+      ],
+      [
+       136,
+       200,
+       34,
+       50
+      ],
+      [
+       170,
+       200,
+       34,
+       50
+      ]
+     ],
+     "ticks": [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
+     ],
+     "lus": false,
+     "noot": "VJ-04 (30): hij flakkert, de kern gaat aan en uit, de kooi rammelt 1 px"
+    },
+    "dood": {
+     "frames": [
+      [
+       0,
+       250,
+       34,
+       50
+      ],
+      [
+       34,
+       250,
+       34,
+       50
+      ],
+      [
+       68,
+       250,
+       34,
+       50
+      ],
+      [
+       102,
+       250,
+       34,
+       50
+      ],
+      [
+       136,
+       250,
+       34,
+       50
+      ],
+      [
+       170,
+       250,
+       34,
+       50
+      ],
+      [
+       204,
+       250,
+       34,
+       50
+      ],
+      [
+       238,
+       250,
+       34,
+       50
+      ]
+     ],
+     "ticks": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+     ],
+     "lus": false,
+     "noot": "de kern flitst, de kooi springt uiteen en valt, alles dooft; voorstel 48 ticks"
+    }
+   },
+   "offset": [
+    -17,
+    -23
+   ],
+   "offset_links": [
+    -17,
+    -23
+   ],
+   "ten_opzichte_van": "vijand-node (midden van de hurtbox 16 x 16)",
+   "noot": "de hurtbox valt op kolom 9-25, rij 15-31 (met de rand); symmetrisch, flip_h is niet nodig",
+   "z_index": 0
+  },
+  "tell_duik": {
+   "bestanden": {
+    "grijs": "dwaallicht_tell_duik_grijs.png",
+    "half": "dwaallicht_tell_duik_half.png",
+    "kleur": "dwaallicht_tell_duik_kleur.png",
+    "index": "dwaallicht_tell_duik_index.png"
+   },
+   "cel": [
+    18,
+    18
+   ],
+   "rand_px": 1,
+   "atlas": [
+    18,
+    36
+   ],
+   "animaties": {
+    "vroeg": {
+     "frames": [
+      [
+       0,
+       0,
+       18,
+       18
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "windup_progress < 0,5"
+    },
+    "laat": {
+     "frames": [
+      [
+       0,
+       18,
+       18,
+       18
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false,
+     "stuurt": "windup_progress >= 0,5"
+    }
+   },
+   "offset": [
+    -1,
+    -1
+   ],
+   "ten_opzichte_van": "de landingsplek: (node.x - 8, vloer - duik_hoogte - 16), linksboven",
+   "noot": "tijdens de aanloop is active_box leeg; de landingsplek is het vlak van de duik",
+   "z_index": 1
+  },
+  "duiklijn": {
+   "bestanden": {
+    "grijs": "dwaallicht_duiklijn_grijs.png",
+    "half": "dwaallicht_duiklijn_half.png",
+    "kleur": "dwaallicht_duiklijn_kleur.png",
+    "index": "dwaallicht_duiklijn_index.png"
+   },
+   "cel": [
+    5,
+    42
+   ],
+   "rand_px": 1,
+   "atlas": [
+    5,
+    84
+   ],
+   "animaties": {
+    "vroeg": {
+     "frames": [
+      [
+       0,
+       0,
+       5,
+       42
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false
+    },
+    "laat": {
+     "frames": [
+      [
+       0,
+       42,
+       5,
+       42
+      ]
+     ],
+     "ticks": [
+      1
+     ],
+     "lus": false
+    }
+   },
+   "offset": [
+    -2,
+    -1
+   ],
+   "ten_opzichte_van": "(node.x, node.y + 8): de onderkant van de hurtbox",
+   "noot": "region_rect: neem de bovenste (baan_hoogte - duik_hoogte - hoogte) px van de cel, de ruimte tussen hem en het vlak (in de slice 8; max. 24)",
+   "z_index": 1
+  }
+ },
+ "koppeling": {
+  "zweven (op zijn baan)": "zweven",
+  "Phase.WINDUP": "aanloop op windup_progress; tell_duik vroeg/laat op de landingsplek en de duiklijn tussen hem en het vlak",
+  "Phase.ACTIVE (de duik, 8)": "duik; de code verschuift de node, de sprite volgt",
+  "Phase.RECOVER (terug, 40)": "terug, daarna zweven",
+  "stun (VJ-04)": "stil (30)",
+  "dood": "dood (48 ticks)"
+ },
+ "import": {
+  "map": "res://art/animatie/dwaallicht/",
+  "texture": "Lossless, mipmaps uit, filter Nearest op het CanvasItem, repeat uit (zoals de Gemaalmeester)",
+  "toestanden": "grijs en half = donkere wijk (s < 2: rand en kern feller, VJ-06) / kleur = verlicht; index = R materiaal-id, G tint*32+16, A 255"
+ }
+}
