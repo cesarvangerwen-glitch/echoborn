@@ -1,10 +1,10 @@
 # CEO-kaart MT2: de Kadewijk spelen, met de Gemaalmeester
 
-Versie 0.1.1 · 2026-11-13 · Eigenaar: QA Lead · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250)
+Versie 0.1.2 · 2026-11-13 · Eigenaar: QA Lead · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250)
 
 **Nog niet spelen.** Deze kaart is voor ná MT1 (de flow-kamer). De Producer stuurt je de kaart als de bots op de hele Kadewijk groen zijn; dan staan de build en de links hieronder ingevuld.
 
-**Tijd: ± 15 min.** Solo, op de staart van **1 s (D = 60)**. Je speelt de Kadewijk **één keer** van begin tot eind (± 7–10 min), beantwoordt 14 vragen met een letter (± 2 min) en luistert op koptelefoon naar één geluidsfragment (± 2 min). Geen kladje nodig.
+**Tijd: ± 15 min.** Solo, op de staart van **1 s (D = 60)**. Je speelt de Kadewijk **één keer** van begin tot eind (± 6–8 min), beantwoordt 14 vragen met een letter (± 2 min) en luistert op koptelefoon naar één geluidsfragment (± 2 min). Geen kladje nodig.
 
 **Lees §1–§4. Lees §6 pas nadat je alles verstuurd hebt.**
 
@@ -15,27 +15,28 @@ Build: commit *in te vullen*. Zip van precies die versie: *in te vullen* (speel 
 1. Open de zip-link hierboven en pak uit in een **nieuwe** map.
 2. **Oude meetlogs opzij:** plak `%APPDATA%\godot\app_userdata\Echoborn` in de adresbalk van de Verkenner, maak een submap `oud-mt2` en verplaats alle `meetlog_*.csv` daarheen.
 3. Start `Godot_v4.6.3-stable_win64.exe`, kies **Importeren**, wijs `game\project.godot` in de **nieuwe** map aan en open het (± 1 min).
-4. Druk in de editor op **F5**. Je staat in de Kadewijk, bij een deur.
+4. Dubbelklik linksonder in *FileSystem* op **`levels` → `kadewijk` → `kadewijk.tscn`**. Druk dan op **F6** (*Huidige scène afspelen*), **niet F5** (F5 start de flow-kamer van MT1). Je staat in de Kadewijk, bij een deur.
 5. Druk **eerst A, D of spatie** (geen pijltje).
-6. **Kijk bovenaan:** staat er **D = 60** en *echo Actief* of *echo Leeg*? Goed. Staat er iets anders: sluit het spelvenster en druk opnieuw F5.
+6. **Kijk bovenaan:** staat er **D = 60** en *echo Actief* of *echo Leeg*? Goed. Staat er iets anders: sluit het spelvenster en druk opnieuw F6.
 
-## 2. Spelen (± 7–10 min)
+## 2. Spelen (± 6–8 min)
 
 | | Toets |
 |---|---|
 | Lopen, springen, dash, slaan | A/D, spatie, linker Shift, E |
-| Slaan naar beneden (in de lucht) | E met S ingedrukt |
-| Vastgelopen | F6 (begint opnieuw bij de deur; laptop: Fn + F6) |
+| Slaan naar beneden (in de lucht; pas nadat je het in de kelder gevonden hebt) | E met S ingedrukt |
+| Echt vastgelopen (je kunt niet meer verder) | F6 (laptop: Fn + F6): de **hele wijk begint opnieuw bij de deur**. Alleen als je echt vastzit; doodgaan is geen vastzitten |
 
-**Het doel:** door de wijk naar het gemaal, het gemaal oppompen (sla op de schoepen), door de kelder naar de **Gemaalmeester**, hem verslaan, en via de lage kade terug naar waar je begon. Het spel zegt je niet hoe; ontdek het zelf. Je bent klaar als je weer op de gang bij de deur staat (de tijd bovenaan stopt).
+**Het doel:** door de wijk naar het gemaal, het gemaal oppompen (sla op de schoepen), door de kelder naar de **Gemaalmeester**, hem verslaan, het gemaal nog een keer oppompen, en via de lage kade terug naar waar je begon. Het spel zegt je niet hoe; ontdek het zelf. Je bent klaar als je weer op de gang bij de deur staat (de tijd bovenaan stopt). Sluit dan het spelvenster.
 
 - **Niet drukken**: Enter of Start (tweede speler), F1/F2/F3/F7 (andere staart), F4 (echo uit), F8 (kamer overslaan).
-- **Dood?** Je begint opnieuw bij het laatste punt. Gewoon doorspelen.
-- **Stoppen mag** na ± 10 min spelen, of na 3 keer dood bij de boss. Sluit dan het spelvenster en zet bij vraag 14 waar je was.
+- **Dood?** Je begint vanzelf opnieuw bij het laatste punt. Gewoon doorspelen, **geen F6**.
+- **Stoppen mag** na ± 8 min spelen, of na 3 keer dood bij de boss. Zet bij vraag 14 waar je was.
+- **Altijd het spelvenster sluiten** (kruisje rechtsboven of Alt+F4), **niet de stopknop ■ van de editor**: anders wordt je meetlog niet bewaard.
 
 ## 3. Vragen (typ in de Claude-chat, ± 2 min)
 
-Kopieer het blok en zet **achter elke vraag een letter** (bij 2 mogen er meer; bij 5 vier cijfers). Er zijn geen goede of foute antwoorden.
+Kopieer het blok en zet **achter elke vraag een letter** (bij 2 mogen er meer; bij 5 vier cijfers). **Alleen bij 12 (B of C) en 14 (D) typ je een paar woorden**; verder alleen letters. Er zijn geen goede of foute antwoorden.
 
 ```
 [CEO → QA Lead]: mijlpaaltest MT2 (Kadewijk, solo, D = 60)
@@ -105,5 +106,6 @@ Klaar. De agent in de chat zet alles in de repo; QA schrijft het rapport.
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.1.2 | 2026-11-13 | Start met `kadewijk.tscn` + F6 (niet F5) tot MT1 klaar is (PR #257); spelvenster sluiten, niet de stopknop (anders geen CSV); stopregel ± 8 min, spelen ± 6–8 min, zodat ± 15 min klopt; bovenaan §3: 12 en 14 zijn de enige open velden; doel met het tweede keer pompen na de boss (trap 2) (SM-review #251). Na Lead-review EP (#258): F6 = de wijk opnieuw bij de deur, alleen als je echt vastzit, doodgaan is geen vastzitten |
 | 0.1.1 | 2026-11-13 | Na Lead-review EP (PR #251): ± 15 min; stopregel ± 10 min (§2); luisteren alleen op koptelefoon, ± 2 min (§4) |
 | 0.1 | 2026-11-13 | Eerste versie (#250): na MT1; één doorloop S1 → S9 → S1 op D = 60 met stopregel; 14 meerkeuzevragen (F4b(a), R-V1, MP-5 in vier delen, de vijf meetvragen uit de reviews, GM-a, GM-c, M1, X); luistercheck F2 (bible §9.4); meetlogs via de Claude-chat. Build, zip en fragmentlink nog in te vullen |
