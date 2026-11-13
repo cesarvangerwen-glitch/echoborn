@@ -1053,6 +1053,8 @@ def kamers_blad(KM):
         rx, ry = int(B[id_]["rect"][0]), int(B[id_]["rect"][1])
         cx = int(np.mean([wx for _, wx, _, _ in lst])) - rx
         cy = int(np.mean([wy for _, _, wy, _ in lst])) - ry - 20
+        if all(t == "dwaallicht" for t, _, _, _ in lst):
+            cy += 30                                      # zwevend: sluier en kade (of water) eronder in beeld
         w = max(160, int(max(wx for _, wx, _, _ in lst) - min(wx for _, wx, _, _ in lst)) + 96)
         w = min(w, 320)
         beelden = []
