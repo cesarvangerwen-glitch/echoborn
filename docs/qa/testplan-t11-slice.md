@@ -1,6 +1,6 @@
 # Testplan T11: de slice per kamer en de boss, solo en co-op (F4, F4b)
 
-Versie 0.1 · 2026-11-13 · Eigenaar: QA Lead · Issue: [#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88) (T11) · Lead-review: Executive Producer
+Versie 0.1.1 · 2026-11-13 · Eigenaar: QA Lead · Issue: [#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88) (T11) · Lead-review: Executive Producer
 
 Basis: fasekader fase 2 (`docs/productie/fase-2-kader.md`: §2 rij T11, §3 F4 en F4b, §4 mijlpaaltests en regel tegen weggooiwerk, §5 kwaliteitslat); pitch v0.4 (§4 pillar 1, §10 R-V1, R-V2, R-V5, R-V9, R-V12); `docs/beslissingen.md` (#51: 1A, 7A, 8A; #124: 1B; 2026-11-12: D = 60 als werkaanname, fase 2 parallel, de CEO test alleen bij mijlpalen); gdd §4.5 (MP-1–MP-7) en §5.1 (grens F4b(b)); `docs/design/kamers/kadewijk.md` v0.4.8 (§6–§6d, §9); `docs/design/gemaalmeester.md` §7–§8; `game/tests/test_boss_runs.gd`; besluit LGD over B-1 ([comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429)).
 
@@ -48,7 +48,7 @@ Definities: gdd §4.5. Op **D = 60**; D = 90, 120 en 180 alleen als regressie in
 
 ### 2.2 F4b(b): de echo buiten de boss
 
-gdd §5.1, **in beide modi**: route-tijd = `RUN_START` tot `RUN_EIND` zonder `BOSS_START` … `BOSS_VERSLAGEN`. Positief als (1) ≥ 2,0 echo-acties/min, (2) springplank-landingen ≥ 1,0/min **én** ontploffingen door het tweede lichaam ≥ 0,5/min, (3) ≥ 30 % van de LP op de route met het tweede lichaam. In co-op is het tweede lichaam P2 en telt elke samenwerkingsactie van P1 en P2 (gdd §4.5 MP-2, MP-6). QA rapporteert ook **per kamer**, zodat een herontwerp weet waar de echo stilviel. In S8 telt alleen de route vóór `BOSS_START` en na `BOSS_VERSLAGEN` (W38).
+gdd §5.1, **in beide modi**: route-tijd = `RUN_START` tot `RUN_EIND` zonder de ticks in een boss- of minibaas-arena (`BOSS_START` … `BOSS_VERSLAGEN`), het pauzemenu en tussenscènes. Positief als (1) ≥ 2,0 echo-acties/min, (2) springplank-landingen ≥ 1,0/min **én** ontploffingen door het tweede lichaam ≥ 0,5/min, (3) ≥ 30 % van de LP op de route met het tweede lichaam. In co-op is het tweede lichaam P2 en telt elke samenwerkingsactie van P1 en P2 (gdd §4.5 MP-2, MP-6). QA rapporteert ook **per kamer**, zodat een herontwerp weet waar de echo stilviel. In S8 telt alleen de route vóór `BOSS_START` en na `BOSS_VERSLAGEN` (W38).
 
 ## 3. Solo, per kamer en de boss
 
@@ -64,7 +64,7 @@ Bot = de gescripte geoefende run, D = 60. "Lus" = `test_kadewijk_lus.gd` met `do
 | **S6** Gemaalplein | SL-01, het gemaal oppompen, trap 2 na de boss | MP-1 5; **MP-2 3,5/min, de krapste kamer** (B-3); SL-01 112 LP; gemaal vol op de eerste doorgang; zonder echo 1,45× (gelijk licht) | idem | MP-2 S6 (krap), pompslagen van de echo, RV-6 (vraag 9b) | — |
 | **S7** Sluiskelder | luik, stuitlijn boven het kanaal, sokkel (Neerslag) | MP-2 16,7/min; 3 stuits, 2 ontploffingen (los 430 ticks); langzame lijn 1,04× | idem | RV-2 (stuiten, vraag 8), `BREEK` (verwacht 0) | — |
 | **S8** Machinehal, route | gemaal → arena-deur, arena in en uit | gemaal → deur 555 ticks (≤ 10 s, SL-03) | route vóór `BOSS_START` en na `BOSS_VERSLAGEN` | tijd gemaal → deur | — |
-| **Boss** Gemaalmeester | verplichte echo-acties: schot, rad, finisher | lus 97,6 s; arena-test 97,9 s (fase 1 28,4 / fase 2 63,5 s), realistische speler 109,3 s, beginner 121,2 s; MP-1 56; MP-2 27,2/min (S8); MP-3 76 % (B-2: de 7 met stilstand alle in fase 1) | telt niet (gdd §5.1) | GM-a (vraag 10, `BOSS_START` → `SCHOT_BREUK` ≤ 60 s), GM-c (vraag 11), doden per fase | — |
+| **Boss** Gemaalmeester | verplichte echo-acties: schot, rad, finisher | lus 97,6 s; arena-test 97,9 s (fase 1 28,4 / fase 2 63,5 s), realistische speler 109,3 s, beginner 121,2 s; MP-1 56; MP-2 27,2/min (S8); MP-3 76 % (B-2: de 7 met stilstand alle in fase 1) | telt niet (gdd §5.1) | GM-a (vraag 10, `BOSS_START` → `SCHOT_BREUK` ≤ 60 s), GM-b (springplank in fase 2 ≥ 2/min), GM-c (vraag 11), GM-d (MP-1 per fase ≤ 300), doden per fase (`gemaalmeester.md` §8; `testplan-mt2.md` §1 punt 4) | — |
 | **S9** Lage kade | lus terug, rustpunt, B2a/b pijler, B1 grachtwand | MP-2 5,2/min (lus); rustpunt 932 ticks in de lus, gaten daarna ≤ 597; **na trap 2: laatste pompslag van de echo → eerste echo-actie in S9 1202 ticks (20,0 s)** (B-1); zonder echo 1,07× | idem | RV-6: dezelfde meting op de CSV van de CEO; A–D S9-B2a/b, S9-B1 | RV-6 zonder pompslag van de echo (Q-2) |
 | **Doorloop** | de hele lus | MP-1 56 / MP-3 76 % / MP-4 0,4 % / MP-6 71 %; langste gat 2101 ticks (35,0 s); 0 echo-breuken bij 60/120/180; F4b(b) 8,2/min · 4,1 en 4,9/min · 78 % | ✅ op de bot (route-tijd 160,8 s) | alles van §2.1 en §2.2 solo | lus **zonder echo** (C-15 over de hele slice; Gameplay Programmer, `kadewijk.md` §9) |
 
@@ -82,7 +82,7 @@ Co-op = P1 en P2, met P2 in de rol van de echo (7A, C-01–C-05); drop-in/drop-o
 | Drop-in/drop-out | generiek in `test_coop.gd`, `test_coop_deel2.gd`; boss: drop-out fase 1 | drop-in en drop-out midden in de Kadewijk: per kamer één keer, plus de open vraag "drop-in terwijl de schaduwklep ligt" (`kadewijk.md` §9, TD) | Gameplay Programmer; QA toetst in de duo-runs |
 | Doorloop | — | de lus S1 → S8 → S9 → S1 in co-op bij D = 60 (90/120/180 regressie), met F4b(b) co-op op route-tijd | Gameplay Programmer (bot), QA (`rekenen.gd` co-op, Q-3) |
 
-**Te meten in MT3 (CEO + P2)**, volgens kader F4b(c) en `testplan-f0.md` §1: norm (3) co-op (MP-5 ≥ 4,0, geen deel < 3,0), C1–C2 (wachten; partner als hulp of last), MP-7 (a)–(d), F4b(a) co-op, F4b(b) co-op, en M1 van P2 als **sterke** *Nine Sols*-check (alleen als P2 de referenties niet kent en antwoordt vóór uitleg over het merk).
+**Te meten in MT3 (CEO + P2)**, volgens kader F4b(c) en `testplan-f0.md` §1: norm (3) co-op (MP-5 ≥ 4,0, geen deel < 3,0), C1–C2 (wachten; partner als hulp of last), MP-7 (a)–(d), F4b(a) co-op, F4b(b) co-op, **de boss in co-op: GM-a en GM-b in beide modi, GM-c, GM-d voor P1 én P2 (MP-7 (b)) per fase** (`gemaalmeester.md` §8), en M1 van P2 als **sterke** *Nine Sols*-check (alleen als P2 de referenties niet kent en antwoordt vóór uitleg over het merk).
 
 **Voorwaarde voor MT3** (kader §4, "geen CEO-test zonder groene bots"): de co-op-duo-runs halen MP-1 (P1 en P2) en MP-7 op D = 60 in elke kamer en de boss.
 
@@ -106,7 +106,7 @@ Co-op = P1 en P2, met P2 in de rol van de echo (7A, C-01–C-05); drop-in/drop-o
 | Q-4 | `testplan-mt3.md` en `ceo-kaart-mt3.md` | F4b(a)–(c) | QA Lead (na T8c/T8d en G-1) |
 | Q-5 | Bot-cijfers van §3 opnieuw draaien op de build van MT2 en de per-kamer-waarden van Q-1 invullen | F4 | QA Lead (heeft Godot of CI nodig) |
 | W-1 | Na MT2, als vraag 9b "leeg lopen" is: een echo-moment op of onder de trap terug (B-1) | S9 | World & Level Designer |
-| E-1 | Een P2 voor MT3 regelen, of de `ceo-beslissing` als die er niet is | F4b(c) | Executive Producer |
+| E-1 | Een P2 voor MT3 regelen, of de `ceo-beslissing` als die er niet is; de EP neemt het op als Q-4 start | F4b(c) | Executive Producer |
 
 **Wat dit plan nu niet kan**: geen engine in deze omgeving en geen CI-jobs; Q-1–Q-3 en Q-5 zijn scripts in `docs/qa/` die QA pas kan toetsen op een machine met Godot 4.6.3 of met werkende CI.
 
@@ -118,11 +118,14 @@ Co-op = P1 en P2, met P2 in de rol van de echo (7A, C-01–C-05); drop-in/drop-o
 |---|---|---|
 | W36 | **F4b(b) uit de korte doorlopen** van MT2 (solo) en MT3 (co-op), niet uit sessies van ± 1 uur zoals gdd §5.1 nog schrijft | Besluit 2026-11-12 (2): kaarten van ± 10–15 min. De LGD bevestigt of past gdd §5.1 aan |
 | W37 | **Co-op eerst met de bots**: de duo-runs (G-1, G-2) zijn een voorwaarde voor MT3, zoals de solo-bots voor MT2; de co-op-bot telt als meting van MP-7 per kamer, MT3 als oordeel | Kader §4 (geen CEO-test zonder groene bots) en F4 ("eerst met de bots") |
-| W38 | **Per kamer** = van het event `KAMER` tot het volgende; **de boss** = `BOSS_START` … `BOSS_VERSLAGEN`, apart van de route van S8 | Zo valt de boss uit de route-tijd van F4b(b) (gdd §5.1) en blijft S8 als kamer meetbaar |
+| W38 | **Per kamer** = van het event `KAMER` tot het volgende; **de boss** = `BOSS_START` … `BOSS_VERSLAGEN`, apart van de route van S8; uit de route-tijd vallen ook minibaas-arena's, het pauzemenu en tussenscènes (in de slice nu geen van drieën) | Zo valt de boss uit de route-tijd van F4b(b) (gdd §5.1) en blijft S8 als kamer meetbaar |
 | W39 | **Gaten en rustpunt met `POMP` van de echo**, MP-2 zonder (besluit LGD over B-1, #83), voor solo en co-op (in co-op de `POMP` van P2) | Het besluit noemt alleen solo; co-op volgt de definitie van MP-6 (pompslagen van P2) |
+
+**Open punt bij W36:** `gemaalmeester.md` §7 noemt voor T11 "eerste speler 8–12 min inclusief pogingen"; dat past niet in een MT2-kaart van ± 10–15 min voor de hele slice. De LGD beslist of het een rapportwaarde uit MT2 wordt of vervalt.
 
 ## Wijzigingen
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.1.1 | 2026-11-13 | Na Lead-review EP (#273): GM-a–GM-d in de rij Boss (§3) en in co-op in MT3 (§4); route-tijd zonder pauzemenu, tussenscènes en minibaas-arena's (§2.2, W38); open punt 8–12 min naast W36; E-1 bij de start van Q-4 |
 | 0.1 | 2026-11-13 | Eerste versie (#88): F4-metingen en F4b(b) per kamer S1–S9 en de boss, solo en co-op; wat de bestaande tests en `mt2-meetlogs/` dekken (cijfers uit `kadewijk.md` §6–§6d en `testplan-mt2.md` §2.2/§2.4, niet opnieuw gedraaid); wat ontbreekt met eigenaar (G-1–G-5, Q-1–Q-5, W-1, E-1); MT2 verwezen, MT3 te maken; W36–W39 |

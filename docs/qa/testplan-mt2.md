@@ -24,9 +24,9 @@ MT2 is de tweede mijlpaaltest: de CEO speelt de **Kadewijk van begin tot eind, s
 3. **F4b(b) solo** (gdd §5.1): de echo ook buiten de boss-arena, uit het meetlog. Een eerste meting; het oordeel F4b(b) vraagt ook co-op (MT3).
 4. **De Gemaalmeester** (gemaalmeester.md §8): GM-a (schot), GM-b (springplank in fase 2), GM-c (finisher), GM-d (stilstand); V-01 (gdd §3.5: stuit per gevecht).
 5. **Zes meetvragen uit de reviews** (§1.1).
+6. **Luistercheck F2** (audio bible §9.4): drie ja/nee-vragen op het F2-fragment, **alleen op koptelefoon, ± 2 min** (EP-besluit, [Lead-review PR #251](https://github.com/cesarvangerwen-glitch/echoborn/pull/251#issuecomment-6842638354); de bible volgt in #249). Afgesproken op de kaart van MT2 (EP, PR #199), geen aparte sessie; niet naar MT3, want F2 is een voorwaarde voor T8d deel 2.
 
 Het overkoepelende plan voor T11 (alle kamers en de boss, solo en co-op, met wat de bots al dekken en wat nog ontbreekt) is `docs/qa/testplan-t11-slice.md`; dit plan is het deel MT2.
-6. **Luistercheck F2** (audio bible §9.4): drie ja/nee-vragen op het F2-fragment, **alleen op koptelefoon, ± 2 min** (EP-besluit, [Lead-review PR #251](https://github.com/cesarvangerwen-glitch/echoborn/pull/251#issuecomment-6842638354); de bible volgt in #249). Afgesproken op de kaart van MT2 (EP, PR #199), geen aparte sessie; niet naar MT3, want F2 is een voorwaarde voor T8d deel 2.
 
 Niet in MT2: co-op en P2 (MT3, F4b(c)); eindkwaliteit van art en audio als oordeel (MT3, F7); de sterke *Nine Sols*-check (F4b(c)); een tweede D (D = 90, 120 en 180 alleen als regressie in de bots).
 
