@@ -65,6 +65,7 @@ const TEST_SCRIPTS := [
 	"res://tests/test_kadewijk_s9.gd",
 	"res://tests/test_boss.gd",
 	"res://tests/test_boss_rad.gd",
+	"res://tests/test_gemaalmeester_beeld.gd",
 	"res://tests/test_boss_runs.gd",
 	"res://tests/test_kadewijk.gd",
 	"res://tests/test_kadewijk_deel2.gd",

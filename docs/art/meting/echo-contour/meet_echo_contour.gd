@@ -11,9 +11,18 @@ extends SceneTree
 ##   de echo: rand, arcering, ogen en contour), m = figuur + 1 px, ring = 3–6 px
 ##   van m (kruis, zoals `ndimage.binary_dilation`);
 ## - **B (contour)**: |p90 L\* van de contour − mediaan L\* van de ring|; de
-##   contour = de pixels van de figuur met een buur (kruis) erbuiten;
-## - **leesbaarheid** = max(A, B) (bible §6.4: "op de vulling of de contour").
-## Norm: ≥ 40 overal; P1 ≥ 40 en P1 het hoogst.
+##   contour = bij de echo de pixels net buiten het silhouet (de shader), bij P1
+##   zijn eigen buitenste pixels;
+## - **C (rand tegen de eigen contour)**: |p90 L\* van de rand − mediaan L\* van
+##   de contour|; de rand = de getekende pixels van het silhouet naast de contour.
+## Norm (CD, #226, comment 6847557495): **max(A, B, C) ≥ 40 én max(A, B) ≥ 30**
+## voor de echo; P1 ≥ 40 en P1 het hoogst (max(A, B, C)). Per kamer de
+## slechtste plek in `resultaten.json` (`slechtste`).
+##
+## S8 met de **echte boss** (#265): een `Gemaalmeester` op `Layout.ARENA_ORIGIN`
+## met zijn sprites (`GemaalmeesterBeeld`, grijs zoals in het gevecht), het
+## schot dicht of de kern open; P1 en de echo zoals de AD (deel 5) en bij het
+## schot met de echo 6 en 3 px over P1 (animatie-timing §1.5).
 ##
 ## Draaien vanaf de repo-root (venster nodig, dus xvfb en opengl3):
 ##   xvfb-run -a godot --path game --rendering-driver opengl3 --audio-driver Dummy \
@@ -22,6 +31,7 @@ extends SceneTree
 
 const Layout = preload("res://levels/kadewijk/kadewijk_layout.gd")
 const EchoContour = preload("res://art/shaders/echo_contour.gd")
+const Gemaalmeester = preload("res://scripts/combat/gemaalmeester.gd")
 
 const SCENES := {
 	&"S3": "res://levels/kadewijk/s3_vismarkt.tscn",
@@ -35,8 +45,14 @@ const GEVALLEN := [
 		"figuren": [["echo", "run2", 1954, 260, false], ["p1", "run0", 2030, 260, false]]},
 	{"plek": "S9 rustpunt bij de bootjes", "kamer": &"S9",
 		"figuren": [["echo", "run2", 3460, 635, true], ["p1", "run0", 3380, 635, true]]},
-	{"plek": "S8 bij de ketel naast P1 (concept-boss)", "kamer": &"S8", "boss": Vector2(4180, 680),
+	{"plek": "S8 bij de ketel naast P1, schot", "kamer": &"S8", "boss": "schot",
 		"figuren": [["p1", "run0", 4416, 680, false], ["echo", "jump", 4448, 660, false]]},
+	{"plek": "S8 bij de ketel naast P1, kern", "kamer": &"S8", "boss": "kern",
+		"figuren": [["p1", "run0", 4416, 680, false], ["echo", "jump", 4448, 660, false]]},
+	{"plek": "S8 echo 6 px over P1 voor het schot", "kamer": &"S8", "boss": "schot",
+		"figuren": [["p1", "run0", 4480, 680, false], ["echo", "run0", 4486, 680, false]]},
+	{"plek": "S8 echo 3 px over P1 voor de kern", "kamer": &"S8", "boss": "kern",
+		"figuren": [["p1", "run0", 4480, 680, false], ["echo", "run0", 4483, 680, false]]},
 ]
 const STATEN := ["grijs", "kleur"]
 const MARGE := 12
@@ -59,6 +75,7 @@ func _run() -> void:
 	var uit: Array = []
 	var uitsneden: Array[Image] = []
 	var fouten := 0
+	var slechtste := {}
 	for geval: Dictionary in GEVALLEN:
 		for staat: String in STATEN:
 			for contour: bool in [true, false]:
@@ -80,16 +97,24 @@ func _run() -> void:
 				uitsneden.append(u)
 				var tekst := PackedStringArray()
 				for m: Dictionary in regel["figuren"]:
-					tekst.append("%s A %.1f B %s lees %.1f" % [m["soort"], m["A"], "%.1f" % m["B"] if m["B"] >= 0.0 else "-", m["lees"]])
+					tekst.append("%s A %.1f B %s C %s lees %.1f" % [m["soort"], m["A"], "%.1f" % m["B"] if m["B"] >= 0.0 else "-", "%.1f" % m["C"] if m["C"] >= 0.0 else "-", m["lees"]])
 				print("%-42s %-5s contour %-5s | %s" % [geval["plek"], staat, contour, " | ".join(tekst)])
 				if contour:
 					var echo: Dictionary = regel["figuren"].filter(func(m: Dictionary) -> bool: return m["soort"] == "echo")[0]
 					var p1: Dictionary = regel["figuren"].filter(func(m: Dictionary) -> bool: return m["soort"] == "p1")[0]
-					regel["norm"] = echo["lees"] >= 40.0 and p1["lees"] >= 40.0 and p1["lees"] >= echo["lees"]
+					regel["norm"] = echo["lees"] >= 40.0 and maxf(echo["A"], echo["B"]) >= 30.0 \
+						and p1["lees"] >= 40.0 and p1["lees"] >= echo["lees"]
 					if not regel["norm"]:
 						fouten += 1
+					var kamer := String(geval["kamer"])
+					var los := maxf(echo["A"], echo["B"])
+					if not slechtste.has(kamer) or los < slechtste[kamer]["max_AB"]:
+						slechtste[kamer] = {"plek": geval["plek"], "staat": staat, "max_AB": los, "lees": echo["lees"], "norm": regel["norm"]}
 	var f := FileAccess.open(_dir + "/resultaten.json", FileAccess.WRITE)
-	f.store_string(JSON.stringify(uit, " "))
+	f.store_string(JSON.stringify({"norm": "echo: max(A, B, C) >= 40 en max(A, B) >= 30; P1 >= 40 en het hoogst (CD, #226)",
+		"slechtste": slechtste, "gevallen": uit}, " "))
+	for kamer: String in slechtste:
+		print("slechtste plek %s: %s" % [kamer, slechtste[kamer]])
 	f.close()
 	_plak(uitsneden).save_png(_dir + "/uitsneden_x4.png")
 	print("klaar: %d gevallen met contour buiten de norm" % fouten)
@@ -119,11 +144,11 @@ func _render(geval: Dictionary, staat: String, contour: bool) -> Array:
 	inhoud.get_node(^"Art").set_staat(staat)
 	var rects: Array = []
 	if geval.has("boss"):
-		var boss := Sprite2D.new()
-		boss.texture = _tex("boss_fase1")
-		boss.centered = false
-		boss.position = Vector2(geval["boss"]) - Vector2(0, float(_posities["boss_av"]))
+		var boss := Gemaalmeester.new()
 		world.add_child(boss)
+		boss.setup_gemaalmeester(Layout.ARENA_ORIGIN)
+		boss.core_open = geval["boss"] == "kern"
+		boss.update_visual(1000)
 	for fig: Array in geval["figuren"]:
 		var soort: String = fig[0]
 		var naam := "%s_%s" % [soort, fig[1]] + ("_" + staat if soort == "echo" else "")
@@ -182,15 +207,23 @@ func _figuur_pixels(fr: Array, met_contour: bool) -> Array:
 				if a * 255.0 >= 1.5:
 					getekend[rect.position + Vector2i(x, y)] = true
 	var contour := {}
+	var rand := {}
 	for p: Vector2i in silhouet:
 		for d: Vector2i in KRUIS:
 			if not silhouet.has(p + d):
 				if met_contour:
 					contour[p + d] = true
+					if getekend.has(p):
+						rand[p] = true
 				elif fr[0] == "p1":
 					contour[p] = true
+	if fr[0] == "p1":
+		for p: Vector2i in contour:
+			for d: Vector2i in KRUIS:
+				if silhouet.has(p + d) and not contour.has(p + d) and getekend.has(p + d):
+					rand[p + d] = true
 	getekend.merge(contour)
-	return [getekend, contour]
+	return [getekend, contour, rand]
 
 
 const KRUIS := [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
@@ -203,6 +236,7 @@ func _meet(img: Image, rects: Array, i: int) -> Dictionary:
 	var fc := _figuur_pixels(fr, contour_aan)
 	var fig: Dictionary = fc[0]
 	var cont: Dictionary = fc[1]
+	var randpx: Dictionary = fc[2]
 	var anderen := {}
 	for j in rects.size():
 		if j != i:
@@ -236,6 +270,7 @@ func _meet(img: Image, rects: Array, i: int) -> Dictionary:
 			ring.append(_l(img.get_pixelv(p)))
 	var lf: Array = []
 	var lc: Array = []
+	var lr: Array = []
 	for p: Vector2i in fig:
 		if p.x < 0 or p.y < 0 or p.x >= w or p.y >= h:
 			continue
@@ -243,11 +278,14 @@ func _meet(img: Image, rects: Array, i: int) -> Dictionary:
 		lf.append(l)
 		if cont.has(p):
 			lc.append(l)
+		if randpx.has(p):
+			lr.append(l)
 	var bg := _p(ring, 0.5)
 	var a := absf(_p(lf, 0.9) - bg)
 	var b := absf(_p(lc, 0.9) - bg) if not lc.is_empty() else -1.0
-	return {"soort": soort, "A": snappedf(a, 0.1), "B": snappedf(b, 0.1), "lees": snappedf(maxf(a, b), 0.1),
-		"ring_L": snappedf(bg, 0.1)}
+	var c := absf(_p(lr, 0.9) - _p(lc, 0.5)) if not lc.is_empty() and not lr.is_empty() else -1.0
+	return {"soort": soort, "A": snappedf(a, 0.1), "B": snappedf(b, 0.1), "C": snappedf(c, 0.1),
+		"lees": snappedf(maxf(a, maxf(b, c)), 0.1), "ring_L": snappedf(bg, 0.1)}
 
 
 var _contour_staat := false

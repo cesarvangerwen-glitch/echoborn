@@ -1,6 +1,6 @@
 # Art bible v0
 
-Versie 0.1 · Eigenaar: Art Director · Issue: #20 · Basis: stijlbesluit 2D (#18), pitch v0.4 (besluit #51), stijltests (`docs/art/stijltests.md`)
+Versie 0.2 · Eigenaar: Art Director · Issue: #20 (v0.2: norm voor de holle echo met contour, §6 regel 4a; besluit CD in #226) · Basis: stijlbesluit 2D (#18), pitch v0.4 (besluit #51), stijltests (`docs/art/stijltests.md`)
 
 Deze bible legt vast hoe de game eruitziet en wat elke artist moet halen. Ze is **v0**: genoeg om de grijze flow-kamer en de slice-art op te bouwen. De paletten per gebied volgen in v1 (zie *Open punten*).
 
@@ -183,6 +183,14 @@ De R5-scène telt (rekenregel uit `docs/tech/lichtmeting.md`, PR #62, in review)
 2. De **arcering is aan de sprite verankerd**, niet aan het scherm. Zo kruipt het patroon niet als de echo beweegt (geen flikkering).
 3. **Geen vijand in amber of cyaan.** De vijand verschilt van speler 1 ook in **vorm** (laag, breed, stekels) en **waarde** (donker lijf), omdat amber en rood bij deuteranopie dichter bij elkaar liggen (stijltests §4.2).
 4. **Leesbaarheid in getallen:** elke gameplay-figuur haalt ΔL* ≥ 40 tegen zijn directe achtergrond op de **vulling of de contour**, in elke toestand. Hulpmiddel: het script meet het.
+   4a. **De holle echo met zijn 1-px contour** (besluit CD, [#226](https://github.com/cesarvangerwen-glitch/echoborn/issues/226#issuecomment-6847557495), meting PR #267) leest ook op zijn **binnencontrast**:
+   > **leesbaar = max(A, B, C) ≥ 40 én max(A, B) ≥ 30**, plus de vorm-eis van §7.1: hol, gearceerd, nabeelden. **Speler 1 blijft in elk beeld de figuur met het hoogste contrast.**
+
+   - **A** = rand (p90) of lijf tegen de ring van 2–6 px.
+   - **B** = de 1-px contour tegen die ring.
+   - **C** = de rand tegen zijn eigen contour (gemeten ± 70).
+
+   Waarom: een middentoon-achtergrond (L* ≈ 36, warm lamplicht) ligt tussen de donkere contour en de amberen rand, en daar haalt geen omlijnde figuur 40 op de ring. De ondergrens van 30 houdt de norm eerlijk: C is bijna constant. Gemeten slechtste plekken: S3-kleur vóór het verlichte winkelraam 35,1 en het S9-rustpunt 34,7. **Niet doen:** de echo lichter maken (een lichtere amber zoals `#ffbe5c` ligt op ΔE 3,4 van de lampgloed, dan lees je de echo als licht). **Vangnet:** raken spelers de echo in MT2 (RV-5) kwijt in de merk-arena van S3, dan wordt dat stuk achtergrond donkerder (lichtpoel of raam), niet de echo lichter. Het S9-rustpunt weegt minder, want daar vraagt de route geen echo-handeling.
 
 ---
 
