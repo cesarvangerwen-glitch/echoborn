@@ -587,14 +587,15 @@ class Blad(GMM.Blad):
 
 
 def godot_uid(pad):
-    """Een vaste uid per bestand (zoals Godot ze schrijft: base 36, a-z dan 0-9), zodat een nieuwe run niets
-    verandert. Godot behoudt een uid die al in de .import staat."""
+    """Een vaste uid per bestand, zodat een nieuwe run niets verandert. Precies zoals Godot ze schrijft
+    (ResourceUID::id_to_text): base 34, eerst a-y (25 tekens), dan 0-8 (9 tekens). Een 'z' of '9' is geen
+    geldig teken: Godot leest die dan als een overloop en herschrijft de .import bij elke verse import (#275)."""
     n = int(hashlib.sha256(pad.encode()).hexdigest(), 16) & 0x7FFFFFFFFFFFFFFF
     s = ""
     while True:
-        c = n % 36
-        s = (chr(ord("a") + c) if c < 26 else chr(ord("0") + c - 26)) + s
-        n //= 36
+        c = n % 34
+        s = (chr(ord("a") + c) if c < 25 else chr(ord("0") + c - 25)) + s
+        n //= 34
         if not n:
             break
     return "uid://" + s
