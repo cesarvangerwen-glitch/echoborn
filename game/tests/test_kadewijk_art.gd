@@ -30,6 +30,12 @@ extends RefCounted
 ##   hetzelfde beeld voor P1 en de echo**, het rad (stil tot de eerste slag, dan
 ##   rond), de sluisklep (dicht, open na `t_v`) en de laag `gemaal_aan` (aan bij
 ##   een vol gemaal zolang de staat niet `kleur` is). In S7 de sokkel.
+## - Deel 5 (§12.4): S8 en S9 zitten in de collisiontest (de stukken van S9 per
+##   D op hun blok). Blokken met een vast stuk (de deuren, het hoogwater, B3)
+##   tekent hun stuk, niet `speelvlak`; een blok dat open begint
+##   (`Layout.START_OPEN`) heeft dan geen collision en zijn stuk is weg. De
+##   deuren van S8 en het hoogwater van S9 volgen `set_door`, het hoogwater ook
+##   na laden (vulstand 200). Het rad draait op `fps_vol` als het gemaal vol is.
 ##
 ## Leest de PNG's voor de pixelcontrole met `Image.load_from_file` (de bron,
 ## niet de importcache); de sprites zelf laden via de import (CI: `--import`).
@@ -43,8 +49,11 @@ const KadewijkArt = preload("res://levels/kadewijk/kadewijk_art.gd")
 
 const DS := [60, 90, 120, 180]
 const KAMERS := {&"S1": "s1_kade_ingang", &"S2": "s2_kadegang", &"S3": "s3_vismarkt", &"S4": "s4_brugkloof",
-	&"S5": "s5_sluiswachtershuis", &"S6": "s6_gemaalplein", &"S7": "s7_sluiskelder"}
+	&"S5": "s5_sluiswachtershuis", &"S6": "s6_gemaalplein", &"S7": "s7_sluiskelder",
+	&"S8": "s8_machinehal", &"S9": "s9_lage_kade"}
 const Schaduwklep = preload("res://levels/kadewijk/kadewijk_schaduwklep.gd")
+const GameState = preload("res://scripts/save/game_state.gd")
+const AreaLoader = preload("res://scripts/world/area_loader.gd")
 const KadewijkObject = preload("res://levels/kadewijk/kadewijk_object.gd")
 const Luikbeeld = preload("res://levels/kadewijk/kadewijk_luikbeeld.gd")
 const LUIK_KAMERS := {&"S7": "res://levels/kadewijk/s7_sluiskelder.tscn", &"S9": "res://levels/kadewijk/s9_lage_kade.tscn"}
@@ -65,10 +74,12 @@ class StilInput:
 		return 0
 
 
-func _wijk(t, d: int, start: StringName, stil := false) -> Array:
+func _wijk(t, d: int, start: StringName, stil := false, state: GameState = null) -> Array:
 	var progress := Progress.new()
 	progress.name = "TestProgress"
 	t.tree.root.add_child(progress)
+	if state != null:
+		progress.adopt(state, -1)
 	# V-01 (besluit LGD #252): wie voorbij de sokkel (S7) begint, heeft de Neerslag al.
 	if start == &"S8" or start == &"S9":
 		Kadewijk.give_neerslag(progress.state)
@@ -170,12 +181,18 @@ func _check_kamer(t, wijk, id: StringName, d: int) -> void:
 		var soort: String = eenrichting["blokken"].get("%s/%s" % [id, body.name], "")
 		if soort != "":
 			stukken[String(body.name)] = [rect, soort, (body.get_child(0) as CollisionShape2D).one_way_collision]
+		elif KadewijkArt.manifest().get("vaste_stukken", {}).has("%s/%s" % [id, body.name]):
+			pass  # getekend door zijn vaste stuk (2b), niet door `speelvlak` (deuren, hoogwater, B3)
 		elif rect.end.y > room.position.y:
 			vast.append(rect)
 		for child in body.get_children():
 			if child is Polygon2D:
 				t.check(not (child as Polygon2D).visible, "%s: placeholder van %s staat nog aan" % [tag, body.name])
-		t.check(body.collision_layer != 0, "%s: collision van %s is uit" % [tag, body.name])
+		# Een blok dat open begint (`Layout.START_OPEN`, de `DeurRechts` van S8) heeft bij de start geen collision.
+		if Layout.START_OPEN.has(String(body.name)):
+			t.check(body.collision_layer == 0, "%s: %s begint open, maar heeft collision" % [tag, body.name])
+		else:
+			t.check(body.collision_layer != 0, "%s: collision van %s is uit" % [tag, body.name])
 	t.check(n_bodies == Layout.blocks(id, d).size(), "%s: %d blokken, layout %d" % [tag, n_bodies, Layout.blocks(id, d).size()])
 
 	# 2b. Vaste stukken per D liggen op hun blok.
@@ -203,6 +220,7 @@ func _check_kamer(t, wijk, id: StringName, d: int) -> void:
 		t.check(sprite.global_position.is_equal_approx(rect.position) and not sprite.centered, "%s %s: stuk op %s, blok op %s" % [tag, blok, sprite.global_position, rect.position])
 		t.check(sprite.region_enabled and sprite.region_rect == want, "%s %s: region %s, verwacht %s" % [tag, blok, sprite.region_rect, want])
 		t.check(_z(sprite) == -10 and vaste_map.get_index() > art.get_node(^"Speelvlak").get_index(), "%s %s: z %d of niet na Speelvlak" % [tag, blok, _z(sprite)])
+		t.check(sprite.visible == (body.collision_layer != 0), "%s %s: stuk zichtbaar %s, collision %d" % [tag, blok, sprite.visible, body.collision_layer])
 		var boven := 0
 		for x in int(want.size.x):
 			boven += 1 if img.get_pixel(x, 0).a > 0.0 else 0
@@ -272,7 +290,7 @@ func _check_kamer(t, wijk, id: StringName, d: int) -> void:
 		t.check(z > -10 and z < -5, "%s %s: z %d, verwacht tussen speelvlak (−10) en licht (−5)" % [tag, blok, z])
 
 
-## S1–S7 (start in die kamer) bij elke D: lagen geladen, op de collision.
+## S1–S9 (start in die kamer) bij elke D: lagen geladen, op de collision.
 func test_kadewijk_art_op_collision(t) -> void:
 	for d: int in DS:
 		for id: StringName in KAMERS:
@@ -543,6 +561,7 @@ func test_kadewijk_art_s6_objecten(t) -> void:
 	t.check(reeksen["p1"] == reeksen["echo"], "S6: pompslag van de echo wijkt af van P1: %s tegen %s" % [reeksen["echo"], reeksen["p1"]])
 	t.check(gemaal.fill > 0 and gemaal.strokes.size() == 2, "S6: pompslagen niet geteld (fill %d)" % gemaal.fill)
 	t.check(rad.speelt(), "S6: rad draait niet na de eerste pompslag")
+	t.check(not rad.vol and is_equal_approx(rad.fps_nu(), float(KadewijkArt.manifest()["objecten"]["gemaal_rad"]["fps"])), "S6: rad vult op %s fps, verwacht fps" % rad.fps_nu())
 	var rad_frames: Array = await _volg_frames(t, [rad], 60)
 	t.check(rad_frames[0].size() >= 8, "S6: rad draait %s in 1 s, verwacht alle 8 frames" % [rad_frames[0]])
 
@@ -550,6 +569,11 @@ func test_kadewijk_art_s6_objecten(t) -> void:
 	gemaal.restore_state(100, true)
 	await t.tree.process_frame
 	t.check(sluis.frame_nu == 1 and sluis.region_rect == _frame("sluisklep", 1), "S6: sluisklep na t_v frame %d" % sluis.frame_nu)
+	var rad_m: Dictionary = KadewijkArt.manifest()["objecten"]["gemaal_rad"]
+	t.check(rad.speelt() and rad.vol and is_equal_approx(rad.fps_nu(), float(rad_m["fps_vol"])), "S6: rad bij een vol gemaal op %s fps, verwacht fps_vol %s" % [rad.fps_nu(), rad_m["fps_vol"]])
+	var vol_frames: Array = await _volg_frames(t, [rad], 60)
+	var stappen: int = vol_frames[0].size() - 1
+	t.check(stappen >= int(rad_m["fps_vol"]) - 1 and stappen <= int(rad_m["fps_vol"]), "S6: rad vol %d frames in 1 s, verwacht %s" % [stappen, rad_m["fps_vol"]])
 	t.check(extra != null and extra.visible, "S6: gemaal_aan uit bij een vol gemaal in grijs")
 	art.set_staat("half")
 	await t.tree.process_frame
@@ -581,3 +605,49 @@ func test_kadewijk_art_sokkel(t) -> void:
 		t.check(sokkel.frame_nu == 0 and sokkel.region_rect == _frame("sokkel", 0), "S7: sokkel uit, frame %d" % sokkel.frame_nu)
 	t.check(not (inhoud.get_node(^"Sokkel") as CanvasItem).visible, "S7: placeholder Sokkel staat aan")
 	await _free(t, parts)
+
+
+## S8: de deuren als vaste stukken volgen `set_door` (DeurRechts begint open).
+func test_kadewijk_art_deuren_s8(t) -> void:
+	var parts := _wijk(t, 60, &"S8", true)
+	await t.tree.physics_frame
+	await t.tree.process_frame
+	var wijk = parts[0]
+	var map: Node = wijk.loader.kamers[&"S8"].inhoud_node.get_node_or_null(^"Art/VasteStukken")
+	var links := map.get_node_or_null(^"DeurLinks") as Sprite2D if map else null
+	var rechts := map.get_node_or_null(^"DeurRechts") as Sprite2D if map else null
+	t.check(links != null and rechts != null, "S8: deuren ontbreken als vaste stukken")
+	if links == null or rechts == null:
+		await _free(t, parts)
+		return
+	t.check(links.visible and not rechts.visible, "S8 start: DeurLinks %s (dicht), DeurRechts %s (open)" % [links.visible, rechts.visible])
+	t.check(wijk.set_door(&"S8", "DeurRechts", true), "S8: set_door DeurRechts")
+	await t.tree.process_frame
+	t.check(rechts.visible, "S8: DeurRechts dicht (BOSS_START), stuk niet zichtbaar")
+	wijk.set_door(&"S8", "DeurLinks", false)
+	await t.tree.process_frame
+	t.check(not links.visible, "S8: DeurLinks open (BOSS_VERSLAGEN), stuk nog zichtbaar")
+	await _free(t, parts)
+
+
+## S9: het hoogwater is dicht tot `s = 2` (set_door), en uit een save met vulstand 200 meteen weg.
+func test_kadewijk_art_hoogwater_s9(t) -> void:
+	for geval: String in ["dicht", "s2", "save200", "save100"]:
+		var state: GameState = null
+		if geval.begins_with("save"):
+			state = GameState.new()
+			state.set_gemaal(AreaLoader.object_flag(&"S6", ^"Gemaal", Kadewijk.GEBIED), 200 if geval == "save200" else 100, true)
+		var parts := _wijk(t, 60, &"S9", true, state)
+		await t.tree.physics_frame
+		await t.tree.process_frame
+		var wijk = parts[0]
+		var stuk := wijk.loader.kamers[&"S9"].inhoud_node.get_node_or_null(^"Art/VasteStukken/Hoogwater") as Sprite2D
+		t.check(stuk != null, "S9 %s: geen vast stuk Hoogwater" % geval)
+		if stuk != null:
+			if geval == "s2":
+				wijk.hoogwater_open_tick = wijk.sim.tick
+				wijk._update_hoogwater(wijk.sim.tick)
+				await t.tree.process_frame
+			var open: bool = geval == "s2" or geval == "save200"
+			t.check(stuk.visible == not open and wijk.hoogwater_open == open, "S9 %s: hoogwater-stuk zichtbaar %s, open %s" % [geval, stuk.visible, wijk.hoogwater_open])
+		await _free(t, parts)

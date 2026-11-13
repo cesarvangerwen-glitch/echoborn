@@ -21,6 +21,10 @@ extends Node2D
 ##   linksboven op het blok met dezelfde naam uit `Layout.blocks(kamer_id, D)`,
 ##   met `region` = de maat van het blok, begrensd tot de texture. Geen blok bij
 ##   deze D (het B3-blok bij D ≤ 60): geen stuk. Na `Speelvlak` in de boom, z −10.
+##   Een stuk is zichtbaar zolang zijn blok collision heeft (deel 5 §12.2: de
+##   deuren van S8 via `Kadewijk.set_door`, `DeurRechts` begint open
+##   (`Layout.START_OPEN`); het `Hoogwater` van S9 gaat weg bij `s = 2`, ook na
+##   laden). Dat volgt `_process` uit het blok, zonder signaal van de GP.
 ## - Extra lagen (manifest `kamers.<naam>.extra`, deel 4 §11.3: in S6
 ##   `gemaal_aan` voor trap 1): een `Sprite2D` met die naam, linksboven op de
 ##   kamer, z uit het manifest, standaard uit. `set_extra(naam, aan)` zet hem;
@@ -216,8 +220,23 @@ func _bouw_eenrichting(d: int) -> void:
 		map.add_child(np)
 
 
+## De vaste stukken volgen de collision van hun blok (deuren, hoogwater).
+func _process(_delta: float) -> void:
+	_volg_blokken()
+
+
+func _volg_blokken() -> void:
+	var blokken := get_parent().get_node_or_null(^"Blokken") if get_parent() else null
+	if blokken == null:
+		return
+	for sprite in _vaste_stukken():
+		var body := blokken.get_node_or_null(NodePath(String(sprite.name))) as CollisionObject2D
+		sprite.visible = body != null and body.collision_layer != 0
+
+
 ## Na de `_ready` van de inhoud (die bouwt de blokken pas dan).
 func _verberg_placeholders() -> void:
+	_volg_blokken()
 	var blokken := get_parent().get_node_or_null(^"Blokken") if get_parent() else null
 	if blokken != null:
 		for body in blokken.get_children():

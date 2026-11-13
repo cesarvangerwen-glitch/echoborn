@@ -16,7 +16,8 @@ extends Node2D
 ##   niet gelezen, geen andere dekking, maat of timing.
 ## - `gemaal_rad` (96 × 96, middelpunt op het gemaal): frame 0 tot de eerste
 ##   pompslag die water pompt (`fill > 0`; een slag zonder licht pompt niets),
-##   daarna draait hij rond op `fps`.
+##   daarna draait hij rond op `fps`, en op `fps_vol` (6) zodra het gemaal vol
+##   is (`is_full()`, trap 1; ook na laden).
 ## - `sluisklep` (cel 64 × 16, de klep van 60 × 10 op 2 px van links): op de
 ##   sluis, frame 0 dicht, frame 1 open (`gemaal.sluice_open`, ook na laden).
 ## - de laag `gemaal_aan` van `Art` (trap 1): aan als het gemaal vol is en de
@@ -118,6 +119,7 @@ func _volg() -> void:
 	if _gemaal == null:
 		return
 	rad.lus(_gemaal.fill > 0 or _gemaal.is_full())
+	rad.set_vol(_gemaal.is_full())
 	if sluisklep != null:
 		sluisklep.toon(1 if _gemaal.sluice_open else 0)
 	var art := get_parent()
