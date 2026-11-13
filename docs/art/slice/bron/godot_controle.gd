@@ -1,5 +1,5 @@
 extends SceneTree
-## Controle van de Art Director (#85, deel 2 en 3): zet de kamerlagen van S1–S4 en de
+## Controle van de Art Director (#85, deel 2–4): zet de kamerlagen van S1–S7 en de
 ## eenrichtingsstukken (en in S2 de vaste stukken per D) op de blokken van
 ## `Layout.blocks()` in Godot 4.6, tekent de
 ## collision-randen erover (cyaan = vast, geel = eenrichting) en bewaart een PNG.
@@ -25,7 +25,7 @@ func _init() -> void:
 	var staat: String = args[1]
 	var d := int(args[2])
 	var out: String = args[3]
-	var naam: String = {&"S1": "s1_kade_ingang", &"S2": "s2_kadegang", &"S3": "s3_vismarkt", &"S4": "s4_brugkloof"}[room]
+	var naam: String = {&"S1": "s1_kade_ingang", &"S2": "s2_kadegang", &"S3": "s3_vismarkt", &"S4": "s4_brugkloof", &"S5": "s5_sluiswachtershuis", &"S6": "s6_gemaalplein", &"S7": "s7_sluiskelder"}[room]
 	var r: Rect2 = Layout.ROOMS[room]
 	var vp := SubViewport.new()
 	vp.size = Vector2i(int(r.size.x), int(r.size.y))

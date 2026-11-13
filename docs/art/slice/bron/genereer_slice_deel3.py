@@ -137,17 +137,20 @@ def bolder8():
 
 def schaduwklep(fase):
     """De schaduwklep (V-01d): de schaduw van het luik waarop de echo blijft staan, 40 x 16.
-    Schaduwgeometrie (bible §4.4): paars gearceerd met een rafelige rand, in grijs grijs.
+    Schaduwgeometrie (bible §4.4): een holle afdruk van de klep (rand + arcering), paars, in grijs grijs.
     fase 0 = vol, 1 en 2 = oplossen (Bayer 50 % en 25 %)."""
     t = T(40, 16)
     yy, xx = np.mgrid[0:16, 0:40]
     r = rng(232)
-    rand_b = 1 + (r.random(40) < 0.3).astype(int)
+    rand_b = np.ones(40, int)       # deel 4: een rechte, doorlopende bovenrand op rij 1 (daar staat de echo; test #241)
     lijf = (yy >= rand_b[xx]) & (yy < 12 + (r.random(40) < 0.4).astype(int)[xx])
-    t.fill(lijf, "schaduwgeo", 3)
-    t.fill(lijf & ((xx + yy) % 3 == 0), "schaduwgeo", 5)                 # arcering, aan het stuk verankerd
+    # deel 4, punt van de CD (#227): **hol**, zoals de echo (vol = levend, hol = echo): alleen een rand
+    # en een diagonale arcering om de 3 px, geen vulling; de naden van de planken als onderbroken lijnen.
+    rand = lijf & ~D2.ndimage.binary_erosion(lijf)
+    t.fill(lijf & ((xx + yy) % 3 == 0), "schaduwgeo", 4)                 # arcering, aan het stuk verankerd
+    t.fill(lijf & (xx % 8 == 7) & (yy > 2) & (yy % 2 == 0), "schaduwgeo", 3)   # naden van de planken
+    t.fill(rand, "schaduwgeo", 5)
     t.fill(lijf & (yy == rand_b[xx]), "schaduwgeo", 7)                    # bovenrand: hier staat de echo
-    t.fill(lijf & (xx % 8 == 7) & (yy > 2), "schaduwgeo", 1)              # de naden van de planken, als schaduw
     rank = (yy >= 11) & (yy < 16) & (np.abs(xx - (6 + 9 * ((xx // 9)))) < 1) & ((yy - 11) < 2 + (xx % 3))
     t.fill(rank, "schaduwgeo", 4)                                         # ranken eronder
     if fase:

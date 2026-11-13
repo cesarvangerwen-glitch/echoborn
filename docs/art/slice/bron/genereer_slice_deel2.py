@@ -61,7 +61,7 @@ S3_PLATFORMS = [(1820, 190, 120), (2180, 190, 120)]
 TREAD_W = 40
 # Werkaanname AD: het gemaal van S6 (nog niet gebouwd) staat rechts van S5, ± hier in
 # wereldcoördinaten van de wijk. De TA leest de echte plek uit `wijk_gemaal` (kamerdoc §9).
-GEMAAL_WERELD = (4960.0, 150.0)
+GEMAAL_WERELD = (4600.0, 140.0)   # deel 4: het echte gemaal van S6 (`S6/Gemaal`, s6_gemaalplein.tscn)
 
 
 def keerzone(d):
@@ -92,8 +92,8 @@ EXPORT = {"achter": ["lucht", "ver", "huizen"], "midden": ["midden"], "speelvlak
 class Kamer:
     """Een kamer als lagen van (materiaal, tint); mat -1 = leeg. Coördinaten lokaal (0,0 = linksboven)."""
 
-    def __init__(self, naam, wx, w, h=ROOM_H):
-        self.naam, self.wx, self.w, self.h = naam, wx, w, h
+    def __init__(self, naam, wx, w, h=ROOM_H, wy=0):
+        self.naam, self.wx, self.w, self.h, self.wy = naam, wx, w, h, wy
         self.mat = np.full((len(LAGEN), h, w), -1, np.int16)
         self.t = np.zeros((len(LAGEN), h, w), np.int16)
         self.emis = np.zeros((len(LAGEN), h, w), bool)   # eigen licht: houdt zijn kleur
@@ -180,7 +180,7 @@ class Kamer:
         """st per pixel: 0 grijs, 1 half, 2 kleur. golf = (r_half, r_vol) in px vanaf het gemaal."""
         if golf is None:
             return np.full((self.h, self.w), STATEN.index(staat), np.int8)
-        gx, gy = GEMAAL_WERELD[0] - self.wx, GEMAAL_WERELD[1]
+        gx, gy = GEMAAL_WERELD[0] - self.wx, GEMAAL_WERELD[1] - self.wy
         d = np.hypot(self.XX - gx, self.YY - gy)
         edge = 10.0
         r_h, r_v = golf
@@ -194,7 +194,7 @@ class Kamer:
     def golf_aan(self, golf, x, y, jitter=0.0):
         if golf is None:
             return None
-        gx, gy = GEMAAL_WERELD[0] - self.wx, GEMAAL_WERELD[1]
+        gx, gy = GEMAAL_WERELD[0] - self.wx, GEMAAL_WERELD[1] - self.wy
         return np.hypot(x - gx, y - gy) + jitter * 40 < golf[0]
 
     def render(self, staat="grijs", golf=None):
@@ -219,7 +219,7 @@ class Kamer:
             ok = tl.mat >= 0
             mat[L, y:y + hh, x:x + ww][ok] = tl.mat[ok]
             t[L, y:y + hh, x:x + ww][ok] = tl.t[ok]
-            gl = ok & (tl.mat == MI["gloed"])
+            gl = ok & ((tl.mat == MI["gloed"]) | (tl.mat == MI["raam"]))   # een verlicht raam is emissief (bible)
             emis[L, y:y + hh, x:x + ww][gl] = True
         # ramen
         for rm in self.ramen:
@@ -428,7 +428,36 @@ def ninepatch(t_full, w):
 
 
 EENRICHTING = {"galerij": galerij_stuk(), "trede": trede_stuk(), "snelluik": snelluik_stuk()}
-EENR_VOLGORDE = ["galerij", "trede", "snelluik"]
+# deel 4: de trede tegen een wand rechts (S5, B2a/B2c): gespiegeld, de kraag aan de muurkant
+_tr = trede_stuk()
+_trr = T(48, 16)
+_trr.mat[:], _trr.t[:] = _tr.mat[:, ::-1], _tr.t[:, ::-1]
+EENRICHTING["trede_r"] = _trr
+
+
+def richel_stuk():
+    """NinePatch 48x16 voor een richel/overloop in het sluiswachtershuis (S5, B2; deel 4): grenen
+    vloerdelen met een lichte, versleten neus (het loopvlak leest tegen de binnenmuur), een balk eronder
+    en aan de koppen een ijzeren hoekijzer."""
+    t = T(48, 16)
+    yy, xx = np.mgrid[0:16, 0:48]
+    t.box(0, 0, 48, 6, "hout", 4)
+    t.box(0, 0, 48, 1, "hout", 7)
+    t.box(0, 1, 48, 2, "hout", 6)
+    t.fill((yy >= 2) & (yy <= 4) & (xx % 16 == 15), "hout", 2)
+    t.fill((yy == 3) & (xx % 5 == 2), "hout", 5)
+    t.box(0, 5, 48, 6, "hout", 2)
+    t.box(0, 6, 48, 10, "hout", 3)                     # balk
+    t.box(0, 6, 48, 7, "hout", 1)
+    t.box(0, 9, 48, 10, "hout", 2)
+    t.fill((yy >= 7) & (yy <= 8) & (xx % 16 == 8), "ijzer", 5)   # bouten
+    t.box(0, 0, 2, 10, "ijzer", 3)
+    t.box(46, 0, 48, 10, "ijzer", 3)
+    return t
+
+
+EENRICHTING["richel"] = richel_stuk()
+EENR_VOLGORDE = ["galerij", "trede", "snelluik", "trede_r", "richel"]
 
 
 def kasseien(seed):
@@ -1092,11 +1121,12 @@ def plak_fig(img, figs, ox):
     h, w = img.shape[:2]
     for kind, rows, x, y, flip, kleur in figs:
         vx = max(0, min(w - 640, x - 320))
+        vy = max(0, min(h - 400, y - 200))          # hoge kamers (S5, S6: 560): een venster van 400
         st = "kleur" if kleur else "grijs"
-        lay, _ = R.fig_layer(kind, rows, x - vx, y, st, flip=flip)
-        lay = lay[:h]
-        sub = img[:, vx:vx + 640]
-        img[:, vx:vx + 640] = over(sub, lay)
+        lay, _ = R.fig_layer(kind, rows, x - vx, y - vy, st, flip=flip)
+        hh = min(400, h - vy)
+        sub = img[vy:vy + hh, vx:vx + 640]
+        img[vy:vy + hh, vx:vx + 640] = over(sub, lay[:hh])
     return img
 
 
@@ -1230,10 +1260,10 @@ def export_kamer(k, manifest, extra_lagen=None):
         Image.fromarray(k.index_laag(delen), "RGBA").save(os.path.join(UIT_GAME, fn), optimize=True)
         files[naam]["index"] = fn
     manifest["kamers"][k.naam] = dict(
-        wereld_rect=[k.wx, 0, k.w, k.h],
+        wereld_rect=[k.wx, k.wy, k.w, k.h],
         lagen=[dict(naam=n, z_index=z, bestanden=files[n]) for n, z in
                [("achter", -30), ("midden", -20), ("speelvlak", -10), ("licht", -5), ("voor", 20)] if n in files],
-        lampen=[dict(x=lp["x"] + k.wx, y=lp["y"], straal_band1=int(80 * lp["r"]),
+        lampen=[dict(x=lp["x"] + k.wx, y=lp["y"] + k.wy, straal_band1=int(80 * lp["r"]),
                      aan_in=[s for s in STATEN if lp["aan"][s]]) for lp in k.lampen],
         ramen=len(k.ramen),
     )
@@ -1252,7 +1282,9 @@ def eenrichting_export(manifest):
         atlas={s: f"kadewijk_eenrichting_{s}.png" for s in STATEN + ["index"]},
         stukken={"galerij": dict(region=[0, 0, 48, 16], marge_links=16, marge_rechts=16, herhaal="tile"),
                  "trede": dict(region=[0, 16, 48, 16], marge_links=16, marge_rechts=16, herhaal="tile"),
-                 "snelluik": dict(region=[0, 32, 48, 16], marge_links=16, marge_rechts=16, herhaal="tile")},
+                 "snelluik": dict(region=[0, 32, 48, 16], marge_links=16, marge_rechts=16, herhaal="tile"),
+                 "trede_r": dict(region=[0, 48, 48, 16], marge_links=16, marge_rechts=16, herhaal="tile"),
+                 "richel": dict(region=[0, 64, 48, 16], marge_links=16, marge_rechts=16, herhaal="tile")},
         blokken={"S1/Galerij": "galerij", "S1/B1Trede30": "trede", "S1/B1Trede60": "trede", "S1/B1Trede90": "trede",
                  "S1/Snelluik": "snelluik"},
         plaatsing="NinePatchRect op Rect2(blok.position, Vector2(blok.size.x, 16)); loopvlak = bovenrand van het blok",

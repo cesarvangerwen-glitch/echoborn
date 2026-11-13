@@ -1,6 +1,6 @@
-# Slice-art Kadewijk: kleurscript, lichtovergang, tileset, stijlregels vijanden (deel 1) en eindkwaliteit S1–S4 (deel 2 en 3)
+# Slice-art Kadewijk: kleurscript, lichtovergang, tileset, stijlregels vijanden (deel 1) en eindkwaliteit S1–S7 (deel 2–4)
 
-Versie 0.3 · Eigenaar: Art Director · Issue [#85](https://github.com/cesarvangerwen-glitch/echoborn/issues/85) (T8c, deel 1, 2 en 3) · Hoort bij `docs/art/bible.md` v0 en `docs/art/assetlijst.md`
+Versie 0.4 · Eigenaar: Art Director · Issue [#85](https://github.com/cesarvangerwen-glitch/echoborn/issues/85) (T8c, deel 1–4) · Hoort bij `docs/art/bible.md` v0 en `docs/art/assetlijst.md`
 Bronnen: `docs/design/wereld.md` v0.2 §2 (slice Kadewijk), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.1 (§2, §3, §9), `docs/narrative/verhaal-v2.md` §4.3 en §6, `docs/art/ui-stijlgids.md` (merk, klokring, `#ff475c`), fasekader fase 2 v0.4 §2 (T8c) en §4.
 
 ## 0. Werkaanname (kader §5)
@@ -182,7 +182,9 @@ Bladen: `concept_vijanden_x4_placeholder.png` (per type: silhouet, idle, aanloop
 |---|---|---|
 | Eindkwaliteit S1 en S3 | Art Director | **Gedaan in deel 2 (§9)** |
 | Eindkwaliteit S2 en S4, snelluik S1, schaduwklep | Art Director | **Gedaan in deel 3 (§10)** |
-| Eindkwaliteit S5–S9 (interieurs S5, S7, S8) | Art Director met Environment Artist | S5/S6 maatvast (#228 gemerged); eindkwaliteit S5/S6 volgt na de regel van de WLD in kadewijk.md §8. S7–S9 na hun visie-review |
+| Eindkwaliteit S5, S6, S7 en de luiken | Art Director | **Gedaan in deel 4 (§11)** |
+| Eindkwaliteit S8 en S9 | Art Director met Environment Artist | S8 als de boss erin zit (kandidaat), S9 na de her-review (kadewijk.md §8) |
+| Koppeling van S5–S7, de objecten (luik, schaduwklep, schoep, pompslag, sluis, sokkel, rad) en de laag `gemaal_aan` (§11.4) | Technical Artist met GP | Volgende stap; SM-review (code in `game/`) |
 | Koppeling van S1/S3 aan de kamerscènes | Technical Artist | **Gedaan in #230** |
 | Koppeling van S2/S4, de vaste stukken van S2 en de schaduwklep (§10.4) | Technical Artist (schaduwklep met de GP) | Volgende stap; SM-review (code in `game/`) |
 | Regels van §4.2 (bovenrand 2 px, tell-taal, amber/cyaan alleen als merk-overlay) en de drie nieuwe ramps opnemen in bible v1 §3 en §6, met de drempels: **bovenrand ΔL\* ≥ 50** tegen de directe achtergrond (ring van 2–6 px), in grijs én kleur (gemeten 50–75); de bestaande eis van **ΔL\* ≥ 40** op vulling of contour wordt voor vijanden "op bovenrand of kern" (het lijf haalt 2,6–37); kleurafstanden **ΔE76 ≥ 30, en ≥ 25 bij deuteranopie**, anders ΔL\* ≥ 20 of vorm (bible §7.1); en uit het kleurscript (§1) een **gemiddelde chroma ≤ ± 12 tot trap 2** (gemeten 3–12), en de beat na trap 2 minstens ± 1,5× de hoogste grijze beat (gemeten 20 tegen 12) | Art Director | Bible v1 |
@@ -198,6 +200,7 @@ Deel 1: alles in `docs/art/slice/` (behalve `eindkwaliteit/`) wordt gemaakt door
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.4 | 2026-11-13 | Deel 4 van T8c (#85): **S5, S6 en S7 op eindkwaliteit** (S5 met variatie per verdieping, LGD #227), de laag `gemaal_aan` voor trap 1 in S6, de objecten (breekbaar luik voor S7 en S9, **holle** schaduwklep, pompschoep en pompslag gelijk voor P1 en de echo, sluisklep, sokkel, rad), de geometrie uit `kadewijk_blokken.json`, het gemaal voor de kleurgolf op `S6/Gemaal` (§11). |
 | 0.3 | 2026-11-13 | Deel 3 van T8c (#85): **S2 en S4 op eindkwaliteit**, het **snelluik** in S1 (PR #231) als eenrichtingsstuk, de vaste stukken per D van S2 (B3-wand, B3-blok), de **schaduwklep** zichtbaar (PR #232), renders, metingen en Godot-controle (§10). |
 | 0.2 | 2026-11-12 | Deel 2 van T8c (#85): **S1 en S3 op eindkwaliteit** (§9): lagen per kamer in grijs, half, kleur en index in `game/art/wereld/kadewijk/`, eenrichtingsstukken per D als NinePatch, manifest, importconventie en overdracht aan de TA, renders en metingen in `docs/art/slice/eindkwaliteit/`, controle in Godot 4.6.3. |
 | 0.1.1 | 2026-11-12 | Na de SM-review (PR #195): het gemaal in S1 benoemd, S1 en "S1 terug" als één plek in twee toestanden (§1), drempels voor ΔL\* en chroma in §6. |
@@ -341,3 +344,61 @@ De loopvlakken zijn alle blokken waar je op kunt staan, ook de pijlerkop, de bol
 - **S5/S6 maatvast (#228 gemerged); eindkwaliteit S5/S6 volgt na de regel van de WLD in kadewijk.md §8.** S7–S9 na hun visie-review.
 - De breekbare luiken (V-01) in S7/S9 op eindkwaliteit, 40 × 16 met scheur en gebroken toestand. Dat gebeurt met hun kamers, want de luiktegels van deel 1 zijn nog 32 × 16 placeholder.
 - Bij D ≥ 90 overlapt het wand-stuk een deel van de pakhuismuur. De hijsdeuren staan daarom rechts van x 1506 (wereld). Dit geldt alleen voor de regressie, het spel draait op D = 60.
+
+---
+
+## 11. Deel 4: S5 Sluiswachtershuis, S6 Gemaalplein, S7 Sluiskelder en de objecten
+
+**Werkaanname (kader §5):** S5 en S6 zijn maatvast door #228 (LGD-besluiten 2 en 3 in #227). S7 is maatvast sinds de Lead-review in #239: de schaduwklep is er (#232) en de CD gaf `past` na de her-review. De geometrie komt nu rechtstreeks uit het spel. `bron/dump_blokken.gd` schrijft `Layout.blocks()` van alle kamers bij D = 60/90/120/180 naar `bron/kadewijk_blokken.json`, en `genereer_slice_deel4.py` leest dat bestand. **Het gemaal voor de kleurgolf** staat nu op `S6/Gemaal` (4600, 140) in plaats van de werkaanname (4960, 150). Daardoor veranderen de lichtovergangsrenders van S1–S4 een beetje; hun assets niet, behalve één bestand: `s1_kade_ingang_achter_half.png`, omdat een verlicht boograam nu ook in `half` emissief is (bible: een verlicht raam houdt zijn kleur). S8 en S9 zijn nog niet maatvast (§8 van het kamerdoc) en krijgen nog niets.
+
+### 11.1 Wat de kamers laten zien
+
+| Kamer | Beeld | Grijs / kleur |
+|---|---|---|
+| **S5 Sluiswachtershuis** | Het trappenhuis van binnen. **Elke verdieping heeft een eigen kamer**: dat is de variatie die volgens het LGD-besluit 3 (#227) uit de art moet komen.<br>• Beneden de keuken: wit pleister, blauwe tegeltjes, het fornuis met vuur en de tafel met het logboek.<br>• Verdieping 1, de wasruimte: groen, met een waslijn met lakens en een tobbe.<br>• Verdieping 2, de werkplaats: oker, met de **peilschaal** van de sluiswachter (het peil op hoog water) en tandwielen op een plank.<br>• Verdieping 3, de kaartenkamer: rood, met de kaart van de wijk (gracht en gemaal) en een bed.<br>• De zolder: sporen, panlatten, een hanenbalk en een dakraam met sterren.<br>Elke verdieping heeft een raam met de nacht erachter. Daarnaast een lambrisering met een donkere lijst (geen valse richel), de buitenmuren in doorsnede, de doorgang uit S4 en in de hoek de trap van S9.<br>De richels zijn een **nieuw stuk `richel`**: grenen delen met een lichte neus, op een balk. | Grijs: alleen het fornuis gloeit (kleurscript S5: het enige warme interieur vóór het gemaal). Kleur: een wandlamp per verdieping en verre ramen in de vensters. |
+| **S6 Gemaalplein** | Het plein met kasseien. Het **gemaal** is een bakstenen hal met trapgevel, speklagen, schoorsteen en twee boogramen met de machine erachter. Het **rad** hangt op `S6/Gemaal`, met de drijfstang naar de **pompgang**: een ijzeren as op lagers langs de vier schoepen en een goot met water. Daarachter staan de kerk, het belfort en de daklijn, zodat de hoge lucht niet leeg is. Links de loopbrug van de zolder en de trap als hardstenen treden aan een ijzeren steiger. Rechts de sluistoren met een peilschaal, en de schacht onder de sluis met het water van de kelderingang. | Grijs: geen lamp. **Trap 1** (extra laag `gemaal_aan`): de boogramen warm, en de poel rond het gemaal en de pompgang in kleur, terwijl de wijk nog grijs is (kleurscript §1, regel 2). Kleur: alles. |
+| **S7 Sluiskelder** | Tongewelven op pijlers, een koperen en een ijzeren buis naar de machinehal, en links de rondboog naar S8. De **kelder** (de zak bovenin) heeft een eigen gewelf, kisten en de schacht van de kelderingang, met licht dat erin valt. De opening van het luik blijft leeg in `speelvlak`, want het luik is een object. In het **kanaal** staat water (beeld), met de trede van 45 en de kademuren. | Grijs: alleen de warme gloed van de sokkel (kleurscript S7). Kleur: wandlampen aan de pijlers. De Dwaallichten zijn het enige rood. |
+
+### 11.2 Objecten (`kadewijk_objecten_*.png`, frames in het manifest `objecten`)
+
+| Object | Frames | Waarvoor |
+|---|---|---|
+| `luik` (40 × 16) | 0 dicht met scheur (L-03), 1–2 breuk, 3 open | `scripts/objects/luik.gd` in **S7 en S9**. De sponning bovenaan is licht, zodat het loopvlak leest (ΔL\* zoals het snelluik) |
+| `schaduwklep` (40 × 16) | 0 vol, 1–2 oplossen | **Nu hol** (punt van de CD in #227): alleen een rand en een arcering om de 3 px, zoals de echo. "Vol = levend, hol = echo": je leest dat de echo op zijn eigen klep staat. De bovenrand is een rechte, doorlopende rij (rij 1). Daar staat de echo, en de test van #241 eist hem |
+| `pompschoep` (32 × 48) | 0 rust, 1–4 slag | De vier `Pomprad`-objecten in S6 |
+| `pompslag` (48 × 48) | 5 frames, een warme ring die in de as stroomt | Bij elke pompslag. **P1 en de echo gebruiken dezelfde schoep-frames, hetzelfde effect en dezelfde timing, 100 % dekkend.** Geen transparantie en geen kleinere versie voor de echo: zijn slag moet even zwaar ogen als die van P1 (CD, #227), anders leest hij als nagalm |
+| `sluisklep` (60 × 10, in een cel van 64 × 16) | dicht, open | `S6/Sluis` |
+| `sokkel` (32 × 32) | uit, aan (warme gloed) | De sokkel van V-01 in S7 |
+| `gemaal_rad` (96 × 96) | 8 frames | Het rad aan de gevel van het gemaal (S6). Staat stil tot de eerste pompslag en draait als het gemaal pompt |
+
+**Audio (voor de Audio Director, T8d):** het andere deel van het punt van de CD. De pompslag van de echo moet **even zwaar klinken** als die van P1: hetzelfde sample en hetzelfde volume, zonder galm of low-pass die hem tot nagalm maakt. Hooguit een kleine toonhoogte-variatie, zodat twee slagen vlak na elkaar niet als één klinken. Mijn voorstel is een kort issue voor de AuD. Ik zet dit punt in het comment in #85.
+
+### 11.3 Assets en metingen
+
+- `s5_sluiswachtershuis_*` (640 × 560), `s6_gemaalplein_*` (960 × 560) en `s7_sluiskelder_*` (960 × 360). Elk heeft de lagen achter, midden, speelvlak en licht in grijs, half, kleur en index (`voor` is in alle drie leeg). Daarbij komt `s6_gemaalplein_gemaal_aan_grijs.png`, de extra laag voor trap 1 (manifest `kamers.s6_gemaalplein.extra`). De `.import`-bestanden zijn gecommit (TD-besluit c).
+- De eenrichtingsatlas heeft nu 5 stukken (48 × 80): `galerij`, `trede`, `snelluik`, `trede_r` (de trede tegen een wand rechts, gespiegeld) en `richel`. In het manifest staan de 16 blokken van S5 (`S5/Richel1–3`, `S5/Zolder`, `S5/B2a–dTrede30/60/90`).
+- De vaste eenrichtingsblokken van S6 (de loopbrug, de trap) en van S5 (de treden van de trap van S9) zitten in `speelvlak`. Dat volgt de kolomregel van de test van #230.
+
+| | S5 grijs | S5 kleur | S6 grijs | S6 trap 1 | S6 kleur | S7 grijs | S7 kleur | Norm |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| Gemiddelde chroma | 2,6 | 15,3 | 3,0 | 3,7 | 18,6 | 3,0 | 11,3 | grijs ≤ 12 ✓ |
+| ΔL\* loopvlakken (alle blokken met een bovenkant in de kamer) | 25–44 | 20–73 | 20–31 | — | 32–50 | 22–42 | 33–63 | ≥ 20 ✓ |
+
+S7 blijft in kleur rustiger (11,3): het is een kelder zonder lucht en zonder gevels. Het kleurscript legt de grote stap bij S9, niet hier.
+
+**Controle in Godot 4.6.3:** `godot_controle_s5_s7.png` (S5 ook bij D = 120: de richels en de treden volgen de layout). De hele suite is groen: **413 geslaagd, 0 mislukt**.
+
+**Renders:** `s5_*`, `s6_*` (met `s6_gemaalplein_trap1_960x560.png`) en `s7_*`, telkens grijs en kleur met figuren, een vergelijking ×2, de lichtovergang en een geometriecontrole. Verder `kadewijk_objecten_x3.png`.
+
+### 11.4 Overdracht aan de TA (met de GP)
+
+1. **S5–S7:** een node `Art` zoals in #230, met `kamer_id`/`naam` uit het manifest. Let op: `wereld_rect` heeft nu ook een y (S5/S6 −200, S7 360). De richels en treden van S5 zet `kadewijk_art.gd` al via het manifest (soort `richel`, `trede`, `trede_r`).
+2. **S6 trap 1:** de laag `gemaal_aan` (z −15) is zichtbaar bij `GEMAAL_VOL` zolang `s < 2`.
+3. **Objecten:** het luik (S7, S9), de schaduwklep, de pompschoep en de pompslag (gelijk voor P1 en de echo), de sluisklep, de sokkel en het rad. Plaatsing en frames staan per object in het manifest (`objecten`). Dat is code in de objecten (GP) of in de art-koppeling (TA).
+
+### 11.5 Wat openstaat
+
+- Koppeling van S5–S7, de laag `gemaal_aan` en de objecten (§11.4): TA met GP, daarna een SM-review.
+- Audio van de pompslag van de echo: Audio Director (§11.2).
+- S8 (als de boss erin zit) en S9 (na de her-review). Het punt van de CD over S9 (het lege scherm tussen het Dwaallicht en het E-paar: daar moet het beeld de beloning zijn) neem ik mee als S9 maatvast is.
+- Bevroren echo's (kinderen in S6, de koppen in S5) en de logbladzijden: Animator en GP.
