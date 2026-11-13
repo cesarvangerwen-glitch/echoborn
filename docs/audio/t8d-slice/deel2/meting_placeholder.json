@@ -1,0 +1,568 @@
+{
+ "_werkaanname": {
+  "D_ticks": 60,
+  "merk_solo_ticks": 90,
+  "merk_coop_ticks": 150,
+  "knal_tick": 63,
+  "echo_aanloop_ticks": 12,
+  "bpm": 120
+ },
+ "aftelling": {
+  "aftelling_1_grijs": {
+   "bestand": "game/audio/sfx/combat/aftelling_1_grijs_placeholder.wav",
+   "duur_s": 1.0,
+   "duur_ticks": 60.0,
+   "lufs_momentaan_max": -19.0,
+   "true_peak_dbtp": -8.0,
+   "aandeel_boven_250hz_pct": 100.0,
+   "zwaartepunt_hz": 977,
+   "piek_op_s": 0.005,
+   "stijging_db": -67.8,
+   "clipping_samples": 0,
+   "aanzet_ticks": 0.0
+  },
+  "aftelling_2_grijs": {
+   "bestand": "game/audio/sfx/combat/aftelling_2_grijs_placeholder.wav",
+   "duur_s": 1.0,
+   "duur_ticks": 60.0,
+   "lufs_momentaan_max": -17.5,
+   "true_peak_dbtp": -4.5,
+   "aandeel_boven_250hz_pct": 100.0,
+   "zwaartepunt_hz": 1198,
+   "piek_op_s": 0.004,
+   "stijging_db": -74.3,
+   "clipping_samples": 0,
+   "aanzet_ticks": 0.0
+  },
+  "aftelling_3_grijs": {
+   "bestand": "game/audio/sfx/combat/aftelling_3_grijs_placeholder.wav",
+   "duur_s": 1.0,
+   "duur_ticks": 60.0,
+   "lufs_momentaan_max": -16.0,
+   "true_peak_dbtp": -3.0,
+   "aandeel_boven_250hz_pct": 100.0,
+   "zwaartepunt_hz": 1562,
+   "piek_op_s": 0.004,
+   "stijging_db": -74.1,
+   "clipping_samples": 0,
+   "aanzet_ticks": 0.0
+  },
+  "aftelling_4_zacht_grijs": {
+   "bestand": "game/audio/sfx/combat/aftelling_4_zacht_grijs_placeholder.wav",
+   "duur_s": 1.0,
+   "duur_ticks": 60.0,
+   "lufs_momentaan_max": -22.0,
+   "true_peak_dbtp": -10.7,
+   "aandeel_boven_250hz_pct": 100.0,
+   "zwaartepunt_hz": 1432,
+   "piek_op_s": 0.004,
+   "stijging_db": -74.6,
+   "clipping_samples": 0,
+   "aanzet_ticks": 0.0
+  },
+  "merk_zet_grijs": {
+   "bestand": "game/audio/sfx/combat/merk_zet_grijs_placeholder.wav",
+   "duur_s": 0.9,
+   "duur_ticks": 54.0,
+   "lufs_momentaan_max": -22.0,
+   "true_peak_dbtp": -9.9,
+   "aandeel_boven_250hz_pct": 100.0,
+   "zwaartepunt_hz": 1503,
+   "piek_op_s": 0.004,
+   "stijging_db": -89.2,
+   "clipping_samples": 0,
+   "aanzet_ticks": 0.0
+  },
+  "doelstreep_voorslag_grijs": {
+   "bestand": "game/audio/sfx/combat/doelstreep_voorslag_grijs_placeholder.wav",
+   "duur_s": 0.5,
+   "duur_ticks": 30.0,
+   "lufs_momentaan_max": -27.0,
+   "true_peak_dbtp": -17.1,
+   "aandeel_boven_250hz_pct": 100.0,
+   "zwaartepunt_hz": 2601,
+   "piek_op_s": 0.462,
+   "stijging_db": 37.2,
+   "clipping_samples": 0,
+   "aanzet_ticks": 10.71
+  },
+  "aftelling_1_kleur": {
+   "bestand": "game/audio/sfx/combat/aftelling_1_kleur_placeholder.wav",
+   "duur_s": 1.0,
+   "duur_ticks": 60.0,
+   "lufs_momentaan_max": -19.0,
+   "true_peak_dbtp": -6.1,
+   "aandeel_boven_250hz_pct": 100.0,
+   "zwaartepunt_hz": 1182,
+   "piek_op_s": 0.005,
+   "stijging_db": -70.6,
+   "clipping_samples": 0,
+   "aanzet_ticks": 0.0
+  },
+  "aftelling_2_kleur": {
+   "bestand": "game/audio/sfx/combat/aftelling_2_kleur_placeholder.wav",
+   "duur_s": 1.0,
+   "duur_ticks": 60.0,
+   "lufs_momentaan_max": -17.5,
+   "true_peak_dbtp": -5.6,
+   "aandeel_boven_250hz_pct": 100.0,
+   "zwaartepunt_hz": 1271,
+   "piek_op_s": 0.006,
+   "stijging_db": -80.5,
+   "clipping_samples": 0,
+   "aanzet_ticks": 0.0
+  },
+  "aftelling_3_kleur": {
+   "bestand": "game/audio/sfx/combat/aftelling_3_kleur_placeholder.wav",
+   "duur_s": 1.0,
+   "duur_ticks": 60.0,
+   "lufs_momentaan_max": -16.0,
+   "true_peak_dbtp": -3.9,
+   "aandeel_boven_250hz_pct": 100.0,
+   "zwaartepunt_hz": 1170,
+   "piek_op_s": 0.006,
+   "stijging_db": -73.6,
+   "clipping_samples": 0,
+   "aanzet_ticks": 0.0
+  },
+  "aftelling_4_zacht_kleur": {
+   "bestand": "game/audio/sfx/combat/aftelling_4_zacht_kleur_placeholder.wav",
+   "duur_s": 1.0,
+   "duur_ticks": 60.0,
+   "lufs_momentaan_max": -22.0,
+   "true_peak_dbtp": -9.9,
+   "aandeel_boven_250hz_pct": 100.0,
+   "zwaartepunt_hz": 1468,
+   "piek_op_s": 0.006,
+   "stijging_db": -78.0,
+   "clipping_samples": 0,
+   "aanzet_ticks": 0.0
+  },
+  "merk_zet_kleur": {
+   "bestand": "game/audio/sfx/combat/merk_zet_kleur_placeholder.wav",
+   "duur_s": 0.9,
+   "duur_ticks": 54.0,
+   "lufs_momentaan_max": -22.0,
+   "true_peak_dbtp": -7.7,
+   "aandeel_boven_250hz_pct": 100.0,
+   "zwaartepunt_hz": 3605,
+   "piek_op_s": 0.006,
+   "stijging_db": -91.2,
+   "clipping_samples": 0,
+   "aanzet_ticks": 0.0
+  },
+  "doelstreep_voorslag_kleur": {
+   "bestand": "game/audio/sfx/combat/doelstreep_voorslag_kleur_placeholder.wav",
+   "duur_s": 0.5,
+   "duur_ticks": 30.0,
+   "lufs_momentaan_max": -27.0,
+   "true_peak_dbtp": -13.3,
+   "aandeel_boven_250hz_pct": 100.0,
+   "zwaartepunt_hz": 2239,
+   "piek_op_s": 0.495,
+   "stijging_db": 48.3,
+   "clipping_samples": 0,
+   "aanzet_ticks": 23.21
+  },
+  "merk_dooft": {
+   "bestand": "game/audio/sfx/combat/merk_dooft_placeholder.wav",
+   "duur_s": 1.0,
+   "duur_ticks": 60.0,
+   "lufs_momentaan_max": -19.0,
+   "true_peak_dbtp": -5.3,
+   "aandeel_boven_250hz_pct": 100.0,
+   "zwaartepunt_hz": 865,
+   "piek_op_s": 0.005,
+   "stijging_db": -60.5,
+   "clipping_samples": 0,
+   "aanzet_ticks": 0.0
+  }
+ },
+ "aftelling_controle": {
+  "bestand": "docs/audio/t8d-slice/deel2/aftelling_d60_controle_placeholder.wav",
+  "duur_s": 18.55,
+  "true_peak_dbtp": -1.7,
+  "situaties": [
+   {
+    "situatie": "A geen doelstreep (echo Leeg)",
+    "start_s": 0.0,
+    "events": [
+     {
+      "event": "merk_zet_grijs",
+      "tick": 0,
+      "aanzet_gemeten_tick": 0.0
+     },
+     {
+      "event": "aftelling_1_grijs",
+      "tick": 30,
+      "aanzet_gemeten_tick": 29.99
+     },
+     {
+      "event": "aftelling_2_grijs",
+      "tick": 45,
+      "aanzet_gemeten_tick": 44.99
+     },
+     {
+      "event": "aftelling_3_grijs",
+      "tick": 60,
+      "aanzet_gemeten_tick": 60.0
+     },
+     {
+      "event": "aftelling_4_zacht_grijs",
+      "tick": 75,
+      "aanzet_gemeten_tick": 74.99
+     },
+     {
+      "event": "merk_dooft",
+      "tick": 90,
+      "aanzet_gemeten_tick": 90.0
+     }
+    ]
+   },
+   {
+    "situatie": "B doelstreep op dit merk",
+    "start_s": 4.5,
+    "events": [
+     {
+      "event": "merk_zet_grijs",
+      "tick": 0,
+      "aanzet_gemeten_tick": 0.0
+     },
+     {
+      "event": "aftelling_1_grijs",
+      "tick": 30,
+      "aanzet_gemeten_tick": 29.99
+     },
+     {
+      "event": "ontploffing_k1_grijs",
+      "tick": 63,
+      "aanzet_gemeten_tick": 62.97
+     },
+     {
+      "event": "doelstreep_voorslag_grijs",
+      "tick": 33,
+      "einde_gemeten_tick": 63.0
+     }
+    ]
+   },
+   {
+    "situatie": "C streep weg op t 50",
+    "start_s": 8.55,
+    "events": [
+     {
+      "event": "merk_zet_grijs",
+      "tick": 0,
+      "aanzet_gemeten_tick": 0.0
+     },
+     {
+      "event": "aftelling_1_grijs",
+      "tick": 30,
+      "aanzet_gemeten_tick": 29.99
+     },
+     {
+      "event": "aftelling_3_grijs",
+      "tick": 60,
+      "aanzet_gemeten_tick": 60.0
+     },
+     {
+      "event": "aftelling_4_zacht_grijs",
+      "tick": 75,
+      "aanzet_gemeten_tick": 74.99
+     },
+     {
+      "event": "merk_dooft",
+      "tick": 90,
+      "aanzet_gemeten_tick": 90.0
+     },
+     {
+      "event": "doelstreep_voorslag_grijs",
+      "tick": 33,
+      "einde_gemeten_tick": 51.78
+     }
+    ]
+   },
+   {
+    "situatie": "D co-op (150 t, geen echo)",
+    "start_s": 13.05,
+    "events": [
+     {
+      "event": "merk_zet_grijs",
+      "tick": 0,
+      "aanzet_gemeten_tick": 0.0
+     },
+     {
+      "event": "aftelling_1_grijs",
+      "tick": 90,
+      "aanzet_gemeten_tick": 89.99
+     },
+     {
+      "event": "aftelling_2_grijs",
+      "tick": 105,
+      "aanzet_gemeten_tick": 104.99
+     },
+     {
+      "event": "aftelling_3_grijs",
+      "tick": 120,
+      "aanzet_gemeten_tick": 120.0
+     },
+     {
+      "event": "aftelling_4_zacht_grijs",
+      "tick": 135,
+      "aanzet_gemeten_tick": 134.99
+     },
+     {
+      "event": "merk_dooft",
+      "tick": 150,
+      "aanzet_gemeten_tick": 150.0
+     }
+    ]
+   }
+  ]
+ },
+ "speler_en_echo": {
+  "p1_slag": {
+   "bestand": "game/audio/sfx/speler/p1_slag_placeholder.wav",
+   "duur_s": 0.5,
+   "duur_ticks": 30.0,
+   "lufs_momentaan_max": -17.6,
+   "true_peak_dbtp": -1.5,
+   "aandeel_boven_250hz_pct": 54.8,
+   "zwaartepunt_hz": 2021,
+   "piek_op_s": 0.064,
+   "stijging_db": -35.9,
+   "clipping_samples": 0
+  },
+  "echo_slag": {
+   "bestand": "game/audio/sfx/echo/echo_slag_placeholder.wav",
+   "duur_s": 0.7,
+   "duur_ticks": 42.0,
+   "lufs_momentaan_max": -28.3,
+   "true_peak_dbtp": -14.3,
+   "aandeel_boven_250hz_pct": 93.7,
+   "zwaartepunt_hz": 1195,
+   "piek_op_s": 0.134,
+   "stijging_db": -30.4,
+   "clipping_samples": 0,
+   "aanloop_ticks": 12,
+   "verschil_met_levend_lu": -10.7
+  },
+  "p1_sprong": {
+   "bestand": "game/audio/sfx/speler/p1_sprong_placeholder.wav",
+   "duur_s": 0.3,
+   "duur_ticks": 18.0,
+   "lufs_momentaan_max": -24.0,
+   "true_peak_dbtp": -6.6,
+   "aandeel_boven_250hz_pct": 35.3,
+   "zwaartepunt_hz": 682,
+   "piek_op_s": 0.004,
+   "stijging_db": -34.0,
+   "clipping_samples": 0
+  },
+  "echo_sprong": {
+   "bestand": "game/audio/sfx/echo/echo_sprong_placeholder.wav",
+   "duur_s": 0.5,
+   "duur_ticks": 30.0,
+   "lufs_momentaan_max": -36.6,
+   "true_peak_dbtp": -24.2,
+   "aandeel_boven_250hz_pct": 96.3,
+   "zwaartepunt_hz": 1026,
+   "piek_op_s": 0.173,
+   "stijging_db": -19.0,
+   "clipping_samples": 0,
+   "aanloop_ticks": 12,
+   "verschil_met_levend_lu": -12.6
+  },
+  "p1_landing": {
+   "bestand": "game/audio/sfx/speler/p1_landing_placeholder.wav",
+   "duur_s": 0.35,
+   "duur_ticks": 21.0,
+   "lufs_momentaan_max": -22.0,
+   "true_peak_dbtp": -5.6,
+   "aandeel_boven_250hz_pct": 7.4,
+   "zwaartepunt_hz": 160,
+   "piek_op_s": 0.004,
+   "stijging_db": -43.4,
+   "clipping_samples": 0
+  },
+  "echo_landing": {
+   "bestand": "game/audio/sfx/echo/echo_landing_placeholder.wav",
+   "duur_s": 0.55,
+   "duur_ticks": 33.0,
+   "lufs_momentaan_max": -37.3,
+   "true_peak_dbtp": -23.4,
+   "aandeel_boven_250hz_pct": 92.2,
+   "zwaartepunt_hz": 867,
+   "piek_op_s": 0.183,
+   "stijging_db": -47.8,
+   "clipping_samples": 0,
+   "aanloop_ticks": 12,
+   "verschil_met_levend_lu": -15.3
+  },
+  "p2_slag": {
+   "bestand": "game/audio/sfx/speler/p2_slag_placeholder.wav",
+   "duur_s": 0.5,
+   "duur_ticks": 30.0,
+   "lufs_momentaan_max": -17.5,
+   "true_peak_dbtp": -1.5,
+   "aandeel_boven_250hz_pct": 88.1,
+   "zwaartepunt_hz": 2887,
+   "piek_op_s": 0.064,
+   "stijging_db": -31.4,
+   "clipping_samples": 0
+  },
+  "p1_geraakt": {
+   "bestand": "game/audio/sfx/speler/p1_geraakt_placeholder.wav",
+   "duur_s": 0.667,
+   "duur_ticks": 40.0,
+   "lufs_momentaan_max": -15.0,
+   "true_peak_dbtp": -1.7,
+   "aandeel_boven_250hz_pct": 75.2,
+   "zwaartepunt_hz": 453,
+   "piek_op_s": 0.012,
+   "stijging_db": -44.8,
+   "clipping_samples": 0
+  },
+  "p2_geraakt": {
+   "bestand": "game/audio/sfx/speler/p2_geraakt_placeholder.wav",
+   "duur_s": 0.667,
+   "duur_ticks": 40.0,
+   "lufs_momentaan_max": -15.4,
+   "true_peak_dbtp": -1.5,
+   "aandeel_boven_250hz_pct": 75.8,
+   "zwaartepunt_hz": 747,
+   "piek_op_s": 0.003,
+   "stijging_db": -46.2,
+   "clipping_samples": 0
+  },
+  "echo_gm_rad_treffer_1": {
+   "bestand": "game/audio/sfx/echo/echo_gm_rad_treffer_1_placeholder.wav",
+   "duur_s": 1.3,
+   "duur_ticks": 78.0,
+   "lufs_momentaan_max": -25.4,
+   "true_peak_dbtp": -17.6,
+   "aandeel_boven_250hz_pct": 99.5,
+   "zwaartepunt_hz": 855,
+   "piek_op_s": 0.145,
+   "stijging_db": -52.5,
+   "clipping_samples": 0,
+   "aanloop_ticks": 12,
+   "verschil_met_levend_lu": -8.4
+  }
+ },
+ "echo_aanloop_bij_lm04": {
+  "aanloop_21_ticks": {
+   "aandeel_van_D_pct": 35,
+   "aanlopen_voor_vorige_slag": 3
+  },
+  "aanloop_12_ticks": {
+   "aandeel_van_D_pct": 20,
+   "aanlopen_voor_vorige_slag": 0
+  }
+ },
+ "boss_stems": {
+  "boss_fase1_harmonium": {
+   "bestand": "game/audio/muziek/kadewijk/boss_fase1_harmonium_placeholder.ogg",
+   "maat": "4/4",
+   "maten": 16,
+   "bpm": 120,
+   "duur_s_bron": 32.0,
+   "duur_ticks_bron": 1920.0,
+   "samples_na_decoderen": 1536000,
+   "samples_verwacht": 1536000,
+   "lufs_geintegreerd": -27.0,
+   "true_peak_dbtp_na_decoderen": -15.7,
+   "aandeel_boven_250hz_pct": 39.9,
+   "lusnaad": {
+    "naad_tegen_maatgrens_midden_db": 1.2,
+    "sprong_over_naad": 0.00306,
+    "sprong_99e_pct_elders": 0.00453
+   },
+   "kb": 526
+  },
+  "boss_fase1_ritme": {
+   "bestand": "game/audio/muziek/kadewijk/boss_fase1_ritme_placeholder.ogg",
+   "maat": "4/4",
+   "maten": 16,
+   "bpm": 120,
+   "duur_s_bron": 32.0,
+   "duur_ticks_bron": 1920.0,
+   "samples_na_decoderen": 1536000,
+   "samples_verwacht": 1536000,
+   "lufs_geintegreerd": -27.0,
+   "true_peak_dbtp_na_decoderen": -12.3,
+   "aandeel_boven_250hz_pct": 47.0,
+   "lusnaad": {
+    "naad_tegen_maatgrens_midden_db": 0.03,
+    "sprong_over_naad": 0.00131,
+    "sprong_99e_pct_elders": 0.01037
+   },
+   "kb": 491
+  },
+  "boss_fase2_harmonium": {
+   "bestand": "game/audio/muziek/kadewijk/boss_fase2_harmonium_placeholder.ogg",
+   "maat": "3/4",
+   "maten": 16,
+   "bpm": 120,
+   "duur_s_bron": 24.0,
+   "duur_ticks_bron": 1440.0,
+   "samples_na_decoderen": 1152000,
+   "samples_verwacht": 1152000,
+   "lufs_geintegreerd": -27.0,
+   "true_peak_dbtp_na_decoderen": -16.4,
+   "aandeel_boven_250hz_pct": 80.4,
+   "lusnaad": {
+    "naad_tegen_maatgrens_midden_db": -0.07,
+    "sprong_over_naad": 0.00211,
+    "sprong_99e_pct_elders": 0.0082
+   },
+   "kb": 413
+  },
+  "boss_fase2_ritme": {
+   "bestand": "game/audio/muziek/kadewijk/boss_fase2_ritme_placeholder.ogg",
+   "maat": "3/4",
+   "maten": 16,
+   "bpm": 120,
+   "duur_s_bron": 24.0,
+   "duur_ticks_bron": 1440.0,
+   "samples_na_decoderen": 1152000,
+   "samples_verwacht": 1152000,
+   "lufs_geintegreerd": -27.1,
+   "true_peak_dbtp_na_decoderen": -12.5,
+   "aandeel_boven_250hz_pct": 34.5,
+   "lusnaad": {
+    "naad_tegen_maatgrens_midden_db": 0.06,
+    "sprong_over_naad": 0.00286,
+    "sprong_99e_pct_elders": 0.01601
+   },
+   "kb": 391
+  },
+  "_samen_fase1": {
+   "lufs_geintegreerd": -24.0,
+   "true_peak_dbtp": -9.4,
+   "lusnaad": {
+    "naad_tegen_maatgrens_midden_db": -0.07,
+    "sprong_over_naad": 0.0031,
+    "sprong_99e_pct_elders": 0.01069
+   }
+  },
+  "_samen_fase2": {
+   "lufs_geintegreerd": -24.0,
+   "true_peak_dbtp": -11.1,
+   "lusnaad": {
+    "naad_tegen_maatgrens_midden_db": -0.53,
+    "sprong_over_naad": 0.00497,
+    "sprong_99e_pct_elders": 0.01666
+   }
+  },
+  "_luisterbestand": {
+   "bestand": "docs/audio/t8d-slice/deel2/boss_stems_samen_placeholder.ogg",
+   "duur_s": 112.0,
+   "naden_op_s": [
+    32.0,
+    64.0,
+    88.0
+   ],
+   "fase2_vanaf_s": 64.0
+  }
+ }
+}
