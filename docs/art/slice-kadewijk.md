@@ -1,6 +1,6 @@
-# Slice-art Kadewijk: kleurscript, lichtovergang, tileset, stijlregels vijanden (deel 1) en eindkwaliteit S1 en S3 (deel 2)
+# Slice-art Kadewijk: kleurscript, lichtovergang, tileset, stijlregels vijanden (deel 1) en eindkwaliteit S1–S4 (deel 2 en 3)
 
-Versie 0.2 · Eigenaar: Art Director · Issue [#85](https://github.com/cesarvangerwen-glitch/echoborn/issues/85) (T8c, deel 1 en 2) · Hoort bij `docs/art/bible.md` v0 en `docs/art/assetlijst.md`
+Versie 0.3 · Eigenaar: Art Director · Issue [#85](https://github.com/cesarvangerwen-glitch/echoborn/issues/85) (T8c, deel 1, 2 en 3) · Hoort bij `docs/art/bible.md` v0 en `docs/art/assetlijst.md`
 Bronnen: `docs/design/wereld.md` v0.2 §2 (slice Kadewijk), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.1 (§2, §3, §9), `docs/narrative/verhaal-v2.md` §4.3 en §6, `docs/art/ui-stijlgids.md` (merk, klokring, `#ff475c`), fasekader fase 2 v0.4 §2 (T8c) en §4.
 
 ## 0. Werkaanname (kader §5)
@@ -181,8 +181,10 @@ Bladen: `concept_vijanden_x4_placeholder.png` (per type: silhouet, idle, aanloop
 | Punt | Wie | Wanneer |
 |---|---|---|
 | Eindkwaliteit S1 en S3 | Art Director | **Gedaan in deel 2 (§9)** |
-| Eindkwaliteit S2, S4, en daarna S5–S9 (interieurs S5, S7, S8) | Art Director met Environment Artist | S2 en S4: maatvast (#212, #221, #223), eindkwaliteit in deel 3; S5–S9 zodra ze maatvast zijn |
-| Koppeling van de S1/S3-lagen aan de kamerscènes (§9.4) | Technical Artist (met TD voor de `--import`-stap in CI) | Volgende stap; SM-review (code in `game/`) |
+| Eindkwaliteit S2 en S4, snelluik S1, schaduwklep | Art Director | **Gedaan in deel 3 (§10)** |
+| Eindkwaliteit S5–S9 (interieurs S5, S7, S8) | Art Director met Environment Artist | S5/S6 na de merge van #228 (wacht op de CEO), S7–S9 na hun visie-review |
+| Koppeling van S1/S3 aan de kamerscènes | Technical Artist | **Gedaan in #230** |
+| Koppeling van S2/S4, de vaste stukken van S2 en de schaduwklep (§10.4) | Technical Artist (schaduwklep met de GP) | Volgende stap; SM-review (code in `game/`) |
 | Regels van §4.2 (bovenrand 2 px, tell-taal, amber/cyaan alleen als merk-overlay) en de drie nieuwe ramps opnemen in bible v1 §3 en §6, met de drempels: **bovenrand ΔL\* ≥ 50** tegen de directe achtergrond (ring van 2–6 px), in grijs én kleur (gemeten 50–75); de bestaande eis van **ΔL\* ≥ 40** op vulling of contour wordt voor vijanden "op bovenrand of kern" (het lijf haalt 2,6–37); kleurafstanden **ΔE76 ≥ 30, en ≥ 25 bij deuteranopie**, anders ΔL\* ≥ 20 of vorm (bible §7.1); en uit het kleurscript (§1) een **gemiddelde chroma ≤ ± 12 tot trap 2** (gemeten 3–12), en de beat na trap 2 minstens ± 1,5× de hoogste grijze beat (gemeten 20 tegen 12) | Art Director | Bible v1 |
 | De LUT-shader en de kleurgolf in Godot 4.6, met de kost tegen het lichtbudget (≤ 20 LE) | Technical Artist | Vóór de eerste maatvaste kamer |
 | Tegels naar `game/art/wereld/kadewijk/` met de importconventie (dan SM-review, code in `game/`) | Technical Artist | Met de LUT-shader |
@@ -196,6 +198,7 @@ Deel 1: alles in `docs/art/slice/` (behalve `eindkwaliteit/`) wordt gemaakt door
 
 | Versie | Datum | Wat |
 |---|---|---|
+| 0.3 | 2026-11-13 | Deel 3 van T8c (#85): **S2 en S4 op eindkwaliteit**, het **snelluik** in S1 (PR #231) als eenrichtingsstuk, de vaste stukken per D van S2 (B3-wand, B3-blok), de **schaduwklep** zichtbaar (PR #232), renders, metingen en Godot-controle (§10). |
 | 0.2 | 2026-11-12 | Deel 2 van T8c (#85): **S1 en S3 op eindkwaliteit** (§9): lagen per kamer in grijs, half, kleur en index in `game/art/wereld/kadewijk/`, eenrichtingsstukken per D als NinePatch, manifest, importconventie en overdracht aan de TA, renders en metingen in `docs/art/slice/eindkwaliteit/`, controle in Godot 4.6.3. |
 | 0.1.1 | 2026-11-12 | Na de SM-review (PR #195): het gemaal in S1 benoemd, S1 en "S1 terug" als één plek in twee toestanden (§1), drempels voor ΔL\* en chroma in §6. |
 | 0.1 | 2026-11-12 | Deel 1 van T8c (#85): kleurscript, lichtovergang, tileset-opzet met 46 tegels en 8 props in 3 toestanden plus index-atlas, 3 nieuwe ramps, concept-sheets voor 3 vijandtypes en de Gemaalmeester, metingen. |
@@ -286,3 +289,55 @@ De generator gebruikt deel 1 (palet, tegels, props, vijanden) en de R5-figuren. 
 - **Bevroren echo van de bakker** (S-12) op de kade van S1: Animator.
 - **Echo in kleur vóór een verlicht raam** (S3, ΔL\* 35 tegen ≥ 40): de amberen rand valt weg tegen warm raamlicht. Dat los je niet op in de achtergrond, want verlichte ramen horen bij de kleurtoestand. Voorstel voor de TA (echo-weergave F-07/S-10): een donkere buitencontour van 1 px die blijft staan, ook in kleur. Ik meet opnieuw als de echo-shader er is.
 - **Bible v1:** de drempel voor het loopvlak (ΔL\* ≥ 20) en de chroma op volle art (§9.5).
+
+---
+
+## 10. Deel 3: S2 Kadegang, S4 Brugkloof, het snelluik en de schaduwklep
+
+**Werkaanname (kader §5):** S2 en S4 zijn maatvast. De CD gaf `past` in #212, PR #221 is gemerged en de LGD bevestigde in #223. De art volgt `kadewijk_layout.gd` op `origin/main` (met S9 en het snelluik uit #231, en de schaduwklep uit #232) bij D = 60. S5 en S6 worden pas maatvast na de merge van #228, en die wacht op de CEO, dus daar maak ik nog niets. Het gemaal voor de kleurgolf staat nog steeds op de werkaanname (4960, 150) uit §9.
+
+### 10.1 Wat de kamers laten zien
+
+| Kamer | Beeld | Grijs / kleur |
+|---|---|---|
+| **S2 Kadegang** | De kade op 230 met twee duikers waarin het water van de gracht staat. Linksboven komt een stenen brugboog uit de kamer en rust op de **pijler** (20 × 90, hardsteen met ijzeren banden en een lichte dekplaat). Langs de pijler loopt de **gang op 160**, een houten gang op consoles met een touwleuning. In de kom staat de **B3-trede**, een stenen console. Rechts staat het **pakhuis**: een bakstenen muur met speklagen, hijsdeuren en een hijsbalk. Zijn lijst op 70 is de **bovenroute** naar S3, op kraagstenen boven de kom. Aan de overkant van de gracht staat een gevelrij, een tint donkerder want verder weg, met het belfort. | Grijs: geen enkele lamp aan (kleurscript S2: niets in de omgeving). Kleur: de straatlamp op de kade, de wandlamp aan het pakhuis, ramen en hijsdeur-ramen. |
+| **S4 Brugkloof** | De aanloop en de overkant op 260 (kasseien). Daartussen ligt de **kloof**: de oude sluiskolk met een kademuur, puin, resten van de sluisdeur en een plas. Op de bodem op 350 ligt slik met een lichte rand. Tegen de overkant staat de **trede van 45**. De **bolder** staat op de rand en is precies 8 × 8, met een versleten lichte kop zodat je de keerwand ziet. Boven de kloof staat **de brug, met een ingestort midden**: een boog met zwikken, een dek met leuning, een ketting en een losse balk bij de breuk. Die staat ver boven de vrije ruimte van B4 en is donker, dus hij leest niet als plafond. | Grijs: koude bundels door de kloof (kleurscript S4). Kleur: straatlampen, ramen en het belfort. |
+| **S1, snelluik** (x 460–500) | De gang stopt op 460 met een kopse kant van hardsteen. Het **snelluik** is een eiken luik in een hardstenen sponning, met scharnieren en een ringgreep, en het is een eenrichtingsstuk. Eronder zit de **schacht naar S9**: baksteen met klimijzers, in `midden`. De proloogdeur blijft in de wand erachter. | Zoals S1. |
+| **Schaduwklep** (V-01d) | **Besluit AD: zichtbaar.** Een echo die op niets staat, leest als een fout. De schaduwklep is de schaduw van het gebroken luik in de vormtaal van schaduwgeometrie (bible §4.4): een gearceerd vlak in *schaduwgeo* met een lichte bovenrand (daar staat de echo), plankennaden en ranken eronder. Ze heeft drie frames: vol, en oplossen 1 en 2 (Bayer 50 % en 25 %) voor `schaduwklep_weg`. | Paars in kleur, grijs in grijs, zoals de echo. |
+
+### 10.2 Assets (`game/art/wereld/kadewijk/`, met `.import`, TD-besluit (c))
+
+| Bestand | Inhoud |
+|---|---|
+| `s2_kadegang_<laag>_<staat>.png`, `s4_brugkloof_<laag>_<staat>.png` | Zoals §9.3 (960 × 360; achter, midden, speelvlak, licht, voor; grijs, half, kleur en index). In S2 en S4 is `voor` leeg en wordt niet geëxporteerd. |
+| `s1_kade_ingang_speelvlak_*`, `…_midden_*` | Bijgewerkt: de gang stopt op 460 en de schacht staat in `midden`. Het snelluik zit níét in de laag. |
+| `kadewijk_eenrichting_*.png` | Nu 48 × 48: `galerij` (0, 0), `trede` (0, 16), **`snelluik` (0, 32)**. Het manifest heeft `S1/Snelluik` en de stukken van S2 (`S2/Galerij70`, `S2/B1Trede30/60/90`). `kadewijk_art.gd` (#230) zet ze zonder codewijziging. |
+| `s2_kadegang_b3_wand_*.png` (136 × 284) en `s2_kadegang_b3_blok_*.png` (120 × 45) | **Vaste stukken per D** (manifest `vaste_stukken`). De kopse kant van het pakhuis is de B3-keerwand en schuift mee met `b3_width(D)`: `Sprite2D` linksboven op (1250 + b, 76). Het B3-blok bestaat pas bij D > 60: `Sprite2D` met `region = (0, 0, b, 45)` op (1250, 185). Beide op z −10, na `Speelvlak` in de boom. `speelvlak` heeft in x 1250–1386 boven 230 alleen de bovenroute. Daardoor blijft de kolomtest van #230 bij elke D gelijk. |
+| `kadewijk_objecten_*.png` (120 × 16) | De schaduwklep in 3 frames van 40 × 16. Manifest `objecten.schaduwklep`: frames, 12 fps, z −9, plaatsing op de rechthoek van het luik. |
+
+### 10.3 Metingen (`bron/genereer_slice_deel3.py`)
+
+| | S2 grijs | S2 kleur | S4 grijs | S4 kleur | Norm |
+|---|---:|---:|---:|---:|---|
+| Gemiddelde chroma | 2,9 | 15,6 | 2,9 | 15,6 | grijs ≤ 12 ✓, kleur × 5,4 ✓ |
+| ΔL\* loopvlakken (per blok, bovenste 2 px tegen 2–6 px erboven) | 20–46 | 27–67 | 26–40 | 33–55 | ≥ 20 ✓ |
+| ΔL\* snelluik (S1) | 23 | 28 | | | ≥ 20 ✓ |
+
+De loopvlakken zijn alle blokken waar je op kunt staan, ook de pijlerkop, de bolder en de kloofbodem. De wand van B3 onder de bovenroute telt niet mee: die heeft geen loopvlak.
+
+**Controle in Godot 4.6.3:** `godot_controle_s1_s3.png` (nu met het snelluik) en `godot_controle_s2_s4.png` (S2 bij D = 60, 120 en 180: het B3-blok en de wand schuiven mee). Na `--import` is de hele suite groen: **413 geslaagd, 0 mislukt**. `test_kadewijk_art` (592 checks) zit erbij, met het snelluik als stuk.
+
+**Renders:** `s2_kadegang_*`, `s4_brugkloof_*` (grijs en kleur met figuren, vergelijking ×2, lichtovergang, geometriecontrole; voor S2 ook bij D = 120 en 180), `s1_kade_ingang_snelluik_x4.png`, `kadewijk_schaduwklep_x4.png`, `kadewijk_eenrichting_x4.png`.
+
+### 10.4 Overdracht aan de Technical Artist (en de GP voor de schaduwklep)
+
+1. **S1, snelluik:** gebeurt vanzelf via het manifest (`S1/Snelluik` → NinePatch). Alleen de scène opnieuw laden: er verandert geen code.
+2. **S2 en S4:** een node `Art` zoals in S1/S3 (#230), met `kamer_id`/`naam` `s2_kadegang` en `s4_brugkloof`. In S2 komen daarbij de twee vaste stukken op de plek uit het manifest (`vaste_stukken`), en de kolomtest moet S2 en S4 meenemen. De placeholders van de blokken gaan uit.
+3. **Schaduwklep:** een `Sprite2D` (frame 0) op `Luik` zolang de schaduwklep op laag 5 staat. Bij `schaduwklep_weg(tick, by)` spelen frame 1 en 2 af (12 fps), daarna is hij weg. Dat is code in `scripts/objects/luik.gd` of in de art-koppeling: TA met GP.
+
+### 10.5 Wat openstaat
+
+- Koppeling S2/S4, de vaste stukken en de schaduwklep (§10.4): TA (met GP), daarna een SM-review.
+- **S5/S6** na de merge van #228 (CEO). S7–S9 na hun visie-review.
+- De breekbare luiken (V-01) in S7/S9 op eindkwaliteit, 40 × 16 met scheur en gebroken toestand. Dat gebeurt met hun kamers, want de luiktegels van deel 1 zijn nog 32 × 16 placeholder.
+- Bij D ≥ 90 overlapt het wand-stuk een deel van de pakhuismuur. De hijsdeuren staan daarom rechts van x 1506 (wereld). Dit geldt alleen voor de regressie, het spel draait op D = 60.
