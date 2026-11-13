@@ -1,6 +1,6 @@
 # Audio bible v0: audiorichting
 
-Versie 0.4 · Eigenaar: Audio Director · Issue: #66 (T2 uit `docs/productie/fase-2-kader.md` §2), v0.4: #196 · Met: Composer/Sound Designer · Basis: pitch v0.5, art bible v0 (`docs/art/bible.md`), `docs/design/gdd.md` v0.8 (E-02m, E-02t, E-14b, C-12e, C-14), fasekader v0.4, `docs/audio/slice-audio.md` v0.1.1
+Versie 0.5 · Eigenaar: Audio Director · Issue: #66 (T2 uit `docs/productie/fase-2-kader.md` §2), v0.4: #196, v0.5: #243 · Met: Composer/Sound Designer · Basis: pitch v0.5, art bible v0 (`docs/art/bible.md`), `docs/design/gdd.md` v0.8 (E-02m, E-02t, E-14b, C-12e, C-14), fasekader v0.4, `docs/audio/slice-audio.md` v0.1.1
 
 Deze bible legt vast hoe *Polderlight* (werktitel, besluit #96) klinkt en wat elke audiorol moet halen. Ze is **v0**: genoeg voor de grijze flow-kamer en voor het F2-fragment. Muziek per gebied en de assetlijst volgen in v1 (§13).
 
@@ -37,7 +37,7 @@ Elke audiopijler hangt aan een design pillar. **Toetsvraag voor elk geluid:** *V
 
 | # | Pijler | Hangt aan | Wat het betekent |
 |---|---|---|---|
-| A1 | **De echo klinkt als jij, maar hol** | P1 | De echo speelt hetzelfde geluid als zijn eigenaar, met hetzelfde ritme en dezelfde toonhoogte, maar zonder lijf en door een holle buis (§4). Je herkent je eigen slag een tel later terug. Antwoord op gdd **O-4**: ja, de echo speelt audio af, gedempt (−7 tot −8 dB), ook om hem buiten beeld te volgen. |
+| A1 | **De echo klinkt als jij, maar hol** | P1 | De echo speelt hetzelfde geluid als zijn eigenaar, met hetzelfde ritme en dezelfde toonhoogte, maar zonder lijf en door een holle buis (§4). Je herkent je eigen slag een tel later terug. Antwoord op gdd **O-4**: ja, de echo speelt audio af, gedempt (−7 tot −8 dB), ook om hem buiten beeld te volgen. **Uitzondering:** een echo-actie met gewicht (de pompslag, §4.1) klinkt als die van P1. |
 | A2 | **Het carillon is de klok van de echo** | P1, R-V1 | Het merk telt af met carillonslagen, één per 15 ticks. De echo komt altijd op de plek van slag 3: de merksprong op D, de **knal op D + 3**. Staat de doelstreep op het merk, dan vallen slag 2 en 3 weg en zwelt een voorslag aan tot de knal: "één, … *zwel* … **boem**" (§6.1). |
 | A3 | **De terts komt terug met het licht** | P2 | Grijs klinkt in lege kwinten en klokken zonder terts. Pomp je licht in, dan keert de terts terug: in de klokken, in de muziek, in de galm (§5). |
 | A4 | **Leesbaarheid vóór sfeer** | P2 (pitch: "Gevolg voor Art en Audio") | Spelinformatie (merk, aftelling, tells, echo) heeft altijd voorrang in de mix; sfeer wijkt (§8). |
@@ -73,6 +73,28 @@ We kiezen bewust instrumenten die **met code op eindkwaliteit te maken zijn** (R
 | Timing | Op de event-tick | Op de event-tick van de afspeling (D ticks later), **framexact**, nooit gequantiseerd | — |
 
 **Regel voor de Composer:** maak geen apart echo-geluid. Maak het levende geluid en leid de echo-versie ervan af met dezelfde keten (functie `echo_versie` in het script van §9). Zo klopt "dat ben jij" altijd.
+
+### 4.1 Uitzondering: echo-acties met gewicht (v0.5, #243)
+
+**Waarom.** Visie-review S6 door de CD (#227): "De pompslag van de echo moet even zwaar klinken en ogen als die van P1, anders lees je hem als een nagalm en niet als een tweede lichaam." Het beeld is al gelijk (`docs/art/slice-kadewijk.md` §11.2). Een holle, zachte pompslag zegt de speler: "dit telde minder". Dat klopt niet: de echo pompt evenveel (LM-03, `gemaal.gd`: elke treffer op een schoep geeft `min(15, L, G_max − G)` LP, wie ook slaat).
+
+**De regel.** §4 gaat over het **lichaam** van de echo: zijn zwaai, sprong, landing en zijn slag op een vijand blijven hol (A1). Het geluid van **wat geraakt wordt** hoort bij het object, niet bij wie slaat. Doet een echo-actie in de regels **precies hetzelfde** als die van P1, dan klinkt het objectgeluid ook precies hetzelfde. Doet ze minder, dan niet: het geluid mag geen gewicht beloven dat de regels niet geven.
+
+| Echo-actie | Zelfde effect als P1? | Geluid van de echo |
+|---|---|---|
+| **Pompslag** op een schoep (S6, LM-03) | Ja: dezelfde LP per slag | **Als P1** (zie hieronder) |
+| Luik breken met een neerslag (S7, S9, V-01d/e) | Ja: de eerste treffer opent het, ook van de echo | Als P1: hetzelfde breekgeluid, zelfde volume |
+| Merk laten knallen (ontploffing, ketting) | Ja | Was al zo: de ontploffing (`ontploffing_k*`) is van het merk en klinkt vol, wie hem ook laat knallen |
+| Rad-treffer op de Gemaalmeester (B-10) | **Nee**: de echo doet 5 SE in plaats van 18 en telt niet mee voor `kant_treffers` | **Niet** als P1: `gm_rad_treffer_1` via `echo_versie` op de bus Echo; **nooit** `gm_rad_treffer_2` ("deze kant is klaar"), want die belooft een treffer die niet telt |
+| Slag op een vijand | Lichaamsgeluid | Hol (§4). Een reactie van de vijand zelf (tink, pantser breekt, dood) is van de vijand en klinkt vol |
+| Finisherslag (C-14) | Eigen regel | Ongewijzigd: materiaal van wie slaat, de echo hol en −4 dB (`slice-audio.md` §2.3) |
+
+**Pompslag van de echo: wat precies gelijk is.**
+- **Zelfde sample** (`pompslag_schoep`, §11), **zelfde `volume_db`**, **zelfde bus** (`SFX`, niet `Echo` met zijn −7 dB) en **dezelfde ruimte-send** als P1 (de galm van de kamer, niet meer en niet minder). Geen `echo_versie`, geen hoogdoorlaat of low-pass, geen kam, geen omgekeerde aanloop, geen extra galm, geen Haas-verbreding.
+- **Enige verschil: −1 halve toon** (`pitch_scale` = 2^(−1/12) ≈ 0,944) voor de echo. Vast, niet willekeurig: de echo herhaalt P1 framexact (§10), en een vaste stap is te testen. Lager in plaats van hoger, omdat hoger lichter klinkt. Het verschil is nodig: P1 kan om de 20 ticks slaan (LM-04), dus bij D = 60 valt de echo-slag vaak op of vlak naast een nieuwe slag van P1; twee gelijke samples op dezelfde tick zouden versmelten (en tot +6 dB optellen) en als één slag klinken.
+- **Geen holle laag erbovenop.** Op een schoep klinkt alleen de pompslag, bij P1 en bij de echo; de zwaai van de echo blijft hol (§4), maar dat is beweging, geen treffer.
+- **Plaats:** `AudioStreamPlayer2D` op de schoep die geraakt is (`gemaal.last_vane`), niet op het lichaam. Zo komt de slag van de echo van dezelfde plek als die van P1.
+- **Stemmen:** max. 3 pompslagen tegelijk (de oudste valt weg). Ze tellen niet mee voor de 2 echo-geluiden van §8.3.
 
 ## 5. Van grijs naar leven
 
@@ -148,7 +170,7 @@ De finisher speelt jullie laatste 10 s versneld ×5 af in 120 ticks. Elke finish
 **Regels:**
 1. **Elke gevaarlijke aanval is hoorbaar aangekondigd**, minstens even vroeg als in beeld en minstens 10 frames vóór de treffer (pitch P1: vensters ≥ 10 frames).
 2. **Frequentievakken.** Lijf van de spelers: 60–250 Hz. Carillon en aftelling: 0,9–2,4 kHz. Echo: 0,7–4 kHz, zonder lijf. Omgeving: gedempt boven 1,5 kHz in grijs. Geen spelinformatie alleen onder 250 Hz: op de luidsprekers van de Steam Deck en veel tv's hoor je dat niet.
-3. **Stemmen beperken.** Eén hoorbare aftelling tegelijk (§6.1); max. 4 klokken tegelijk; max. 2 echo-geluiden tegelijk; vijandgeluiden max. 3 per type.
+3. **Stemmen beperken.** Eén hoorbare aftelling tegelijk (§6.1); max. 4 klokken tegelijk; max. 2 echo-geluiden tegelijk (de echo-acties met gewicht uit §4.1 tellen niet mee); max. 3 pompslagen tegelijk; vijandgeluiden max. 3 per type.
 4. **Geen laag in de galm** (send met hoogdoorlaat op 180 Hz): de mix blijft helder in een druk gevecht.
 5. **Toonhoogte is informatie.** Willekeurige variatie (± 3 % toonhoogte, ± 1,5 dB) wel op voetstappen, slagen en water, **nooit** op klokken.
 6. **Mono-compatibel.** De echo is breed, maar alle spelinformatie blijft hoorbaar in mono (Deck-luidsprekers dicht bij elkaar, tv-modus).
@@ -301,7 +323,7 @@ Master  (HardLimiter, plafond −1 dB)
 ```
 
 - **Afspelen op de simulatietick.** Geluiden starten op het event van de Sim (`_physics_process`, `docs/tech/ontwerp.md` §2, event-systeem §4a), nooit vanuit `_process` of een animatie-callback. Zo klopt een SFX framexact met de gameplay, ook voor de echo.
-- **De echo gebruikt dezelfde events.** Speelt de echo een opgenomen event af (E-02), dan roept de code dezelfde geluidsfunctie aan met `bron = ECHO`; die kiest de holle variant en de bus Echo. Geen tweede systeem.
+- **De echo gebruikt dezelfde events.** Speelt de echo een opgenomen event af (E-02), dan roept de code dezelfde geluidsfunctie aan met `bron = ECHO`; die kiest de holle variant en de bus Echo. Geen tweede systeem. **Behalve** bij een echo-actie met gewicht (§4.1): dan kiest ze hetzelfde sample, volume en dezelfde bus als voor P1, met voor de pompslag alleen `pitch_scale` 2^(−1/12). De pompslag start op het signaal `pumped(tick, amount, who)` van `game/scripts/light/gemaal.gd` (`who` = "p1", "p2" of "echo").
 - **Holle varianten voorrenderen** in plaats van de kam live op de bus te zetten: goedkoper op de Steam Deck en precies wat in het fragment klinkt.
 - **Merk-aftelling:** een kleine `MerkAudio`-node per merk. Met levensduur `L` (solo `D + 30`, co-op 150, C-12e) speelt hij op ticks `L − 60`, `L − 45` en `L − 30` na het zetten een slag, op `L − 15` de zachte slag 4 en op `L` (einde levensduur, E-14b) het doven, tenzij een ander merk al hoorbaar aftelt (§6.1). Solo bij D = 60: t 30, 45, 60, 75 en doven op 90; co-op: t 90, 105, 120, 135 en doven op 150. Ontploffing en dooft stoppen de aftelling.
   - **Naast de doelstreep** (§6.1): `MerkAudio` luistert naar `doelstreep_on(tick, mark_id)` en de vlag `doelstreep` (`game/scripts/echo/echo_hints.gd`). Zolang de streep op **dit** merk staat, speelt hij geen aftelslagen (slag 1 op `D − 30`, dezelfde tick als `doelstreep_on`, klinkt nog; slag 2 en 3 vallen weg) en start hij één keer de voorslag, met wachttijd en beginpunt uit `doelstreep_strength` (`slice-audio.md` §3), zodat die op de knal (`D + 3`, t 63) eindigt. Gaat de streep uit vóór `D`, dan fadet hij de voorslag in 30 ms uit en speelt hij de slagen die nog komen (slag 3 op `D`, slag 4, doven). Co-op: geen doelstreep, dus ongewijzigd.
@@ -315,6 +337,7 @@ Master  (HardLimiter, plafond −1 dB)
 
 - Speelbare audio: `game/audio/sfx/<familie>/<naam>_<variant>.wav` en `game/audio/muziek/<gebied>/<laag>.ogg` (rolbestand Composer/Sound Designer). Familie: `speler`, `echo`, `combat`, `omgeving`, `ui`.
 - Varianten: `_grijs` / `_kleur`, `_k1` … `_k5`, `_p1` / `_p2`.
+- Echo-acties met gewicht (§4.1) hebben **geen** echo-variant: één bestand voor P1, P2 en de echo, bv. `game/audio/sfx/omgeving/pompslag_schoep.wav`.
 - Niet-eindkwaliteit krijgt `_placeholder` (`WERKWIJZE.md` §9).
 - Bron (scripts) staat naast het geluid in een map `bron/` of in `audio-bron/`, zodat elk geluid opnieuw te maken is. Referentiewerk voor een gate (zoals het F2-fragment) staat in `docs/audio/`.
 
@@ -322,9 +345,9 @@ Master  (HardLimiter, plafond −1 dB)
 
 | Rol | Doe | Doe niet |
 |---|---|---|
-| Composer/Sound Designer | Leid de echo-variant af van het levende geluid (§4); houd klokken op toonhoogte; lever het script mee | Geen apart "spookgeluid" voor de echo; geen samples zonder licentie |
+| Composer/Sound Designer | Leid de echo-variant af van het levende geluid (§4); houd klokken op toonhoogte; lever het script mee | Geen apart "spookgeluid" voor de echo; geen echo-variant voor een echo-actie met gewicht (§4.1); geen samples zonder licentie |
 | Combat Designer | Geef per gevaarlijke aanval het tell-moment in ticks door | Geen tell korter dan 10 frames |
-| Gameplay Programmer | Start geluid op het Sim-event, ook voor de echo (§10) | Geen geluid vanuit `_process` of een animatie-callback |
+| Gameplay Programmer | Start geluid op het Sim-event, ook voor de echo (§10); geef de pompslag van de echo hetzelfde sample, volume en dezelfde bus als die van P1 (§4.1) | Geen geluid vanuit `_process` of een animatie-callback; geen bus Echo of filter op een echo-actie met gewicht |
 | Lead Game Designer | Houd de merk-levensduur solo op D + 30 en de knal op D + 3 (§6.1); co-op 150 ticks (C-12e) | — |
 | Art Director | Laat de kleurgolf en de kruisfade van de galm samen lopen (± 2 s) | — |
 
@@ -336,12 +359,14 @@ Master  (HardLimiter, plafond −1 dB)
 - **gdd O-4** (speelt de echo audio af?) is met §2 A1 beantwoord: ja, gedempt. De LGD kan O-4 sluiten.
 - **Geluid van speler 2** (ijzer en glas, A5) en de **finisher** (§6.4) zitten nog niet in het fragment.
 - **D = 60 (v0.4):** de aftelling naast de doelstreep (§6.1) is een besluit van de Audio Director; de LGD krijgt er een melding van (alleen audio, geen regel in de gdd). Nog niet gerenderd: de aftelslagen en de voorslag samen op t 30/33/63 komen in slice-audio deel 2 (`slice-audio.md` §5 punt 1), na een groene bot-run op D = 60. Ook daar: of de omgekeerde aanloop van de echo (± 0,35 s, §4) bij een staart van 1 s nog prettig klinkt (`slice-audio.md` §5 punt 2).
+- **Pompslag van de echo (v0.5, #243):** nog geen audio in `game/` (geen bussen, geen spelers). De regel uit §4.1 gaat mee in de eerste audiokoppeling (T8d deel 2): sample door de Composer/Sound Designer, koppeling en test door de Gameplay Programmer met de Audio Director. Taak staat in #243. Klaar als in een opname van S6 (D = 60) de slag van P1 en die van de echo even luid en van dezelfde soort zijn; de CD bevestigt dat bij de volgende review.
 - **Hulpmiddelen** (numpy, scipy, ffmpeg met libvorbis) worden alleen gebruikt om audio te maken en gaan niet mee in de game. De BLA beslist of ze in `docs/licenties.md` horen.
 
 ### Logboek
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.5 | 2026-11-13 | #243 (CD-punt S6, #227): nieuw §4.1, echo-acties met gewicht. Het objectgeluid volgt de regels: de pompslag van de echo krijgt hetzelfde sample, volume, dezelfde bus en ruimte-send als die van P1, zonder filter of extra galm, alleen −1 halve toon; zo ook het luik breken. De rad-treffer van de echo blijft hol (5 SE, telt niet voor de kant) en speelt nooit `gm_rad_treffer_2`. §2 A1, §8.3, §10, §11, §12 en §13 bijgewerkt. Audio zit nog niet in de code: taak in #243. |
 | 0.4 | 2026-11-12 | Op D = 60 (besluit 2026-11-12, #196): kop met werkaanname D = 60, bereik 60–180 ticks, merk solo D + 30 / co-op 150 (C-12e), knal op D + 3 en de doelstreep; §2 A2 en §6.1 met de knal op D + 3 en de aftelling naast de doelstreep (slag 1 blijft, slag 2 en 3 vallen weg, voorslag t 33 → knal t 63; streep weg vóór D: slag 3 terug; co-op ongewijzigd), zoals in `slice-audio.md` v0.1.1 §3.1; §10 `MerkAudio` met levensduur `L` en dezelfde regel; §9 (F2) als klankreferentie, gemaakt op D = 120; §12 en §13 bijgewerkt. Lead-review EP (PR #199): de luistercheck gaat naar de kaart van MT2, vóór T8d, niet MT1 en geen aparte sessie (§0, §9.4, §13). |
 | 0.3 | 2026-11-09 | Fragment v2 dat F2 claimt (§9): water als bellenmodel, gelaagde P1-slag, harmonium met celeste, riet-geruis en toetsklik, galm met spiegelbronnen en nagalm per band, droger grijs, gemaal zonder subsonisch laag, dukken van bed en muziek, levensduur zonder echo (doven op D + 30) als losse reeks; metingen met ffmpeg ebur128 en timing op ticks; luistervragen klaar voor T17 (§9.4). §3, §4, §5 bijgewerkt met de v2-metingen. |
 | 0.2 | 2026-11-09 | Lead-review EP (PR #106): doven op D + 30 met een zachte slag 4 op D + 15 (§6.1, §10); EP-besluit over de luistercheck (§0, §9, §13); WAV byte-gelijk, OGG per build (§9). |
