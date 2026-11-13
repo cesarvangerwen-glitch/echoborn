@@ -1,0 +1,134 @@
+{
+ "bestand": "luistercheck_mt2_placeholder.ogg",
+ "controle": {
+  "v2_sha256": "b09aa64310188f997e46dcddf7fea1c8af0e8ced74dccd34fc4606d0c9609057",
+  "deel_A_sample_gelijk_aan_v2": true,
+  "deel_B_sample_gelijk_aan_v2": true,
+  "clipping_samples": 0
+ },
+ "meting": {
+  "duur_s": 66.6,
+  "lufs_geintegreerd_script": -17.9,
+  "lufs_momentaan_max_script": -9.6,
+  "true_peak_dbtp_script": -1.8,
+  "niveau_los_p1_slag_lufs_momentaan": -17.9,
+  "gain_los_paar_db_voor_true_peak": -1.36,
+  "niveau_los_echo_slag_lufs_momentaan": -24.9,
+  "lufs_geintegreerd_pyloudnorm": -18.0,
+  "wav_sha256": "b5524e39796a5687b1b3f715de87f52ec58387f4d2eb0eec359eff4044f59ea2",
+  "wav_ebur128": {
+   "I_LUFS": -18.0,
+   "LRA_LU": 14.2,
+   "true_peak_dBTP": -1.8
+  },
+  "ogg_na_decoderen_ebur128": {
+   "I_LUFS": -18.0,
+   "LRA_LU": 14.2,
+   "true_peak_dBTP": -1.5
+  },
+  "ogg_na_decoderen_pyloudnorm": {
+   "I_LUFS": -18.0,
+   "true_peak_dBTP_4x": -1.5,
+   "duur_s": 66.6
+  },
+  "ogg_bytes": 1012146
+ },
+ "momenten": [
+  {
+   "deel": "A",
+   "van_s": 0.0,
+   "tot_s": 15.5,
+   "wat": "v2-fragment heel (de tijden van bible §9.4 gelden hier)"
+  },
+  {
+   "deel": "L1.1a",
+   "van_s": 17.5,
+   "tot_s": 18.9,
+   "wat": "carillon grijs: aftelslag 1 en 2 (2,1 / 2,35 s) en de klokslag met de echo (2,6 s)"
+  },
+  {
+   "deel": "L1.1b",
+   "van_s": 19.6,
+   "tot_s": 21.2,
+   "wat": "carillon opgepompt: aftelling (10,5 / 10,75 s) en ketting (11,0 s)"
+  },
+  {
+   "deel": "L1.2a",
+   "van_s": 21.9,
+   "tot_s": 23.3,
+   "wat": "carillon grijs: aftelslag 1 en 2 (2,1 / 2,35 s) en de klokslag met de echo (2,6 s)"
+  },
+  {
+   "deel": "L1.2b",
+   "van_s": 24.0,
+   "tot_s": 25.6,
+   "wat": "carillon opgepompt: aftelling (10,5 / 10,75 s) en ketting (11,0 s)"
+  },
+  {
+   "deel": "L2.1a",
+   "van_s": 27.6,
+   "tot_s": 28.6,
+   "wat": "in de mix: slag van speler 1 (0,6 s)"
+  },
+  {
+   "deel": "L2.1b",
+   "van_s": 29.3,
+   "tot_s": 30.3,
+   "wat": "in de mix: de echo op slag 3 (2,6 s)"
+  },
+  {
+   "deel": "L2.2a",
+   "van_s": 31.0,
+   "tot_s": 31.5,
+   "wat": "los: p1_slag (bouwsteen van v2)"
+  },
+  {
+   "deel": "L2.2b",
+   "van_s": 32.2,
+   "tot_s": 33.05,
+   "wat": "los: echo_slag = echo_versie(p1_slag), 7 dB zachter"
+  },
+  {
+   "deel": "L2.3a",
+   "van_s": 33.75,
+   "tot_s": 34.25,
+   "wat": "los: p1_slag (bouwsteen van v2)"
+  },
+  {
+   "deel": "L2.3b",
+   "van_s": 34.95,
+   "tot_s": 35.8,
+   "wat": "los: echo_slag = echo_versie(p1_slag), 7 dB zachter"
+  },
+  {
+   "deel": "L3.1a",
+   "van_s": 37.8,
+   "tot_s": 40.1,
+   "wat": "grijs: water, wind, bourdon, verre klok (wereld zonder spelers)"
+  },
+  {
+   "deel": "L3.1b",
+   "van_s": 40.8,
+   "tot_s": 43.1,
+   "wat": "opgepompt: gemaal, harmonium D-groot add9, belfort-galm, helder water"
+  },
+  {
+   "deel": "L3.2a",
+   "van_s": 43.8,
+   "tot_s": 46.1,
+   "wat": "grijs: water, wind, bourdon, verre klok (wereld zonder spelers)"
+  },
+  {
+   "deel": "L3.2b",
+   "van_s": 46.8,
+   "tot_s": 49.1,
+   "wat": "opgepompt: gemaal, harmonium D-groot add9, belfort-galm, helder water"
+  },
+  {
+   "deel": "B",
+   "van_s": 51.1,
+   "tot_s": 66.6,
+   "wat": "v2-fragment nog een keer heel"
+  }
+ ]
+}

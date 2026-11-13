@@ -1,0 +1,107 @@
+{
+ "pompslag_schoep_placeholder.wav": {
+  "pad": "game/audio/sfx/omgeving/pompslag_schoep_placeholder.wav",
+  "duur_s": 0.4667,
+  "duur_ticks": 28.0,
+  "lufs_momentaan_max": -17.0,
+  "lufs_momentaan_max_pyloudnorm": -17.0,
+  "true_peak_dbtp": -1.8,
+  "aandeel_60_250hz_pct": 42.6,
+  "aandeel_boven_250hz_pct": 44.8,
+  "zwaartepunt_hz": 373,
+  "piek_op_ms": 4.5,
+  "clipping_samples": 0,
+  "ffmpeg_ebur128": {
+   "M_max_LUFS": -17.0,
+   "true_peak_dBTP": -1.8
+  },
+  "sha256": "b73b2ece5b796fd08d7972dae1a34a9dbd1301e049765da5ba0ab8a32f6df258"
+ },
+ "pompslag_controle_zelfde_tick_placeholder.wav": {
+  "pad": "docs/audio/pompslag-schoep/pompslag_controle_zelfde_tick_placeholder.wav",
+  "echo_pitch_scale": 0.9439,
+  "echo_duur_s": 0.4944,
+  "echo_duur_ticks": 29.66,
+  "som_true_peak_voor_gain_dbtp": 3.67,
+  "gain_db_tegen_clippen": -5.17,
+  "lufs_momentaan_max": -18.5,
+  "true_peak_dbtp": -1.5,
+  "piekfrequenties_p1_hz": [
+   176.2,
+   310.2,
+   403.9,
+   551.0,
+   563.0,
+   738.8
+  ],
+  "piekfrequenties_echo_hz": [
+   166.4,
+   292.8,
+   381.3,
+   520.1,
+   531.4,
+   697.3
+  ],
+  "piekfrequenties_samen_hz": [
+   166.3,
+   176.1,
+   292.8,
+   310.3,
+   381.3,
+   403.4,
+   504.3,
+   549.5,
+   697.2,
+   738.4
+  ],
+  "sha256": "5b79793fcc2d4e67dfa86a0de0931b48c183493fee9316c3700a342937a3d231"
+ },
+ "pompslag_controle_s6_reeks_placeholder.wav": {
+  "pad": "docs/audio/pompslag-schoep/pompslag_controle_s6_reeks_placeholder.wav",
+  "momenten": [
+   {
+    "wie": "p1",
+    "tick": 0,
+    "s": 0.2
+   },
+   {
+    "wie": "p1",
+    "tick": 20,
+    "s": 0.533
+   },
+   {
+    "wie": "p1",
+    "tick": 40,
+    "s": 0.867
+   },
+   {
+    "wie": "p1",
+    "tick": 60,
+    "s": 1.2
+   },
+   {
+    "wie": "echo",
+    "tick": 60,
+    "s": 1.2
+   },
+   {
+    "wie": "echo",
+    "tick": 80,
+    "s": 1.533
+   },
+   {
+    "wie": "echo",
+    "tick": 100,
+    "s": 1.867
+   },
+   {
+    "wie": "echo",
+    "tick": 120,
+    "s": 2.2
+   }
+  ],
+  "gain_db_tegen_clippen": -5.11,
+  "true_peak_dbtp": -1.5,
+  "sha256": "afe29aca52b6ea27604d2101d05e8cc833165aeb526eabdf9d71f9e3b4e83c79"
+ }
+}
