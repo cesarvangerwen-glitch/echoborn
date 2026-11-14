@@ -769,7 +769,8 @@ func test_b6_never_hits_echo_or_p2(t) -> void:
 			if boss.is_attack_active() and boss.attack_box.intersects(Rect2(other.global_position
 					- Tuning.body_size() * 0.5, Tuning.body_size())):
 				inside["n"] += 1)
-		await t.run_ticks(sim, 250)
+		# B-14: in co-op valt de pompslag om en om (GMB-14 a); P2 staat in de slagen rechts (0 en 240).
+		await t.run_ticks(sim, 370)
 		t.check(inside["n"] >= 12, "coop %s: het tweede lichaam stond %d actieve ticks in een vlak" % [coop, inside["n"]])
 		t.check(hits.is_empty() and p1.health == 5, "coop %s: treffers %s" % [coop, hits])
 		if coop:
@@ -1073,4 +1074,182 @@ func test_b7_add_names_with_spout(t) -> void:
 		var tick: int = spawned[0][0]
 		t.check(String(spawned[0][1].name) == "Add%d_links" % tick and String(spawned[1][1].name) == "Add%d_rechts" % tick,
 			"namen %s, %s" % [spawned[0][1].name, spawned[1][1].name])
+	await t.cleanup()
+
+
+# --- B-14 (1)–(2): de wissel in fase 1 co-op (GMB-14, v0.1.6.1 §3.10) -----------------------
+
+const Meetlog = preload("res://scripts/events/meetlog.gd")
+
+
+## Zet een speler die op de vloer stilstaat op arena-x `x`, met kijkrichting `face`.
+func _place(p: PlayerActor, x: float, face: int) -> void:
+	p.position = Vector2(x, Fx.STAND_Y)
+	p.motor.velocity = Vector2.ZERO
+	p.motor.facing = face
+
+
+## B-14 test (a), GMB-14 a, b: in co-op valt de pompslag L, R, L, R…, de eerste op de helft van P1,
+## en `DOELHELFT` staat in het meetlog op tick 46 van elke maat (de eerste maat: op het begin van de
+## aanloop, en op tick 66, na de aanloop van 60). `doelhelft()` springt op die tick om. Solo volgt
+## de pompslag P1 (ongewijzigd) en is er geen doelhelft.
+func test_b14_coop_pomp_alternates_and_doelhelft(t) -> void:
+	for p1_x: float in [200.0, 400.0]:
+		var w := _world(t, p1_x)
+		var sim = w["sim"]
+		w["p1"].health = 1000
+		Fx.manual_player(sim, 2, Vector2(600.0 - p1_x, Fx.STAND_Y))
+		var boss := _gemaalmeester(sim)
+		var log := _watch(boss)
+		var meetlog := Meetlog.new(sim, w["p1"], null)
+		meetlog.watch_boss(boss)
+		var seen := {}
+		sim.tick_finished.connect(func(tick: int) -> void: seen[tick] = boss.doelhelft(tick))
+		await t.run_ticks(sim, 610)
+		var s0 := -1 if p1_x < 300.0 else 1
+		var sides: Array = log["attacks"].map(func(a: Array) -> int: return a[2])
+		t.check(sides == [s0, -s0, s0, -s0, s0, -s0], "P1 op %d: pompslag %s (om en om, eerst %d)" % [p1_x, sides, s0])
+		var rows: Array = meetlog.rows.filter(func(r: PackedStringArray) -> bool: return r[2] == "DOELHELFT") \
+			.map(func(r: PackedStringArray) -> Array: return [int(r[0]), r[3]])
+		var name0 := "links" if s0 < 0 else "rechts"
+		var name1 := "rechts" if s0 < 0 else "links"
+		var want := [[0, name0], [66, name1], [166, name0], [286, name1], [406, name0], [526, name1]]
+		t.check(rows == want, "P1 op %d: DOELHELFT %s (verwacht %s)" % [p1_x, rows, want])
+		t.check(seen.get(65) == s0 and seen.get(66) == -s0 and seen.get(165) == -s0 and seen.get(166) == s0,
+			"P1 op %d: doelhelft() op 65/66/165/166 = %s/%s/%s/%s" % [p1_x, seen.get(65), seen.get(66), seen.get(165), seen.get(166)])
+		await t.cleanup()
+	# Solo: de pompslag volgt P1, geen doelhelft, geen DOELHELFT.
+	var w2 := _world(t, 200.0, 60)
+	var sim2 = w2["sim"]
+	w2["p1"].health = 1000
+	var boss2 := _gemaalmeester(sim2)
+	var log2 := _watch(boss2)
+	var halves := []
+	boss2.target_half_changed.connect(func(tick: int, side: int) -> void: halves.append([tick, side]))
+	var nonzero := {"n": 0}
+	sim2.tick_finished.connect(func(tick: int) -> void:
+		if boss2.doelhelft(tick) != 0:
+			nonzero["n"] += 1)
+	await t.run_ticks(sim2, 400)
+	t.check(log2["attacks"].all(func(a: Array) -> bool: return a[2] == -1) and halves.is_empty() and nonzero["n"] == 0,
+		"solo: pompslag %s, DOELHELFT %s, doelhelft ≠ 0 op %d ticks" % [log2["attacks"], halves, nonzero["n"]])
+	await t.cleanup()
+
+
+## B-14 test (b), GMB-14 c: op het intacte schot zet een treffer van P2 vanaf de andere helft geen
+## merk (0 SE, tink), vanaf de doelhelft wel. Een treffer van P1 vanaf dezelfde helft als het merk
+## geeft de tink, het merk blijft en het schot blijft heel; vanaf de andere helft breekt het schot.
+func test_b14_coop_shot_mark_from_target_half(t) -> void:
+	# P1 links: de doelhelft is links tot tick 65, rechts van 66 tot 165.
+	var w := _world(t, KETEL_P1_X)
+	var sim = w["sim"]
+	var p1: PlayerActor = w["p1"]
+	p1.health = 1000
+	var p2 := Fx.manual_player(sim, 2, Vector2(340, Fx.STAND_Y))
+	var boss := _gemaalmeester(sim)
+	var log := _watch(boss)
+	var broke := []
+	boss.shot_broken.connect(func(tick: int) -> void: broke.append(tick))
+	var tinks := []
+	boss.ketel.armor_tinked.connect(func(tick: int) -> void: tinks.append(tick))
+	await _run_to(t, sim, 5)
+	_place(p2, 340.0, -1)
+	var x1: int = sim.tick
+	await _play(t, sim, p2, A)
+	t.check(boss.doelhelft(x1) == -1 and sim.combat.mark_on(boss.ketel) == null and tinks == [x1] and boss.se == _se(),
+		"P2 rechts, doelhelft %d: merk %s, tink %s, %d SE (geen merk, tink, 0 SE)" % [boss.doelhelft(x1),
+			sim.combat.mark_on(boss.ketel), tinks, boss.se])
+	await _run_to(t, sim, 70)
+	_place(p2, 340.0, -1)
+	var x2: int = sim.tick
+	await _play(t, sim, p2, A)
+	var mark: Combat.Mark = sim.combat.mark_on(boss.ketel)
+	t.check(boss.doelhelft(x2) == 1 and mark != null and mark.setter == "p2" and tinks.has(x2),
+		"P2 rechts op de doelhelft: merk %s (gezet)" % [mark.setter if mark else null])
+	# P1 op dezelfde helft als het merk (rechts): tink, het merk blijft, het schot heel.
+	_place(p1, 344.0, -1)
+	var x3: int = sim.tick
+	await _play(t, sim, p1, A)
+	t.check(sim.combat.mark_on(boss.ketel) == mark and mark.alive and tinks.has(x3) and broke.is_empty() \
+		and boss.ketel.armor_intact, "P1 rechts op het merk van rechts: merk %s, tink %s, breuk %s" % [
+			mark.alive, tinks, broke])
+	# P1 vanaf de andere helft (links): het merk knalt, het schot breekt.
+	await t.run_ticks(sim, 20)
+	_place(p1, KETEL_P1_X, 1)
+	var x4: int = sim.tick
+	await _play(t, sim, p1, A)
+	t.check(broke == [x4] and not mark.alive and log["damage"].is_empty(), "P1 links: breuk %s (verwacht [%d])" % [broke, x4])
+	await t.cleanup()
+
+
+## B-14 test (b), GMB-14 e: op de kern hetzelfde. Een treffer zonder merk vanaf de andere helft doet
+## 10 SE en zet geen merk; vanaf de doelhelft 10 SE en een merk; de ander vanaf dezelfde helft 10 SE
+## (het merk blijft); vanaf de andere helft de merk-ontploffing (20 SE).
+func test_b14_coop_core_mark_from_target_half(t) -> void:
+	var w := _world(t, KETEL_P1_X)
+	var sim = w["sim"]
+	var p1: PlayerActor = w["p1"]
+	p1.health = 1000
+	var p2 := Fx.manual_player(sim, 2, Vector2(340, Fx.STAND_Y))
+	var boss := _gemaalmeester(sim)
+	var log := _watch(boss)
+	await _run_to(t, sim, 3)
+	boss.ketel.break_armor(sim.tick)
+	# De doelhelft is links (tot tick 65).
+	_place(p2, 340.0, -1)
+	await _play(t, sim, p2, A)
+	t.check(boss.core_open and sim.combat.mark_on(boss.ketel) == null, "P2 rechts op de kern: merk gezet")
+	await t.run_ticks(sim, 20)
+	_place(p2, KETEL_P1_X, 1)
+	await _play(t, sim, p2, A)
+	var mark: Combat.Mark = sim.combat.mark_on(boss.ketel)
+	t.check(mark != null and mark.setter == "p2", "P2 links (doelhelft) op de kern: geen merk")
+	_place(p1, KETEL_P1_X - 4.0, 1)
+	await _play(t, sim, p1, A)
+	t.check(sim.combat.mark_on(boss.ketel) == mark and mark.alive, "P1 links op het merk van links: het merk knalde")
+	await t.run_ticks(sim, 20)
+	_place(p1, 344.0, -1)
+	await _play(t, sim, p1, A)
+	await t.run_ticks(sim, 2)
+	var got: Array = log["damage"].map(func(e: Array) -> Array: return [e[1], e[2]])
+	t.check(sim.tick < 60 and got == [[10, "p2"], [10, "p2"], [10, "p1"], [20, "ontploffing"]],
+		"kern-schade %s (verwacht 10 p2, 10 p2, 10 p1, 20 ontploffing; tick %d < 60)" % [got, sim.tick])
+	await t.cleanup()
+
+
+## B-14 test (d), GMB-14 f: na een drop-out van P2 volgt de pompslag vanaf de volgende aanloop P1
+## en zet een treffer van beide kanten een merk; na een drop-in geldt de wissel vanaf de volgende
+## aanloop, met de eerste slag op de helft van P1.
+func test_b14_drop_out_and_in_mode_per_beat(t) -> void:
+	var w := _world(t, 200.0)
+	var sim = w["sim"]
+	var p1: PlayerActor = w["p1"]
+	p1.health = 1000
+	Fx.manual_player(sim, 2, Vector2(400, Fx.STAND_Y))
+	var boss := _gemaalmeester(sim)
+	var log := _watch(boss)
+	var halves := []
+	boss.target_half_changed.connect(func(tick: int, side: int) -> void: halves.append([tick, side]))
+	await _run_to(t, sim, 70)
+	var echo: TailEcho = sim.drop_out()
+	t.check(echo != null and not boss.is_coop(), "geen drop-out")
+	# Maat 1 (tick 120): solo, de pompslag op de helft van P1 (links; in co-op was het rechts).
+	await _run_to(t, sim, 130)
+	t.check(boss.doelhelft() == 0, "na de drop-out: doelhelft %d (geen)" % boss.doelhelft())
+	# Zetten kan van beide kanten: P1 links, waar in co-op nu geen doelhelft was.
+	_place(p1, KETEL_P1_X, 1)
+	await _play(t, sim, p1, A)
+	var mark: Combat.Mark = sim.combat.mark_on(boss.ketel)
+	t.check(mark != null and mark.setter == "p1", "solo na de drop-out: P1 links zet geen merk")
+	_place(p1, 200.0, 1)
+	await _run_to(t, sim, 200)
+	var p2 := PlayerActor.new()
+	p2.setup(2, Fx.ManualInput.new(), Color.GRAY)
+	t.check(sim.drop_in(p2), "geen drop-in")
+	_place(p1, 200.0, 1)
+	await _run_to(t, sim, 370)
+	var sides: Array = log["attacks"].map(func(a: Array) -> Array: return [a[0], a[2]])
+	t.check(sides == [[0, -1], [120, -1], [240, -1], [360, 1]],
+		"pompslagen %s (L; na de drop-out L; na de drop-in eerst de helft van P1, dan om en om)" % [sides])
+	t.check(halves == [[0, -1], [66, 1], [240, -1], [286, 1]], "DOELHELFT %s" % [halves])
 	await t.cleanup()

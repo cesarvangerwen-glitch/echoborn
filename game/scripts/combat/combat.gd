@@ -27,6 +27,9 @@ class Mark:
 	## "p1" of "p2": wie het merk zette (E-14a, C-12).
 	var setter: String
 	var born: int
+	## Middelpunt van de zetter op de tick van zetten (wereld). GMB-14 c: in co-op knalt het merk
+	## alleen door een treffer vanaf de andere helft dan deze.
+	var set_at := Vector2.ZERO
 	## Eerste tick waarop het merk er niet meer is: solo born + D + 30 (E-14b),
 	## in co-op born + 150, los van D (C-12e). Ligt vast op de tick van zetten.
 	var expires: int
@@ -102,15 +105,18 @@ func attack(tick: int, attacker: String, layer: int, center: Vector2, facing: in
 		if attacker == "echo":
 			# E-14e: gewone echo-treffer; de echo zet nooit een merk (E-14a).
 			damage = int(c["hit_echo"])
-		elif mark != null and mark.setter != attacker:
+		elif mark != null and mark.setter != attacker and target.allows_detonate(tick, center, mark):
 			# C-12b: het andere lichaam laat het merk knallen, in plaats van 10 SE.
 			_explode(tick, mark, 1)
 			hit.emit(tick, attacker, target, 0)
 			continue
 		else:
+			# Mag het merk niet knallen (GMB-14 c: vanaf dezelfde helft), dan een gewone treffer en
+			# blijft het merk staan.
 			damage = int(c["hit_p1"]) if attacker == "p1" else int(c["hit_p2"])
-			if mark == null and target.is_markable() and not finisher_running:
-				_set_mark(tick, target, attacker)
+			if mark == null and target.is_markable() and not finisher_running \
+					and target.allows_mark(tick, center):
+				_set_mark(tick, target, attacker, center)
 		if target.armor_intact:
 			damage = 0  # E-14g: een intact pantser krijgt niets van treffers
 			target.tink(tick)  # VJ-07: eigen geluid en vonk
@@ -198,12 +204,13 @@ func life_ticks() -> int:
 	return tail_ticks + int(c["mark_extra_life_ticks"])
 
 
-func _set_mark(tick: int, target: CombatTarget, setter: String) -> void:
+func _set_mark(tick: int, target: CombatTarget, setter: String, at := Vector2.ZERO) -> void:
 	var mark := Mark.new()
 	mark.id = _next_id
 	_next_id += 1
 	mark.target = target
 	mark.setter = setter
+	mark.set_at = at
 	mark.born = tick
 	mark.expires = tick + life_ticks()
 	marks.append(mark)

@@ -18,6 +18,13 @@ extends "res://scripts/combat/boss.gd"
 ## Maat en aanvallen (B-6, GM-04): fase 1 elke 120 ticks een pompslag op de helft van P1 (eerste
 ## aanloop 60), fase 2 elke 90 ticks om en om een pompslag op de x van P1 en een schoepenzwiep.
 ## Wankel op 300 SE (GMB-13): de merkplek op de ketel; de finisher regelt `Boss`.
+## Fase 1 co-op, de wissel (GMB-14, B-14 (1)–(2); v0.1.6.1 §3.10): de modus kiest de boss per maat
+## op het begin van de aanloop. In co-op valt de pompslag om en om links en rechts (de eerste op
+## de helft van P1); de doelhelft (`doelhelft`) is de helft van de volgende pompslag en springt om
+## op de eerste tick na het actieve vlak. Op de ketel zet een treffer dan alleen een merk vanaf de
+## doelhelft, en knalt een merk alleen door een treffer vanaf de andere helft dan waar het gezet is
+## (anders een gewone treffer: op het schot de tink, op de kern 10 SE; het merk blijft). Solo, na
+## een drop-out (vanaf de volgende aanloop), in de fasewissel en bij Wankel geldt de regel niet.
 
 ## Begin van een maat (carillon-tel, §9.3): `beat` telt vanaf BOSS_START.
 signal beat(tick: int, number: int)
@@ -35,6 +42,9 @@ signal rad_hit(tick: int, source: String, action: String, amount: int)
 ## RAD_DRAAI (B-10): de kant is klaar (`reason` "treffers", "tijd" of "modus": een drop-in/out
 ## verplaatste de plek, B-13); het rad trilt en draait daarna naar `to_side` (−1 links, +1 rechts).
 signal rad_turning(tick: int, reason: String, to_side: int)
+## DOELHELFT (B-10, B-14 (2)): de doelhelft van fase 1 co-op wordt `side` (−1 links, +1 rechts): op
+## de eerste maat in co-op bij het begin van de aanloop, daarna op de eerste tick na elk actief vlak.
+signal target_half_changed(tick: int, side: int)
 
 const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
@@ -91,6 +101,12 @@ var _air_action := {}
 var _noted_tick := -1
 ## B-13: de modus (co-op of niet) waarin het rad nu hangt.
 var _rad_coop := false
+## GMB-14: geldt de wissel in deze maat (co-op op het begin van de aanloop, fase 1)?
+var _wissel := false
+## GMB-14: de helft van de pompslag van deze maat (−1, +1; 0 zonder wissel) en de eerste tick na
+## zijn actieve vlak (dan springt de doelhelft om).
+var _pomp_side := 0
+var _pomp_active_end := -1
 ## Het beeld (sprites), alleen beeld (TA, #265).
 var _beeld: GemaalmeesterBeeld
 ## RAD_TREFFER-geluid (#243, bible §4.1): luistert alleen naar `rad_hit`.
@@ -216,6 +232,37 @@ func middle() -> float:
 	return (EnemyData.value(data_group, "lichaam_x1") + EnemyData.value(data_group, "lichaam_x2")) * 0.5
 
 
+## GMB-14 b (B-14 (2), vlag voor beeld en audio): de doelhelft op `tick` (standaard de tick van de
+## Sim): −1 links, +1 rechts, 0 als de wissel niet geldt (solo, fasewissel, fase 2, Wankel). Ze is
+## de helft van de volgende pompslag: tot en met het actieve vlak die van deze maat, daarna de andere.
+func doelhelft(tick := -1) -> int:
+	if not _wissel or phase != Phase.ONE or state != State.FIGHT:
+		return 0
+	if tick < 0:
+		tick = sim.tick if sim != null else 0
+	return _pomp_side if tick < _pomp_active_end else -_pomp_side
+
+
+## Helft van arena-x van wereldpunt `at` (−1 links, +1 rechts; `x < midden` is links).
+func half_of(at: Vector2) -> int:
+	return -1 if arena_x(at) < middle() else 1
+
+
+## GMB-14 c, e (via `BossPart.allows_mark`): op de ketel zet een treffer in de wissel alleen een
+## merk vanaf de doelhelft.
+func part_allows_mark(part: BossPart, tick: int, from: Vector2) -> bool:
+	var target := doelhelft(tick)
+	return part != ketel or target == 0 or half_of(from) == target
+
+
+## GMB-14 c, e: in de wissel knalt het merk op de ketel alleen door een treffer vanaf de andere
+## helft dan waar het gezet is.
+func part_allows_detonate(part: BossPart, tick: int, from: Vector2, mark: RefCounted) -> bool:
+	if part != ketel or doelhelft(tick) == 0:
+		return true
+	return half_of(from) != half_of(mark.set_at)
+
+
 ## B-11: de schermschok van nu in px (0 = geen).
 func shake_at(tick: int) -> float:
 	return shake_px if tick < shake_until else 0.0
@@ -249,6 +296,9 @@ func on_reset(tick: int) -> void:
 	_rad_since = -1
 	_rad_until = -1
 	_air_action.clear()
+	_wissel = false
+	_pomp_side = 0
+	_pomp_active_end = -1
 	if rad != null:
 		rad.hittable = false
 		rad.markable = false
@@ -346,6 +396,9 @@ func fight_update(tick: int, p1: Node2D) -> void:
 			if core_open and tick >= _open_until:
 				_close_core(tick, "tijd")
 			spout_glowing = tick >= _glow_from and tick < _glow_until
+			# GMB-14 b: de doelhelft springt om op de eerste tick na het actieve vlak.
+			if _wissel and tick == _pomp_active_end:
+				target_half_changed.emit(tick, -_pomp_side)
 			if tick >= _next_beat:
 				_beat(tick, p1)
 		Phase.SWITCH:
@@ -385,6 +438,16 @@ func _beat(tick: int, p1: Node2D) -> void:
 	if phase == Phase.ONE:
 		var windup := EnemyData.ticks(g, "eerste_aanloop") if _beat_number == 0 \
 			else EnemyData.ticks(g, "pomp1_aanloop")
+		# GMB-14 a, f: de modus op het begin van de aanloop. In co-op na een maat in co-op de andere
+		# helft dan de vorige slag; de eerste maat in co-op (ook na een drop-in) op de helft van P1.
+		var was_wissel := _wissel and _pomp_side != 0
+		_wissel = is_coop()
+		if _wissel and was_wissel:
+			side = -_pomp_side
+		_pomp_side = side if _wissel else 0
+		_pomp_active_end = tick + windup + EnemyData.ticks(g, "pomp1_actief") if _wissel else -1
+		if _wissel and not was_wissel:
+			target_half_changed.emit(tick, side)
 		var width := EnemyData.value(g, "pomp_breedte")
 		var x1 := middle() - width if side < 0 else middle()
 		begin_attack(tick, "pomp", side, arena_rect(x1, x1 + width, 0.0, EnemyData.value(g, "pomp_hoogte")),
@@ -434,6 +497,8 @@ func _close_core(tick: int, reason: String) -> void:
 func _begin_switch(tick: int) -> void:
 	phase = Phase.SWITCH
 	core_open = false
+	_wissel = false
+	_pomp_side = 0
 	_switch_end = tick + EnemyData.ticks(data_group, "fasewissel_ticks")
 	_glow_until = -1
 	spout_glowing = false

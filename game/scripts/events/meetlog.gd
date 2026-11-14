@@ -22,7 +22,8 @@ extends RefCounted
 ## `KERN_DICHT` (waarde drempel/tijd), `RAD_TREFFER` (waarde de actie: bounce, lancering, vang,
 ## stuit, sprong of echo; bron wie sloeg), `RAD_DRAAI` (waarde treffers/tijd; bron de kant waar het
 ## heen draait: links/rechts), `BOSS_AANVAL` (waarde soort_helft, bron raak/mis), `FINISHER_START`,
-## `FINISHERSLAG` (bron wie), `BOSS_VERSLAGEN` (waarde het aantal finisherslagen).
+## `FINISHERSLAG` (bron wie), `BOSS_VERSLAGEN` (waarde het aantal finisherslagen), `DOELHELFT`
+## (fase 1 co-op, waarde links/rechts: de doelhelft wordt die helft; B-14, v0.1.6).
 ##
 ## MP-7 (e) (`WACHT_START`, `WACHT_EIND`; gdd v0.8.6 §4.5, #292): alleen in co-op, voor P1 en P2
 ## (bron `p1`/`p2`), uit de spelstaat (niet uit een bot), dus ook bij mensen. Een tick `t` is
@@ -155,6 +156,9 @@ func watch_boss(boss: Node) -> void:
 	if boss.has_signal("rad_hit"):
 		boss.rad_hit.connect(func(tick: int, source: String, action: String, _amount: int) -> void:
 			_add(tick, "RAD_TREFFER", action, source, at.call()))
+	if boss.has_signal("target_half_changed"):
+		boss.target_half_changed.connect(func(tick: int, side: int) -> void:
+			_add(tick, "DOELHELFT", "links" if side < 0 else "rechts", "", at.call()))
 	if boss.has_signal("rad_turning"):
 		boss.rad_turning.connect(func(tick: int, reason: String, to_side: int) -> void:
 			_add(tick, "RAD_DRAAI", reason, "links" if to_side < 0 else "rechts", at.call()))

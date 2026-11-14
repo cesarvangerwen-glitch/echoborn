@@ -35,6 +35,16 @@ func is_markable() -> bool:
 	return alive and hittable and markable
 
 
+## GMB-14 c: de boss beslist (de doelhelft in co-op, fase 1).
+func allows_mark(tick: int, from: Vector2) -> bool:
+	return boss == null or not boss.has_method(&"part_allows_mark") or boss.part_allows_mark(self, tick, from)
+
+
+func allows_detonate(tick: int, from: Vector2, mark: RefCounted) -> bool:
+	return boss == null or not boss.has_method(&"part_allows_detonate") \
+		or boss.part_allows_detonate(self, tick, from, mark)
+
+
 func is_hit_by(box: Rect2, attacker_layer: int) -> bool:
 	return hittable and super.is_hit_by(box, attacker_layer)
 
