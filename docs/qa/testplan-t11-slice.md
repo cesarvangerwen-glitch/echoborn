@@ -143,7 +143,7 @@ Co-op = P1 en P2, met P2 in de rol van de echo (7A, C-01–C-05); drop-in/drop-o
 
 Gemeten 2026-11-14 op `main` `bc678b7`, Godot 4.6.3 headless: `test_kadewijk_coop.gd` met `POLDERLIGHT_BOTLOGS=<map>`, daarna `rekenen.gd` op die map (§6 Q-3). Per kamer en de boss zoals W38 (S8 mét de boss, S8 route en de boss apart). (a) = tijd co-op / tijd van de solo-lus in dezelfde run (`bot_lus_solo_D60.csv`, 15 504 ticks); (b) = MP-1 van P2 (`STIL_EIND` met bron `p2`); (c) = samenwerkingsacties per minuut (W41); (d) = de tijd tussen `P2_OPGELOST` en `P2_TERUG` of `DROP_OUT`. De S8-route (3 s, arena in en uit) zonder (c), zoals de test.
 
-**Lus, D = 60** (264,7 s, 1,02× de solo-lus; gelijk aan de uitvoer van de test):
+**Lus, D = 60** (264,7 s, 1,02× de solo-lus; gelijk aan de uitvoer van de test, behalve MP-1 per kamer: `rekenen.gd` telt het deel van een stilstand dat in de kamer valt, de test de stilstand die in de kamer eindigt, bv. MP-1 van P2 in de S8-route 13 hier tegen 117 in de test):
 
 | Kamer | Tijd co-op (s) | (a) co-op / solo (≥ 0,5) | MP-1 P1 (≤ 300) | (b) MP-1 P2 (≤ 300) | (c) samen /min (≥ 1,0) | (d) P2 opgelost (≤ 10 %) | MP-6 LP met P2 of samen | Wachten P1 / P2 (ticks, test) |
 |---|---|---|---|---|---|---|---|---|
@@ -160,7 +160,7 @@ Gemeten 2026-11-14 op `main` `bc678b7`, Godot 4.6.3 headless: `test_kadewijk_coo
 | Route (zonder boss) | 177,8 | — | 59 | 58 | 8,8 | 0 % | 84 % van 189 | 229 / 1846 (lus) |
 | Doorloop | 264,7 | 1,02× | 108 | **931** | 17,0 | 0 % | 79 % van 660 | |
 
-Over de lus verder: MP-3 93 % van 41 landingen, SL-01 126 LP vóór de eerste pompslag, 11 pompslagen van P1 en 3 van P2 (alle bij het gemaal; **bij trap 2 pompt alleen P1**), RV-6 (na trap 2, vanaf de laatste `POMP` van P1, Q-2) 1150 ticks (19,2 s), langste gat 2076 ticks (34,6 s). S9 vanaf de binnenkomst via trap 2: gaten 868, 324, 616, 590, 832, 382 ticks (met de `POMP` van P2, W39): het rustpunt (≤ 720) en twee gaten daarna (≤ 600) worden niet gehaald, net als solo (B-1).
+Over de lus verder: MP-3 93 % van 41 landingen, SL-01 126 LP vóór de eerste pompslag, 11 pompslagen van P1 en 3 van P2 (alle bij het gemaal; **bij trap 2 pompt alleen P1**), RV-6 (na trap 2, vanaf de laatste `POMP` van P1, Q-2) 1150 ticks (19,2 s), langste gat 2076 ticks (34,6 s). S9 vanaf de binnenkomst via trap 2: gaten 868, 324, 616, 590, 832, 382 ticks (met de `POMP` van P2, W39): het rustpunt (≤ 720) en twee gaten daarna (616 en 832, grens ≤ 600) worden niet gehaald. Dat is slechter dan solo: solo mist alleen het rustpunt (932, B-1).
 
 **Elke kamer los, D = 60**: MP-7 (b)–(d) gehaald in S1–S7 en S9 (MP-1 van P2 ≤ 51, (c) ≥ 5,4/min, (d) 0 %); S8 los: de boss 87,1 s, MP-1 van P2 **947**. S6 los duurt 83,9 s (het duo begint met 0 LP en haalt licht in S5, LM-13; zegt niets over de lus).
 
@@ -169,7 +169,7 @@ Over de lus verder: MP-3 93 % van 41 landingen, SL-01 126 LP vóór de eerste po
 **Lezing.**
 - **MP-7 per kamer: gehaald in S1–S7, de S8-route en S9**; (b)–(d) bij elke D, (a) alleen bij D = 60 gemeten (open punt in §6 Q-5). (a) ligt bij D = 60 tussen 0,79× en 1,50×: co-op is nergens sneller dan 2× solo; (c) ruim boven 1,0; P2 lost nergens op (d), want het duo valt niet.
 - **De boss: MP-7 (b) niet gehaald** (931 / 947 ticks). Dat is punt TD in §4 (G-2, [#289](https://github.com/cesarvangerwen-glitch/echoborn/issues/289)).
-- **S9: (b) gehaald, toch wacht P2 41 % van de kamer** (punt SM in §4, [#290](https://github.com/cesarvangerwen-glitch/echoborn/issues/290)). MP-1 ziet het niet, omdat P2 heen en weer loopt. Ook F4b(b) toont het: S9 is in co-op de kamer met de laagste MP-2 en (2) ontploffing (§3.1).
+- **S9: (b) gehaald, toch wacht P2 41 % van de kamer** (punt SM in §4, [#290](https://github.com/cesarvangerwen-glitch/echoborn/issues/290)). MP-1 ziet het niet, omdat P2 heen en weer loopt. Ook MP-2 toont het: S9 is in co-op de kamer met de laagste MP-2 (4,8; 3,6 bij D = 120/180, waar ook (2) ontploffing in S9 naar 0,9/min zakt; §3.1).
 - **Trap 2 in co-op is werk voor P1 alleen** (geen `POMP` van P2): voor een mens als P2 is dat wachten of meelopen. Dat hoort bij dezelfde vraag aan de LGD (#290) en bij W-1.
 
 **Te meten in MT3 (CEO + P2)**, volgens kader F4b(c) en `testplan-f0.md` §1: norm (3) co-op (MP-5 ≥ 4,0, geen deel < 3,0), C1–C2 (wachten; partner als hulp of last), MP-7 (a)–(d), F4b(a) co-op, F4b(b) co-op, **de boss in co-op: GM-a en GM-b in beide modi, GM-c, GM-d voor P1 én P2 (MP-7 (b)) per fase** (`gemaalmeester.md` §8), en M1 van P2 als **sterke** *Nine Sols*-check (alleen als P2 de referenties niet kent en antwoordt vóór uitleg over het merk).
@@ -214,6 +214,8 @@ Over de lus verder: MP-3 93 % van 41 landingen, SL-01 126 LP vóór de eerste po
 | W40 | **F4b(b) per kamer is een rapportwaarde**: de drie grenzen van gdd §5.1 gelden over de route-tijd; per kamer laat QA zien waar de echo stilvalt. Een kamer met (1) < 2,0 bij een mens is een bevinding voor de LGD; (2) per kamer niet, want elke kamer toetst één soort echo-actie (keren of merken). W40 wijzigt geen norm; de grenzen van MP-1, MP-2 en MP-4 per kamer komen uit `testplan-mt2.md` §3 | gdd §5.1: "De QA Lead rapporteert ook de waarden per wijk, zodat het herontwerp weet waar de echo stilviel." De grens legt §5.1 over de route |
 | W41 | **Co-op: MP-7 (c) en MP-6 zoals `test_kadewijk_coop.gd`**. (c) "per speler" = alle samenwerkingsacties per minuut (dezelfde acties als MP-2: één contact per drager en tick, een ketting als één), want elke actie vraagt beide spelers; MP-6 en F4b(b) (3) = LP met bron `_p2` of uit een samenwerkingsactie (`springplank`, `bounce`, `lancering`, `vangen`, `ontploffing`) | Zelfde getal als de check van de GP; gdd §4.5 zegt niet hoe "per speler" telt. De LGD bevestigt bij #290 |
 | W42 | **RV-6 "bij trap 2"** = een `POMP` in de kamer van `TRAP_VOL 2`, vanaf de laatste binnenkomst daar tot 120 ticks na `TRAP_VOL 2`; zonder `POMP` van het tweede lichaam (de echo, in co-op P2) daar telt de laatste `POMP` van P1 (Q-2) | Zonder die grens pakt RV-6 in co-op de pompslag bij het gemaal (± 6900 ticks eerder) |
+
+**Open punt bij W41:** MP-7 (c) is onder W41 hetzelfde getal als MP-2, terwijl gdd §4.5 "per speler" vraagt; tot de LGD W41 bevestigt (#290) is "(c) gehaald" geen onafhankelijk bewijs.
 
 **Open punt bij W40:** de LGD bevestigt W40 (F4b(b) per kamer als rapportwaarde, met (1) < 2,0 bij een mens als bevinding) bij de volgende wijziging van gdd §5.1.
 
