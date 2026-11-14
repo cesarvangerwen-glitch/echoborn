@@ -10,6 +10,8 @@ extends SceneTree
 ##   - geen `SCORE`-regels (W32) en geen oefenrun (W31);
 ##   - MP-2 per kamer en de gaten in S9 (rustpunt ≤ 720, daarna ≤ 600 ticks);
 ##   - F4b(b) met route-tijd zonder de arena (gdd §5.1);
+##   - per kamer MP-1, MP-2, MP-4 (S8 mét de boss) en F4b(b) (S8 alleen de route) (T11 Q-1,
+##     `docs/qa/testplan-t11-slice.md` §3.1, W38, W40);
 ##   - RV-2 (stuiten boven het kanaal van S7) en RV-4 (de lege loop na S3);
 ##   - RV-1: de hangtijd boven de echo per keerpunt (W33), uit het hanglog
 ##     van `botlogs.gd` (`hang_*.csv`); een meetlog van de CEO heeft geen
@@ -238,6 +240,9 @@ func _report(file_name: String, rows: Array, hang: Array) -> void:
 		route / 60.0, f1, f2a, f2b, f3 * 100.0, lp_all,
 		"positief" if f1 >= 2.0 and f2a >= 1.0 and f2b >= 0.5 and f3 >= 0.3 else "NEGATIEF"])
 
+	# --- Q-1 (T11 §6): MP-1, MP-2, MP-4 en F4b(b) per kamer, de boss apart (W38) ---
+	_per_room(rows, rep, start, end, boss_a, boss_b, acts)
+
 	# --- echo-acties per soort en per kamer (pitch §5, tabel voor de LGD) ---
 	var kinds := {}
 	for r: Array in rows:
@@ -273,6 +278,175 @@ func _report(file_name: String, rows: Array, hang: Array) -> void:
 
 	# --- §4.2 en RV-1: per keerpunt A–D, en de hangtijd (alleen met hanglog) ---
 	_turns(d, rows, rep, hang)
+
+
+## Q-1 (testplan T11 §6): per kamer MP-1, MP-2, MP-4 en F4b(b), met de boss als
+## eigen rij (W38). Een kamer = alle stukken van `KAMER` tot het volgende
+## `KAMER` met die naam (ook een tweede bezoek, zoals S5/S6 bij trap 2), half
+## open [begin, eind). **S8 telt voor F4 (MP-1, MP-2, MP-4) mét de boss**
+## (`testplan-mt2.md` §3: de normen van P1 gelden ook in het gevecht); de rij
+## "S8 route" (zonder `BOSS_START` … `BOSS_VERSLAGEN`) is alleen voor F4b(b)
+## (gdd §5.1, W38), de rij "boss" alleen ter informatie. Events tellen naar hun
+## tick, niet naar de kamerkolom; MP-2 per kamer is zo gelijk aan MP-2 per kamer
+## van FlowReport. Definities zoals over de doorloop:
+## MP-1 = langste stilstand van P1 binnen de stukken (een stilstand over een
+## kamergrens telt per kamer voor het deel dat erin valt); MP-4 = de tijd dat
+## de echo Leeg is (vanaf `RUN_START` tot de eerste `ECHO_LEEG_EIND`, en elke
+## `ECHO_LEEG_START` … `ECHO_LEEG_EIND`) gedeeld door de kamertijd; F4b(b)
+## zoals de regel F4b(b) hierboven, met de kamertijd als route-tijd.
+func _per_room(rows: Array, rep, start: int, end: int, boss_a: int, boss_b: int, acts: Array) -> void:
+	var segs := {}
+	var room_now := ""
+	var since := start
+	for r: Array in rows:
+		match r[2]:
+			"RUN_START":
+				room_now = r[1]
+				since = int(r[0])
+			"KAMER":
+				_add_seg(segs, room_now, since, int(r[0]))
+				room_now = r[4]
+				since = int(r[0])
+	_add_seg(segs, room_now, since, end)
+	var has_boss := boss_a >= 0 and boss_b >= 0
+	# Per rij: "alles" = F4 en F4b(b); "f4" = alleen F4; "f4b" = alleen F4b(b).
+	var mode := {}
+	if has_boss:
+		for k: String in segs.keys():
+			if k == "S8":
+				mode["S8"] = "f4"
+				segs["S8 route"] = _minus(segs["S8"], boss_a, boss_b)
+				mode["S8 route"] = "f4b"
+			else:
+				segs[k] = _minus(segs[k], boss_a, boss_b)
+	# De echo Leeg: [begin, eind) zoals FlowReport.
+	var empty: Array = []
+	var empty_since := start
+	for r: Array in rows:
+		match r[2]:
+			"ECHO_LEEG_START":
+				if empty_since < 0:
+					empty_since = int(r[0])
+			"ECHO_LEEG_EIND":
+				if empty_since >= 0:
+					empty.append([empty_since, int(r[0])])
+					empty_since = -1
+	if empty_since >= 0:
+		empty.append([empty_since, end])
+	var order: Array = []
+	for room in Layout.ORDER:
+		order.append(String(room))
+	if has_boss:
+		segs["boss"] = [[boss_a, boss_b]]
+		mode["boss"] = "boss"
+		order.insert(order.find("S8") + 1, "S8 route")
+		order.insert(order.find("S8") + 2, "boss")
+	var lines := PackedStringArray()
+	lines.append("| kamer | tijd (s) | MP-1 (≤ 300) | MP-2 /min (≥ 3,0) | MP-4 Leeg (≤ 40 %) | F4b(b) (1) acties/min (≥ 2,0) | (2) plank · ontploffing /min (≥ 1,0 · ≥ 0,5) | (3) LP met de echo (≥ 30 %) | F4b(b) |")
+	lines.append("|---|---|---|---|---|---|---|---|---|")
+	for k: String in order:
+		if not segs.has(k):
+			continue
+		var s: Array = segs[k]
+		var t := 0
+		for seg: Array in s:
+			t += seg[1] - seg[0]
+		if t <= 0:
+			continue
+		var mins := t / MINUTE
+		# MP-1: stilstanden van P1 zijn [begin, eind] inclusief.
+		var still := 0
+		for run: Array in rep.still_runs:
+			for seg: Array in s:
+				still = maxi(still, mini(int(run[1]) + 1, seg[1]) - maxi(int(run[0]), seg[0]))
+		var leeg := 0
+		for e: Array in empty:
+			for seg: Array in s:
+				leeg += maxi(0, mini(e[1], seg[1]) - maxi(e[0], seg[0]))
+		var n_act := 0
+		for a: Array in acts:
+			if _in_segs(s, a[0]):
+				n_act += 1
+		var n_plank := 0
+		var n_boom := 0
+		var lp_all := 0
+		var lp_echo := 0
+		var contacts := {}
+		for r: Array in rows:
+			if not _in_segs(s, int(r[0])):
+				continue
+			match r[2]:
+				"SPRINGPLANK", "VANGEN", "LANCERING":
+					var key := "%s|%s" % [r[0], r[4]]
+					if not contacts.has(key):
+						contacts[key] = true
+						n_plank += 1
+				"ONTPLOFFING":
+					n_boom += 1
+				"LP":
+					var n := int(str(r[3]).trim_prefix("+"))
+					lp_all += n
+					if str(r[4]).ends_with("_echo"):
+						lp_echo += n
+		var f1 := n_act / mins
+		var f2a := n_plank / mins
+		var f2b := n_boom / mins
+		var lp_txt := "%.0f %% van %d" % [100.0 * lp_echo / lp_all, lp_all] if lp_all > 0 else "geen LP"
+		var m: String = mode.get(k, "alles")
+		var verdict := "telt niet (gdd §5.1)"
+		if m == "f4":
+			verdict = "zie S8 route"
+		elif m != "boss":
+			var miss := PackedStringArray()
+			if f1 < 2.0:
+				miss.append("(1)")
+			if f2a < 1.0:
+				miss.append("(2) plank")
+			if f2b < 0.5:
+				miss.append("(2) ontploffing")
+			if lp_all > 0 and float(lp_echo) / lp_all < 0.3:
+				miss.append("(3)")
+			verdict = "positief" if miss.is_empty() else "mist " + ", ".join(miss)
+		var f4 := "%d%s | %.1f%s | %.1f %%" % [still, "" if still <= 300 else " **> 300**", f1,
+			"" if f1 >= 3.0 else " **< 3,0**", 100.0 * leeg / t]
+		if m == "f4b":
+			f4 = "— | — | —"
+		elif m == "boss":
+			f4 = "(%s)" % f4.replace(" | ", ") | (")
+		var f4b := "%.1f | %.1f · %.1f | %s" % [f1, f2a, f2b, lp_txt]
+		if m == "f4" or m == "boss":
+			f4b = "— | — | —"
+		lines.append("| %s | %.1f | %s | %s | %s |" % [k, t / 60.0, f4, f4b, verdict])
+	print("per kamer (Q-1; F4 met S8 mét de boss, testplan-mt2 §3; F4b(b) met de S8-route, W38; boss = informatie):\n%s" % "\n".join(lines))
+
+
+func _add_seg(segs: Dictionary, room: String, a: int, b: int) -> void:
+	if room == "" or b <= a:
+		return
+	if not segs.has(room):
+		segs[room] = []
+	segs[room].append([a, b])
+
+
+## De stukken zonder [a, b) (de boss).
+func _minus(s: Array, a: int, b: int) -> Array:
+	var out: Array = []
+	for seg: Array in s:
+		if seg[1] <= a or seg[0] >= b:
+			out.append(seg)
+			continue
+		if seg[0] < a:
+			out.append([seg[0], a])
+		if seg[1] > b:
+			out.append([b, seg[1]])
+	return out
+
+
+func _in_segs(s: Array, t: int) -> bool:
+	for seg: Array in s:
+		if t >= seg[0] and t < seg[1]:
+			return true
+	return false
 
 
 func _turns(d: int, rows: Array, rep, hang: Array) -> void:
