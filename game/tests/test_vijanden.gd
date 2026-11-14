@@ -472,9 +472,15 @@ func test_b3_schotdrager_tink(t) -> void:
 		and w["log"]["hits"][0][3] == 0, "schade op het pantser: %s" % [w["log"]["hits"]])
 	t.check(meter.value == 0, "LP na een tink: %d" % meter.value)
 	t.check(w["log"]["set"].size() == 1 and enemy.armor_intact, "geen merk of pantser weg")
-	t.check(enemy.get_node("Schot").visible and enemy.get_node("Schot").color == SliceEnemy.TINK_COLOR,
-		"geen vonk op het schot")
+	# De vonk op het schot: het frame `tink` van de sprite (#272), zolang TINK_TICKS loopt.
+	t.check(enemy.get_node("Lijf").visible and enemy.get_node("Lijf").anim == "tink",
+		"geen vonk op het schot (%s)" % enemy.get_node("Lijf").anim)
 	await t.cleanup()
+
+
+## Na de breuk toont de Schotdrager geen heel schot meer: `breuk` of een `gebroken_*`-rij (#272).
+func _schot_weg(anim: String) -> bool:
+	return anim == "breuk" or anim.begins_with("gebroken_")
 
 
 ## B-3 / §2.3, (alle D): in een E-paar (28 px) breekt de knal van het merk op de Kadeloper het
@@ -497,7 +503,7 @@ func test_b3_e_pair_blast_breaks_armor(t) -> void:
 		await t.run_ticks(sim, d + 6)
 		t.check(not kade.alive and broke == [hit_tick + d + 3], "D = %d: pantser brak op %s (%d)" % [d, broke, hit_tick + d + 3])
 		t.check(schot.alive and schot.health == 30 and _damage_of(w["log"], schot).is_empty()
-			and not schot.armor_intact and not schot.get_node("Schot").visible,
+			and not schot.armor_intact and _schot_weg(schot.get_node("Lijf").anim),
 			"D = %d: na de breuk %d SE, schade %s" % [d, schot.health, _damage_of(w["log"], schot)])
 		# Daarna: gewone vijand, 30 SE. Een treffer doet 10.
 		w["p1"].position = Vector2(schot.position.x - 18.0, Fx.STAND_Y)
