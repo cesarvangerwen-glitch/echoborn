@@ -10,6 +10,8 @@ extends RefCounted
 ## (duur); co-op bij D = 60 75–150 s (LGD, PR #253); MP-7 (co-op ÷ solo) 0,5 … 1,0 bij 60 / 90 / 120 (180 als note);
 ## `RAD_DRAAI` reden `tijd` hooguit 1 per solo-run bij D ≤ 120. Rapport: lopend wachten per keer-run en
 ## de beginner-run met 1 slag per bounce.
+## Werkaanname (DoD #190): D = 60 (besluit CEO 2026-11-12, echo-staart 1 s) en Godot 4.6.3-stable
+## (`.github/workflows/tests.yml`); de checks van B-14 (b) en (e) gelden bij D = 60.
 ##
 ## Elke run: arena van 600 px met twee muren, de Gemaalmeester op de linkermuur, P1 (en P2) met de
 ## bot als inputbron, meetlog met `watch_boss`. De run duurt van BOSS_START tot BOSS_VERSLAGEN; de
@@ -59,6 +61,8 @@ static var _coop_breaks_per_beat := -1.0
 static var _coop_phase1_ticks := -1
 ## B-14 (b2, v0.1.7): fase 1 met P2 op één plek duurt ≥ 1,25 × zo lang als in de gewone co-op-run.
 const P2_FIXED_PHASE1_MIN := 1.25
+## B-14 (b): de run "P2 op één plek" duurt hooguit zoveel ticks vanaf BOSS_START.
+const P2_FIXED_LIMIT := 6000
 ## B-9b: totale duur (ticks) van de solo-run per D, voor MP-7 in de co-op-run.
 static var _solo_ticks := {}
 ## v0.1.5 (#247, LGD-besluit in #247): de normen van de solo-run bij D = 60, in seconden.
@@ -507,7 +511,8 @@ func test_b9_c16_coop_p2_never_hits(t) -> void:
 ## helft stond dan P2: de doelhelft op de tick van het zetten, niet van de breuk (het merk leeft 150
 ## ticks, het venster is 120; Lead-review PR #303). (b2) Fase 1 duurt ≥ 1,25 × zo lang als in de
 ## gewone co-op-run. De schotbreuken per maat blijven een note (fase 1 heeft in beide runs 7 vaste
-## openingen, dus ≤ ½ is niet te halen). Hooguit 6000 ticks; P1 heeft genoeg levens.
+## openingen, dus ≤ ½ is niet te halen). Hooguit 6000 ticks vanaf BOSS_START; is fase 1 dan niet
+## klaar, dan is (b2) rood. P1 heeft genoeg levens.
 func test_b14_note_p2_one_place(t) -> void:
 	if _coop_breaks_per_beat < 0.0 or _coop_phase1_ticks < 0:
 		var normal := _arena(t, 60, true)
@@ -530,23 +535,27 @@ func test_b14_note_p2_one_place(t) -> void:
 	sim.combat.mark_exploded.connect(func(_tick: int, mark, _link: int) -> void:
 		if mark.target == boss.ketel and boss.phase == Gemaalmeester.Phase.ONE:
 			from.append(marks_half.get(mark.id, [])))
-	await _run_until(t, sim, func() -> bool: return boss.phase != Gemaalmeester.Phase.ONE, 6000)
+	# De grens van 6000 ticks telt vanaf BOSS_START (de binnenkomst ervoor telt niet mee).
+	await _run_until(t, sim, func() -> bool: return boss.start_tick >= 0, RUN_LIMIT, 1)
+	t.check(boss.start_tick >= 0, "P2 op één plek: de boss startte niet")
+	await _run_until(t, sim, func() -> bool: return boss.phase != Gemaalmeester.Phase.ONE,
+		maxi(boss.start_tick + P2_FIXED_LIMIT - sim.tick, 0))
 	run["log"].finish()
 	var m := _measure(run)
 	var breaks: int = run["log"].count("SCHOT_BREUK")
 	var per_beat := float(breaks) / maxf(float(run["beats1"]), 1.0)
 	var done := boss.phase != Gemaalmeester.Phase.ONE
-	var p1_ticks := _phase1_ticks(m) if done else 6000
+	var p1_ticks := _phase1_ticks(m) if done else -1
 	t.note("P2 als ontsteker op één plek (D = 60): %d schotbreuken in %d maten van fase 1 (%.2f per maat; gewone co-op-run %.2f), fase 1 %s" % [
 		breaks, run["beats1"], per_beat, _coop_breaks_per_beat,
-		"%d ticks" % p1_ticks if done else "niet klaar in 6000 ticks"])
+		"%d ticks" % p1_ticks if done else "niet klaar in %d ticks na BOSS_START" % P2_FIXED_LIMIT])
 	# (b1)
 	var good := func(f: Array) -> bool: return f.size() == 3 and f[0] == "p1" and f[1] != 0 and f[1] == -f[2]
 	t.check(breaks > 0 and from.size() >= breaks and from.all(good),
 		"P2 op één plek (b1): merk-ontploffingen op de ketel [zetter, doelhelft bij het zetten, helft P2] %s (verwacht elk [p1, d, −d])" % [from])
 	# (b2)
-	var ratio := float(p1_ticks) / float(_coop_phase1_ticks) if _coop_phase1_ticks > 0 else -1.0
-	t.check(ratio >= P2_FIXED_PHASE1_MIN, "P2 op één plek (b2): fase 1 %d tegen %d ticks in de gewone co-op-run (%.2f; ≥ %.2f)" % [
+	var ratio := float(p1_ticks) / float(_coop_phase1_ticks) if done and _coop_phase1_ticks > 0 else -1.0
+	t.check(done and ratio >= P2_FIXED_PHASE1_MIN, "P2 op één plek (b2): fase 1 %d (−1 = niet klaar) tegen %d ticks in de gewone co-op-run (%.2f; ≥ %.2f)" % [
 		p1_ticks, _coop_phase1_ticks, ratio, P2_FIXED_PHASE1_MIN])
 	await t.cleanup()
 
