@@ -23,8 +23,10 @@ extends "res://scripts/combat/boss.gd"
 ## de helft van P1); de doelhelft (`doelhelft`) is de helft van de volgende pompslag en springt om
 ## op de eerste tick na het actieve vlak. Op de ketel zet een treffer dan alleen een merk vanaf de
 ## doelhelft, en knalt een merk alleen door een treffer vanaf de andere helft dan waar het gezet is
-## (anders een gewone treffer: op het schot de tink, op de kern 10 SE; het merk blijft). Solo, na
-## een drop-out (vanaf de volgende aanloop), in de fasewissel en bij Wankel geldt de regel niet.
+## (anders een gewone treffer: op het schot de tink, op de kern 10 SE; het merk blijft). Solo, in
+## de fasewissel en bij Wankel geldt de regel niet. Bij een drop-out gaat de doelhelft op die tick
+## uit, ook midden in een maat (v0.1.7, #302): `DOELHELFT` = geen en de solo-regel meteen; de
+## pompslag in de aanloop houdt zijn kant, en vanaf de volgende aanloop volgt de pompslag P1.
 
 ## Begin van een maat (carillon-tel, §9.3): `beat` telt vanaf BOSS_START.
 signal beat(tick: int, number: int)
@@ -43,7 +45,8 @@ signal rad_hit(tick: int, source: String, action: String, amount: int)
 ## verplaatste de plek, B-13); het rad trilt en draait daarna naar `to_side` (−1 links, +1 rechts).
 signal rad_turning(tick: int, reason: String, to_side: int)
 ## DOELHELFT (B-10, B-14 (2)): de doelhelft van fase 1 co-op wordt `side` (−1 links, +1 rechts): op
-## de eerste maat in co-op bij het begin van de aanloop, daarna op de eerste tick na elk actief vlak.
+## de eerste maat in co-op bij het begin van de aanloop, daarna op de eerste tick na elk actief vlak;
+## `side` 0 (geen) op de tick van een drop-out van P2 (v0.1.7, GMB-14 b).
 signal target_half_changed(tick: int, side: int)
 
 const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
@@ -140,12 +143,16 @@ func attach(p_sim: Node) -> void:
 	super.attach(p_sim)
 	if sim.has_signal(&"stuit"):
 		sim.stuit.connect(_on_stuit)
+	if sim.has_signal(&"partner_left"):
+		sim.partner_left.connect(_on_partner_left)
 
 
 ## `Boss.detach` (de arena ontlaadt, #83): de stuit los, en de adds weg bij de Sim en uit de boom.
 func on_detach() -> void:
 	if sim.has_signal(&"stuit") and sim.stuit.is_connected(_on_stuit):
 		sim.stuit.disconnect(_on_stuit)
+	if sim.has_signal(&"partner_left") and sim.partner_left.is_connected(_on_partner_left):
+		sim.partner_left.disconnect(_on_partner_left)
 	for add: SliceEnemy in adds:
 		if is_instance_valid(add):
 			sim.remove_object(add)
@@ -241,6 +248,20 @@ func doelhelft(tick := -1) -> int:
 	if tick < 0:
 		tick = sim.tick if sim != null else 0
 	return _pomp_side if tick < _pomp_active_end else -_pomp_side
+
+
+## GMB-14 b, f (v0.1.7, #302): bij een drop-out van P2 (C-05) gaat de doelhelft op die tick uit, ook
+## midden in een maat en ook na de omslag: `doelhelft()` geeft 0, `DOELHELFT` = geen, en zetten en
+## knallen kan meteen van beide kanten. De pompslag in de aanloop houdt zijn kant (`begin_attack`
+## staat al); de volgende aanloop kiest de helft van P1 (`_beat`: geen wissel in de vorige maat).
+func _on_partner_left(tick: int, _at: Vector2) -> void:
+	if not _wissel:
+		return
+	_wissel = false
+	_pomp_side = 0
+	_pomp_active_end = -1
+	if phase == Phase.ONE and state == State.FIGHT:
+		target_half_changed.emit(tick, 0)
 
 
 ## Helft van arena-x van wereldpunt `at` (−1 links, +1 rechts; `x < midden` is links).

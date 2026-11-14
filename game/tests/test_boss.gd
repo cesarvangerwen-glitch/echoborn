@@ -1217,9 +1217,11 @@ func test_b14_coop_core_mark_from_target_half(t) -> void:
 	await t.cleanup()
 
 
-## B-14 test (d), GMB-14 f: na een drop-out van P2 volgt de pompslag vanaf de volgende aanloop P1
-## en zet een treffer van beide kanten een merk; na een drop-in geldt de wissel vanaf de volgende
-## aanloop, met de eerste slag op de helft van P1.
+## B-14 test (d), GMB-14 b, f (v0.1.7): drop-out ná de omslag van de doelhelft (tick 70, de omslag
+## was op 66): op die tick `DOELHELFT` = geen en `doelhelft()` = geen, en zetten kan meteen van beide
+## kanten; de volgende pompslag valt op de helft van P1 (niet op de doelhelft van tick 66), en een
+## merk van P1 knalt door de echo vanaf dezelfde helft. Na een drop-in geldt de wissel vanaf de
+## volgende aanloop, met de eerste slag op de helft van P1.
 func test_b14_drop_out_and_in_mode_per_beat(t) -> void:
 	var w := _world(t, 200.0)
 	var sim = w["sim"]
@@ -1230,9 +1232,16 @@ func test_b14_drop_out_and_in_mode_per_beat(t) -> void:
 	var log := _watch(boss)
 	var halves := []
 	boss.target_half_changed.connect(func(tick: int, side: int) -> void: halves.append([tick, side]))
+	var exploded := []
+	sim.combat.mark_exploded.connect(func(tick: int, m: Combat.Mark, _link: int) -> void: exploded.append([tick, m]))
 	await _run_to(t, sim, 70)
+	t.check(boss.doelhelft() == 1, "vóór de drop-out: doelhelft %d (verwacht rechts, na de omslag op 66)" % boss.doelhelft())
 	var echo: TailEcho = sim.drop_out()
 	t.check(echo != null and not boss.is_coop(), "drop-out van P2: verwacht een echo en solo")
+	var x0: int = sim.tick
+	var left := Vector2(KETEL_P1_X, Fx.STAND_Y)
+	t.check(boss.doelhelft(x0) == 0 and boss.part_allows_mark(boss.ketel, x0, left),
+		"op de tick van de drop-out: doelhelft %d (verwacht 0) en merken vanaf links (de oude niet-doelhelft) moet kunnen" % boss.doelhelft(x0))
 	# Maat 1 (tick 120): solo, de pompslag op de helft van P1 (links; in co-op was het rechts).
 	await _run_to(t, sim, 130)
 	t.check(boss.doelhelft() == 0, "na de drop-out: doelhelft %d (verwacht 0, geen)" % boss.doelhelft())
@@ -1251,5 +1260,56 @@ func test_b14_drop_out_and_in_mode_per_beat(t) -> void:
 	var sides: Array = log["attacks"].map(func(a: Array) -> Array: return [a[0], a[2]])
 	t.check(sides == [[0, -1], [120, -1], [240, -1], [360, 1]],
 		"pompslagen %s (L; na de drop-out L; na de drop-in eerst de helft van P1, dan om en om)" % [sides])
-	t.check(halves == [[0, -1], [66, 1], [240, -1], [286, 1]], "DOELHELFT %s (verwacht [0, L], [66, R], [240, L], [286, R])" % [halves])
+	t.check(halves == [[0, -1], [66, 1], [70, 0], [240, -1], [286, 1]],
+		"DOELHELFT %s (verwacht [0, L], [66, R], [70, geen], [240, L], [286, R])" % [halves])
+	# Het merk van P1 van links (tick 130) knalt door de echo (die de slag op dezelfde helft herhaalt).
+	t.check(not mark.alive and exploded.any(func(e: Array) -> bool: return e[1] == mark),
+		"het merk van P1 van links moet door de echo knallen (ontploffingen %s)" % [exploded.map(func(e: Array) -> int: return e[0])])
+	await t.cleanup()
+
+
+## B-14 test (d), GMB-14 b, f (v0.1.7): drop-out midden in een maat, vóór de omslag (maat 2 begint op
+## 120, de omslag zou op 166 vallen; drop-out op 130). Op die tick `DOELHELFT` = geen en `doelhelft()`
+## = geen; op 166 geen omslag; de pompslag in de aanloop houdt zijn kant (rechts); de volgende
+## pompslag volgt P1 (rechts; met de wissel was het links); een merk van P1 van rechts knalt door de
+## echo vanaf dezelfde helft (met de oude regel bleef de wissel tot 240 en knalde het daar niet).
+func test_b14_drop_out_mid_beat(t) -> void:
+	var w := _world(t, 200.0)
+	var sim = w["sim"]
+	var p1: PlayerActor = w["p1"]
+	p1.health = 1000
+	Fx.manual_player(sim, 2, Vector2(400, Fx.STAND_Y))
+	var boss := _gemaalmeester(sim)
+	var log := _watch(boss)
+	var meetlog := Meetlog.new(sim, p1, null)
+	meetlog.watch_boss(boss)
+	var halves := []
+	boss.target_half_changed.connect(func(tick: int, side: int) -> void: halves.append([tick, side]))
+	var seen := {}
+	sim.tick_finished.connect(func(tick: int) -> void: seen[tick] = boss.doelhelft(tick))
+	var exploded := []
+	sim.combat.mark_exploded.connect(func(tick: int, m: Combat.Mark, _link: int) -> void: exploded.append([tick, m]))
+	await _run_to(t, sim, 130)
+	t.check(boss.doelhelft() == 1, "vóór de drop-out: doelhelft %d (verwacht rechts, de slag van maat 2)" % boss.doelhelft())
+	var echo: TailEcho = sim.drop_out()
+	t.check(echo != null and not boss.is_coop(), "drop-out van P2: verwacht een echo en solo")
+	var x0: int = sim.tick
+	# P1 merkt het schot van rechts, op de helft van de pompslag die nog in de aanloop is.
+	_place(p1, 344.0, -1)
+	await _play(t, sim, p1, A)
+	var mark: Combat.Mark = sim.combat.mark_on(boss.ketel)
+	t.check(mark != null and mark.setter == "p1", "P1 rechts na de drop-out: er moet een merk van P1 staan")
+	_place(p1, 400.0, -1)
+	await _run_to(t, sim, 250)
+	var sides: Array = log["attacks"].map(func(a: Array) -> Array: return [a[0], a[2]])
+	t.check(sides == [[0, -1], [120, 1], [240, 1]],
+		"pompslagen %s (L, R; de slag in de aanloop houdt R; daarna de helft van P1, R)" % [sides])
+	t.check(halves == [[0, -1], [66, 1], [x0, 0]], "DOELHELFT %s (verwacht [0, L], [66, R], [%d, geen]; geen omslag op 166)" % [halves, x0])
+	var rows: Array = meetlog.rows.filter(func(r: PackedStringArray) -> bool: return r[2] == "DOELHELFT") \
+		.map(func(r: PackedStringArray) -> Array: return [int(r[0]), r[3]])
+	t.check(rows.size() == 3 and rows[2] == [x0, "geen"], "meetlog DOELHELFT %s (de laatste [%d, geen])" % [rows, x0])
+	t.check(seen.get(x0) == 0 and seen.get(166) == 0 and seen.get(200) == 0,
+		"doelhelft() op %d/166/200 = %s/%s/%s (verwacht 0)" % [x0, seen.get(x0), seen.get(166), seen.get(200)])
+	t.check(not mark.alive and exploded.any(func(e: Array) -> bool: return e[1] == mark and e[0] < 240),
+		"het merk van P1 van rechts moet vóór 240 door de echo knallen (ontploffingen %s)" % [exploded.map(func(e: Array) -> int: return e[0])])
 	await t.cleanup()
