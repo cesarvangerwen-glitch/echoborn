@@ -3,10 +3,12 @@ extends "res://scripts/combat/combat_target.gd"
 ##
 ## Eén soort met een type (slice-vijanden-en-boss.md §2): alle drie `Merkbaar` (`Kind.ENEMY`);
 ## de Schotdrager is een Kadeloper met een pantser (E-14g), het Dwaallicht zweeft op een baan.
-## Alle waarden komen uit `slice.csv` (EnemyData); de snelheid hangt van D af (VJ-03). Placeholder-
-## beeld met tells en vlaggen die tests lezen (B-11): `is_telling`, `is_attack_active`, `tink_tick`.
+## Alle waarden komen uit `slice.csv` (EnemyData); de snelheid hangt van D af (VJ-03). Het beeld
+## (sprites van de Animator, #272) volgt de vlaggen die ook tests lezen (B-11): `is_telling`,
+## `is_attack_active`, `tink_tick`.
 
 const EnemyData = preload("res://scripts/combat/enemy_data.gd")
+const VijandBeeld = preload("res://art/animatie/vijanden/vijand_beeld.gd")
 
 enum Type { KADELOPER, SCHOTDRAGER, DWAALLICHT }
 ## Fase van een aanval (VJ-01): aanloop met tell, actief vlak, herstel. Het Dwaallicht keert in
@@ -15,13 +17,8 @@ enum Phase { IDLE, WINDUP, ACTIVE, RECOVER }
 
 const GROUPS := {Type.KADELOPER: "kadeloper", Type.SCHOTDRAGER: "schotdrager",
 	Type.DWAALLICHT: "dwaallicht"}
-## Placeholder-kleuren (§9: leesbaar in silhouet; de Animator vervangt ze).
-const TYPE_COLORS := {Type.KADELOPER: Color(0.72, 0.32, 0.3), Type.SCHOTDRAGER: Color(0.5, 0.42, 0.38),
-	Type.DWAALLICHT: Color(0.55, 0.75, 0.95)}
-const SHIELD_COLOR := Color(0.62, 0.62, 0.68)
-const TELL_COLOR := Color(1.0, 0.85, 0.55)
-const TINK_COLOR := Color(1.0, 1.0, 0.9)
-const TINK_TICKS := 4
+## De tink-vonk duurt zo lang (Schotdrager `tink`, 4 ticks).
+const TINK_TICKS := VijandBeeld.TINK_TICKS
 
 ## Een aanloop begon (tell in beeld en geluid, §9): voor Audio, HUD en tests.
 signal attack_started(tick: int)
@@ -53,6 +50,8 @@ var _lane_dir := 1
 var _lane_y := 0.0
 var _dive_from := Vector2.ZERO
 var _attack_facing := 1
+## Het beeld (sprites), alleen beeld (TA, #272).
+var _beeld: VijandBeeld
 
 
 ## In code (tests, demo, kamers): type en plek. Een loper staat met zijn onderkant op `floor_y`;
@@ -376,55 +375,24 @@ func _group() -> String:
 	return GROUPS[enemy_type]
 
 
-# --- placeholder-beeld (B-11) --------------------------------------------------
+# --- beeld (B-11; sprites van de Animator, #272, gekoppeld door de TA) ------------
 
+## Het beeld: `VijandBeeld` (sprites uit `<type>.json`: `Lijf`, `Tell`, bij het Dwaallicht
+## `Duiklijn`). Het placeholderbeeld `Beeld` van `CombatTarget` blijft bestaan, maar uit.
 func _ensure_visual() -> void:
 	super._ensure_visual()
-	var body := get_node_or_null(^"Beeld") as Polygon2D
+	var body := get_node_or_null(^"Beeld") as CanvasItem
 	if body != null:
-		body.color = TYPE_COLORS[enemy_type]
-	if enemy_type == Type.SCHOTDRAGER and get_node_or_null(^"Schot") == null:
-		var shield := BodyBuilder.make_visual(Vector2(EnemyData.value(_group(), "beeld_breedte") - body_size().x,
-			EnemyData.value(_group(), "beeld_hoogte")), SHIELD_COLOR)
-		shield.name = "Schot"
-		add_child(shield)
-	if get_node_or_null(^"Ogen") == null:
-		var eyes := BodyBuilder.make_visual(Vector2(6, 2), Color.WHITE)
-		eyes.name = "Ogen"
-		eyes.position = Vector2(0, -body_size().y * 0.25)
-		add_child(eyes)
-	if get_node_or_null(^"Tell") == null:
-		var tell := Polygon2D.new()
-		tell.name = "Tell"
-		tell.color = TELL_COLOR
-		tell.visible = false
-		add_child(tell)
+		body.visible = false
+	if _beeld != null and _beeld.type_naam != _group():
+		_beeld.wis()
+		_beeld = null
+	if _beeld == null:
+		_beeld = VijandBeeld.new(self, _group())
 
 
-## Tell (aanloop: vlak licht op, feller naar het einde), actief vlak, tink-vonk, ogen in het donker
-## feller (VJ-06). Alleen beeld; de vlaggen hierboven zijn wat tests lezen.
+## Het beeld volgt de vlaggen (`VijandBeeld.update`). Alleen beeld: tests lezen de vlaggen
+## hierboven (`is_telling`, `is_attack_active`, `active_box`, `tink_tick`).
 func _update_visual(tick: int) -> void:
-	var tell := get_node_or_null(^"Tell") as Polygon2D
-	var eyes := get_node_or_null(^"Ogen") as Polygon2D
-	var shield := get_node_or_null(^"Schot") as Polygon2D
-	if eyes != null:
-		eyes.color = Color(1.0, 0.95, 0.6) if not lit else Color(0.6, 0.55, 0.45)
-	if shield != null:
-		shield.visible = armor_intact
-		shield.position = Vector2(facing * (body_size().x * 0.5 + shield.polygon[2].x), 0.0)
-		shield.color = TINK_COLOR if tick - tink_tick < TINK_TICKS else SHIELD_COLOR
-	if tell == null:
-		return
-	var box := Rect2()
-	if phase == Phase.WINDUP or phase == Phase.ACTIVE:
-		box = _walker_box() if enemy_type != Type.DWAALLICHT else Rect2(global_position - body_size() * 0.5, body_size())
-	tell.visible = box.has_area()
-	if tell.visible:
-		var local := box.position - global_position
-		tell.polygon = PackedVector2Array([local, local + Vector2(box.size.x, 0), local + box.size,
-			local + Vector2(0, box.size.y)])
-		var progress := 1.0
-		if phase == Phase.WINDUP:
-			var total := float(EnemyData.windup(_group(), lit))
-			progress = clampf(1.0 - float(_phase_end - tick) / total, 0.0, 1.0)
-		tell.color = Color(TELL_COLOR, 0.15 + 0.45 * progress) if phase == Phase.WINDUP else Color(1, 0.4, 0.3, 0.8)
+	if _beeld != null:
+		_beeld.update(tick)
