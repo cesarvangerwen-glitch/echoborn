@@ -1,6 +1,6 @@
 # Kamers: de Kadewijk (wijk 1.3, de slice): S1–S9
 
-Versie 0.4.10 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8, deel 3 S9) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
+Versie 0.4.11 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8, deel 3 S9) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
 
 Bronnen: `docs/design/wereld.md` v0.2 §2 (kamerlijst §2.2, SL-regels §2.3, vijandtypes §2.4, T8a §2.5, acceptatie §2.6), `docs/design/gdd.md` v0.8.2 (§4.3 bouwstenen met D in formules, L-08–L-14, §4.5 normen, §4.8.5 vaste basis, §4.8.7 de langzame lijn met dash), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.3 (§2.6 plaatsing, VJ-01–VJ-08, §3.2 arena), `docs/design/gemaalmeester.md` v0.2.2 (GM-01, GM-07, GM-10, GM-11), `docs/productie/fase-2-kader.md` v0.4 §4, `docs/tech/ontwerp.md` v0.3 (§3a, §7, §12 "naar T8a"), de visie-review van de CD ([comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), `docs/concept/visie-review/kadewijk/`).
 
@@ -454,6 +454,8 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 - **S3 Vismarkt: Visie-review: past** (CD, #212): de echo is je tweede slag (46 van 88 LP). Punt van de CD, geen blokkade: na golf 2 ± 5 s leeg lopen naar de uitgang (§9).
 - **S4 Brugkloof: Visie-review: past** (CD, [#212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), na het herontwerp van #217, doorloop PR #221; eerst "past niet"): keren tegen de bolder, de echo tegemoet, lancering en dash over de kloof, 19 ticks sneller dan de langzame lijn. Kanttekeningen van de CD: ± 10 ticks in de lucht boven de naderende echo (MT1: leest het als wachten?), en bij D ≥ 90 is de echolijn trager (stijgt D, dan terug naar de CD).
 
+**Keerpunten in co-op** (WLD met de LGD, [#299](https://github.com/cesarvangerwen-glitch/echoborn/issues/299), gdd v0.8.7 §4.8.8): **geen kameropdracht.** Wie achteraan komt, draagt. De voorste keert en gaat hem tegemoet, bij B1 en B2 tot `Z + 60` px van de keerwand en nooit onder een trede. Bij B3 stopt hij op x 1160, of hij gaat onder de trede van 35 door tot hooguit x 1000 als de drager bij het keren links van x 900 is (gdd §4.8.8). Dat past op de bestaande maten. Galerijen en richels zijn eenrichting (`ONE_WAY_T`), dus een bounce tot daar komt erdoorheen. De treden beginnen aan de keerwand, waar de drager toch heen loopt. Geen co-op-versie van een kamer (C-15 d). De bouw (de duo-bot) is van de GP (KP-1–KP-3).
+
 **Maatvast per kamer** (fasekader §4 regel 3: bots groen op D = 60 + `Visie-review: past` van de CD + geen open herontwerp):
 
 | Kamer | Stand |
@@ -548,6 +550,7 @@ Besluiten: D = 60 als werkaanname, bereik 1–3 s, en fase 2 parallel, ook bouwe
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie: S1–S4 als grijze kamers, bot en tests bij D = 60 (120/180 regressie) |
 | 0.1.1 | 2026-11-12 | Lead-review #208: langzame lijn met dash gemeten bij 60/90/120 (§6), besluiten van de LGD per afwijking en maatvast-stand per kamer (§8), open punten bijgewerkt (§9) |
+| 0.4.11 | 2026-11-14 | WLD met de LGD, [#299](https://github.com/cesarvangerwen-glitch/echoborn/issues/299): keerpunten in co-op in §8, zonder kameropdracht (gdd v0.8.7 §4.8.8) |
 | 0.4.10 | 2026-11-14 | GP, [#291](https://github.com/cesarvangerwen-glitch/echoborn/issues/291) (G-3): de lus zonder echo gemeten bij D = 60/120/180, per kamer met de verhouding tot de lus met echo, en de keuze voor S8 (C-16-testuitzondering) in §6d; §9 bijgewerkt; TD-review #296: S5 ≤ 2×, `abort_attack` vóór `_defeat`, venster = negatief bewijs; SM-review #296: S6 de enige kamer zonder toets per kamer, waarom geen D = 90 |
 | 0.4.9 | 2026-11-13 | §9 B-1: de grens van het rustpunt (± 12 s, #227) en de gemeten waarden van de note uit CI op `main` (D = 60/120/180: 20,0 / 19,5 / 19,0 s) erbij (LGD, [comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429)) |
 | 0.4.8 | 2026-11-13 | §8: S8 en S9 maatvast (LGD, [comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6844964137)): S1–S9 alle negen maatvast. B-1 (LGD, [comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429)): het gat na trap 2 als rapport in `test_kadewijk_lus.gd`, de terugvaloptie (keerpunt aan de voet van de trap) in §9 als na-MT2-punt |
