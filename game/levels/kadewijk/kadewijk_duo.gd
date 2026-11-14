@@ -38,12 +38,12 @@ extends RefCounted
 ##   als tweede, twee treden achter de ander. Op de trap staat dus nooit iemand op de
 ##   ander, en niemand wacht onderaan.
 ## - **De Gemaalmeester** (S8): `boss_input` maakt de boss-bot (`tests/boss_bot.gd`,
-##   co-op: P2 als drager onder het rad, merk-combo op de ketel); tot `BOSS_START`
-##   lopen beide spelers zelf de arena in (de boss start pas als beide lichamen
-##   24 px binnen de muren staan, #229). De boss-bot laat P2 aan de ketel en onder
-##   het rad tot ± 925 ticks stilstaan (arena-test). Het duo laat dat zo: wachten met
-##   wiebelen telt als wachten (gdd MP-1/MP-3). MP-7 (b) van P2 in de boss is dus niet
-##   gehaald → G-2 (Combat Designer); zie `tests/test_kadewijk_coop.gd`.
+##   co-op, B-14: in fase 1 de wissel van GMB-14, P2 zet het merk op de doelhelft en P1
+##   ontsteekt vanaf de andere helft; in fase 2 drager en springer, GMB-15; Wankel GMB-16);
+##   tot `BOSS_START` lopen beide spelers zelf de arena in (de boss start pas als beide
+##   lichamen 24 px binnen de muren staan, #229, GM-01). Na `BOSS_VERSLAGEN` (deur links
+##   open) nemen beide stoelen weer de route, door naar S9. MP-7 (b) van P2 in de boss:
+##   `tests/test_kadewijk_coop.gd` (B-14 (g)).
 ##
 ## Samen blijven: wie voor is en meer dan 400 × 300 px van de ander, wacht heen en
 ## weer (± 18 px; net buiten de 24 px van MP-1, daarom telt elke stoel die ticks per
