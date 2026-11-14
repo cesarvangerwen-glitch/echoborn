@@ -215,7 +215,7 @@ Over de lus verder: MP-3 93 % van 41 landingen, SL-01 126 LP vóór de eerste po
 | W41 | **Co-op: MP-7 (c) en MP-6 zoals `test_kadewijk_coop.gd`**. (c) "per speler" = alle samenwerkingsacties per minuut (dezelfde acties als MP-2: één contact per drager en tick, een ketting als één), want elke actie vraagt beide spelers; MP-6 en F4b(b) (3) = LP met bron `_p2` of uit een samenwerkingsactie (`springplank`, `bounce`, `lancering`, `vangen`, `ontploffing`) | Zelfde getal als de check van de GP; gdd §4.5 zegt niet hoe "per speler" telt. De LGD bevestigt bij #290 |
 | W42 | **RV-6 "bij trap 2"** = een `POMP` in de kamer van `TRAP_VOL 2`, vanaf de laatste binnenkomst daar tot 120 ticks na `TRAP_VOL 2`; zonder `POMP` van het tweede lichaam (de echo, in co-op P2) daar telt de laatste `POMP` van P1 (Q-2) | Zonder die grens pakt RV-6 in co-op de pompslag bij het gemaal (± 6900 ticks eerder) |
 
-**Open punt bij W41:** MP-7 (c) is onder W41 hetzelfde getal als MP-2, terwijl gdd §4.5 "per speler" vraagt; tot de LGD W41 bevestigt (#290) is "(c) gehaald" geen onafhankelijk bewijs.
+**Open punt bij W41:** MP-7 (c) is onder W41 hetzelfde getal als MP-2, terwijl gdd §4.5 "per speler" vraagt; tot de LGD W41 bevestigt ([#290](https://github.com/cesarvangerwen-glitch/echoborn/issues/290)) is "(c) gehaald" geen onafhankelijk bewijs.
 
 **Open punt bij W40:** de LGD bevestigt W40 (F4b(b) per kamer als rapportwaarde, met (1) < 2,0 bij een mens als bevinding) bij de volgende wijziging van gdd §5.1.
 
