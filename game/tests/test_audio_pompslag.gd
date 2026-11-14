@@ -215,8 +215,9 @@ func test_audio_raakt_de_sim_niet(t) -> void:
 
 ## Bible §4.1: breekt P1 of de echo het luik, dan klinkt hetzelfde breekgeluid
 ## (stream, volume_db, bus SFX, pitch 1,0). De schaduwklep die de echo weghaalt
-## klinkt ook zo; die die vanzelf weggaat ("tijd") niet. Zonder bestand (de
-## data, nog leeg) is het luik stil en zonder fout.
+## klinkt ook zo; die die vanzelf weggaat ("tijd") niet. Het geluid komt uit de
+## data (`luik_breekt.stream`, het echte bestand). Zonder bestand (`sfx` null)
+## is het luik stil en zonder fout.
 func test_luik_zelfde_breekgeluid(t) -> void:
 	var sim = Fx.world(t)
 	var luiken: Array = []
@@ -228,14 +229,21 @@ func test_luik_zelfde_breekgeluid(t) -> void:
 		sim.add_object(luik)
 		luiken.append(luik)
 	var stil: Luik = luiken[2]
+	stil.audio.sfx = null
 	stil.apply_damage(5, 0, "p1")
 	t.check(stil.is_open and stil.audio != null and stil.audio.starts.is_empty(),
 		"luik zonder geluid: %d starts" % (stil.audio.starts.size() if stil.audio else -1))
-	var sfx := _test_stream()
+	var c := SimSfx.config("luik_breekt")
+	var sfx := SimSfx.stream(String(c.get("stream", "")))
+	t.check(sfx is AudioStreamWAV and String(c.get("stream", "")).ends_with("luik_breekt_placeholder.wav"),
+		"luik_breekt.stream (%s) laadt niet als WAV" % c.get("stream", ""))
 	var a: Luik = luiken[0]
 	var b: Luik = luiken[1]
-	a.audio.sfx = sfx
-	b.audio.sfx = sfx
+	# Geen eigen stream: beide luiken nemen hem uit de data, en dat is hetzelfde object.
+	# De is_same-checks leunen op de resource-cache van `load()`: zolang iemand de
+	# stream vasthoudt (hier `sfx`), geeft elk `load()` van dat pad hetzelfde object.
+	t.check(is_same(a.audio.sfx, sfx) and is_same(b.audio.sfx, sfx),
+		"de luiken laden het breekgeluid niet uit de data: %s / %s" % [a.audio.sfx, b.audio.sfx])
 	a.apply_damage(10, 0, "p1")
 	b.apply_damage(70, 0, "echo")
 	b.schaduwklep_weg.emit(80, "tijd")
@@ -247,7 +255,8 @@ func test_luik_zelfde_breekgeluid(t) -> void:
 		for s: Dictionary in sb:
 			t.check(is_same(s["stream"], sa[0]["stream"]) and s["volume_db"] == sa[0]["volume_db"]
 				and s["bus"] == &"SFX" and sa[0]["bus"] == &"SFX" and s["send"] == sa[0]["send"]
-				and is_equal_approx(s["pitch"], 1.0) and is_equal_approx(sa[0]["pitch"], 1.0),
+				and is_equal_approx(s["pitch"], 1.0) and is_equal_approx(sa[0]["pitch"], 1.0)
+				and is_same(s["stream"], sfx) and is_equal_approx(s["volume_db"], float(c.get("volume_db", 0.0))),
 				"echo (%s) breekt anders dan P1: %s / %s" % [s["who"], s, sa[0]])
 		t.check(sb[0]["tick"] == 70 and sb[1]["tick"] == 90 and sa[0]["tick"] == 10, "ticks van de starts")
 	await t.cleanup()

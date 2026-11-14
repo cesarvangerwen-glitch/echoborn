@@ -8,8 +8,8 @@
     "max_stemmen": 3
   },
   "luik_breekt": {
-    "_toelichting": "Hetzelfde breekgeluid voor P1, P2 en de echo. Het bestand staat klaar: res://audio/sfx/omgeving/luik_breekt_placeholder.wav (#243, Composer/Sound Designer). stream blijft leeg tot de Gameplay Programmer het pad zet en het stille luik in test_luik_zelfde_breekgeluid een eigen lege sfx geeft.",
-    "stream": "",
+    "_toelichting": "Hetzelfde breekgeluid voor P1, P2 en de echo, ook als de echo de schaduwklep wegslaat (V-01d); \"tijd\" is stil. Bestand van de Composer/Sound Designer (#243, slice-audio.md §1.3, −15 LUFS). Maskeert het luik in S7 een tell van de Dwaallichten, dan gaat volume_db naar −1 (mixpass MT2).",
+    "stream": "res://audio/sfx/omgeving/luik_breekt_placeholder.wav",
     "volume_db": 0.0,
     "max_stemmen": 2
   },

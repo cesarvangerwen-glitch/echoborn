@@ -12,8 +12,8 @@ extends "res://scripts/audio/sim_sfx.gd"
 ##   een treffer die niet telt.
 ##
 ## Waarden in `data/audio.json`, groep `rad_treffer`. De levende
-## `gm_rad_treffer_1/_2` staan nog niet in `game/audio/` (alleen in
-## `docs/audio/t8d-slice/`): tot ze er zijn, zijn de treffers van P1/P2 stil.
+## `gm_rad_treffer_1/_2` staan in `audio/sfx/gemaalmeester/` (Composer/Sound
+## Designer, `slice-audio.md` §1.3); de holle echo-versie in `audio/sfx/echo/`.
 
 const EnemyData = preload("res://scripts/combat/enemy_data.gd")
 
