@@ -33,12 +33,12 @@ extends RefCounted
 ## perioden die overlappen tellen als één). **Check** (langste ≤ 300 ticks en aandeel ≤ 5 % per
 ## speler, en P2 pompt mee) op trap 2 samen: van `BOSS_VERSLAGEN` tot P1 na trap 2 terug in S9
 ## is (#292; P2 minstens 3 van de 7 slagen). Over de hele lus buiten de boss haalt de duo-bot de
-## norm (300 / 5 %) nog niet: hij wacht ook bij de keerpunten (de drager op de springer, die de
-## langzame lijn van het vorige keerpunt nam) en bij de smalle plekken (de luiken, de schacht, de
-## Dwaallichten): D = 60 ± 12 % per speler, bij D ≥ 120 ook langste > 300. Daar staat een
-## **regressiegrens als check** (langste ≤ 400 ticks en aandeel ≤ 16 % per speler, besluit TD in
-## PR #297); de norm volgt in #298 (GP: smalle plekken in de duo-bot) en #299 (LGD/WLD: keerpunten
-## in co-op). Per kamer en in de boss is het een rapportwaarde.
+## norm (300 / 5 %) nog niet: hij wacht nog bij de keerpunten (de drager op de springer; KP-1 van
+## gdd §4.8.8, #298) en kort bij het Dwaallicht van S9 (± 210 ticks). Op de smalle plekken (de
+## luiken, de schacht) wacht hij niet meer (#298 deel 1): D = 60 ± 8 % / 5 % (P1 / P2), bij D = 180
+## langste ± 317. Daar staat een **regressiegrens als check** (langste ≤ 350 ticks en aandeel ≤ 13 %
+## per speler; was 400 / 16 %, besluit TD in PR #297); de norm 300 / 5 % volgt met KP-1–KP-3
+## (#298 deel 2). Per kamer en in de boss is het een rapportwaarde.
 ## Ter vergelijking ook het wachten van de bot zelf (`wait_ticks`, ± 18 px, geen maat). Verder:
 ## de lus is rond, de boss verslagen (één poging), trap 2 en het water, alles opgepakt, geen
 ## respawn, en de run is deterministisch.
@@ -72,10 +72,11 @@ const Gemaalmeester = preload("res://scripts/combat/gemaalmeester.gd")
 const InputBits = preload("res://scripts/input/input_bits.gd")
 
 const RUN_LIMIT := 34000
-## MP-7 (e) over de lus buiten de boss: regressiegrens per speler tot #298 en #299 (besluit TD,
-## PR #297); de norm is 300 ticks / 5 %.
-const WAIT_REGRESSIE_MAX := 400
-const WAIT_REGRESSIE_SHARE := 0.16
+## MP-7 (e) over de lus buiten de boss: regressiegrens per speler tot KP-1–KP-3 (#298 deel 2; was
+## 400 / 16 %, besluit TD in PR #297; aangescherpt na de smalle plekken, #298 deel 1); de norm is
+## 300 ticks / 5 %.
+const WAIT_REGRESSIE_MAX := 350
+const WAIT_REGRESSIE_SHARE := 0.13
 const MINUTE := 3600.0
 ## Bronnen van LP met een samenwerkingsactie (MP-6 co-op), zoals `test_flowtest_t17.gd`.
 const COOP_LP := ["springplank", "bounce", "lancering", "vangen", "ontploffing"]
@@ -611,11 +612,11 @@ func _lus(t, d: int) -> String:
 	t.check(_count(rows, "WACHT_START") == _count(rows, "WACHT_EIND"), "%s: WACHT_START en WACHT_EIND niet in paren" % name)
 	if at["boss_start"] >= 0 and at["verslagen"] >= 0:
 		var buiten := _measure(rows, [[first_tick, at["boss_start"]], [at["verslagen"], last_tick]])
-		# MP-7 (e) over de lus buiten de boss: check op de regressiegrens (400 / 16 %), de norm
-		# (300 / 5 %) volgt in #298 en #299, zie de kop; de boss: rapport.
+		# MP-7 (e) over de lus buiten de boss: check op de regressiegrens (350 / 13 %), de norm
+		# (300 / 5 %) volgt met KP-1–KP-3 (#298 deel 2), zie de kop; de boss: rapport.
 		fails.append_array(_wait_norms(buiten, WAIT_REGRESSIE_MAX, WAIT_REGRESSIE_SHARE))
 		var open_e := _wait_norms(buiten)
-		mp7e_buiten = "%s → %s" % [_fmt_wait(buiten), "gehaald" if open_e.is_empty() else "niet gehaald (%s), grens 300 / 5 %% volgt in #298 en #299" % "; ".join(open_e)]
+		mp7e_buiten = "%s → %s" % [_fmt_wait(buiten), "gehaald" if open_e.is_empty() else "niet gehaald (%s), grens 300 / 5 %% volgt met KP-1–KP-3 (#298 deel 2)" % "; ".join(open_e)]
 	else:
 		fails.append("geen BOSS_START … BOSS_VERSLAGEN: MP-7e buiten de boss niet te meten")
 	# MP-7 (e), de check van #292: trap 2 samen, van `BOSS_VERSLAGEN` tot P1 terug in S9 is
