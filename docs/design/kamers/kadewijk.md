@@ -1,6 +1,6 @@
 # Kamers: de Kadewijk (wijk 1.3, de slice): S1–S9
 
-Versie 0.4.9 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8, deel 3 S9) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
+Versie 0.4.10 · Eigenaar: World & Level Designer · Issues [#83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83) (T8a, eigenaar Gameplay Programmer met WLD; deel 1 S1–S4, deel 2 S5–S8, deel 3 S9) en [#217](https://github.com/cesarvangerwen-glitch/echoborn/issues/217) (S4 herontwerp, W-12) · Review: Lead Game Designer
 
 Bronnen: `docs/design/wereld.md` v0.2 §2 (kamerlijst §2.2, SL-regels §2.3, vijandtypes §2.4, T8a §2.5, acceptatie §2.6), `docs/design/gdd.md` v0.8.2 (§4.3 bouwstenen met D in formules, L-08–L-14, §4.5 normen, §4.8.5 vaste basis, §4.8.7 de langzame lijn met dash), `docs/design/combat/slice-vijanden-en-boss.md` v0.1.3 (§2.6 plaatsing, VJ-01–VJ-08, §3.2 arena), `docs/design/gemaalmeester.md` v0.2.2 (GM-01, GM-07, GM-10, GM-11), `docs/productie/fase-2-kader.md` v0.4 §4, `docs/tech/ontwerp.md` v0.3 (§3a, §7, §12 "naar T8a"), de visie-review van de CD ([comment in #212](https://github.com/cesarvangerwen-glitch/echoborn/issues/212), `docs/concept/visie-review/kadewijk/`).
 
@@ -354,6 +354,30 @@ De normen van de lus: de boss verslagen zonder dood (≤ 4 treffers), trap 2 pas
 
 **De runs van deel 1–3 geven dezelfde ticks** (vergeleken met `main`, hele suite), op één ding na: **de motorfix van #231** (§9). Tegen een muur aan houdt P1 nu de vloer. De bot van de langzame lijn springt daardoor eerder: in S4 de treden van de kloof 3 ticks eerder (de runs zonder echo van deel 1 en 2 −3, de langzame lijn van B4 287 → 284), en in de co-op-meeloper van de flow-kamer (T17) −2. Elke run mét echo is gelijk, ook S9, de boss-runs en W-12. Het lampglas geeft in de runs van deel 2 6 levenspunten; daar is niemand geraakt, dus dezelfde ticks.
 
+### De lus zonder echo (G-3, `test_kadewijk_lus_zonder_echo.gd`, [#291](https://github.com/cesarvangerwen-glitch/echoborn/issues/291))
+
+Dezelfde bot en dezelfde route als hierboven, solo met de echo uit: de bot neemt bij elke bouwsteen de langzame lijn (FK-2) en haalt in S6 licht in S5 (afwijking 10). Ter vergelijking draait de test de lus mét echo opnieuw bij dezelfde D. Ticks bij 60 Hz; een kamer = alle bezoeken samen (FlowReport); **S8 zonder de boss** (`BOSS_START` … `BOSS_VERSLAGEN` telt in geen verhouding mee).
+
+**Keuze voor S8: een testuitzondering.** Solo met de echo uit is de Gemaalmeester niet te verslaan (C-16 a). De lus gaat de arena in, vecht 1800 ticks (30 s, langer dan fase 1 mét echo) met de boss-bot en toetst daar C-16 in de echte arena: het schot breekt niet, de boss verliest geen SE, de bot verslaat hem niet. Dat venster is alleen negatief bewijs; het bewijs voor C-16 (a) blijft B-5/B-7 in `test_boss.gd`. Daarna breekt de test een lopende aanval af (`abort_attack`) en verslaat hij de boss langs dezelfde weg als de finisher (`BOSS_VERSLAGEN`, de deuren open, 100 LP, de vlag), zodat trap 2, het hoogwater, S9 en het snelluik zonder echo getoetst zijn. Zo eindigt de lus niet vóór de boss en mist de test geen kamer.
+
+| Per kamer: zonder / met echo (ticks, ×) | **D = 60** | D = 120 | D = 180 |
+|---|---|---|---|
+| S1 | 619 / 575 (1,08×) | 619 / 567 (1,09×) | 619 / 567 (1,09×) |
+| S2 | 1200 / 1038 (1,16×) | 1199 / 1083 (1,11×) | 1199 / 1141 (1,05×) |
+| S3 | 1034 / 941 (1,10×) | 1042 / 1077 (0,97×) | 1096 / 1343 (0,82×) |
+| S4 | 558 / 499 (1,12×) | 558 / 571 (0,98×) | 558 / 631 (0,88×) |
+| S5 (twee bezoeken + licht halen) | 1628 / 1449 (1,12×) | 1628 / 1416 (1,15×) | 1628 / 1448 (1,12×) |
+| S6 (4× terug voor licht, afwijking 10) | 4868 / 1031 (**4,72×**) | 4872 / 1031 (4,73×) | 4870 / 1031 (4,72×) |
+| S7 | 430 / 430 (1,00×) | 430 / 430 (1,00×) | 430 / 430 (1,00×) |
+| S8 route (arena in en uit) | 166 / 230 (0,72×) | 166 / 292 (0,57×) | 166 / 354 (0,47×) |
+| S9 (met de trap en trap 2) | 3675 / 3457 (1,06×) | 3674 / 3433 (1,07×) | 3675 / 3449 (1,07×) |
+| **Route (zonder de boss)** | **14 179 / 9651 (1,47×, marge 5123 tot 2×)** | 14 189 / 9901 (1,43×) | 14 242 / 10 395 (1,37×) |
+| Run tot `SLICE_EIND` (boss = C-16-venster) | 15 979 (1800) | 15 989 (1800) | 16 042 (1800) |
+
+**S6 (4,7×) is de enige kamer waar C-15 per kamer hier niet getoetst wordt**: zonder echo komt P1 er met minder licht aan en moet hij 4× terug; C-15 voor S6 is getoetst met gelijk licht bij binnenkomst in §6b (1,45×, `test_kadewijk_deel2.gd`). **D = 90 is bewust niet gemeten**: de lus met echo (`test_kadewijk_lus.gd`) draait bij 60/120/180, de verhouding van de route daalt van 60 naar 120 (1,47× → 1,43×), en 90 ligt tussen twee D die allebei met ruime marge groen zijn (5123 en 5613 ticks tot 2×); een vierde D kost ± 10 s in de lange groep. Niet gemeten is dus ook niet bewezen: bij een twijfel over 90 komt hij erbij.
+
+Normen (alle groen bij 60/120/180): de route ≤ 2× (C-15 a, FK-2); per kamer ≤ 2× buiten S6 (daar rapport: 4× terug voor licht zonder echo, afwijking 10; C-15 in S6 met gelijk licht staat in §6b, 1,45×); ≤ 4× terug voor licht (4); **elke plek bereikbaar**: alle negen kamers, de vijf verzamelobjecten en `S8/BossVerslagen` in de save, het gemaal vol (200), trap 2 en 180 ticks later het hoogwater, de luiken van S7 en S9, één `SLICE_EIND`; **geen echolijn** op de 13 bouwstenen met een echolijn (B1–B4, het gemaal, trap 2); 0 respawns, MP-1 ≤ 300, ≤ 5 vijanden. De stuit op het luik, het kanaal, het Dwaallicht en de schacht is de Neerslag van P1 zelf (V-01), geen samenwerkingsactie, en telt dus niet als echolijn. In de lus mét echo zijn S3 en S4 bij D ≥ 120 trager dan zonder (de bot wacht op de lange staart); samenwerken levert op de route dus alleen tempo op, nooit een plek (C-15 b).
+
 ## 7. Checklist (wereld.md §2.6, voor S1–S4)
 
 | Punt | Stand |
@@ -469,7 +493,7 @@ Besluiten uit de Lead-review van PR #208 ([comment](https://github.com/cesarvang
 - **Levenspunten in de save** (LM-12): het maximum komt na laden uit de vlag van het lampglas; de levenspunten zelf staan niet in schema v1 (je laadt met vol leven).
 
 **Gameplay Programmer (deel 3, S9):**
-- ~~**De run S1 → S9 → S1 door de arena**~~ **Gedaan** (#83, §6d): solo bij D = 60/120/180. Nog open: dezelfde lus zonder echo (C-15 over de hele slice) en in co-op.
+- ~~**De run S1 → S9 → S1 door de arena**~~ **Gedaan** (#83, §6d): solo bij D = 60/120/180. ~~Dezelfde lus zonder echo~~ **gedaan** ([#291](https://github.com/cesarvangerwen-glitch/echoborn/issues/291), §6d "De lus zonder echo"): route 1,47× bij D = 60, elke plek bereikbaar, S8 met een C-16-testuitzondering. Nog open: de lus in co-op; en komt er een derde test die de private `Boss._defeat` aanroept (nu `test_kadewijk_lus_zonder_echo.gd`), dan een publieke testingang op `Boss` (TD-review [#296](https://github.com/cesarvangerwen-glitch/echoborn/pull/296)).
 - ~~**`SLICE_EIND`** als echt event, en logbladzijde 3 als object~~ **Gedaan** (#83): `S1/SliceEind` (`kadewijk_slice_eind.gd`) en `S9/Logbladzijde3` (een `Pickup`).
 - ~~**De schaduwklep in `Luik`**~~ **Gedaan** (#232; besluit 1, #227, uitgebreid door de LGD in #232: altijd bij een solo-breuk met de echo aan, ook als die Leeg is).
 - **Schaduwklep en drop-in van P2** (TD, Lead-review #232): komt P2 erbij terwijl de schaduwklep er nog ligt, dan kan P2 hooguit `D + G` ticks op een onzichtbare klep op laag 5 staan. Mogelijke oplossing: bij `combat.coop` de schaduwklep in `sim_update` meteen weghalen (`"tijd"`). Komt niet voor in de slice-runs.
@@ -524,6 +548,7 @@ Besluiten: D = 60 als werkaanname, bereik 1–3 s, en fase 2 parallel, ook bouwe
 |---|---|---|
 | 0.1 | 2026-11-12 | Eerste versie: S1–S4 als grijze kamers, bot en tests bij D = 60 (120/180 regressie) |
 | 0.1.1 | 2026-11-12 | Lead-review #208: langzame lijn met dash gemeten bij 60/90/120 (§6), besluiten van de LGD per afwijking en maatvast-stand per kamer (§8), open punten bijgewerkt (§9) |
+| 0.4.10 | 2026-11-14 | GP, [#291](https://github.com/cesarvangerwen-glitch/echoborn/issues/291) (G-3): de lus zonder echo gemeten bij D = 60/120/180, per kamer met de verhouding tot de lus met echo, en de keuze voor S8 (C-16-testuitzondering) in §6d; §9 bijgewerkt; TD-review #296: S5 ≤ 2×, `abort_attack` vóór `_defeat`, venster = negatief bewijs; SM-review #296: S6 de enige kamer zonder toets per kamer, waarom geen D = 90 |
 | 0.4.9 | 2026-11-13 | §9 B-1: de grens van het rustpunt (± 12 s, #227) en de gemeten waarden van de note uit CI op `main` (D = 60/120/180: 20,0 / 19,5 / 19,0 s) erbij (LGD, [comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429)) |
 | 0.4.8 | 2026-11-13 | §8: S8 en S9 maatvast (LGD, [comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6844964137)): S1–S9 alle negen maatvast. B-1 (LGD, [comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429)): het gat na trap 2 als rapport in `test_kadewijk_lus.gd`, de terugvaloptie (keerpunt aan de voet van de trap) in §9 als na-MT2-punt |
 | 0.4.7 | 2026-11-13 | GP, [#247](https://github.com/cesarvangerwen-glitch/echoborn/issues/247): de boss op de data van v0.1.5 (§6b en §6d opnieuw gemeten), de vaste arena-camera, de Neerslag vergrendeld tot de sokkel (§9); merge met 0.4.6 van de WLD (S6 en S9 buren); co-op-norm van de boss na de review van de LGD (#253) |
