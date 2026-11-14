@@ -8,13 +8,13 @@
     "max_stemmen": 3
   },
   "luik_breekt": {
-    "_toelichting": "Hetzelfde breekgeluid voor P1, P2 en de echo. Het bestand bestaat nog niet (Composer/Sound Designer).",
+    "_toelichting": "Hetzelfde breekgeluid voor P1, P2 en de echo. Het bestand staat klaar: res://audio/sfx/omgeving/luik_breekt_placeholder.wav (#243, Composer/Sound Designer). stream blijft leeg tot de Gameplay Programmer het pad zet en het stille luik in test_luik_zelfde_breekgeluid een eigen lege sfx geeft.",
     "stream": "",
     "volume_db": 0.0,
     "max_stemmen": 2
   },
   "rad_treffer": {
-    "_toelichting": "P1/P2: stream_1, op de treffer die kant_treffers haalt stream_2 (nog niet in game/audio/). De echo: altijd echo_stream op bus Echo vanaf echo_start_s, nooit stream_2.",
+    "_toelichting": "P1/P2: stream_1, op de treffer die kant_treffers haalt stream_2 (beide in game/audio/sfx/gemaalmeester/, #243). De echo: altijd echo_stream op bus Echo vanaf echo_start_s, nooit stream_2.",
     "stream_1": "res://audio/sfx/gemaalmeester/gm_rad_treffer_1_placeholder.wav",
     "stream_2": "res://audio/sfx/gemaalmeester/gm_rad_treffer_2_placeholder.wav",
     "volume_db": 0.0,
