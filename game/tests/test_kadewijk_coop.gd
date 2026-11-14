@@ -19,9 +19,12 @@ extends RefCounted
 ## 180, met de co-op-regel van fase 1 (GMB-14: de wissel) en de boss-bot van B-14 (`tests/boss_bot.gd`).
 ## **De boss in de Kadewijk-arena in co-op** (B-14 (6), GM-01): de boss start pas als beide spelers
 ## binnen de muren staan (deur rechts dan dicht); van `BOSS_START` tot `BOSS_VERSLAGEN` staat de
-## camera vast op de arena met beide spelers in beeld en binnen de muren; de co-op-regel geldt
-## (`DOELHELFT` in fase 1); na `BOSS_VERSLAGEN` is de deur links open en de camera weer vrij, en de
-## lus loopt door naar S9. Bij D = 60 ook de ontwerpcheck B-14 (f) in de echte arena: P2 zet in
+## camera vast op de arena met beide spelers in beeld en binnen de muren, en als tegencheck staat
+## hij in S8 vóór `BOSS_START` en na `BOSS_VERSLAGEN` níet op de arena en volgt hij beide spelers;
+## de co-op-regel geldt (`DOELHELFT` in fase 1); na `BOSS_VERSLAGEN` is de deur links open, en de
+## lus loopt door naar S9. **De binnenkomst (GM-01) meet de lus**: daar lopen beide spelers vanuit
+## S7 de arena in. In S8 los beginnen P1 en P2 op hetzelfde punt al binnen de muren (de boss start
+## op tick 17), dus daar is de GM-01-check geen echte binnenkomst. Bij D = 60 ook de ontwerpcheck B-14 (f) in de echte arena: P2 zet in
 ## fase 1 merken vanaf beide helften (≥ 2 per helft) en heeft daar 0 JUMP-flanken.
 ## MP-7 (e) (gdd v0.8.6 §4.5, #292): het wachten per speler uit het meetlog (`WACHT_START` /
 ## `WACHT_EIND`, `meetlog.gd`: 120 ticks binnen 64 px zonder eigen actie), de langste
@@ -165,7 +168,7 @@ func _in_arena(body: Node2D) -> bool:
 ## deur links en de camera op de tick na `BOSS_VERSLAGEN`.
 func _watch_arena(wijk) -> Dictionary:
 	var a := {"boss": null, "start_tick": -1, "start": {}, "fight": 0, "cam_ok": 0, "cam_fout": 0,
-		"buiten_beeld": 0, "buiten_arena": 0, "p2_weg": 0, "marks": {-1: 0, 1: 0}, "jumps": 0,
+		"buiten_beeld": 0, "buiten_arena": 0, "rond": 0, "rond_arena": 0, "rond_buiten_beeld": 0, "p2_weg": 0, "marks": {-1: 0, 1: 0}, "jumps": 0,
 		"defeat_tick": -1, "after": {}, "coop": false}
 	var prev := {"j": false}
 	wijk.sim.combat.mark_set.connect(func(_tick: int, mark) -> void:
@@ -183,12 +186,19 @@ func _watch_arena(wijk) -> Dictionary:
 		var boss: Gemaalmeester = a["boss"]
 		var p2: Node2D = wijk.p2
 		var p2_live: bool = p2 != null and is_instance_valid(p2) and not p2.dissolved
-		if boss.is_defeated():
-			if a["defeat_tick"] < 0:
+		if boss.is_defeated() or boss.state == boss.State.IDLE:
+			if boss.is_defeated() and a["defeat_tick"] < 0:
 				a["defeat_tick"] = tick
 				a["after"] = {"deur_links_open": not _door_closed(wijk, "DeurLinks"), "arena_camera": wijk.is_arena_camera()}
-			return
-		if boss.state == boss.State.IDLE:
+			# Tegencheck (zoals `test_kadewijk_boss.gd`): rond het gevecht (S8 geladen, vóór
+			# `BOSS_START` en na `BOSS_VERSLAGEN`) staat de camera níet op de arena en volgt hij beide spelers.
+			a["rond"] += 1
+			var free_view: Rect2 = wijk.camera_view()
+			if wijk.is_arena_camera() or free_view == Kadewijk.arena_view():
+				a["rond_arena"] += 1
+			for body in [wijk.p1, p2 if p2_live else null]:
+				if body != null and not free_view.has_point(body.position):
+					a["rond_buiten_beeld"] += 1
 			return
 		if a["start_tick"] < 0:
 			a["start_tick"] = tick
@@ -233,6 +243,9 @@ func _check_arena(t, name: String, out: Dictionary, d: int) -> String:
 	t.check(int(a["buiten_beeld"]) == 0 and int(a["buiten_arena"]) == 0 and int(a["p2_weg"]) == 0,
 		"%s: in het gevecht %d keer een speler buiten beeld, %d buiten de arena, P2 %d ticks opgelost" % [
 		name, a["buiten_beeld"], a["buiten_arena"], a["p2_weg"]])
+	t.check(int(a["rond"]) > 0 and int(a["rond_arena"]) == 0 and int(a["rond_buiten_beeld"]) == 0,
+		"%s: rond het gevecht (%d ticks in S8 vóór BOSS_START of na BOSS_VERSLAGEN) %d ticks de arena-camera, %d keer een speler buiten beeld" % [
+		name, a["rond"], a["rond_arena"], a["rond_buiten_beeld"]])
 	var b0 := _first(rows, "BOSS_START")
 	var wissel := _first(rows, "BOSS_FASE", "wissel")
 	var doel := 0
@@ -248,8 +261,8 @@ func _check_arena(t, name: String, out: Dictionary, d: int) -> String:
 		t.check(int(marks[-1]) >= 2 and int(marks[1]) >= 2 and int(a["jumps"]) == 0,
 			"%s: fase 1 merken van P2 links %d / rechts %d (≥ 2), JUMP-flanken P2 %d (0; B-14 (f))" % [
 			name, marks[-1], marks[1], a["jumps"]])
-	return "arena: BOSS_START tick %d (P1 %s, P2 %s), camera vast %d/%d ticks, DOELHELFT fase 1 %d×, merken P2 fase 1 L %d / R %d, JUMP P2 fase 1 %d" % [
-		a["start_tick"], st.get("p1", Vector2.ZERO), st.get("p2", Vector2.ZERO), a["cam_ok"], a["fight"], doel, marks[-1], marks[1], a["jumps"]]
+	return "arena: BOSS_START tick %d (P1 %s, P2 %s), camera vast %d/%d ticks, rond het gevecht %d ticks vrij met beide spelers in beeld, DOELHELFT fase 1 %d×, merken P2 fase 1 L %d / R %d, JUMP P2 fase 1 %d" % [
+		a["start_tick"], st.get("p1", Vector2.ZERO), st.get("p2", Vector2.ZERO), a["cam_ok"], a["fight"], a["rond"], doel, marks[-1], marks[1], a["jumps"]]
 
 
 func _save_csv(wijk, file: String) -> void:
