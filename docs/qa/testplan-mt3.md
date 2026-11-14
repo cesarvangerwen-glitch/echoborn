@@ -8,7 +8,7 @@ Dit is een **concept**: het legt vast wanneer MT3 start, welke bot-checks eerst 
 
 ## 0. Wanneer MT3 start
 
-De Producer plant MT3 pas als alle drie de regels gelden (kader §4):
+De Producer plant MT3 pas als alle vier de regels gelden (kader §4):
 
 1. **MT2 is gespeeld en verwerkt** (`docs/qa/rapport-mt2.md`), en wat daaruit volgt voor de slice is gebouwd of bewust uitgesteld.
 2. **De slice staat op eindkwaliteit** (T8c art, T8d audio): de merkbare stap van MT3.
@@ -73,10 +73,11 @@ Volgt bij v0.2, na T8c/T8d en E-1: ± 10–15 min, ± 3–4 runs (besluit 2026-1
 ## 7. Open punten
 
 - **F4b(c) en MP-7 (e)** (EP): kader F4b(c) noemt MP-7 (a)–(d), dit plan toetst ook (e) bij mensen en V-5 houdt MT3 tegen tot G-6 klaar is; de EP past F4b(c) in `fase-2-kader.md` aan, of houdt (e) bij mensen als rapportwaarde.
+- **Latere co-op-kaart met P2** (Producer): dat is een extra CEO-sessie; de Producer plant die alleen als mijlpaal, met groene bots (besluit 2026-11-12 (2)).
 
 ## Wijzigingen
 
 | Versie | Datum | Wat |
 |---|---|---|
-| 0.1.1 | 2026-11-14 | Na Lead-review EP (PR #305): Q-6 als startregel 4 en V-8; P2 geen startvoorwaarde (zonder P2 solo door); V-6 met Combat Designer en #302; grenzen MP-7 (e) als werkaanname LGD; §7 open punt F4b(c) |
+| 0.1.1 | 2026-11-14 | Na Lead-review EP (PR #305; tweede ronde: "alle vier de regels", open punt latere co-op-kaart): Q-6 als startregel 4 en V-8; P2 geen startvoorwaarde (zonder P2 solo door); V-6 met Combat Designer en #302; grenzen MP-7 (e) als werkaanname LGD; §7 open punt F4b(c) |
 | 0.1 | 2026-11-14 | Concept (T11 Q-4): wanneer MT3 start, voorwaarden V-1–V-7 met de stand van de bot, wat QA rekent, observaties OB-1–OB-4; kaart en sessie volgen |
