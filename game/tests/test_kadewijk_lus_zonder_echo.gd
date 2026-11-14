@@ -21,7 +21,7 @@ extends RefCounted
 ## kamers, de 5 verzamelobjecten, het gemaal vol, trap 2, het hoogwater, beide luiken,
 ## `SLICE_EIND`), geen enkele echolijn genomen (13 bouwstenen met een echolijn), geen respawn. Per kamer ≤ 2×, behalve S6:
 ## daar loopt de bot zonder echo terug voor licht (afwijking 10, LGD-besluit: C-15 in S6 met gelijk
-## licht, `test_kadewijk_deel2.gd`); die twee zijn een rapportwaarde.
+## licht, `test_kadewijk_deel2.gd`); S6 is dus een rapportwaarde, S5 houdt ≤ 2×.
 
 const Scene := preload("res://levels/kadewijk/kadewijk.tscn")
 const Bot = preload("res://levels/kadewijk/kadewijk_bot.gd")
