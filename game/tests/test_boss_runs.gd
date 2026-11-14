@@ -318,6 +318,9 @@ func _parts(m: Dictionary) -> Array:
 ## B-14 (e): per deel de langste stilstand (MP-1, `STIL_EIND` met bron p1/p2, geknipt op het deel) en
 ## het wachten (MP-7 (e), `WACHT_START`/`WACHT_EIND`: langste periode en aandeel van het deel; twee
 ## perioden die overlappen tellen als één), voor P1 en P2, naast de verwachting van §3.10 voor P2.
+## Let op: deze arena heeft geen lichtmeter, dus geen `LP`-regels; slaan en ontsteken tellen hier niet
+## als eigen actie (MP-7 (e)) en het wachten valt hoger uit dan in de Kadewijk-arena, waar de
+## merk-combo's LP geven (`test_kadewijk_coop.gd`, S8 los: de boss).
 func _per_part_text(m: Dictionary) -> String:
 	var still := {"p1": [], "p2": []}
 	var waits := {"p1": [], "p2": []}
@@ -359,7 +362,7 @@ func _per_part_text(m: Dictionary) -> String:
 			cells.append("%s stil %d, wacht langste %d (%.1f %%)" % [who.to_upper(), longest_still, longest_wait,
 				100.0 * total / maxf(float(b - a), 1.0)])
 		out.append("%s (%d ticks): %s; verwacht P2 %s" % [part[0], b - a, " / ".join(cells), EXPECTED_P2[part[0]]])
-	return "per deel: " + " · ".join(out)
+	return "per deel (wachten zonder LP-regels, zie `_per_part_text`): " + " · ".join(out)
 
 
 func test_b9_solo_d60(t) -> void:
