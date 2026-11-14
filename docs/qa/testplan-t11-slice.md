@@ -1,6 +1,6 @@
 # Testplan T11: de slice per kamer en de boss, solo en co-op (F4, F4b)
 
-Versie 0.2 · 2026-11-14 · Eigenaar: QA Lead · Issue: [#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88) (T11) · Lead-review: Executive Producer
+Versie 0.2.1 · 2026-11-14 · Eigenaar: QA Lead · Issue: [#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88) (T11) · Lead-review: Executive Producer
 
 Basis: fasekader fase 2 (`docs/productie/fase-2-kader.md`: §2 rij T11, §3 F4 en F4b, §4 mijlpaaltests en regel tegen weggooiwerk, §5 kwaliteitslat); pitch v0.4 (§4 pillar 1, §10 R-V1, R-V2, R-V5, R-V9, R-V12); `docs/beslissingen.md` (#51: 1A, 7A, 8A; #124: 1B; 2026-11-12: D = 60 als werkaanname, fase 2 parallel, de CEO test alleen bij mijlpalen); gdd §4.5 (MP-1–MP-7) en §5.1 (grens F4b(b)); `docs/design/kamers/kadewijk.md` v0.4.8 (§6–§6d, §9); `docs/design/gemaalmeester.md` §7–§8; `game/tests/test_boss_runs.gd`; besluit LGD over B-1 ([comment in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429)).
 
@@ -72,7 +72,9 @@ Bronnen per cel: `kadewijk.md` §6, §6b, §6c, §6d en de boss-tabel; `testplan
 
 ### 3.1 Per kamer gemeten (Q-1, de lus)
 
-Gemeten 2026-11-14 op `main` `91d5143`, Godot 4.6.3 headless: `botlogs.gd` en daarna `rekenen.gd` (commando's in `testplan-mt2.md` §4.4). De lus-ticks zijn gelijk aan `kadewijk.md` §6d (15 504 / 15 245 / 15 392 / 16 838 bij D = 60 / 90 / 120 / 180) en de cijfers over de doorloop zijn gelijk aan `testplan-mt2.md` §2.4 (`de037be`); MP-2 per kamer is gelijk aan de MP-2-regel van FlowReport (S8 daar mét de boss). Een kamer = alle stukken van `KAMER` tot het volgende `KAMER` (W38), ook het tweede bezoek aan S5 en S6 bij trap 2; S8 is alleen de route, de boss een eigen rij. Een stilstand over een kamergrens telt per kamer voor het deel dat erin valt.
+Gemeten 2026-11-14 op `main` `91d5143`, Godot 4.6.3 headless: `botlogs.gd` en daarna `rekenen.gd` (commando's in `testplan-mt2.md` §4.4). De lus-ticks zijn gelijk aan `kadewijk.md` §6d (15 504 / 15 245 / 15 392 / 16 838 bij D = 60 / 90 / 120 / 180) en de cijfers over de doorloop zijn gelijk aan `testplan-mt2.md` §2.4 (`de037be`); MP-2 per kamer is gelijk aan de MP-2-regel van FlowReport (S8 daar mét de boss). Een kamer = alle stukken van `KAMER` tot het volgende `KAMER` (W38), ook het tweede bezoek aan S5 en S6 bij trap 2. **Voor F4 (MP-1, MP-2, MP-4) telt S8 mét de boss**, zoals `testplan-mt2.md` §3 ("de normen van P1 gelden ook in het gevecht"); de grenzen per kamer komen uit die §3. De rij **S8 route** (zonder `BOSS_START` … `BOSS_VERSLAGEN`) is er alleen voor F4b(b) (gdd §5.1, W38); de rij **Boss** is informatie. Een stilstand over een kamergrens telt per kamer voor het deel dat erin valt.
+
+**De boss-tijd** in de lus is 5853 ticks (`BOSS_START` 5322 → `BOSS_VERSLAGEN` 11 175) = 97,55 s: **97,6 s** afgerond, zoals in §3 (`rekenen.gd` drukt 97,5 af, `testplan-mt2.md` §2.4 ook; zelfde ticks, andere afronding). De 97,9 s in §3 en Q-5 is een andere meting: de boss in de **testarena** van `test_boss_runs.gd` (5875 ticks), niet in de lus.
 
 **D = 60** (werkaanname):
 
@@ -85,17 +87,18 @@ Gemeten 2026-11-14 op `main` `91d5143`, Godot 4.6.3 headless: `botlogs.gd` en da
 | S5 | 24,1 | 0 | 9,9 | 0 % | 9,9 | 9,9 · **0,0** | 100 % van 20 |
 | S6 | 17,2 | 5 | 3,5 | 0 % | 3,5 | **0,0** · 7,0 | 75 % van 16 |
 | S7 | 7,2 | 0 | 16,7 | 0 % | 16,7 | **0,0** · 16,7 | 75 % van 16 |
-| S8 route | 3,8 | 4 | 0,0 | 0 % | 0,0 | 0,0 · 0,0 | geen LP |
-| Boss | 97,5 | 56 | 28,3 | 0 % | — | — | — (telt niet, gdd §5.1) |
+| S8 (mét de boss, F4) | 101,4 | 56 | 27,2 | 0 % | — | — | — |
+| S8 route (alleen F4b(b)) | 3,8 | — | — | — | 0,0 | 0,0 · 0,0 | geen LP |
+| Boss (informatie) | 97,6 | (56) | (28,3) | (0 %) | — | — | — (telt niet, gdd §5.1) |
 | S9 | 57,6 | 2 | 5,2 | 0 % | 5,2 | 3,1 · 2,1 | 77 % van 35 |
 | Doorloop / route | 258,4 / 160,8 | 56 | 15,8 | 0,4 % | 8,2 | 4,1 · 4,9 | 78 % van 175 → **positief** |
 
-**Regressie D = 90 / 120 / 180** (alleen wat afwijkt van D = 60): MP-1 per kamer overal ≤ 24 op de route, in de boss 59 / 92 / 56. MP-4 alleen in S1 boven 0 % (15,9 / 21,2 / 31,7 %: de echo is Leeg tot tick D na `RUN_START`, E-03), elders 0 %. Laagste MP-2 per kamer gelijk aan `testplan-mt2.md` §2.4: S6 3,5, en **S7 0,0 bij D = 180** (B-4, bekend). F4b(b) per kamer heeft bij D = 90 en 120 hetzelfde patroon als bij D = 60; bij D = 180 haalt S4 geen ontploffing (11,4 · 0,0) en S5 wel (9,9 · 2,5), en mist S7 alle vier.
+**Regressie D = 90 / 120 / 180** (alleen wat afwijkt van D = 60): MP-1 per kamer buiten S8 ≤ 8; S8 (mét de boss) MP-1 59 / 92 / 56 en MP-2 28,4 / 24,9 / 26,0. MP-4 alleen in S1 boven 0 % (15,9 / 21,2 / 31,7 %: de echo is Leeg tot tick D na `RUN_START`, E-03), elders 0 %. Laagste MP-2 per kamer gelijk aan `testplan-mt2.md` §2.4: S6 3,5, en **S7 0,0 bij D = 180** (B-4, bekend). F4b(b) per kamer heeft bij D = 90 en 120 hetzelfde patroon als bij D = 60; bij D = 180 haalt S4 geen ontploffing (11,4 · 0,0) en S5 wel (9,9 · 2,5), en mist S7 alle vier.
 
 **Lezing.**
-- **F4-4 per kamer (MP-1, MP-2): groen bij de bot.** MP-1 op de route ≤ 8 ticks, in de boss 56 (grens 300); MP-2 ≥ 3,0 in elke kamer behalve de S8-route (3,8 s, deur → arena en arena → trap, geen echo-actie verwacht). S6 blijft de krapste (B-3).
+- **F4-4 per kamer (MP-1, MP-2): groen bij de bot, in elke kamer.** MP-1 ≤ 8 ticks buiten S8, in S8 (mét de boss) 56 (grens 300); MP-2 ≥ 3,0 in elke kamer, S8 27,2. S6 blijft de krapste (3,5, B-3).
 - **F4-2 per kamer (MP-4): groen.** De bot laat de echo nergens Leeg vallen; de enige Leeg-tijd is de start in S1 (60 ticks). Bij een mens is MP-4 per kamer pas informatief na een `RESPAWN` of `BREEK` (de echo begint dan opnieuw Leeg); daarom staat het per kamer in de rekenregel.
-- **F4b(b) per kamer is een rapportwaarde, geen norm per kamer** (W40). Criterium (2) splitst per kamer in wat de kamer toetst: de keerkamers S1 en S5 geven alleen springplank-landingen, de merkkamers S3, S6 en S7 alleen ontploffingen; samen over de route is (2) ruim gehaald. (1) en (3) zijn in elke kamer met echo-werk gehaald. Waar de echo stilvalt is daarmee zichtbaar: alleen de S8-route (kort, geen echo-werk ontworpen) en, als regressie, S7 bij D = 180.
+- **F4b(b) per kamer is een rapportwaarde, geen norm per kamer** (W40). Criterium (2) splitst per kamer in wat de kamer toetst: de keerkamers S1 en S5 geven alleen springplank-landingen, de merkkamers S3, S6 en S7 alleen ontploffingen; samen over de route is (2) ruim gehaald. (1) en (3) zijn in elke kamer met echo-werk gehaald. Zonder echo-actie zijn alleen de S8-route (3,8 s: arena in en uit) en, als regressie, S7 bij D = 180.
 - **Bij de CEO (MT2)** geeft dezelfde `rekenen.gd` deze tabel uit zijn CSV; dan zijn de kamertijden langer en is een kamer met (1) < 2,0 of MP-1 > 300 een verdwaal- of stilvalpunt voor het rapport (`testplan-mt2.md` §4.1).
 
 ## 4. Co-op, per kamer en de boss
@@ -132,7 +135,7 @@ Co-op = P1 en P2, met P2 in de rol van de echo (7A, C-01–C-05); drop-in/drop-o
 | Q-2 | `rekenen.gd`: RV-6 vanaf de laatste `POMP` van P1 als de echo bij trap 2 niet pompte | B-1, MT2 | QA Lead |
 | Q-3 | `rekenen.gd` voor co-op: `bron` `p2`, samenwerkingsacties, MP-7 (a)–(d) per kamer; MP-1 van P2 en de tijd dat P2 opgelost is (staan die niet in het meetlog, dan uit de testcode, zoals `testplan-f0.md` §2) | F4-3 | QA Lead (na G-1) |
 | Q-4 | `testplan-mt3.md` en `ceo-kaart-mt3.md` | F4b(a)–(c) | QA Lead (na T8c/T8d en G-1) |
-| Q-5 | Bot-cijfers van §3 opnieuw draaien op de build van MT2 en de per-kamer-waarden van Q-1 invullen. **Deels gedaan in v0.2**, op `main` `91d5143` (de MT2-commit is nog niet vastgelegd): de lus bij 60/90/120/180 opnieuw gemeten en Q-1 ingevuld (§3.1); de hele suite groen (456 geslaagd, 0 mislukt); steekproef van de losse kamer-cijfers in §3 uit de uitvoer van de suite, alle gelijk (keren 68 / 104 / 94, S5 1304 en 1,14×, S7 430 en 1,04×, S9 1,07×, SL-01 112 LP, gemaal → deur 555, langste gat S1–S4 715, boss 97,9 / 109,3 / 121,2 s). **Open**: dezelfde run op de MT2-commit zodra `testplan-mt2.md` §2.3 die noemt | F4 | QA Lead |
+| Q-5 | Bot-cijfers van §3 opnieuw draaien op de build van MT2 en de per-kamer-waarden van Q-1 invullen. **Deels gedaan in v0.2**, op `main` `91d5143` (de MT2-commit is nog niet vastgelegd): de lus bij 60/90/120/180 opnieuw gemeten en Q-1 ingevuld (§3.1); de hele suite groen (456 geslaagd, 0 mislukt); steekproef van de losse kamer-cijfers in §3 uit de uitvoer van de suite, alle gelijk (keren 68 / 104 / 94, S5 1304 en 1,14×, S7 430 en 1,04×, S9 1,07×, SL-01 112 LP, gemaal → deur 555, langste gat S1–S4 715, boss in de testarena 97,9 / 109,3 / 121,2 s). **Open**: dezelfde run op de MT2-commit zodra `testplan-mt2.md` §2.3 die noemt | F4 | QA Lead |
 | W-1 | Na MT2, als vraag 9b "leeg lopen" is: een echo-moment op of onder de trap terug (B-1) | S9 | World & Level Designer |
 | E-1 | Een P2 voor MT3 regelen, of de `ceo-beslissing` als die er niet is; de EP neemt het op als Q-4 start | F4b(c) | Executive Producer |
 
@@ -148,7 +151,9 @@ Co-op = P1 en P2, met P2 in de rol van de echo (7A, C-01–C-05); drop-in/drop-o
 | W37 | **Co-op eerst met de bots**: de duo-runs (G-1, G-2) zijn een voorwaarde voor MT3, zoals de solo-bots voor MT2; de co-op-bot telt als meting van MP-7 per kamer, MT3 als oordeel | Kader §4 (geen CEO-test zonder groene bots) en F4 ("eerst met de bots") |
 | W38 | **Per kamer** = van het event `KAMER` tot het volgende; **de boss** = `BOSS_START` … `BOSS_VERSLAGEN`, apart van de route van S8; uit de route-tijd vallen ook minibaas-arena's, het pauzemenu en tussenscènes (in de slice nu geen van drieën) | Zo valt de boss uit de route-tijd van F4b(b) (gdd §5.1) en blijft S8 als kamer meetbaar |
 | W39 | **Gaten en rustpunt met `POMP` van de echo**, MP-2 zonder (besluit LGD over B-1, #83), voor solo en co-op (in co-op de `POMP` van P2) | Het besluit noemt alleen solo; co-op volgt de definitie van MP-6 (pompslagen van P2) |
-| W40 | **F4b(b) per kamer is een rapportwaarde**: de drie grenzen van gdd §5.1 gelden over de route-tijd; per kamer laat QA zien waar de echo stilvalt. Een kamer met (1) < 2,0 bij een mens is een bevinding voor de LGD; (2) per kamer niet, want elke kamer toetst één soort echo-actie (keren of merken). MP-1, MP-2 en MP-4 per kamer houden hun grens (gdd §4.5) | gdd §5.1 definieert F4b(b) over de route; per kamer zou (2) in elke keer- en merkkamer falen zonder dat de echo stilvalt (§3.1) |
+| W40 | **F4b(b) per kamer is een rapportwaarde**: de drie grenzen van gdd §5.1 gelden over de route-tijd; per kamer laat QA zien waar de echo stilvalt. Een kamer met (1) < 2,0 bij een mens is een bevinding voor de LGD; (2) per kamer niet, want elke kamer toetst één soort echo-actie (keren of merken). W40 wijzigt geen norm; de grenzen van MP-1, MP-2 en MP-4 per kamer komen uit `testplan-mt2.md` §3 | gdd §5.1: "De QA Lead rapporteert ook de waarden per wijk, zodat het herontwerp weet waar de echo stilviel." De grens legt §5.1 over de route |
+
+**Open punt bij W40:** de LGD bevestigt W40 (F4b(b) per kamer als rapportwaarde, met (1) < 2,0 bij een mens als bevinding) bij de volgende wijziging van gdd §5.1.
 
 **Open punt bij W36:** `gemaalmeester.md` §7 noemt voor T11 "eerste speler 8–12 min inclusief pogingen"; dat past niet in een MT2-kaart van ± 10–15 min voor de hele slice. De LGD beslist of het een rapportwaarde uit MT2 wordt of vervalt.
 
@@ -156,6 +161,7 @@ Co-op = P1 en P2, met P2 in de rol van de echo (7A, C-01–C-05); drop-in/drop-o
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.2.1 | 2026-11-14 | Na Lead-review EP (#284): S8 mét de boss voor F4 in §3.1 en in `rekenen.gd` (de S8-route alleen voor F4b(b)), geen vrijstelling van MP-2; W40 met de zin "waarden per wijk" uit gdd §5.1 als grond, grenzen per kamer uit `testplan-mt2.md` §3; boss-tijd 97,6 s (lus) tegen 97,9 s (testarena) toegelicht; open punt bij W40 |
 | 0.2 | 2026-11-14 | Q-1: `rekenen.gd` rekent MP-1, MP-2, MP-4 en F4b(b) per kamer, de boss apart; gemeten op de lus (`main` `91d5143`, Godot 4.6.3 headless, D = 60/90/120/180) en ingevuld in nieuw §3.1; §3 verwijst ernaar. Q-5 deels: lus en suite opnieuw gedraaid, steekproef §3 gelijk; open: de MT2-commit. W40 (F4b(b) per kamer als rapportwaarde). §0 en de slotregel van §6 bijgewerkt |
 | 0.1.1 | 2026-11-13 | Na Lead-review EP (#273): GM-a–GM-d in de rij Boss (§3) en in co-op in MT3 (§4); route-tijd zonder pauzemenu, tussenscènes en minibaas-arena's (§2.2, W38); open punt 8–12 min naast W36; E-1 bij de start van Q-4 |
 | 0.1 | 2026-11-13 | Eerste versie (#88): F4-metingen en F4b(b) per kamer S1–S9 en de boss, solo en co-op; wat de bestaande tests en `mt2-meetlogs/` dekken (cijfers uit `kadewijk.md` §6–§6d en `testplan-mt2.md` §2.2/§2.4, niet opnieuw gedraaid); wat ontbreekt met eigenaar (G-1–G-5, Q-1–Q-5, W-1, E-1); MT2 verwezen, MT3 te maken; W36–W39 |
