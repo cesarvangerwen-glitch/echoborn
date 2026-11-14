@@ -204,7 +204,8 @@ func life_ticks() -> int:
 	return tail_ticks + int(c["mark_extra_life_ticks"])
 
 
-func _set_mark(tick: int, target: CombatTarget, setter: String, at := Vector2.ZERO) -> void:
+## `at`: het middelpunt van de zetter (verplicht: GMB-14 c leest er de helft van, `Mark.set_at`).
+func _set_mark(tick: int, target: CombatTarget, setter: String, at: Vector2) -> void:
 	var mark := Mark.new()
 	mark.id = _next_id
 	_next_id += 1

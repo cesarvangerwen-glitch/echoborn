@@ -435,7 +435,7 @@ func test_r10_remove_combat_target(t) -> void:
 	var sim = Fx.world(t)
 	Fx.manual_player(sim, 1, Vector2(200, Fx.STAND_Y))
 	var target := Fx.target(sim, CombatTarget.Kind.ENEMY, 400)
-	sim.combat._set_mark(sim.tick, target, "P1")
+	sim.combat._set_mark(sim.tick, target, "P1", target.global_position)
 	var mark = sim.combat.mark_on(target)
 	sim.remove_object(target)
 	t.check(not sim.objects.has(target) and not sim.combat.targets.has(target), "vijand nog aangemeld")
