@@ -24,8 +24,9 @@ extends RefCounted
 ## de co-op-regel geldt (`DOELHELFT` in fase 1); na `BOSS_VERSLAGEN` is de deur links open, en de
 ## lus loopt door naar S9. **De binnenkomst (GM-01) meet de lus**: daar lopen beide spelers vanuit
 ## S7 de arena in. In S8 los beginnen P1 en P2 op hetzelfde punt al binnen de muren (de boss start
-## op tick 17), dus daar is de GM-01-check geen echte binnenkomst. Bij D = 60 ook de ontwerpcheck B-14 (f) in de echte arena: P2 zet in
-## fase 1 merken vanaf beide helften (≥ 2 per helft) en heeft daar 0 JUMP-flanken.
+## op tick 17), dus daar is de GM-01-check geen echte binnenkomst. Bij D = 60 ook de ontwerpcheck
+## B-14 (f) in de echte arena: P2 zet in fase 1 merken vanaf beide helften (≥ 2 per helft) en heeft
+## daar 0 JUMP-flanken.
 ## MP-7 (e) (gdd v0.8.6 §4.5, #292): het wachten per speler uit het meetlog (`WACHT_START` /
 ## `WACHT_EIND`, `meetlog.gd`: 120 ticks binnen 64 px zonder eigen actie), de langste
 ## wachtperiode en het aandeel van de speeltijd, over de lus, per kamer en in de boss (twee
