@@ -176,12 +176,12 @@ Over de lus verder: MP-3 93 % van 41 landingen, SL-01 126 LP vóór de eerste po
 
 Bron: de uitvoer van `test_kadewijk_coop.gd` op `main` `a400888` (B-14 deel 2; Linux, Godot 4.6.3 headless, alle tests geslaagd). `rekenen.gd` is daar nog niet op gedraaid: de tabel in §4.1 blijft de meting op `bc678b7`, tot de herhaling in Q-4 (stap 1). De test telt MP-1 per kamer anders dan `rekenen.gd` (§4.1), dus de getallen kunnen een paar ticks verschillen.
 
-| Wat | Lus D = 60 | D = 90 / 120 / 180 | S8 los D = 60 | Grens | Gehaald? |
+| Wat | Lus D = 60 | D = 90 / 120 / 180 | S8 los D = 60 | Grens | Gebouwd? (W43) |
 |---|---|---|---|---|---|
-| MP-7 (b) P2 in de boss | 110 | 110 / 110 / 146 | 108 | ≤ 300 | ja, in de test (W43) |
-| MP-1 P1 in de boss | 95 | 95 / 95 / 95 | 95 | ≤ 300 | ja |
-| Camera in de arena | vast 5131/5131 ticks, beide spelers in beeld | idem (D = 180: 5231/5231) | idem | GM-01 | ja |
-| MP-7 (e) wachten, trap 2 (P1 / P2) | 0 / 0 %, P2 pompt 3× | idem | — | langste ≤ 300, ≤ 5 % | ja |
+| MP-7 (b) P2 in de boss | 110 | 110 / 110 / 146 | 108 | ≤ 300 | gebouwd; gehaald na de nachtrun |
+| MP-1 P1 in de boss | 95 | 95 / 95 / 95 | 95 | ≤ 300 | gebouwd; gehaald na de nachtrun |
+| Camera in de arena | vast 5131/5131 ticks, beide spelers in beeld | idem (D = 180: 5231/5231) | idem | GM-01 | gebouwd; gehaald na de nachtrun |
+| MP-7 (e) wachten, trap 2 (P1 / P2) | 0 / 0 %, P2 pompt 3× | idem | — | langste ≤ 300, ≤ 5 % | gebouwd; gehaald na de nachtrun |
 | MP-7 (e) wachten buiten de boss (P1 / P2) | 12,2 / 11,0 %, langste 294 / 238 | P1 tot 15,8 %, P2 langste tot 367 | — | norm ≤ 300 en ≤ 5 %; check van de test nu 400 / 16 % | **nee** (keerpunten en smalle plekken, [#298](https://github.com/cesarvangerwen-glitch/echoborn/issues/298), [#299](https://github.com/cesarvangerwen-glitch/echoborn/issues/299)) |
 | P2 wacht op P1 in S9 (`wait_ticks`) | 587 | 525 / 489 / 460 | — | rapportwaarde | (was 1556) |
 
@@ -189,7 +189,7 @@ Bron: de uitvoer van `test_kadewijk_coop.gd` op `main` `a400888` (B-14 deel 2; L
 
 **Nog niet in de bot** (B-14 v0.1.7, `combat/slice-vijanden-en-boss.md`, [#302](https://github.com/cesarvangerwen-glitch/echoborn/issues/302)): de note-run "P2 blijft als ontsteker op één plek" met b1 (elke breuk van een merk gezet met de doelhelft tegenover P2, op de tick van het zetten) en b2 (fase 1 ≥ 1,25 × zo lang); P2 in fase 2 ± 150 met bovengrens 180; de doelhelft uit bij een drop-out. QA toetst die checks in de uitvoer zodra ze in de test staan, en neemt ze op in de voorwaarde voor MT3.
 
-**Te meten in MT3 (CEO + P2)**, volgens kader F4b(c) en `testplan-f0.md` §1: norm (3) co-op (MP-5 ≥ 4,0, geen deel < 3,0), C1–C2 (wachten; partner als hulp of last), MP-7 (a)–(d), F4b(a) co-op, F4b(b) co-op, **de boss in co-op: GM-a en GM-b in beide modi, GM-c, GM-d voor P1 én P2 (MP-7 (b)) per fase** (`gemaalmeester.md` §8), en M1 van P2 als **sterke** *Nine Sols*-check (alleen als P2 de referenties niet kent en antwoordt vóór uitleg over het merk).
+**Te meten in MT3 (CEO + P2)**, volgens kader F4b(c) en `testplan-f0.md` §1: norm (3) co-op (MP-5 ≥ 4,0, geen deel < 3,0), C1–C2 (wachten; partner als hulp of last), MP-7 (a)–(e), F4b(a) co-op, F4b(b) co-op, **de boss in co-op: GM-a en GM-b in beide modi, GM-c, GM-d voor P1 én P2 (MP-7 (b)) per fase** (`gemaalmeester.md` §8), en M1 van P2 als **sterke** *Nine Sols*-check (alleen als P2 de referenties niet kent en antwoordt vóór uitleg over het merk).
 
 **Voorwaarde voor MT3** (kader §4, "geen CEO-test zonder groene bots"): de co-op-duo-runs halen MP-1 (P1 en P2) en MP-7 (a)–(e) op D = 60 in elke kamer en de boss. **Bij de bot nu**: elke kamer (§4.1) en de boss (§4.2, gebouwd; gehaald na de nachtrun, W43) halen (a)–(d); **MP-7 (e) buiten de boss niet**. De lijst per check staat in `testplan-mt3.md` §2.
 
@@ -233,7 +233,7 @@ Bron: de uitvoer van `test_kadewijk_coop.gd` op `main` `a400888` (B-14 deel 2; L
 | W40 | **F4b(b) per kamer is een rapportwaarde**: de drie grenzen van gdd §5.1 gelden over de route-tijd; per kamer laat QA zien waar de echo stilvalt. Een kamer met (1) < 2,0 bij een mens is een bevinding voor de LGD; (2) per kamer niet, want elke kamer toetst één soort echo-actie (keren of merken). W40 wijzigt geen norm; de grenzen van MP-1, MP-2 en MP-4 per kamer komen uit `testplan-mt2.md` §3 | gdd §5.1: "De QA Lead rapporteert ook de waarden per wijk, zodat het herontwerp weet waar de echo stilviel." De grens legt §5.1 over de route |
 | W41 | **Co-op: MP-7 (c) en MP-6 zoals `test_kadewijk_coop.gd`**. (c) "per speler" = alle samenwerkingsacties per minuut (dezelfde acties als MP-2: één contact per drager en tick, een ketting als één), want elke actie vraagt beide spelers; MP-6 en F4b(b) (3) = LP met bron `_p2` of uit een samenwerkingsactie (`springplank`, `bounce`, `lancering`, `vangen`, `ontploffing`) | Zelfde getal als de check van de GP; gdd §4.5 zegt niet hoe "per speler" telt. De LGD bevestigt bij #290 |
 | W42 | **RV-6 "bij trap 2"** = een `POMP` in de kamer van `TRAP_VOL 2`, vanaf de laatste binnenkomst daar tot 120 ticks na `TRAP_VOL 2`; zonder `POMP` van het tweede lichaam (de echo, in co-op P2) daar telt de laatste `POMP` van P1 (Q-2) | Zonder die grens pakt RV-6 in co-op de pompslag bij het gemaal (± 6900 ticks eerder) |
-| W43 | **Gebouwd ≠ gehaald.** Een nieuwe check in een lang testscript (`LANG_SCRIPTS`) telt als **gebouwd** als hij in de PR en na de merge groen is, en als **gehaald** pas na de eerste groene nachtrun op `main` die dat script draait | Afspraak van de Producer bij G-2; de nachtrun draait de volledige matrix (besluit 2026-11-13, CI zuiniger) |
+| W43 | **Gebouwd ≠ gehaald.** Een nieuwe check in een lang testscript (`LANG_SCRIPTS`) telt als **gebouwd** als hij in de PR en na de merge groen is, en als **gehaald** pas na de eerste groene nachtrun op `main` die dat script draait | Afspraak van de Producer bij G-2 ([comment in #88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88), 2026-11-14 07:32); de nachtrun draait de volledige matrix (besluit 2026-11-13, CI zuiniger) |
 
 **Open punt bij W41:** MP-7 (c) is onder W41 hetzelfde getal als MP-2, terwijl gdd §4.5 "per speler" vraagt; tot de LGD W41 bevestigt ([#290](https://github.com/cesarvangerwen-glitch/echoborn/issues/290)) is "(c) gehaald" geen onafhankelijk bewijs.
 
@@ -245,7 +245,7 @@ Bron: de uitvoer van `test_kadewijk_coop.gd` op `main` `a400888` (B-14 deel 2; L
 
 | Versie | Datum | Wijziging |
 |---|---|---|
-| 0.4 | 2026-11-14 | Na G-2 (B-14 deel 2), slice-vijanden-en-boss v0.1.7 en gdd v0.8.7 (keerpunten, merk-combo in MP-7 (e)): §4 rij Boss naar de Kadewijk-arena (gebouwd, gehaald na de nachtrun, W43) en drop-in/drop-out in de boss; punten TD en SM bijgewerkt; nieuw §4.2 (uitvoer van de test op `a400888`); voorwaarde MT3 met MP-7 (e); §6: G-2 gebouwd, L-1 gedaan, nieuw G-6 en Q-6, Q-4 als concept in `testplan-mt3.md`; W43 |
+| 0.4 | 2026-11-14 | Na G-2 (B-14 deel 2), slice-vijanden-en-boss v0.1.7 en gdd v0.8.7 (keerpunten, merk-combo in MP-7 (e)): §4 rij Boss naar de Kadewijk-arena (gebouwd, gehaald na de nachtrun, W43) en drop-in/drop-out in de boss; punten TD en SM bijgewerkt; nieuw §4.2 (uitvoer van de test op `a400888`, kolom "Gebouwd?"); "Te meten in MT3" met MP-7 (e); voorwaarde MT3 met MP-7 (e); §6: G-2 gebouwd, L-1 gedaan, nieuw G-6 en Q-6, Q-4 als concept in `testplan-mt3.md`; W43 |
 | 0.3 | 2026-11-14 | Q-3: `rekenen.gd` (MT2-kopie, uitgebreid) rekent co-op (bron `p2`): MP-7 (a)–(d) per kamer, MP-1 van P2, P2 opgelost, MP-6 en F4b(b) met P2; gemeten op de co-op-meetlogs van `test_kadewijk_coop.gd` (`main` `bc678b7`, D = 60/90/120/180 en elke kamer los): co-op in §3.1, nieuw §4.1. Q-2: RV-6 vanaf de laatste `POMP` van P1 (W42). §4: G-1 ingevuld, punten TD (boss, G-2, [#289](https://github.com/cesarvangerwen-glitch/echoborn/issues/289)) en SM (wachten, [#290](https://github.com/cesarvangerwen-glitch/echoborn/issues/290)); voorwaarde MT3 met de stand bij de bot. §6: G-1, Q-2, Q-3 gedaan, G-2 naar de Combat Designer, L-1 nieuw. W41, W42 |
 | 0.2.1 | 2026-11-14 | Na Lead-review EP (#284): S8 mét de boss voor F4 in §3.1 en in `rekenen.gd` (de S8-route alleen voor F4b(b)), geen vrijstelling van MP-2; W40 met de zin "waarden per wijk" uit gdd §5.1 als grond, grenzen per kamer uit `testplan-mt2.md` §3; boss-tijd 97,6 s (lus) tegen 97,9 s (testarena) toegelicht; open punt bij W40 |
 | 0.2 | 2026-11-14 | Q-1: `rekenen.gd` rekent MP-1, MP-2, MP-4 en F4b(b) per kamer, de boss apart; gemeten op de lus (`main` `91d5143`, Godot 4.6.3 headless, D = 60/90/120/180) en ingevuld in nieuw §3.1; §3 verwijst ernaar. Q-5 deels: lus en suite opnieuw gedraaid, steekproef §3 gelijk; open: de MT2-commit. W40 (F4b(b) per kamer als rapportwaarde). §0 en de slotregel van §6 bijgewerkt |
