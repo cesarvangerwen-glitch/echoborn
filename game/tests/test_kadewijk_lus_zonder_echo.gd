@@ -9,7 +9,8 @@ extends RefCounted
 ## **Testuitzondering voor S8 (C-16).** Solo met de echo uit is de Gemaalmeester niet te
 ## verslaan (C-16 (a); `test_boss.gd` B-5/B-7: het schot breekt zonder echo nooit). De lus zonder
 ## echo gaat daarom wél de arena in en vecht `C16_WINDOW` ticks met de boss-bot, en toetst in dat
-## venster C-16 op de echte arena: het schot breekt niet, de boss verliest geen SE en is niet
+## venster C-16 op de echte arena (alleen negatief bewijs; het bewijs voor C-16 (a) blijft B-5/B-7 in
+## `test_boss.gd`): het schot breekt niet, de boss verliest geen SE en is niet
 ## verslagen. Daarna verslaat de test de boss (`Boss._defeat`, dezelfde weg als de finisher:
 ## `BOSS_VERSLAGEN`, de deuren open, 100 LP, de vlag). Zo blijft de rest van de lus (trap 2, het
 ## hoogwater, S9, het snelluik) te toetsen. De boss telt in geen enkele verhouding mee: de
@@ -18,7 +19,7 @@ extends RefCounted
 ## Per kamer: de tijd (alle bezoeken samen, FlowReport `room_time`; S8 zonder de boss) zonder en
 ## mét echo, en de verhouding. Normen: de route ≤ 2× (C-15 a, FK-2), elke plek bereikbaar (alle
 ## kamers, de 5 verzamelobjecten, het gemaal vol, trap 2, het hoogwater, beide luiken,
-## `SLICE_EIND`), geen enkele echolijn genomen (13 bouwstenen met een echolijn), geen respawn. Per kamer ≤ 2×, behalve S5 en S6:
+## `SLICE_EIND`), geen enkele echolijn genomen (13 bouwstenen met een echolijn), geen respawn. Per kamer ≤ 2×, behalve S6:
 ## daar loopt de bot zonder echo terug voor licht (afwijking 10, LGD-besluit: C-15 in S6 met gelijk
 ## licht, `test_kadewijk_deel2.gd`); die twee zijn een rapportwaarde.
 
@@ -38,8 +39,9 @@ const RUN_LIMIT := 34000
 ## D = 60 (1680 ticks, §6b): met de echo is het schot dan al gebroken.
 const C16_WINDOW := 1800
 const ROOMS := [&"S1", &"S2", &"S3", &"S4", &"S5", &"S6", &"S7", &"S8", &"S9"]
-## Kamers waar de bot zonder echo licht haalt (afwijking 10): de verhouding is daar een rapport.
-const LIGHT_ROOMS := [&"S5", &"S6"]
+## De kamer waar de bot zonder echo 4× terug moet voor licht (afwijking 10): de verhouding is daar
+## een rapport. S5 (licht halen) houdt wel ≤ 2× (TD-review #296).
+const LIGHT_ROOMS := [&"S6"]
 ## Soorten stappen van `kadewijk_bot.gd` met een echolijn (bouwstenen B1–B4, het gemaal en trap 2:
 ## de echo pompt mee). Het luik, het kanaal, het Dwaallicht en de schacht zijn de Neerslag van P1
 ## zelf (V-01), geen samenwerkingsactie: daar is `lines` true als P1 stuit, met of zonder echo.
@@ -120,6 +122,10 @@ func _lus(t, d: int, echo_on: bool) -> Dictionary:
 				c16["window"] = true
 				c16["se_after"] = boss.se
 				c16["exception_tick"] = wijk.sim.tick
+				# Vanuit FIGHT kan een aanval lopen: eerst afbreken (attack_ended), dan verslaan
+				# (TD-review #296). `_defeat` is privé; komt er een derde test die hem aanroept,
+				# dan een publieke testingang op `Boss` (kamerdoc §9).
+				boss.abort_attack(wijk.sim.tick)
 				boss._defeat(wijk.sim.tick)
 	await t.tree.physics_frame
 	await t.tree.physics_frame
@@ -224,7 +230,7 @@ func _zonder_echo(t, d: int) -> void:
 		per_room.append("%s %d / %d (%.2f×)" % [k, off, on, q])
 		if not LIGHT_ROOMS.has(k):
 			t.check(on > 0 and off <= 2 * on, "%s: %s zonder echo %d ticks, met %d (%.2f×; C-15: ≤ 2×)" % [name, k, off, on, q])
-	t.note("%s: route %d tegen %d ticks (%.2f×, marge %d tot 2×) · run %d (boss = C-16-venster %d) · %d× terug voor licht · per kamer zonder / met echo (S8 zonder de boss; S5/S6 rapport, afwijking 10): %s" % [
+	t.note("%s: route %d tegen %d ticks (%.2f×, marge %d tot 2×) · run %d (boss = C-16-venster %d) · %d× terug voor licht · per kamer zonder / met echo (S8 zonder de boss; S6 rapport, afwijking 10): %s" % [
 		name, r["route"], ref["route"], ratio, 2 * ref["route"] - r["route"], r["ticks"], r["boss_ticks"], r["returns"], ", ".join(per_room)])
 
 
