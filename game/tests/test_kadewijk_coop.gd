@@ -20,10 +20,21 @@ extends RefCounted
 ## wachten (gdd MP-1/MP-3), dus de waarde is niet gehaald → G-2 (Combat Designer). Een
 ## check die nu rood is, zegt niets over deze PR; de lus checkt MP-7 (b) van P2 daarom
 ## buiten de boss. De voorwaarde voor MT3 ("MP-7 in de boss") is dus nog niet gehaald.
-## Ook in de uitvoer: de ticks waarin elke speler op de ander wacht (`wait_ticks`, ± 18 px,
-## net buiten de 24 px van MP-1), per kamer, zodat "niemand wacht" (MP-7) niet alleen op
-## MP-1 leunt. Verder: de lus is rond, de boss verslagen (één poging),
-## trap 2 en het water, alles opgepakt, geen respawn, en de run is deterministisch.
+## MP-7 (e) (gdd v0.8.6 §4.5, #292): het wachten per speler uit het meetlog (`WACHT_START` /
+## `WACHT_EIND`, `meetlog.gd`: 120 ticks binnen 64 px zonder eigen actie), de langste
+## wachtperiode en het aandeel van de speeltijd, over de lus, per kamer en in de boss (twee
+## perioden die overlappen tellen als één). **Check** (langste ≤ 300 ticks en aandeel ≤ 5 % per
+## speler, en P2 pompt mee) op trap 2 samen: van `BOSS_VERSLAGEN` tot P1 na trap 2 terug in S9
+## is (#292; P2 minstens 3 van de 7 slagen). Over de hele lus buiten de boss haalt de duo-bot de
+## norm (300 / 5 %) nog niet: hij wacht ook bij de keerpunten (de drager op de springer, die de
+## langzame lijn van het vorige keerpunt nam) en bij de smalle plekken (de luiken, de schacht, de
+## Dwaallichten): D = 60 ± 12 % per speler, bij D ≥ 120 ook langste > 300. Daar staat een
+## **regressiegrens als check** (langste ≤ 400 ticks en aandeel ≤ 16 % per speler, besluit TD in
+## PR #297); de norm volgt in #298 (GP: smalle plekken in de duo-bot) en #299 (LGD/WLD: keerpunten
+## in co-op). Per kamer en in de boss is het een rapportwaarde (de boss tot #289 en G-2, B-14).
+## Ter vergelijking ook het wachten van de bot zelf (`wait_ticks`, ± 18 px, geen maat). Verder:
+## de lus is rond, de boss verslagen (één poging), trap 2 en het water, alles opgepakt, geen
+## respawn, en de run is deterministisch.
 ##
 ## De meetlogs (zelfde formaat als de solo-meetlog: `tick, kamer, event, waarde, bron,
 ## x, y`; P2 met bron `p2`, de samenwerkingsacties met bron = de drager) schrijft dit
@@ -52,6 +63,10 @@ const FlowReport = preload("res://levels/flowkamer/flow_report.gd")
 const Gemaal = preload("res://scripts/light/gemaal.gd")
 
 const RUN_LIMIT := 34000
+## MP-7 (e) over de lus buiten de boss: regressiegrens per speler tot #298 en #299 (besluit TD,
+## PR #297); de norm is 300 ticks / 5 %.
+const WAIT_REGRESSIE_MAX := 400
+const WAIT_REGRESSIE_SHARE := 0.16
 const MINUTE := 3600.0
 ## Bronnen van LP met een samenwerkingsactie (MP-6 co-op), zoals `test_flowtest_t17.gd`.
 const COOP_LP := ["springplank", "bounce", "lancering", "vangen", "ontploffing"]
@@ -174,6 +189,9 @@ func _measure(rows: Array, segments: Array) -> Dictionary:
 	var m := {"ticks": ticks, "mp1_p1": 0, "mp1_p2": 0, "actions": 0, "coop": 0, "combos": 0,
 		"bounce": 0, "lancering": 0, "vangen": 0, "springplank": 0, "lp": 0, "lp_coop": 0,
 		"pomp_p1": 0, "pomp_p2": 0, "dissolved": 0, "gap": 0, "stuit_p2": 0}
+	# MP-7 (e): de wachtperioden [begin, begin + lengte) per speler, geknipt op de stukken.
+	var waits := {"p1": [], "p2": []}
+	var wait_from := {}
 	var contacts := {}
 	var action_ticks: Array = []
 	var gone_since := -1
@@ -188,6 +206,12 @@ func _measure(rows: Array, segments: Array) -> Dictionary:
 					if inside.call(k):
 						m["dissolved"] += 1
 			gone_since = -1
+		if event == "WACHT_START":
+			wait_from[row[4]] = int(row[3])
+		elif event == "WACHT_EIND" and wait_from.has(row[4]):
+			var w0: int = wait_from[row[4]]
+			waits[row[4]].append([w0, w0 + int(row[3])])
+			wait_from.erase(row[4])
 		if not inside.call(tick):
 			continue
 		match event:
@@ -237,6 +261,32 @@ func _measure(rows: Array, segments: Array) -> Dictionary:
 				m["gap"] = maxi(int(m["gap"]), a - last)
 				last = a
 		m["gap"] = maxi(int(m["gap"]), int(seg[1]) - last)
+	for who: String in ["p1", "p2"]:
+		# Twee perioden kunnen overlappen (de tweede begint 120 ticks vóór zijn eerste wachtende
+		# tick): samen één periode, de vereniging.
+		var merged: Array = []
+		for w: Array in waits[who]:
+			if not merged.is_empty() and int(w[0]) <= int(merged[-1][1]):
+				merged[-1][1] = maxi(int(merged[-1][1]), int(w[1]))
+			else:
+				merged.append([int(w[0]), int(w[1])])
+		var longest := 0
+		var total := 0
+		var count := 0
+		for w: Array in merged:
+			var hit := false
+			for seg: Array in segments:
+				var n := mini(int(w[1]), int(seg[1])) - maxi(int(w[0]), int(seg[0]))
+				if n > 0:
+					longest = maxi(longest, n)
+					total += n
+					hit = true
+			if hit:
+				count += 1
+		m["wacht_max_" + who] = longest
+		m["wacht_sum_" + who] = total
+		m["wacht_n_" + who] = count
+		m["mp7e_" + who] = float(total) / maxf(float(ticks), 1.0)
 	var minutes := maxf(float(ticks), 1.0) / MINUTE
 	m["mp2"] = float(m["actions"]) / minutes
 	m["mp7c"] = float(m["coop"]) / minutes
@@ -284,9 +334,27 @@ func _add_segment(out: Dictionary, room: String, from: int, to: int, boss: Array
 
 func _fmt(m: Dictionary) -> String:
 	return ("%d ticks (%.1f s) · MP-1 P1 %d / P2 %d · MP-2 %.1f/min, gat %d · samen %d (bounce %d, lancering %d, vang %d, combo %d) " +
-		"→ MP-7c %.2f/min per speler · MP-7d %.1f %% · MP-6 %.0f %% van %d LP · pomp P1 %d / P2 %d") % [
+		"→ MP-7c %.2f/min per speler · MP-7d %.1f %% · MP-6 %.0f %% van %d LP · pomp P1 %d / P2 %d · %s") % [
 		m["ticks"], m["ticks"] / 60.0, m["mp1_p1"], m["mp1_p2"], m["mp2"], m["gap"], m["coop"], m["bounce"], m["lancering"],
-		m["vangen"], m["combos"], m["mp7c"], m["mp7d"] * 100.0, m["mp6"] * 100.0, m["lp"], m["pomp_p1"], m["pomp_p2"]]
+		m["vangen"], m["combos"], m["mp7c"], m["mp7d"] * 100.0, m["mp6"] * 100.0, m["lp"], m["pomp_p1"], m["pomp_p2"], _fmt_wait(m)]
+
+
+## MP-7 (e) per speler: langste wachtperiode, aandeel van de ticks van het stuk, aantal perioden.
+func _fmt_wait(m: Dictionary) -> String:
+	return "MP-7e wachten P1 langste %d, %.1f %% (%d×) / P2 langste %d, %.1f %% (%d×)" % [
+		m["wacht_max_p1"], m["mp7e_p1"] * 100.0, m["wacht_n_p1"], m["wacht_max_p2"], m["mp7e_p2"] * 100.0, m["wacht_n_p2"]]
+
+
+## MP-7 (e), de norm (gdd §4.5): langste wachtperiode ≤ 300 ticks en aandeel ≤ 5 % per speler.
+## `longest`/`share`: een andere grens (de regressiegrens over de lus buiten de boss).
+func _wait_norms(m: Dictionary, longest := 300, share := 0.05) -> PackedStringArray:
+	var out := PackedStringArray()
+	for who: String in ["p1", "p2"]:
+		if int(m["wacht_max_" + who]) > longest:
+			out.append("MP-7e %s langste wachtperiode %d" % [who.to_upper(), m["wacht_max_" + who]])
+		if float(m["mp7e_" + who]) > share:
+			out.append("MP-7e %s wacht %.1f %%" % [who.to_upper(), float(m["mp7e_" + who]) * 100.0])
+	return out
 
 
 ## Normen van de co-op-run (gdd §4.5, testplan T11 §2.1, §4): leeg = gehaald. `per_room`:
@@ -313,7 +381,8 @@ func _boss_p2(m: Dictionary) -> String:
 	return "MP-7b P2 in de boss %d%s" % [v, " (niet gehaald → G-2, Combat Designer; geen check)" if v > 300 else " (≤ 300)"]
 
 
-## Wachten op de ander (`Seat.wait_ticks`, ± 18 px): per kamer van die speler, en totaal.
+## Wachten op de ander volgens de bot zelf (`Seat.wait_ticks`, ± 18 px; geen maat, MP-7 (e)
+## staat in `_fmt`): per kamer van die speler, en totaal.
 func _waits(duo, room := "") -> String:
 	var out := PackedStringArray()
 	for s in [duo.p1_input, duo.p2_input]:
@@ -329,7 +398,7 @@ func _waits(duo, room := "") -> String:
 			if n > 0:
 				parts.append("%s %d" % [k, n])
 		out.append("P%d %d (%s)" % [s.index, total, ", ".join(parts) if not parts.is_empty() else "—"])
-	return "wachten op de ander %s ticks" % " / ".join(out)
+	return "bot wacht op de ander (wait_ticks) %s ticks" % " / ".join(out)
 
 
 # --- De solo-referentie (MP-7 (a)) ------------------------------------------------
@@ -410,10 +479,36 @@ func _lus(t, d: int) -> String:
 	var mp4 := float(all["dissolved"]) / maxf(float(all["ticks"]), 1.0)
 	# MP-7 (b) van P2 over de lus zonder de boss (de boss: geen check, zie de kop).
 	var fails := _norms(all, false, true, false)
+	var mp7e_buiten := ""
+	t.check(_count(rows, "WACHT_START") == _count(rows, "WACHT_EIND"), "%s: WACHT_START en WACHT_EIND niet in paren" % name)
 	if at["boss_start"] >= 0 and at["verslagen"] >= 0:
 		var buiten := _measure(rows, [[first_tick, at["boss_start"]], [at["verslagen"], last_tick]])
 		if int(buiten["mp1_p2"]) > 300:
 			fails.append("MP-7b P2 buiten de boss %d" % buiten["mp1_p2"])
+		# MP-7 (e) over de lus buiten de boss: check op de regressiegrens (400 / 16 %), de norm
+		# (300 / 5 %) volgt in #298 en #299, zie de kop; de boss: rapport tot #289 en G-2.
+		fails.append_array(_wait_norms(buiten, WAIT_REGRESSIE_MAX, WAIT_REGRESSIE_SHARE))
+		var open_e := _wait_norms(buiten)
+		mp7e_buiten = "%s → %s" % [_fmt_wait(buiten), "gehaald" if open_e.is_empty() else "niet gehaald (%s), grens 300 / 5 %% volgt in #298 en #299" % "; ".join(open_e)]
+	else:
+		fails.append("geen BOSS_START … BOSS_VERSLAGEN: MP-7e buiten de boss niet te meten")
+	# MP-7 (e), de check van #292: trap 2 samen, van `BOSS_VERSLAGEN` tot P1 terug in S9 is
+	# (de trap op, trap 2, de trap af). Daar wachtte P2 ± 1556 ticks onderaan de trap.
+	var trap_from: int = at["verslagen"]
+	var trap_to := -1
+	for row in rows:
+		if row[2] == "KAMER" and row[4] == "S9" and int(row[0]) > at["trap2"] and at["trap2"] > 0:
+			trap_to = int(row[0])
+			break
+	var trap_e := ""
+	if trap_from > 0 and trap_to > trap_from:
+		var tm := _measure(rows, [[trap_from, trap_to]])
+		var tf := _wait_norms(tm)
+		t.check(tf.is_empty(), "%s: trap 2 samen (MP-7e, %d … %d) haalt niet: %s" % [name, trap_from, trap_to, "; ".join(tf)])
+		t.check(int(tm["pomp_p2"]) >= 3, "%s: P2 pompt trap 2 niet mee (%d slagen, ≥ 3)" % [name, tm["pomp_p2"]])
+		trap_e = "%d ticks, pomp P1 %d / P2 %d · %s" % [tm["ticks"], tm["pomp_p1"], tm["pomp_p2"], _fmt_wait(tm)]
+	else:
+		t.check(false, "%s: geen stuk BOSS_VERSLAGEN … terug in S9 na trap 2 (%s, %d)" % [name, at, trap_to])
 	if mp4 > 0.40:
 		fails.append("MP-4 %.0f %%" % (mp4 * 100.0))
 	t.check(fails.is_empty(), "%s: de lus haalt niet: %s" % [name, "; ".join(fails)])
@@ -434,6 +529,8 @@ func _lus(t, d: int) -> String:
 		per_room.append("%s: %s%s%s" % [k, _fmt(m), (" · MP-7a %.2f× solo" % (float(m["ticks"]) / solo_t)) if solo_t > 0 else "", extra])
 	var solo_run: int = int(_solo.get("run", 0)) if d == 60 else 0
 	var rep = FlowReport.from_rows(rows, false)
+	t.note("%s: MP-7e trap 2 samen (BOSS_VERSLAGEN … terug in S9; check: langste ≤ 300, ≤ 5 %%) %s" % [name, trap_e])
+	t.note("%s: MP-7e buiten de boss (check: langste ≤ %d, ≤ %d %%; norm 300 / 5 %%) %s" % [name, WAIT_REGRESSIE_MAX, int(WAIT_REGRESSIE_SHARE * 100.0), mp7e_buiten])
 	t.note("%s: run %d ticks (%.1f s) · %s · MP-3 %.0f %% van %d landingen zonder wachten · MP-4 %.1f %% · SL-01 %d LP vóór de eerste pompslag · MP-7a %s · treffers P1 %d · stuits P2 %d (combo %d) · %s · %s · lijnen %s" % [
 		name, wijk.run_ticks(), wijk.run_ticks() / 60.0, _fmt(all), rep.landings_without_still * 100.0, rep.landings, mp4 * 100.0, sl01,
 		("%.2f× solo (%d/%d)" % [float(wijk.run_ticks()) / solo_run, wijk.run_ticks(), solo_run]) if solo_run > 0 else "— (solo-referentie alleen bij D = 60)",

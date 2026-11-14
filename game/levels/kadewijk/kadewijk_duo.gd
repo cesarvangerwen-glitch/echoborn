@@ -29,9 +29,14 @@ extends RefCounted
 ##   van S9 stuit P1 op de Dwaallichten; P2 volgt en stuit op hetzelfde Dwaallicht,
 ##   en zijn neerslag laat het merk van P1 knallen (wat solo de echo doet).
 ## - **Pompen samen** (LM-03, LM-04): in S6 (trap 1) slaan beide spelers elke schoep
-##   in het voorbijlopen. Trap 2 (na de boss, SL-02) pompt P1 alleen met zijn 100 LP
-##   (GM-10: 8 slagen); P2 wacht onderaan de trap op de vloer van S9 en gaat de kade
-##   op als P1 de trap af komt (zo hoeft niemand op de smalle trap te wachten).
+##   in het voorbijlopen. **Trap 2** (na de boss, SL-02; gdd v0.8.6 §2.7 "wat de echo
+##   doet, kan P2 ook", #292): P2 gaat met P1 de trap naar het plein op, twee treden
+##   (`TRAP_GAP`) achter hem, en pompt trap 2 in het voorbijgaan mee zoals de echo solo
+##   (LM-03, C-02): P1 slaat de vier schoepen en gaat terug naar de trap zodra de slagen
+##   die P2 nog voor zich heeft trap 2 vol maken (zoals `_will_fill_trap_2` met de echo),
+##   P2 slaat de rest. Dan samen de trap af naar S9: wie het verst van de trap is, gaat
+##   als tweede, twee treden achter de ander. Op de trap staat dus nooit iemand op de
+##   ander, en niemand wacht onderaan.
 ## - **De Gemaalmeester** (S8): `boss_input` maakt de boss-bot (`tests/boss_bot.gd`,
 ##   co-op: P2 als drager onder het rad, merk-combo op de ketel); tot `BOSS_START`
 ##   lopen beide spelers zelf de arena in (de boss start pas als beide lichamen
@@ -62,6 +67,7 @@ const InputBits = preload("res://scripts/input/input_bits.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
 const Layout = preload("res://levels/kadewijk/kadewijk_layout.gd")
 const SliceEnemy = preload("res://scripts/combat/slice_enemy.gd")
+const Gemaal = preload("res://scripts/light/gemaal.gd")
 
 const L := InputBits.LEFT
 const R := InputBits.RIGHT
@@ -78,12 +84,15 @@ const SPRINGER := {
 	"S9-B2a": 1, "S9-B2b": 2, "S9-B1": 1,
 }
 ## Smalle plekken: P2 begint pas als P1 erdoor is.
-const ONE_AT_A_TIME := ["S7-luik", "S9-luik", "S9-trap", "S9-trap-af", "S9-schacht"]
-## P2 wacht op de trap naar het plein hier (op de vloer van S9, links van de deur van de arena).
-const S9_TRAP_WAIT_X := 4040.0
-## De trap naar het plein en trap 2: P1 alleen; daar wacht hij niet op P2 (P2 staat onderaan,
-## binnen de leiband: hooguit 700 × 420 px, en S9 is een buur van S5 en S6).
+const ONE_AT_A_TIME := ["S7-luik", "S9-luik", "S9-schacht"]
+## De trap naar het plein, trap 2 en terug: samen, de tweede `TRAP_GAP` achter de eerste
+## (`_trap_hold`); daar wacht niemand op de ander (de afstand blijft binnen de leiband).
 const TRAP_LEGS := ["S9-trap", "S6-trap2", "S9-trap-af"]
+## Op de trap (treden om en om, 42 px boven elkaar, kamerdoc §3f): de tweede begint pas als de
+## eerste twee treden verder is, zodat hij niet op hem springt of valt.
+const TRAP_GAP := 84.0
+## Omlaag wacht de tweede pas zo dicht bij de rand van het plein (de schacht van de trap).
+const TRAP_HOLD_DX := 40.0
 ## Stuiten op de Dwaallichten (S7, S9): P1 wacht tot P2 binnen `TOGETHER_PX` achter hem is.
 const TOGETHER := ["S7-kanaal", "S9-dwaallicht"]
 const TOGETHER_PX := 90.0
@@ -397,19 +406,12 @@ func _decide_leg(s: Seat, tick: int, b: CharacterBody2D) -> int:
 	# Op de ander blijven staan buiten een samenwerkingsactie: eraf stappen.
 	if _on_partner(s) and (not coop_leg or s.sub == "solo") and kind != "end":
 		return _own(s, _walk(1 if b.position.x >= _body(o).position.x else -1))
-	# Trap 2 (SL-02): P1 pompt hem alleen (100 LP na de boss, GM-10, zijn 8 slagen); P2 wacht
-	# onderaan de trap op de vloer van S9 (niet in de deur van de arena: S8 ontlaadt als P1 op de
-	# trap is) en gaat de kade op als P1 de trap af komt.
-	if s.index == 2 and name == "S9-trap":
-		if not p1_input.bot.leg_done.has("S6-trap2"):
-			s.waiting = true
-			return _own(s, _patrol(s, S9_TRAP_WAIT_X, WAIT_PX))
-		s.bot.leg = s.bot._leg_index("S9-kade")
-		s.bot.sub = ""
-		s.leg_seen = s.bot.leg
-		s.done = p1_input.done + 1
-		s.sub = ""
-		s.anchor = NAN
+	# De trap naar het plein en terug (v0.8.6, #292): de tweede houdt twee treden afstand.
+	if (name == "S9-trap" or name == "S9-trap-af") and _trap_hold(s, name):
+		return _own(s, _wait(s))
+	# Trap 2: P1 gaat terug naar de trap als P2 hem met zijn slagen vol maakt (P2 als de echo).
+	if s.index == 1 and name == "S6-trap2" and s.bot.sub == "gang" and s.bot._past_gang() and _p2_fills_trap_2():
+		s.bot._next_leg(true)
 		return _own(s, L)
 	# Smalle plek: P2 laat P1 eerst gaan.
 	if s.index == 2 and name in ONE_AT_A_TIME and not p1_input.bot.leg_done.has(name) and fresh and not _far(b, _body(o)):
@@ -447,6 +449,44 @@ func _decide_leg(s: Seat, tick: int, b: CharacterBody2D) -> int:
 			if boss_input.is_valid() and _room_of(s) == &"S8":
 				return _own(s, _boss(s, tick))
 	return _solo(s, tick)
+
+
+## De trap naar het plein (`S9-trap`) en terug (`S9-trap-af`): moet `s` nog wachten tot de
+## ander twee treden verder is? Omhoog gaat P1 eerst (P2 wacht op de vloer van S9); omlaag
+## gaat wie het dichtst bij de trap is eerst (de ander loopt door en wacht pas aan de rand).
+func _trap_hold(s: Seat, name: String) -> bool:
+	var o := _other(s)
+	if _other_gone(o) or o.bot.leg_done.has(name):
+		return false
+	var b := _body(s)
+	var ob := _body(o)
+	if name == "S9-trap":
+		if s.index != 2 or not _on_level(s, Layout.S9_DOOR_FLOOR):
+			return false
+		return ob.position.y > Layout.S9_DOOR_FLOOR - Layout.HALF_H - TRAP_GAP
+	# Omlaag: pas wachten vlak voor de trap (de schacht links van het plein), niet waar je staat.
+	if not _on_level(s, Layout.S6_FLOOR) or o.bot.leg_name() != name \
+			or b.position.x > Layout.ROOMS[&"S6"].position.x + TRAP_HOLD_DX:
+		return false
+	var plaza := Layout.S6_FLOOR - Layout.HALF_H
+	var ahead: bool = ob.position.y > plaza + 1.0 or ob.position.x < b.position.x \
+		or (ob.position.x == b.position.x and s.index == 2)
+	return ahead and ob.position.y < plaza + TRAP_GAP
+
+
+## Trap 2: maken de schoepen die P2 in deze doorgang nog voor zich heeft hem vol (LM-03; zoals
+## `_will_fill_trap_2` van de solo-bot met de echo)?
+func _p2_fills_trap_2() -> bool:
+	var g: Node = _w.gemaal
+	var o := p2_input
+	if g == null or _other_gone(o) or o.bot.leg_name() != "S6-trap2" or o.bot.sub != "gang" or o.bot._pass_dir != 1:
+		return false
+	var x := _body(o).position.x
+	var pending := 0
+	for i in Layout.PUMP_VANES.size():
+		if not o.bot._struck.has(i) and (Layout.PUMP_VANES[i] as Vector2).x - x >= -6.0:
+			pending += 1
+	return int(g.fill) + mini(pending * Gemaal.per_stroke(), int(_w.meter.value)) >= 2 * Gemaal.MAX
 
 
 ## Zo ver uit elkaar dat de voorste wacht.
