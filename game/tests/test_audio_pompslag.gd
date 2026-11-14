@@ -240,6 +240,8 @@ func test_luik_zelfde_breekgeluid(t) -> void:
 	var a: Luik = luiken[0]
 	var b: Luik = luiken[1]
 	# Geen eigen stream: beide luiken nemen hem uit de data, en dat is hetzelfde object.
+	# De is_same-checks leunen op de resource-cache van `load()`: zolang iemand de
+	# stream vasthoudt (hier `sfx`), geeft elk `load()` van dat pad hetzelfde object.
 	t.check(is_same(a.audio.sfx, sfx) and is_same(b.audio.sfx, sfx),
 		"de luiken laden het breekgeluid niet uit de data: %s / %s" % [a.audio.sfx, b.audio.sfx])
 	a.apply_damage(10, 0, "p1")
