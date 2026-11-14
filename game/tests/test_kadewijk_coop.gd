@@ -25,11 +25,13 @@ extends RefCounted
 ## wachtperiode en het aandeel van de speeltijd, over de lus, per kamer en in de boss (twee
 ## perioden die overlappen tellen als één). **Check** (langste ≤ 300 ticks en aandeel ≤ 5 % per
 ## speler, en P2 pompt mee) op trap 2 samen: van `BOSS_VERSLAGEN` tot P1 na trap 2 terug in S9
-## is (#292). Over de hele lus buiten de boss is het nu een **rapportwaarde, geen check**: de duo-bot
-## wacht daar ook bij de keerpunten (de drager op de springer, die de langzame lijn van het vorige
-## keerpunt nam) en bij de smalle plekken (de luiken, de schacht, de Dwaallichten) en haalt de 5 %
-## niet (D = 60: ± 12 % per speler; bij D ≥ 120 ook langste > 300). Dat is een bevinding voor de
-## LGD en de duo-bot buiten #292, geen gevolg van trap 2; zie #292. Per kamer en in de boss is het
+## is (#292; P2 minstens 3 van de 7 slagen). Over de hele lus buiten de boss haalt de duo-bot de
+## norm (300 / 5 %) nog niet: hij wacht ook bij de keerpunten (de drager op de springer, die de
+## langzame lijn van het vorige keerpunt nam) en bij de smalle plekken (de luiken, de schacht, de
+## Dwaallichten): D = 60 ± 12 % per speler, bij D ≥ 120 ook langste > 300. Daar staat een
+## **regressiegrens als check** (langste ≤ 400 ticks en aandeel ≤ 16 % per speler, besluit TD in
+## PR #297); de norm volgt in #298 (GP: smalle plekken in de duo-bot) en #299 (LGD/WLD: keerpunten
+## in co-op). Per kamer en in de boss is het
 ## een rapportwaarde (de boss tot #289 en G-2, B-14). Ter vergelijking ook het wachten van de bot
 ## zelf (`wait_ticks`, ± 18 px, geen maat). Verder: de lus is rond, de boss verslagen (één poging),
 ## trap 2 en het water, alles opgepakt, geen respawn, en de run is deterministisch.
@@ -61,6 +63,10 @@ const FlowReport = preload("res://levels/flowkamer/flow_report.gd")
 const Gemaal = preload("res://scripts/light/gemaal.gd")
 
 const RUN_LIMIT := 34000
+## MP-7 (e) over de lus buiten de boss: regressiegrens per speler tot #298 en #299 (besluit TD,
+## PR #297); de norm is 300 ticks / 5 %.
+const WAIT_REGRESSIE_MAX := 400
+const WAIT_REGRESSIE_SHARE := 0.16
 const MINUTE := 3600.0
 ## Bronnen van LP met een samenwerkingsactie (MP-6 co-op), zoals `test_flowtest_t17.gd`.
 const COOP_LP := ["springplank", "bounce", "lancering", "vangen", "ontploffing"]
@@ -339,13 +345,14 @@ func _fmt_wait(m: Dictionary) -> String:
 		m["wacht_max_p1"], m["mp7e_p1"] * 100.0, m["wacht_n_p1"], m["wacht_max_p2"], m["mp7e_p2"] * 100.0, m["wacht_n_p2"]]
 
 
-## MP-7 (e), de check (gdd §4.5): langste wachtperiode ≤ 300 ticks en aandeel ≤ 5 % per speler.
-func _wait_norms(m: Dictionary) -> PackedStringArray:
+## MP-7 (e), de norm (gdd §4.5): langste wachtperiode ≤ 300 ticks en aandeel ≤ 5 % per speler.
+## `longest`/`share`: een andere grens (de regressiegrens over de lus buiten de boss).
+func _wait_norms(m: Dictionary, longest := 300, share := 0.05) -> PackedStringArray:
 	var out := PackedStringArray()
 	for who: String in ["p1", "p2"]:
-		if int(m["wacht_max_" + who]) > 300:
+		if int(m["wacht_max_" + who]) > longest:
 			out.append("MP-7e %s langste wachtperiode %d" % [who.to_upper(), m["wacht_max_" + who]])
-		if float(m["mp7e_" + who]) > 0.05:
+		if float(m["mp7e_" + who]) > share:
 			out.append("MP-7e %s wacht %.1f %%" % [who.to_upper(), float(m["mp7e_" + who]) * 100.0])
 	return out
 
@@ -478,10 +485,11 @@ func _lus(t, d: int) -> String:
 		var buiten := _measure(rows, [[first_tick, at["boss_start"]], [at["verslagen"], last_tick]])
 		if int(buiten["mp1_p2"]) > 300:
 			fails.append("MP-7b P2 buiten de boss %d" % buiten["mp1_p2"])
-		# MP-7 (e) over de lus buiten de boss: rapport, zie de kop (de keerpunten en de smalle
-		# plekken, #292); de boss: rapport tot #289 en G-2.
+		# MP-7 (e) over de lus buiten de boss: check op de regressiegrens (400 / 16 %), de norm
+		# (300 / 5 %) volgt in #298 en #299, zie de kop; de boss: rapport tot #289 en G-2.
+		fails.append_array(_wait_norms(buiten, WAIT_REGRESSIE_MAX, WAIT_REGRESSIE_SHARE))
 		var open_e := _wait_norms(buiten)
-		mp7e_buiten = "%s → %s" % [_fmt_wait(buiten), "gehaald" if open_e.is_empty() else "niet gehaald (%s; geen check, #292)" % "; ".join(open_e)]
+		mp7e_buiten = "%s → %s" % [_fmt_wait(buiten), "gehaald" if open_e.is_empty() else "niet gehaald (%s), grens 300 / 5 %% volgt in #298 en #299" % "; ".join(open_e)]
 	else:
 		fails.append("geen BOSS_START … BOSS_VERSLAGEN: MP-7e buiten de boss niet te meten")
 	# MP-7 (e), de check van #292: trap 2 samen, van `BOSS_VERSLAGEN` tot P1 terug in S9 is
@@ -497,7 +505,7 @@ func _lus(t, d: int) -> String:
 		var tm := _measure(rows, [[trap_from, trap_to]])
 		var tf := _wait_norms(tm)
 		t.check(tf.is_empty(), "%s: trap 2 samen (MP-7e, %d … %d) haalt niet: %s" % [name, trap_from, trap_to, "; ".join(tf)])
-		t.check(int(tm["pomp_p2"]) >= 1, "%s: P2 pompt trap 2 niet mee" % name)
+		t.check(int(tm["pomp_p2"]) >= 3, "%s: P2 pompt trap 2 niet mee (%d slagen, ≥ 3)" % [name, tm["pomp_p2"]])
 		trap_e = "%d ticks, pomp P1 %d / P2 %d · %s" % [tm["ticks"], tm["pomp_p1"], tm["pomp_p2"], _fmt_wait(tm)]
 	else:
 		t.check(false, "%s: geen stuk BOSS_VERSLAGEN … terug in S9 na trap 2 (%s, %d)" % [name, at, trap_to])
@@ -522,7 +530,7 @@ func _lus(t, d: int) -> String:
 	var solo_run: int = int(_solo.get("run", 0)) if d == 60 else 0
 	var rep = FlowReport.from_rows(rows, false)
 	t.note("%s: MP-7e trap 2 samen (BOSS_VERSLAGEN … terug in S9; check: langste ≤ 300, ≤ 5 %%) %s" % [name, trap_e])
-	t.note("%s: MP-7e buiten de boss (norm: langste ≤ 300, ≤ 5 %%) %s" % [name, mp7e_buiten])
+	t.note("%s: MP-7e buiten de boss (check: langste ≤ %d, ≤ %d %%; norm 300 / 5 %%) %s" % [name, WAIT_REGRESSIE_MAX, int(WAIT_REGRESSIE_SHARE * 100.0), mp7e_buiten])
 	t.note("%s: run %d ticks (%.1f s) · %s · MP-3 %.0f %% van %d landingen zonder wachten · MP-4 %.1f %% · SL-01 %d LP vóór de eerste pompslag · MP-7a %s · treffers P1 %d · stuits P2 %d (combo %d) · %s · %s · lijnen %s" % [
 		name, wijk.run_ticks(), wijk.run_ticks() / 60.0, _fmt(all), rep.landings_without_still * 100.0, rep.landings, mp4 * 100.0, sl01,
 		("%.2f× solo (%d/%d)" % [float(wijk.run_ticks()) / solo_run, wijk.run_ticks(), solo_run]) if solo_run > 0 else "— (solo-referentie alleen bij D = 60)",
