@@ -31,10 +31,10 @@ extends RefCounted
 ## Dwaallichten): D = 60 ± 12 % per speler, bij D ≥ 120 ook langste > 300. Daar staat een
 ## **regressiegrens als check** (langste ≤ 400 ticks en aandeel ≤ 16 % per speler, besluit TD in
 ## PR #297); de norm volgt in #298 (GP: smalle plekken in de duo-bot) en #299 (LGD/WLD: keerpunten
-## in co-op). Per kamer en in de boss is het
-## een rapportwaarde (de boss tot #289 en G-2, B-14). Ter vergelijking ook het wachten van de bot
-## zelf (`wait_ticks`, ± 18 px, geen maat). Verder: de lus is rond, de boss verslagen (één poging),
-## trap 2 en het water, alles opgepakt, geen respawn, en de run is deterministisch.
+## in co-op). Per kamer en in de boss is het een rapportwaarde (de boss tot #289 en G-2, B-14).
+## Ter vergelijking ook het wachten van de bot zelf (`wait_ticks`, ± 18 px, geen maat). Verder:
+## de lus is rond, de boss verslagen (één poging), trap 2 en het water, alles opgepakt, geen
+## respawn, en de run is deterministisch.
 ##
 ## De meetlogs (zelfde formaat als de solo-meetlog: `tick, kamer, event, waarde, bron,
 ## x, y`; P2 met bron `p2`, de samenwerkingsacties met bron = de drager) schrijft dit
