@@ -14,7 +14,7 @@ De aanslag valt op sample 0, de tick van `opened` / `schaduwklep_weg`
   1. de klap van de neerslag op het hout (plof 120 -> 60 Hz, het lijf);
   2. de scheur die openbarst: een korte reeks krakende breuken (0-90 ms),
      elke breuk een klik met houtmodi die per plank anders liggen;
-  3. splinters: korte heldere tikjes tot ± 11 kHz (lucht, "levend", bible §4);
+  3. splinters tot ± 11 kHz (1,2 % boven 8 kHz); een objectgeluid, geen lichaam;
   4. het ijzeren beslag dat losschiet: één ring/scharnier-tik (A5-familie
      vermeden; inharmonisch, geen klok, bible §8.5);
   5. planken die beneden neerkomen: twee doffe houtklopjes op 260 en 330 ms
