@@ -51,9 +51,14 @@ const MAX_FRAMES := {
 ## B-14 (c): de solo-run bij D = 60 in ticks van v0.1.5 (de wissel geldt solo niet).
 const SOLO_D60_TICKS := 5875
 ## B-14 (e): de verwachting van §3.10 voor de langste stilstand van P2 per deel (ticks).
-const EXPECTED_P2 := {"fase 1": "± 90", "fasewissel": "≤ 60", "fase 2": "± 90", "wankel+finisher": "± 100"}
-## B-14 (b): schotbreuken per maat van fase 1 in de gewone co-op-run bij D = 60.
+## v0.1.7 (#302): fase 2 ± 150, bovengrens 180 (was ± 90).
+const EXPECTED_P2 := {"fase 1": "± 90", "fasewissel": "≤ 60", "fase 2": "± 150, bovengrens 180", "wankel+finisher": "± 100"}
+## B-14 (b): schotbreuken per maat van fase 1 in de gewone co-op-run bij D = 60 (note).
 static var _coop_breaks_per_beat := -1.0
+## B-14 (b2): de duur van fase 1 (ticks, BOSS_START tot de fasewissel) in de gewone co-op-run bij D = 60.
+static var _coop_phase1_ticks := -1
+## B-14 (b2, v0.1.7): fase 1 met P2 op één plek duurt ≥ 1,25 × zo lang als in de gewone co-op-run.
+const P2_FIXED_PHASE1_MIN := 1.25
 ## B-9b: totale duur (ticks) van de solo-run per D, voor MP-7 in de co-op-run.
 static var _solo_ticks := {}
 ## v0.1.5 (#247, LGD-besluit in #247): de normen van de solo-run bij D = 60, in seconden.
@@ -300,6 +305,7 @@ func _coop(t, d: int) -> void:
 			"%s: fase 1 merken van P2 links %d / rechts %d (≥ 2), JUMP-flanken P2 %d (0)" % [name, marks[-1], marks[1],
 				run["p2_jumps"]])
 		_coop_breaks_per_beat = float(m["breaks_total"]) / maxf(float(run["beats1"]), 1.0)
+		_coop_phase1_ticks = _phase1_ticks(m)
 		t.note("%s: fase 1 %d schotbreuken in %d maten (%.2f per maat); merken van P2 links %d / rechts %d; rolwissels fase 2 %d" % [
 			name, m["breaks_total"], run["beats1"], _coop_breaks_per_beat, marks[-1], marks[1], m["swaps"]])
 	await t.cleanup()
@@ -494,48 +500,63 @@ func test_b9_c16_coop_p2_never_hits(t) -> void:
 	await t.cleanup()
 
 
-## B-14 (b), note-run: "P2 blijft als ontsteker op één plek" (D = 60): de oude co-op-bot (P1 links van
-## de ketel, slaat om de 20 ticks; P2 rechts, zet geen merken en ontsteekt alleen van zijn plek). Met
-## de wissel knalt P2 het merk van P1 alleen als P1 het van de doelhelft (links) zette, dus alleen in
-## de maten met de doelhelft links (check: elke schotbreuk komt van zo'n merk). De verhouding
-## schotbreuken per maat van fase 1 tegen de gewone co-op-run staat in de note, met de grens ½ van
-## §6 B-14 (b). Die grens is hier geen check: fase 1 heeft in beide runs precies `openingen` (7)
-## schotbreuken (één per opening), dus de verhouding is die van het aantal maten, en een opening van
-## de kern duurt ± een maat (zie de PR; vraag aan de Combat Designer). Hooguit 6000 ticks; P1 heeft
-## genoeg levens (alleen de schotbreuken tellen).
+## B-14 (b), run "P2 blijft als ontsteker op één plek" (D = 60, v0.1.7, #302): de oude co-op-bot (P1
+## links van de ketel, slaat om de 20 ticks; P2 rechts, zet geen merken en ontsteekt alleen van zijn
+## plek). Twee checks. (b1) Elke merk-ontploffing op de ketel in fase 1 (elke `SCHOT_BREUK` en elke
+## ontploffing van 20 SE op de kern) komt van een merk dat gezet werd terwijl de doelhelft op de andere
+## helft stond dan P2: de doelhelft op de tick van het zetten, niet van de breuk (het merk leeft 150
+## ticks, het venster is 120; Lead-review PR #303). (b2) Fase 1 duurt ≥ 1,25 × zo lang als in de
+## gewone co-op-run. De schotbreuken per maat blijven een note (fase 1 heeft in beide runs 7 vaste
+## openingen, dus ≤ ½ is niet te halen). Hooguit 6000 ticks; P1 heeft genoeg levens.
 func test_b14_note_p2_one_place(t) -> void:
-	if _coop_breaks_per_beat < 0.0:
+	if _coop_breaks_per_beat < 0.0 or _coop_phase1_ticks < 0:
 		var normal := _arena(t, 60, true)
 		var mn := await _play_run(t, normal)
 		_coop_breaks_per_beat = float(mn["breaks_total"]) / maxf(float(normal["beats1"]), 1.0)
+		_coop_phase1_ticks = _phase1_ticks(mn)
 		await t.cleanup()
 	var run := _arena(t, 60, true)
 	run["bot"].p2_fixed = true
 	run["p1"].health = 1000
 	var sim = run["sim"]
 	var boss: Gemaalmeester = run["boss"]
-	# Welk merk brak het schot: wie zette het, vanaf welke helft, en was dat de doelhelft?
-	var last := {"mark": null}
+	var p2: PlayerActor = run["p2"]
+	# Per merk: [zetter, doelhelft op de tick van het zetten, helft van P2 op die tick].
 	var marks_half := {}
 	sim.combat.mark_set.connect(func(tick: int, mark) -> void:
-		marks_half[mark.id] = [mark.setter, boss.half_of(mark.set_at), boss.doelhelft(tick)])
-	sim.combat.mark_exploded.connect(func(_tick: int, mark, _link: int) -> void: last["mark"] = mark)
+		marks_half[mark.id] = [mark.setter, boss.doelhelft(tick), boss.half_of(p2.global_position)])
+	# Elke merk-ontploffing op de ketel in fase 1 (schotbreuk of 20 SE op de kern).
 	var from := []
-	boss.shot_broken.connect(func(_tick: int) -> void:
-		from.append(marks_half.get(last["mark"].id, []) if last["mark"] != null else []))
+	sim.combat.mark_exploded.connect(func(_tick: int, mark, _link: int) -> void:
+		if mark.target == boss.ketel and boss.phase == Gemaalmeester.Phase.ONE:
+			from.append(marks_half.get(mark.id, [])))
 	await _run_until(t, sim, func() -> bool: return boss.phase != Gemaalmeester.Phase.ONE, 6000)
 	run["log"].finish()
+	var m := _measure(run)
 	var breaks: int = run["log"].count("SCHOT_BREUK")
 	var per_beat := float(breaks) / maxf(float(run["beats1"]), 1.0)
+	var done := boss.phase != Gemaalmeester.Phase.ONE
+	var p1_ticks := _phase1_ticks(m) if done else 6000
 	t.note("P2 als ontsteker op één plek (D = 60): %d schotbreuken in %d maten van fase 1 (%.2f per maat; gewone co-op-run %.2f), fase 1 %s" % [
 		breaks, run["beats1"], per_beat, _coop_breaks_per_beat,
-		"klaar op tick %d" % sim.tick if boss.phase != Gemaalmeester.Phase.ONE else "niet klaar in 6000 ticks"])
-	t.check(breaks > 0 and from.size() == breaks and from.all(func(f: Array) -> bool: return f == ["p1", -1, -1]),
-		"P2 op één plek: schotbreuken van merken [zetter, helft, doelhelft] %s (verwacht alleen [p1, links, links])" % [from])
-	var ratio := per_beat / _coop_breaks_per_beat if _coop_breaks_per_beat > 0.0 else -1.0
-	t.note("P2 op één plek: verhouding schotbreuken per maat %.2f tegen de gewone co-op-run (grens §6 B-14 (b): ≤ 0,50; %s; geen check, zie de kop)" % [
-		ratio, "gehaald" if ratio >= 0.0 and ratio <= 0.5 else "niet gehaald"])
+		"%d ticks" % p1_ticks if done else "niet klaar in 6000 ticks"])
+	# (b1)
+	var good := func(f: Array) -> bool: return f.size() == 3 and f[0] == "p1" and f[1] != 0 and f[1] == -f[2]
+	t.check(breaks > 0 and from.size() >= breaks and from.all(good),
+		"P2 op één plek (b1): merk-ontploffingen op de ketel [zetter, doelhelft bij het zetten, helft P2] %s (verwacht elk [p1, d, −d])" % [from])
+	# (b2)
+	var ratio := float(p1_ticks) / float(_coop_phase1_ticks) if _coop_phase1_ticks > 0 else -1.0
+	t.check(ratio >= P2_FIXED_PHASE1_MIN, "P2 op één plek (b2): fase 1 %d tegen %d ticks in de gewone co-op-run (%.2f; ≥ %.2f)" % [
+		p1_ticks, _coop_phase1_ticks, ratio, P2_FIXED_PHASE1_MIN])
 	await t.cleanup()
+
+
+## B-14 (b2): de duur van fase 1 in ticks (BOSS_START tot de fasewissel; −1 als die er niet is).
+func _phase1_ticks(m: Dictionary) -> int:
+	var at: Dictionary = m["at"]
+	if not at.has("start") or not at.has("wissel"):
+		return -1
+	return int(at["wissel"]) - int(at["start"])
 
 
 # --- B-10: meetlog ---------------------------------------------------------------------
