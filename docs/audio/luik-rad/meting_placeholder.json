@@ -1,0 +1,59 @@
+{
+ "gm_rad_treffer_1_placeholder.wav": {
+  "pad": "game/audio/sfx/gemaalmeester/gm_rad_treffer_1_placeholder.wav",
+  "bron": "docs/audio/t8d-slice/sfx/gemaalmeester/gm_rad_treffer_1_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -17.0,
+  "lufs_momentaan_max_pyloudnorm": null,
+  "true_peak_dbtp": -6.01,
+  "aandeel_60_250hz_pct": 1.7,
+  "aandeel_boven_250hz_pct": 98.3,
+  "zwaartepunt_hz": 847,
+  "piek_op_ms": 4.2,
+  "clipping_samples": 0,
+  "ffmpeg_ebur128": {
+   "M_max_LUFS": -17.0,
+   "true_peak_dBTP": -6.0
+  },
+  "sha256": "7aa0b054c1424d0f4d461695888d711ef5169feb4aa6d882afd7a75031d63624"
+ },
+ "gm_rad_treffer_2_placeholder.wav": {
+  "pad": "game/audio/sfx/gemaalmeester/gm_rad_treffer_2_placeholder.wav",
+  "bron": "docs/audio/t8d-slice/sfx/gemaalmeester/gm_rad_treffer_2_placeholder.wav",
+  "duur_s": 1.1,
+  "duur_ticks": 66.0,
+  "lufs_momentaan_max": -17.0,
+  "lufs_momentaan_max_pyloudnorm": null,
+  "true_peak_dbtp": -6.63,
+  "aandeel_60_250hz_pct": 1.7,
+  "aandeel_boven_250hz_pct": 98.3,
+  "zwaartepunt_hz": 1131,
+  "piek_op_ms": 5.4,
+  "clipping_samples": 0,
+  "ffmpeg_ebur128": {
+   "M_max_LUFS": -17.0,
+   "true_peak_dBTP": -6.6
+  },
+  "sha256": "6068dd0b827b9de3ee714755a162354b235cbf2b760ed91656342d19d5268728"
+ },
+ "luik_breekt_placeholder.wav": {
+  "pad": "game/audio/sfx/omgeving/luik_breekt_placeholder.wav",
+  "duur_s": 0.7,
+  "duur_ticks": 42.0,
+  "lufs_momentaan_max": -15.0,
+  "lufs_momentaan_max_pyloudnorm": null,
+  "true_peak_dbtp": -1.8,
+  "aandeel_60_250hz_pct": 53.4,
+  "aandeel_boven_250hz_pct": 41.3,
+  "zwaartepunt_hz": 701,
+  "piek_op_ms": 14.8,
+  "clipping_samples": 0,
+  "ffmpeg_ebur128": {
+   "M_max_LUFS": -15.0,
+   "true_peak_dBTP": -1.8
+  },
+  "aandeel_boven_8khz_pct": 1.2,
+  "sha256": "4f53ec4a8f9ca1e1271056f37c110b6bd7806c4602f3e5b3e95d18bacc755711"
+ }
+}
