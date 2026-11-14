@@ -14,12 +14,19 @@ extends RefCounted
 ## (een mediaan over mensen) staan alleen in de uitvoer; MP-7 (a) tegen de solo-lus van
 ## dezelfde D uit dit script.
 ##
-## Geen check (wel gemeten, in de uitvoer): MP-7 (b) van P2 in de boss (`BOSS_START` …
-## `BOSS_VERSLAGEN`, in de lus en in S8 los). De boss-bot (`tests/boss_bot.gd`) laat P2
-## aan de ketel en onder het rad ± 925 ticks stilstaan; wachten met wiebelen telt als
-## wachten (gdd MP-1/MP-3), dus de waarde is niet gehaald → G-2 (Combat Designer). Een
-## check die nu rood is, zegt niets over deze PR; de lus checkt MP-7 (b) van P2 daarom
-## buiten de boss. De voorwaarde voor MT3 ("MP-7 in de boss") is dus nog niet gehaald.
+## MP-7 (b) van P2 **ook in de boss** (`BOSS_START` … `BOSS_VERSLAGEN`; B-14 (g),
+## `slice-vijanden-en-boss.md` §6): een check in S8 los (D = 60) en in de lus bij 60, 90, 120 en
+## 180, met de co-op-regel van fase 1 (GMB-14: de wissel) en de boss-bot van B-14 (`tests/boss_bot.gd`).
+## **De boss in de Kadewijk-arena in co-op** (B-14 (6), GM-01): de boss start pas als beide spelers
+## binnen de muren staan (deur rechts dan dicht); van `BOSS_START` tot `BOSS_VERSLAGEN` staat de
+## camera vast op de arena met beide spelers in beeld en binnen de muren, en als tegencheck staat
+## hij in S8 vóór `BOSS_START` en na `BOSS_VERSLAGEN` níet op de arena en volgt hij beide spelers;
+## de co-op-regel geldt (`DOELHELFT` in fase 1); na `BOSS_VERSLAGEN` is de deur links open, en de
+## lus loopt door naar S9. **De binnenkomst (GM-01) meet de lus**: daar lopen beide spelers vanuit
+## S7 de arena in. In S8 los beginnen P1 en P2 op hetzelfde punt al binnen de muren (de boss start
+## op tick 17), dus daar is de GM-01-check geen echte binnenkomst. Bij D = 60 ook de ontwerpcheck
+## B-14 (f) in de echte arena: P2 zet in fase 1 merken vanaf beide helften (≥ 2 per helft) en heeft
+## daar 0 JUMP-flanken.
 ## MP-7 (e) (gdd v0.8.6 §4.5, #292): het wachten per speler uit het meetlog (`WACHT_START` /
 ## `WACHT_EIND`, `meetlog.gd`: 120 ticks binnen 64 px zonder eigen actie), de langste
 ## wachtperiode en het aandeel van de speeltijd, over de lus, per kamer en in de boss (twee
@@ -31,7 +38,7 @@ extends RefCounted
 ## Dwaallichten): D = 60 ± 12 % per speler, bij D ≥ 120 ook langste > 300. Daar staat een
 ## **regressiegrens als check** (langste ≤ 400 ticks en aandeel ≤ 16 % per speler, besluit TD in
 ## PR #297); de norm volgt in #298 (GP: smalle plekken in de duo-bot) en #299 (LGD/WLD: keerpunten
-## in co-op). Per kamer en in de boss is het een rapportwaarde (de boss tot #289 en G-2, B-14).
+## in co-op). Per kamer en in de boss is het een rapportwaarde.
 ## Ter vergelijking ook het wachten van de bot zelf (`wait_ticks`, ± 18 px, geen maat). Verder:
 ## de lus is rond, de boss verslagen (één poging), trap 2 en het water, alles opgepakt, geen
 ## respawn, en de run is deterministisch.
@@ -61,6 +68,8 @@ const GameState = preload("res://scripts/save/game_state.gd")
 const AreaLoader = preload("res://scripts/world/area_loader.gd")
 const FlowReport = preload("res://levels/flowkamer/flow_report.gd")
 const Gemaal = preload("res://scripts/light/gemaal.gd")
+const Gemaalmeester = preload("res://scripts/combat/gemaalmeester.gd")
+const InputBits = preload("res://scripts/input/input_bits.gd")
 
 const RUN_LIMIT := 34000
 ## MP-7 (e) over de lus buiten de boss: regressiegrens per speler tot #298 en #299 (besluit TD,
@@ -123,6 +132,7 @@ func _coop(t, d: int, start: StringName, run_end: StringName, lus: bool, setup :
 	t.check(wijk.join_partner(duo.p2_input), "co-op %s D=%d: drop-in mislukt" % [start, d])
 	if setup.is_valid():
 		setup.call(wijk)
+	var arena := _watch_arena(wijk)
 	var hits: Array = []
 	var last_health := {"v": wijk.p1.health}
 	wijk.p1.health_changed.connect(func(tick: int, health: int) -> void:
@@ -134,7 +144,126 @@ func _coop(t, d: int, start: StringName, run_end: StringName, lus: bool, setup :
 	await t.tree.physics_frame
 	if not wijk.meetlog.is_closed():
 		wijk.meetlog.finish()
-	return {"wijk": wijk, "progress": parts[1], "duo": duo, "rows": wijk.meetlog.rows, "hits": hits, "parts": parts}
+	return {"wijk": wijk, "progress": parts[1], "duo": duo, "rows": wijk.meetlog.rows, "hits": hits, "parts": parts,
+		"arena": arena}
+
+
+# --- De arena in co-op (B-14 (6), GM-01) ------------------------------------------------
+
+func _door_closed(wijk, block_name: String) -> bool:
+	var kamer = wijk.loader.kamers[&"S8"]
+	if kamer.inhoud_node == null:
+		return false
+	var body := kamer.inhoud_node.get_node_or_null("Blokken/" + block_name) as StaticBody2D
+	return body != null and body.collision_layer != 0
+
+
+## Staat het lichaam helemaal tussen de muren van de arena?
+func _in_arena(body: Node2D) -> bool:
+	var x := body.position.x
+	return x - Layout.HALF_W >= Layout.ARENA_WALL_L - 0.5 and x + Layout.HALF_W <= Layout.ARENA_WALL_R + 0.5
+
+
+## Volgt de boss in de echte arena per tick: de binnenkomst (de tick van `BOSS_START`), de camera en
+## beide spelers tijdens het gevecht, de merken en JUMP-flanken van P2 in fase 1 (B-14 (f)), en de
+## deur links en de camera op de tick na `BOSS_VERSLAGEN`.
+func _watch_arena(wijk) -> Dictionary:
+	var a := {"boss": null, "start_tick": -1, "start": {}, "fight": 0, "cam_ok": 0, "cam_fout": 0,
+		"buiten_beeld": 0, "buiten_arena": 0, "rond": 0, "rond_arena": 0, "rond_buiten_beeld": 0, "p2_weg": 0, "marks": {-1: 0, 1: 0}, "jumps": 0,
+		"defeat_tick": -1, "after": {}, "coop": false}
+	var prev := {"j": false}
+	wijk.sim.combat.mark_set.connect(func(_tick: int, mark) -> void:
+		if a["boss"] == null or not is_instance_valid(a["boss"]):
+			return
+		var boss: Gemaalmeester = a["boss"]
+		if mark.setter == "p2" and mark.target == boss.ketel and boss.phase == Gemaalmeester.Phase.ONE \
+				and boss.state == boss.State.FIGHT:
+			a["marks"][boss.half_of(mark.set_at)] += 1)
+	wijk.sim.tick_finished.connect(func(tick: int) -> void:
+		if a["boss"] == null and wijk.boss != null:
+			a["boss"] = wijk.boss
+		if a["boss"] == null or not is_instance_valid(a["boss"]):
+			return
+		var boss: Gemaalmeester = a["boss"]
+		var p2: Node2D = wijk.p2
+		var p2_live: bool = p2 != null and is_instance_valid(p2) and not p2.dissolved
+		if boss.is_defeated() or boss.state == boss.State.IDLE:
+			if boss.is_defeated() and a["defeat_tick"] < 0:
+				a["defeat_tick"] = tick
+				a["after"] = {"deur_links_open": not _door_closed(wijk, "DeurLinks"), "arena_camera": wijk.is_arena_camera()}
+			# Tegencheck (zoals `test_kadewijk_boss.gd`): rond het gevecht (S8 geladen, vóór
+			# `BOSS_START` en na `BOSS_VERSLAGEN`) staat de camera níet op de arena en volgt hij beide spelers.
+			a["rond"] += 1
+			var free_view: Rect2 = wijk.camera_view()
+			if wijk.is_arena_camera() or free_view == Kadewijk.arena_view():
+				a["rond_arena"] += 1
+			for body in [wijk.p1, p2 if p2_live else null]:
+				if body != null and not free_view.has_point(body.position):
+					a["rond_buiten_beeld"] += 1
+			return
+		if a["start_tick"] < 0:
+			a["start_tick"] = tick
+			a["coop"] = boss.is_coop()
+			a["start"] = {"p1": wijk.p1.position, "p2": p2.position if p2 != null else Vector2.ZERO,
+				"p1_binnen": _in_arena(wijk.p1), "p2_binnen": p2_live and _in_arena(p2),
+				"deur_rechts_dicht": _door_closed(wijk, "DeurRechts"), "deur_links_dicht": _door_closed(wijk, "DeurLinks")}
+		a["fight"] += 1
+		var view: Rect2 = wijk.camera_view()
+		if view == Kadewijk.arena_view():
+			a["cam_ok"] += 1
+		else:
+			a["cam_fout"] += 1
+		var bodies: Array = [wijk.p1]
+		if p2_live:
+			bodies.append(p2)
+		else:
+			a["p2_weg"] += 1
+		for body: Node2D in bodies:
+			if not view.has_point(body.position):
+				a["buiten_beeld"] += 1
+			if not _in_arena(body):
+				a["buiten_arena"] += 1
+		var down: bool = p2_live and p2.last_input & InputBits.JUMP != 0
+		if down and not prev["j"] and boss.phase == Gemaalmeester.Phase.ONE and boss.state == boss.State.FIGHT:
+			a["jumps"] += 1
+		prev["j"] = down)
+	return a
+
+
+## De checks van B-14 (6) op de arena (en bij D = 60 B-14 (f)); geeft de note-tekst terug.
+func _check_arena(t, name: String, out: Dictionary, d: int) -> String:
+	var a: Dictionary = out["arena"]
+	var rows: Array = out["rows"]
+	var st: Dictionary = a["start"]
+	t.check(a["start_tick"] >= 0 and a["coop"], "%s: geen BOSS_START in co-op (start %d, co-op %s)" % [name, a["start_tick"], a["coop"]])
+	t.check(st.get("p1_binnen", false) and st.get("p2_binnen", false) and st.get("deur_rechts_dicht", false)
+		and st.get("deur_links_dicht", false),
+		"%s: binnenkomst (GM-01): bij BOSS_START %s" % [name, st])
+	t.check(int(a["fight"]) > 0 and int(a["cam_fout"]) == 0 and int(a["cam_ok"]) == int(a["fight"]),
+		"%s: arena-camera %d van %d ticks vast (%d fout)" % [name, a["cam_ok"], a["fight"], a["cam_fout"]])
+	t.check(int(a["buiten_beeld"]) == 0 and int(a["buiten_arena"]) == 0 and int(a["p2_weg"]) == 0,
+		"%s: in het gevecht %d keer een speler buiten beeld, %d buiten de arena, P2 %d ticks opgelost" % [
+		name, a["buiten_beeld"], a["buiten_arena"], a["p2_weg"]])
+	t.check(int(a["rond"]) > 0 and int(a["rond_arena"]) == 0 and int(a["rond_buiten_beeld"]) == 0,
+		"%s: rond het gevecht (%d ticks in S8 vóór BOSS_START of na BOSS_VERSLAGEN) %d ticks de arena-camera, %d keer een speler buiten beeld" % [
+		name, a["rond"], a["rond_arena"], a["rond_buiten_beeld"]])
+	var b0 := _first(rows, "BOSS_START")
+	var wissel := _first(rows, "BOSS_FASE", "wissel")
+	var doel := 0
+	for row in rows:
+		if row[2] == "DOELHELFT" and int(row[0]) >= b0 and (wissel < 0 or int(row[0]) < wissel):
+			doel += 1
+	t.check(doel >= 2, "%s: %d keer DOELHELFT in fase 1 (de co-op-regel GMB-14 geldt niet in de arena?)" % [name, doel])
+	var after: Dictionary = a["after"]
+	t.check(a["defeat_tick"] >= 0 and after.get("deur_links_open", false) and not after.get("arena_camera", true),
+		"%s: na BOSS_VERSLAGEN (tick %d): %s" % [name, a["defeat_tick"], after])
+	var marks: Dictionary = a["marks"]
+	if d == 60:
+		t.check(int(marks[-1]) >= 2 and int(marks[1]) >= 2 and int(a["jumps"]) == 0,
+			"%s: fase 1 merken van P2 links %d / rechts %d (≥ 2), JUMP-flanken P2 %d (0; B-14 (f))" % [
+			name, marks[-1], marks[1], a["jumps"]])
+	return "arena: BOSS_START tick %d (P1 %s, P2 %s), camera vast %d/%d ticks, rond het gevecht %d ticks vrij met beide spelers in beeld, DOELHELFT fase 1 %d×, merken P2 fase 1 L %d / R %d, JUMP P2 fase 1 %d" % [
+		a["start_tick"], st.get("p1", Vector2.ZERO), st.get("p2", Vector2.ZERO), a["cam_ok"], a["fight"], a["rond"], doel, marks[-1], marks[1], a["jumps"]]
 
 
 func _save_csv(wijk, file: String) -> void:
@@ -359,12 +488,12 @@ func _wait_norms(m: Dictionary, longest := 300, share := 0.05) -> PackedStringAr
 
 ## Normen van de co-op-run (gdd §4.5, testplan T11 §2.1, §4): leeg = gehaald. `per_room`:
 ## dan geen MP-6 (een kamer zonder LP-bron is geen fout) en geen pompslag. `rates` = false:
-## zonder MP-2 en MP-7 (c) (de route van S8, zie `_lus`). `p2_still` = false: zonder
-## MP-7 (b) van P2 (de boss, zie de kop van dit script).
-func _norms(m: Dictionary, per_room: bool, rates := true, p2_still := true) -> PackedStringArray:
+## zonder MP-2 en MP-7 (c) (de route van S8, zie `_lus`). MP-7 (b) van P2 overal, ook in de boss
+## (B-14 (g)).
+func _norms(m: Dictionary, per_room: bool, rates := true) -> PackedStringArray:
 	var out := PackedStringArray()
 	if int(m["mp1_p1"]) > 300: out.append("MP-1 P1 %d" % m["mp1_p1"])
-	if p2_still and int(m["mp1_p2"]) > 300: out.append("MP-7b P2 %d" % m["mp1_p2"])
+	if int(m["mp1_p2"]) > 300: out.append("MP-7b P2 %d" % m["mp1_p2"])
 	if rates and float(m["mp2"]) < 3.0: out.append("MP-2 %.2f/min" % m["mp2"])
 	if int(m["gap"]) > 2400: out.append("MP-2 gat %d" % m["gap"])
 	if rates and float(m["mp7c"]) < 1.0: out.append("MP-7c %.2f/min" % m["mp7c"])
@@ -375,10 +504,9 @@ func _norms(m: Dictionary, per_room: bool, rates := true, p2_still := true) -> P
 	return out
 
 
-## MP-7 (b) van P2 in de boss, als echte waarde (geen check, zie de kop van dit script).
+## MP-7 (b) van P2 in de boss (check ≤ 300, B-14 (g)), met P1 ernaast.
 func _boss_p2(m: Dictionary) -> String:
-	var v := int(m["mp1_p2"])
-	return "MP-7b P2 in de boss %d%s" % [v, " (niet gehaald → G-2, Combat Designer; geen check)" if v > 300 else " (≤ 300)"]
+	return "MP-7b in de boss P2 %d / P1 %d (check ≤ 300)" % [int(m["mp1_p2"]), int(m["mp1_p1"])]
 
 
 ## Wachten op de ander volgens de bot zelf (`Seat.wait_ticks`, ± 18 px; geen maat, MP-7 (e)
@@ -477,16 +605,14 @@ func _lus(t, d: int) -> String:
 	var last_tick := int(rows[rows.size() - 1][0]) + 1
 	var all := _measure(rows, [[first_tick, last_tick]])
 	var mp4 := float(all["dissolved"]) / maxf(float(all["ticks"]), 1.0)
-	# MP-7 (b) van P2 over de lus zonder de boss (de boss: geen check, zie de kop).
-	var fails := _norms(all, false, true, false)
+	# MP-7 (b) van P2 over de hele lus, de boss inbegrepen (B-14 (g)).
+	var fails := _norms(all, false)
 	var mp7e_buiten := ""
 	t.check(_count(rows, "WACHT_START") == _count(rows, "WACHT_EIND"), "%s: WACHT_START en WACHT_EIND niet in paren" % name)
 	if at["boss_start"] >= 0 and at["verslagen"] >= 0:
 		var buiten := _measure(rows, [[first_tick, at["boss_start"]], [at["verslagen"], last_tick]])
-		if int(buiten["mp1_p2"]) > 300:
-			fails.append("MP-7b P2 buiten de boss %d" % buiten["mp1_p2"])
 		# MP-7 (e) over de lus buiten de boss: check op de regressiegrens (400 / 16 %), de norm
-		# (300 / 5 %) volgt in #298 en #299, zie de kop; de boss: rapport tot #289 en G-2.
+		# (300 / 5 %) volgt in #298 en #299, zie de kop; de boss: rapport.
 		fails.append_array(_wait_norms(buiten, WAIT_REGRESSIE_MAX, WAIT_REGRESSIE_SHARE))
 		var open_e := _wait_norms(buiten)
 		mp7e_buiten = "%s → %s" % [_fmt_wait(buiten), "gehaald" if open_e.is_empty() else "niet gehaald (%s), grens 300 / 5 %% volgt in #298 en #299" % "; ".join(open_e)]
@@ -512,6 +638,7 @@ func _lus(t, d: int) -> String:
 	if mp4 > 0.40:
 		fails.append("MP-4 %.0f %%" % (mp4 * 100.0))
 	t.check(fails.is_empty(), "%s: de lus haalt niet: %s" % [name, "; ".join(fails)])
+	var arena_note := _check_arena(t, name, out, d)
 	var segs := _segments(rows)
 	var per_room := PackedStringArray()
 	for k in ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "Boss", "S9"]:
@@ -522,7 +649,7 @@ func _lus(t, d: int) -> String:
 		# De route van S8 (W38: vóór `BOSS_START` en na `BOSS_VERSLAGEN`) is de arena in en de
 		# deur links uit, ± 3 s zonder bouwsteen: daar geen MP-2 en MP-7 (c) per minuut (ook solo
 		# heeft S8 daar geen MP-2, testplan T11 §3; SL-03 meet die tijd). Wel MP-1, MP-7 (b) en (d).
-		var f := _norms(m, true, k != "S8", k != "Boss")
+		var f := _norms(m, true, k != "S8")
 		t.check(f.is_empty(), "%s: %s haalt niet: %s" % [name, k, "; ".join(f)])
 		var solo_t: int = int(_solo.get("per", {}).get(k, 0)) if d == 60 else 0
 		var extra := (" · " + _boss_p2(m)) if k == "Boss" else (" · " + _waits(duo, k))
@@ -537,6 +664,7 @@ func _lus(t, d: int) -> String:
 		out["hits"].size(), all["stuit_p2"], duo.p2_stuit_combos, _boss_p2(_measure(rows, segs.get("Boss", [[0, 0]]))),
 		_waits(duo), duo.lines])
 	t.note("%s per kamer (W38) · %s" % [name, " | ".join(per_room)])
+	t.note("%s: %s" % [name, arena_note])
 	_save_csv(wijk, "bot_lus_coop_D%d.csv" % d)
 	var csv: String = wijk.meetlog.to_csv()
 	await _free(t, out["parts"])
@@ -596,10 +724,12 @@ func _kamer(t, id: StringName) -> void:
 	var keys: Array = ["Boss"] if id == &"S8" else [String(id)]
 	for k: String in keys:
 		var m := _measure(rows, segs.get(k, [[0, 0]]))
-		var f := _norms(m, true, true, k != "Boss")
+		var f := _norms(m, true)
 		t.check(f.is_empty(), "%s: %s haalt niet: %s" % [name, k, "; ".join(f)])
 		var extra := _boss_p2(m) if k == "Boss" else _waits(duo, k)
 		t.note("%s: %s · %s · %s · keerpunten %s" % [name, k, _fmt(m), extra, legs])
+	if id == &"S8":
+		t.note("%s: %s" % [name, _check_arena(t, name, out, 60)])
 	_save_csv(wijk, "bot_kamer_coop_%s_D60.csv" % id)
 	await _free(t, out["parts"])
 
