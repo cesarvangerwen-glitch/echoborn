@@ -97,6 +97,11 @@ func sim_update(tick: int, bodies: Array[Node2D]) -> void:
 			opgepakt = true
 			picked_tick = tick
 			if game_state != null:
+				# Atomair (TD-review #285): de vlag samen met de vaardigheid of het verzamelobject.
+				# Anders staat na een herlaad zonder save (debugmenu) het object weer op zijn plek
+				# terwijl het lampglas al meetelt, en geeft opnieuw oppakken 7 van 7.
+				if save_id != &"":
+					game_state.set_flag(save_id)
 				record_in(game_state, save_id)
 			_update_visual()
 			picked_up.emit(tick, "p%d" % body.player_index)

@@ -230,13 +230,38 @@ func test_kadewijk_pickups_schrijven_in_progress(t) -> void:
 	await _ticks(t, 120)
 	t.check(wijk.neerslag_tick > 0 and parts[1].state.has_vaardigheid(&"V-01") and wijk.has_neerslag(),
 		"S7: opgepakt op %d, vaardigheden %s" % [wijk.neerslag_tick, parts[1].state.vaardigheden])
+	# Atomair (TD-review #285): de vlag staat meteen in `state`, niet pas na `store_world`.
+	t.check(parts[1].state.has_flag(SOKKEL), "S7: na het oppakken staat de vlag van de sokkel nog niet in state")
 	await _free(t, parts)
-	parts = _wijk(t, GameState.new(), &"S5", ScriptedInput.new([]))
+	var state := GameState.new()
+	parts = _wijk(t, state, &"S5", ScriptedInput.new([]))
 	await _ticks(t, 1)
 	var inhoud: Node = parts[0].loader.kamers[&"S5"].inhoud_node
 	var lampglas := inhoud.get_node_or_null(^"Lampglas") as Pickup if inhoud != null else null
 	t.check(lampglas != null and lampglas.save_id == LAMPGLAS and lampglas.game_state == parts[1].state,
 		"S5: het lampglas kreeg %s en %s" % [lampglas.save_id if lampglas else null, lampglas.game_state if lampglas else null])
+	if lampglas == null:
+		await _free(t, parts)
+		return
+	parts[0].p1.respawn_at(lampglas.global_position)
+	await _ticks(t, 3)
+	t.check(parts[0].lampglas_tick >= 0 and state.has_flag(LAMPGLAS) and state.lampglazen() == 1
+		and parts[0].p1.max_health == 6 and parts[0].p1.health == 6,
+		"S5: lampglas op %d, vlag %s, %d van %d" % [parts[0].lampglas_tick, state.has_flag(LAMPGLAS), parts[0].p1.health, parts[0].p1.max_health])
+	await _free(t, parts)
+	# Herladen zonder save (F4, F6, de staarttoetsen van SL-05): hetzelfde `state`, geen
+	# `store_world`. Het lampglas is weg en het maximum is 6; de levenspunten zijn die van de
+	# laatste `store_world` (hier de start, 5), geklemd op het maximum. Op de plek geen 7 van 7.
+	parts = _wijk(t, state, &"S5", ScriptedInput.new([]))
+	await _ticks(t, 1)
+	inhoud = parts[0].loader.kamers[&"S5"].inhoud_node
+	lampglas = inhoud.get_node(^"Lampglas") as Pickup
+	t.check(lampglas.opgepakt and not lampglas.visible and parts[0].p1.max_health == 6 and parts[0].p1.health == 5,
+		"herladen: lampglas opgepakt %s, zichtbaar %s, %d van %d" % [lampglas.opgepakt, lampglas.visible, parts[0].p1.health, parts[0].p1.max_health])
+	parts[0].p1.respawn_at(lampglas.global_position)
+	await _ticks(t, 3)
+	t.check(parts[0].lampglas_tick < 0 and parts[0].p1.max_health == 6 and parts[0].p1.health <= 6 and state.max_levenspunten() == 6,
+		"herladen en opnieuw op de plek: lampglas op %d, maximum %d (verwacht 6, geen 7 van 7)" % [parts[0].lampglas_tick, parts[0].p1.max_health])
 	await _free(t, parts)
 
 
