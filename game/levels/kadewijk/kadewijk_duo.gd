@@ -48,8 +48,10 @@ extends RefCounted
 ## Samen blijven: wie voor is en meer dan 400 × 300 px van de ander, wacht heen en
 ## weer (± 18 px; net buiten de 24 px van MP-1, daarom telt elke stoel die ticks per
 ## kamer in `wait_ticks`) tot de ander bij is (de leiband van
-## C-07 en de geladen kamers van C-06); op smalle plekken (`ONE_AT_A_TIME`: de luiken
-## en de schacht) laat P2 P1 eerst gaan, en bij de Dwaallichten (`TOGETHER`) wacht
+## C-07 en de geladen kamers van C-06). Op de smalle plekken (de luiken van S7 en S9, de
+## schacht van S9) gaan ze achter elkaar door zonder op elkaar te wachten (#298: de regel
+## "P2 laat P1 eerst gaan" gaf P2 tot 367 ticks MP-7 (e)-wachten; de luiken en de schacht
+## laten twee lichamen kort na elkaar toe). Bij de Dwaallichten (`TOGETHER`) wacht
 ## P1 tot P2 vlak achter hem is. Wie op de ander staat buiten een samenwerkingsactie,
 ## stapt eraf. Lost P2 op (C-06), dan pakt hij bij terugkomst de stap van P1 op.
 ##
@@ -83,8 +85,6 @@ const SPRINGER := {
 	"S5-B2a": 1, "S5-B2b": 2, "S5-B2c": 1, "S5-B2d": 2,
 	"S9-B2a": 1, "S9-B2b": 2, "S9-B1": 1,
 }
-## Smalle plekken: P2 begint pas als P1 erdoor is.
-const ONE_AT_A_TIME := ["S7-luik", "S9-luik", "S9-schacht"]
 ## De trap naar het plein, trap 2 en terug: samen, de tweede `TRAP_GAP` achter de eerste
 ## (`_trap_hold`); daar wacht niemand op de ander (de afstand blijft binnen de leiband).
 const TRAP_LEGS := ["S9-trap", "S6-trap2", "S9-trap-af"]
@@ -413,9 +413,6 @@ func _decide_leg(s: Seat, tick: int, b: CharacterBody2D) -> int:
 	if s.index == 1 and name == "S6-trap2" and s.bot.sub == "gang" and s.bot._past_gang() and _p2_fills_trap_2():
 		s.bot._next_leg(true)
 		return _own(s, L)
-	# Smalle plek: P2 laat P1 eerst gaan.
-	if s.index == 2 and name in ONE_AT_A_TIME and not p1_input.bot.leg_done.has(name) and fresh and not _far(b, _body(o)):
-		return _own(s, _wait(s))
 	# Samen stuiten: P1 wacht tot P2 vlak achter hem is, P2 begint als P1 springt.
 	# (Beide lopen daar naar links.)
 	if name in TOGETHER and fresh and not _other_gone(o):
