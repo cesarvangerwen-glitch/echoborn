@@ -23,6 +23,19 @@ extends RefCounted
 ## stuit, sprong of echo; bron wie sloeg), `RAD_DRAAI` (waarde treffers/tijd; bron de kant waar het
 ## heen draait: links/rechts), `BOSS_AANVAL` (waarde soort_helft, bron raak/mis), `FINISHER_START`,
 ## `FINISHERSLAG` (bron wie), `BOSS_VERSLAGEN` (waarde het aantal finisherslagen).
+##
+## MP-7 (e) (`WACHT_START`, `WACHT_EIND`; gdd v0.8.6 §4.5, #292): alleen in co-op, voor P1 en P2
+## (bron `p1`/`p2`), uit de spelstaat (niet uit een bot), dus ook bij mensen. Een tick `t` is
+## wachtend als het middelpunt van de speler in `t − 120 … t` steeds binnen 64 px (rechte
+## afstand) van zijn middelpunt op `t − 120` bleef, en hij in die ticks geen eigen actie had:
+## een `LP`- of `POMP`-regel met hem als bron, of een `SPRINGPLANK`, `BOUNCE`, `VANGEN` of
+## `LANCERING` waarin hij drager (bron) of springer (het andere lichaam) was. `WACHT_START` staat
+## op de eerste wachtende tick `t₀`, met waarde de begintick `t₀ − 120`; `WACHT_EIND` op de eerste
+## tick die niet meer wacht (of bij `finish`, dan telt de laatste tick mee), met waarde de lengte:
+## een wachtperiode is `[waarde van WACHT_START, die + lengte)`, zodat een lezer hem per kamer of
+## per bossfase kan knippen. Niet mee telt wat MP-1 niet telt (de eerste 30 ticks, 60 na een
+## respawn of `P2_TERUG`), voor P2 de ticks dat hij opgelost is, en `WARD_START … WARD_EIND`:
+## het venster van 120 ticks moet helemaal buiten die ticks liggen.
 
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 const Motor = preload("res://scripts/echo/motor.gd")
@@ -35,6 +48,25 @@ const RUN_GRACE := 30
 const RESPAWN_GRACE := 60
 ## LM-02: springplank-reeks telt tot n = 4.
 const CHAIN_MAX := 4
+## MP-7 (e): venster en straal voor een wachtende tick.
+const WAIT_WINDOW := 120
+const WAIT_RADIUS := 64.0
+## Rijen die een eigen actie zijn van hun bron (MP-7 e); bij de plank-events ook van de springer.
+const OWN_ACTION := ["LP", "POMP"]
+const PLANK_ACTION := ["SPRINGPLANK", "BOUNCE", "VANGEN", "LANCERING"]
+
+
+## MP-7 (e): het wachten van één speler (zie de kop van dit script).
+class Wait:
+	extends RefCounted
+	var source := ""
+	var positions: Array[Vector2] = []
+	var last_action := -1_000_000
+	## Eerste tick die als begin van een venster mag gelden (na een uitgesloten tick).
+	var from_tick := 0
+	## Begintick (`t₀ − 120`) van de open wachtperiode, of -1.
+	var since := -1
+	var at := Vector2.ZERO
 
 ## Regels als arrays van 7 strings, in volgorde van ontstaan.
 var rows: Array[PackedStringArray] = []
@@ -57,6 +89,11 @@ var _p2_positions: Array[Vector2] = []
 var _p2_last_move_tick := -1_000_000
 var _p2_grace_until := 0
 var _p2_still_since := -1
+## MP-7 (e): wachten van P1 en P2 (alleen co-op), en `WARD_START … WARD_EIND`.
+var _wait_p1 := Wait.new()
+var _wait_p2 := Wait.new()
+var _ward := false
+var _p2_wait_body: Node2D = null
 
 
 ## Begint het log op de volgende tick van `sim`. `echo` mag null zijn (co-op).
@@ -66,12 +103,18 @@ func _init(sim: Node, p1: PlayerActor, echo: Node2D) -> void:
 	_echo = echo
 	_start_tick = sim.tick
 	_grace_until = _start_tick + RUN_GRACE
+	_wait_p1.source = "p1"
+	_wait_p2.source = "p2"
+	_wait_p1.from_tick = _grace_until
+	_wait_p2.from_tick = _grace_until
 	_add(_start_tick, "RUN_START", "", "", p1.position)
 	sim.tick_finished.connect(_on_tick)
 	if sim.has_signal("partner_returned"):
 		sim.partner_returned.connect(func(tick: int, _at: Vector2) -> void:
 			_p2_grace_until = tick + RESPAWN_GRACE
-			_p2_positions.clear())
+			_p2_positions.clear()
+			_wait_p2.positions.clear()
+			_wait_p2.from_tick = maxi(_wait_p2.from_tick, _p2_grace_until))
 	if sim.has_signal("stuit"):
 		sim.stuit.connect(func(tick: int, player: Node2D) -> void:
 			_add(tick, "STUIT", "", "p%d" % player.player_index, player.position))
@@ -128,6 +171,9 @@ func finish() -> void:
 		var at: Vector2 = _p2.position if _p2 != null and is_instance_valid(_p2) else Vector2.ZERO
 		_add(tick, "STIL_EIND", str(tick - _p2_still_since + 1), "p2", at)
 		_p2_still_since = -1
+	# MP-7 (e): een open wachtperiode loopt tot en met de laatste tick (+ 1).
+	_close_wait(_wait_p1, tick + 1, tick)
+	_close_wait(_wait_p2, tick + 1, tick)
 	_add(tick, "RUN_EIND", "", "", _p1.position)
 	# Daarna komt er niets meer bij, ook niet als de Sim nog een tick draait.
 	_closed = true
@@ -168,6 +214,9 @@ func _on_tick(tick: int) -> void:
 		PlayerActor.EchoReset.RESPAWN:
 			_add(tick, "RESPAWN", "", "p1", _p1.position)
 			_grace_until = tick + RESPAWN_GRACE
+			# Zoals MP-1: de respawn-ticks tellen voor P1 en P2 niet.
+			_wait_p1.from_tick = maxi(_wait_p1.from_tick, _grace_until)
+			_wait_p2.from_tick = maxi(_wait_p2.from_tick, _grace_until)
 	var p2: PlayerActor = _sim.get_player(2) if _sim.has_method("get_player") else null
 	# Bron = de drager (§4.5): solo de echo, in co-op het andere lichaam.
 	_chain = _plank_rows(tick, ev, _chain, "p2" if p2 != null else "echo", _p1.position)
@@ -181,6 +230,7 @@ func _on_tick(tick: int) -> void:
 		_last_move_tick = tick
 	_update_still(tick)
 	_update_still_p2(tick, p2)
+	_update_waits(tick, p2)
 
 
 ## SPRINGPLANK, BOUNCE, VANGEN en LANCERING van één springer; `n` (LM-02) per
@@ -267,8 +317,79 @@ func _close_still_p2(tick: int) -> void:
 	_p2_still_since = -1
 
 
+## MP-7 (e), na MP-1: het wachten van P1 en P2, alleen zolang er een P2 is (co-op).
+func _update_waits(tick: int, p2: PlayerActor) -> void:
+	if p2 != _p2_wait_body:
+		# Drop-in, drop-out of een nieuw P2-lichaam: beide opnieuw, het venster pas vanaf nu.
+		_close_wait(_wait_p1, tick, tick)
+		_close_wait(_wait_p2, tick, tick)
+		_p2_wait_body = p2
+		for w: Wait in [_wait_p1, _wait_p2]:
+			w.positions.clear()
+			w.from_tick = maxi(w.from_tick, tick)
+	if p2 == null:
+		return
+	_step_wait(_wait_p1, tick, _p1.position)
+	if p2.dissolved:
+		_close_wait(_wait_p2, tick, tick)
+		_wait_p2.positions.clear()
+		_wait_p2.from_tick = maxi(_wait_p2.from_tick, tick + 1)
+		return
+	_step_wait(_wait_p2, tick, p2.position)
+
+
+func _step_wait(w: Wait, tick: int, at: Vector2) -> void:
+	w.at = at
+	if _ward:
+		w.from_tick = maxi(w.from_tick, tick + 1)
+	w.positions.append(at)
+	if w.positions.size() > WAIT_WINDOW + 1:
+		w.positions.pop_front()
+	var begin := tick - WAIT_WINDOW
+	var waiting := begin >= w.from_tick and w.positions.size() == WAIT_WINDOW + 1 \
+		and w.last_action < begin
+	if waiting:
+		var origin := w.positions[0]
+		for p in w.positions:
+			if p.distance_to(origin) > WAIT_RADIUS:
+				waiting = false
+				break
+	if waiting and w.since < 0:
+		w.since = begin
+		_add(tick, "WACHT_START", str(begin), w.source, at)
+	elif not waiting:
+		_close_wait(w, tick, tick)
+
+
+## Sluit een open wachtperiode op de regel van `tick`; `end` is de eerste tick die niet meer
+## meetelt (lengte = `end − (t₀ − 120)`).
+func _close_wait(w: Wait, end: int, tick: int) -> void:
+	if w.since < 0:
+		return
+	var since := w.since
+	w.since = -1
+	_add(tick, "WACHT_EIND", str(end - since), w.source, w.at)
+
+
+## MP-7 (e): een eigen actie van `who` (`p1` of `p2`) op `tick`.
+func _note_action(tick: int, who: String) -> void:
+	if who == "p1":
+		_wait_p1.last_action = maxi(_wait_p1.last_action, tick)
+	elif who == "p2":
+		_wait_p2.last_action = maxi(_wait_p2.last_action, tick)
+
+
 func _add(tick: int, event: String, value: String, source: String, at: Vector2) -> void:
 	if _closed:
 		return
+	if event in OWN_ACTION:
+		_note_action(tick, source.get_slice("_", source.get_slice_count("_") - 1))
+	elif event in PLANK_ACTION and (source == "p1" or source == "p2"):
+		_note_action(tick, "p1")
+		_note_action(tick, "p2")
+	elif event == "WARD_START":
+		_ward = true
+	elif event == "WARD_EIND":
+		_ward = false
 	rows.append(PackedStringArray([str(tick), room, event, value, source,
 		"%.2f" % at.x, "%.2f" % at.y]))
