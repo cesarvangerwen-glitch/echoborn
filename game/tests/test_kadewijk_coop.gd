@@ -7,7 +7,8 @@ extends RefCounted
 ##
 ## Wat een check is (gdd §4.5: de co-op-run bewijst dat de kamer de normen kán halen;
 ## testplan T11 §4, voorwaarde MT3): MP-1 van P1 én P2 ≤ 300, MP-2 ≥ 3,0 per minuut
-## met een gat ≤ 2400 ticks, MP-4 ≤ 40 %, MP-6 ≥ 40 % met ≥ 1 pompslag van P2, en
+## met een gat ≤ 2400 ticks, MP-4 ≤ 40 %, MP-6 ≥ 40 % met ≥ 1 pompslag van P2, SL-01
+## ≥ 100 LP vóór de eerste pompslag (L-14 c, over de lus), en
 ## MP-7 (b)–(d), over de lus en per kamer (W38: per kamer = `KAMER` tot `KAMER`; de
 ## boss = `BOSS_START` … `BOSS_VERSLAGEN`, apart van de route van S8). MP-3 en MP-7 (a)
 ## (een mediaan over mensen) staan alleen in de uitvoer; MP-7 (a) tegen de solo-lus van
@@ -142,6 +143,18 @@ func _first(rows: Array, event: String, value := "") -> int:
 		if row[2] == event and (value == "" or row[3] == value):
 			return int(row[0])
 	return -1
+
+
+## SL-01 (L-14 c): LP gevuld van RUN_START tot de eerste pompslag (van P1 of P2), zoals
+## `_lp_before_pump` in `test_kadewijk_deel2.gd` (solo: 112 bij D = 60).
+func _lp_before_pump(rows: Array) -> int:
+	var n := 0
+	for row in rows:
+		if row[2] == "POMP":
+			return n
+		if row[2] == "LP":
+			n += int(str(row[3]).trim_prefix("+"))
+	return n
 
 
 # --- Maten per stuk van de run (W38) --------------------------------------------
@@ -388,6 +401,8 @@ func _lus(t, d: int) -> String:
 	t.check(missed.is_empty(), "%s: zonder de ander (langzame lijn of niet gedaan): %s" % [name, missed])
 	t.check(_count(rows, "LANCERING", "", "p1") >= 1, "%s: geen lancering van P2 over P1 (B4)" % name)
 	t.check(_count(rows, "POMP", "", "p2") >= 1, "%s: geen pompslag van P2" % name)
+	var sl01 := _lp_before_pump(rows)
+	t.check(sl01 >= 100, "%s: %d LP vóór de eerste pompslag (SL-01: ≥ 100)" % [name, sl01])
 	# Normen over de lus en per kamer.
 	var first_tick := int(rows[0][0])
 	var last_tick := int(rows[rows.size() - 1][0]) + 1
@@ -419,8 +434,8 @@ func _lus(t, d: int) -> String:
 		per_room.append("%s: %s%s%s" % [k, _fmt(m), (" · MP-7a %.2f× solo" % (float(m["ticks"]) / solo_t)) if solo_t > 0 else "", extra])
 	var solo_run: int = int(_solo.get("run", 0)) if d == 60 else 0
 	var rep = FlowReport.from_rows(rows, false)
-	t.note("%s: run %d ticks (%.1f s) · %s · MP-3 %.0f %% van %d landingen zonder wachten · MP-4 %.1f %% · MP-7a %s · treffers P1 %d · stuits P2 %d (combo %d) · %s · %s · lijnen %s" % [
-		name, wijk.run_ticks(), wijk.run_ticks() / 60.0, _fmt(all), rep.landings_without_still * 100.0, rep.landings, mp4 * 100.0,
+	t.note("%s: run %d ticks (%.1f s) · %s · MP-3 %.0f %% van %d landingen zonder wachten · MP-4 %.1f %% · SL-01 %d LP vóór de eerste pompslag · MP-7a %s · treffers P1 %d · stuits P2 %d (combo %d) · %s · %s · lijnen %s" % [
+		name, wijk.run_ticks(), wijk.run_ticks() / 60.0, _fmt(all), rep.landings_without_still * 100.0, rep.landings, mp4 * 100.0, sl01,
 		("%.2f× solo (%d/%d)" % [float(wijk.run_ticks()) / solo_run, wijk.run_ticks(), solo_run]) if solo_run > 0 else "— (solo-referentie alleen bij D = 60)",
 		out["hits"].size(), all["stuit_p2"], duo.p2_stuit_combos, _boss_p2(_measure(rows, segs.get("Boss", [[0, 0]]))),
 		_waits(duo), duo.lines])
