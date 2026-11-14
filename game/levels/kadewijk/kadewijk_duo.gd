@@ -36,11 +36,13 @@ extends RefCounted
 ##   co-op: P2 als drager onder het rad, merk-combo op de ketel); tot `BOSS_START`
 ##   lopen beide spelers zelf de arena in (de boss start pas als beide lichamen
 ##   24 px binnen de muren staan, #229). De boss-bot laat P2 aan de ketel en onder
-##   het rad tot ± 925 ticks stilstaan (arena-test); hier wipt P2 na 240 ticks
-##   (`_fidget`, MP-7 (b)), zonder de boss-bot te wijzigen.
+##   het rad tot ± 925 ticks stilstaan (arena-test). Het duo laat dat zo: wachten met
+##   wiebelen telt als wachten (gdd MP-1/MP-3). MP-7 (b) van P2 in de boss is dus niet
+##   gehaald → G-2 (Combat Designer); zie `tests/test_kadewijk_coop.gd`.
 ##
 ## Samen blijven: wie voor is en meer dan 400 × 300 px van de ander, wacht heen en
-## weer (± 18 px, dus geen stilstand van MP-1) tot de ander bij is (de leiband van
+## weer (± 18 px; net buiten de 24 px van MP-1, daarom telt elke stoel die ticks per
+## kamer in `wait_ticks`) tot de ander bij is (de leiband van
 ## C-07 en de geladen kamers van C-06); op smalle plekken (`ONE_AT_A_TIME`: de luiken
 ## en de schacht) laat P2 P1 eerst gaan, en bij de Dwaallichten (`TOGETHER`) wacht
 ## P1 tot P2 vlak achter hem is. Wie op de ander staat buiten een samenwerkingsactie,
@@ -107,8 +109,6 @@ const B4_SPRINGER_WAIT_X := 2770.0
 const B4_HOLD_GIVE_UP := 400
 ## Gevecht: tussen twee slagen (zoals de solo-bot).
 const ATTACK_EVERY := 21
-## Boss: zo lang staat P2 hooguit stil (MP-7 (b) ≤ 300, met marge) voor hij wipt.
-const FIDGET_TICKS := 240
 
 
 ## Wat de solo-bot van één stoel ziet: de wijk, met het lichaam van die stoel als `p1`
@@ -130,7 +130,7 @@ class View:
 		get:
 			if index == 1:
 				return w.room
-			var b = w.p2
+			var b: CharacterBody2D = w.p2
 			if b == null or b.dissolved:
 				return w.room
 			var id := Layout.room_of(b.position)
@@ -184,15 +184,15 @@ class Seat:
 	var was_dissolved := false
 	## Wacht deze stoel deze tick op de ander (dan wacht de ander niet op hem)?
 	var waiting := false
-	## Boss: sinds wanneer dit lichaam binnen 20 px van `still_at` staat, zonder sprong.
-	var still_at := Vector2.INF
-	var still_tick := 0
+	## Ticks waarin deze stoel op de ander wachtte (`waiting`), per kamer van dit lichaam
+	## (MP-7 "niemand wacht": het wachten ± 18 px valt buiten MP-1).
+	var wait_ticks := {}
 	var last_x := INF
 	var stuck := 0
 	var recorded := PackedInt32Array()
 
 	func sample(tick: int) -> int:
-		var owner = duo.get_ref()
+		var owner: RefCounted = duo.get_ref()
 		var bits: int = owner._decide(self, tick) if owner != null else 0
 		recorded.append(bits)
 		prev = bits
@@ -213,8 +213,6 @@ var boss_from := -1
 var boss_until := -1
 ## Stuits van P2 op een Dwaallicht met een merk van P1 (V-01e in co-op).
 var p2_stuit_combos := 0
-## Sprongetjes van P2 in de boss (`_fidget`).
-var fidgets := 0
 
 var _w: Node
 var _d := 60
@@ -367,6 +365,9 @@ func _decide(s: Seat, tick: int) -> int:
 	_note_leg(s, tick)
 	s.since += 1
 	var bits := _decide_leg(s, tick, b)
+	if s.waiting:
+		var here := _room_of(s)
+		s.wait_ticks[here] = int(s.wait_ticks.get(here, 0)) + 1
 	# De stap kan in deze tick afgerond zijn: de ander ziet dan meteen de nieuwe stap.
 	_note_leg(s, tick)
 	return bits
@@ -843,28 +844,4 @@ func _boss(s: Seat, tick: int) -> int:
 	if s.index == 2 and _w.boss.state == _w.boss.State.IDLE:
 		# Vóór BOSS_START: de arena in, rechts van het midden (de boss-bot laat P2 dan naar rechts lopen).
 		return _go_to(s, Layout.ARENA_WALL_L + _w.boss.middle() + 40.0)
-	var bits: int = _boss_bot.sample_for(s.index, tick)
-	if s.index == 2:
-		bits = _fidget(s, bits, tick)
-	return bits
-
-
-## P2 in de boss (MP-7 (b)): de boss-bot laat P2 aan de ketel slaan en onder het rad wachten,
-## zonder te bewegen (gemeten in de arena-test: 925 ticks stil). Een speler die zo lang staat,
-## wipt: na `FIDGET_TICKS` binnen 20 px zonder sprong een sprongetje, als P1 niet op of naar P2
-## springt (P1 op de vloer, ≥ 70 px weg).
-func _fidget(s: Seat, bits: int, tick: int) -> int:
-	var b := _body(s)
-	var p1 := _body(p1_input)
-	if bits & (J | DASH) or b.move_events & (Motor.EV_JUMP | Motor.EV_DASH) or b.position.distance_to(s.still_at) > 20.0:
-		s.still_at = b.position
-		s.still_tick = tick
-		return bits
-	var safe: bool = b.motor.on_floor and p1.motor.on_floor and p1.motor.support != Motor.Support.SHADOW_BODY \
-		and absf(p1.position.x - b.position.x) >= 70.0
-	if tick - s.still_tick >= FIDGET_TICKS and safe:
-		s.still_at = b.position
-		s.still_tick = tick
-		fidgets += 1
-		return bits | J
-	return bits
+	return _boss_bot.sample_for(s.index, tick)

@@ -61,7 +61,7 @@ var sub := ""
 
 ## De wijk (`kadewijk.gd`), of een blik erop die voor één speler hetzelfde laat zien
 ## (`kadewijk_duo.gd`, co-op: `p1` is dan het lichaam van die speler, zonder echo).
-var _room
+var _room: Object
 var _d := 60
 var _prev := 0
 var _last_x := INF
@@ -156,7 +156,7 @@ var _legs := [
 ]
 
 
-func _init(room, d: int, start_room: StringName = &"S1") -> void:
+func _init(room: Object, d: int, start_room: StringName = &"S1") -> void:
 	_room = room
 	_d = d
 	for i in _legs.size():

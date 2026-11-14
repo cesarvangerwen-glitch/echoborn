@@ -11,7 +11,17 @@ extends RefCounted
 ## MP-7 (b)–(d), over de lus en per kamer (W38: per kamer = `KAMER` tot `KAMER`; de
 ## boss = `BOSS_START` … `BOSS_VERSLAGEN`, apart van de route van S8). MP-3 en MP-7 (a)
 ## (een mediaan over mensen) staan alleen in de uitvoer; MP-7 (a) tegen de solo-lus van
-## dezelfde D uit dit script. Verder: de lus is rond, de boss verslagen (één poging),
+## dezelfde D uit dit script.
+##
+## Geen check (wel gemeten, in de uitvoer): MP-7 (b) van P2 in de boss (`BOSS_START` …
+## `BOSS_VERSLAGEN`, in de lus en in S8 los). De boss-bot (`tests/boss_bot.gd`) laat P2
+## aan de ketel en onder het rad ± 925 ticks stilstaan; wachten met wiebelen telt als
+## wachten (gdd MP-1/MP-3), dus de waarde is niet gehaald → G-2 (Combat Designer). Een
+## check die nu rood is, zegt niets over deze PR; de lus checkt MP-7 (b) van P2 daarom
+## buiten de boss. De voorwaarde voor MT3 ("MP-7 in de boss") is dus nog niet gehaald.
+## Ook in de uitvoer: de ticks waarin elke speler op de ander wacht (`wait_ticks`, ± 18 px,
+## net buiten de 24 px van MP-1), per kamer, zodat "niemand wacht" (MP-7) niet alleen op
+## MP-1 leunt. Verder: de lus is rond, de boss verslagen (één poging),
 ## trap 2 en het water, alles opgepakt, geen respawn, en de run is deterministisch.
 ##
 ## De meetlogs (zelfde formaat als de solo-meetlog: `tick, kamer, event, waarde, bron,
@@ -268,11 +278,12 @@ func _fmt(m: Dictionary) -> String:
 
 ## Normen van de co-op-run (gdd §4.5, testplan T11 §2.1, §4): leeg = gehaald. `per_room`:
 ## dan geen MP-6 (een kamer zonder LP-bron is geen fout) en geen pompslag. `rates` = false:
-## zonder MP-2 en MP-7 (c) (de route van S8, zie `_lus`).
-func _norms(m: Dictionary, per_room: bool, rates := true) -> PackedStringArray:
+## zonder MP-2 en MP-7 (c) (de route van S8, zie `_lus`). `p2_still` = false: zonder
+## MP-7 (b) van P2 (de boss, zie de kop van dit script).
+func _norms(m: Dictionary, per_room: bool, rates := true, p2_still := true) -> PackedStringArray:
 	var out := PackedStringArray()
 	if int(m["mp1_p1"]) > 300: out.append("MP-1 P1 %d" % m["mp1_p1"])
-	if int(m["mp1_p2"]) > 300: out.append("MP-7b P2 %d" % m["mp1_p2"])
+	if p2_still and int(m["mp1_p2"]) > 300: out.append("MP-7b P2 %d" % m["mp1_p2"])
 	if rates and float(m["mp2"]) < 3.0: out.append("MP-2 %.2f/min" % m["mp2"])
 	if int(m["gap"]) > 2400: out.append("MP-2 gat %d" % m["gap"])
 	if rates and float(m["mp7c"]) < 1.0: out.append("MP-7c %.2f/min" % m["mp7c"])
@@ -281,6 +292,31 @@ func _norms(m: Dictionary, per_room: bool, rates := true) -> PackedStringArray:
 		if float(m["mp6"]) < 0.40: out.append("MP-6 %.0f %%" % (float(m["mp6"]) * 100.0))
 		if int(m["pomp_p2"]) < 1: out.append("MP-6 geen pompslag van P2")
 	return out
+
+
+## MP-7 (b) van P2 in de boss, als echte waarde (geen check, zie de kop van dit script).
+func _boss_p2(m: Dictionary) -> String:
+	var v := int(m["mp1_p2"])
+	return "MP-7b P2 in de boss %d%s" % [v, " (niet gehaald → G-2, Combat Designer; geen check)" if v > 300 else " (≤ 300)"]
+
+
+## Wachten op de ander (`Seat.wait_ticks`, ± 18 px): per kamer van die speler, en totaal.
+func _waits(duo, room := "") -> String:
+	var out := PackedStringArray()
+	for s in [duo.p1_input, duo.p2_input]:
+		var per: Dictionary = s.wait_ticks
+		if room != "":
+			out.append("P%d %d" % [s.index, int(per.get(StringName(room), 0))])
+			continue
+		var total := 0
+		var parts := PackedStringArray()
+		for k in ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9"]:
+			var n := int(per.get(StringName(k), 0))
+			total += n
+			if n > 0:
+				parts.append("%s %d" % [k, n])
+		out.append("P%d %d (%s)" % [s.index, total, ", ".join(parts) if not parts.is_empty() else "—"])
+	return "wachten op de ander %s ticks" % " / ".join(out)
 
 
 # --- De solo-referentie (MP-7 (a)) ------------------------------------------------
@@ -353,9 +389,16 @@ func _lus(t, d: int) -> String:
 	t.check(_count(rows, "LANCERING", "", "p1") >= 1, "%s: geen lancering van P2 over P1 (B4)" % name)
 	t.check(_count(rows, "POMP", "", "p2") >= 1, "%s: geen pompslag van P2" % name)
 	# Normen over de lus en per kamer.
-	var all := _measure(rows, [[int(rows[0][0]), int(rows[rows.size() - 1][0]) + 1]])
+	var first_tick := int(rows[0][0])
+	var last_tick := int(rows[rows.size() - 1][0]) + 1
+	var all := _measure(rows, [[first_tick, last_tick]])
 	var mp4 := float(all["dissolved"]) / maxf(float(all["ticks"]), 1.0)
-	var fails := _norms(all, false)
+	# MP-7 (b) van P2 over de lus zonder de boss (de boss: geen check, zie de kop).
+	var fails := _norms(all, false, true, false)
+	if at["boss_start"] >= 0 and at["verslagen"] >= 0:
+		var buiten := _measure(rows, [[first_tick, at["boss_start"]], [at["verslagen"], last_tick]])
+		if int(buiten["mp1_p2"]) > 300:
+			fails.append("MP-7b P2 buiten de boss %d" % buiten["mp1_p2"])
 	if mp4 > 0.40:
 		fails.append("MP-4 %.0f %%" % (mp4 * 100.0))
 	t.check(fails.is_empty(), "%s: de lus haalt niet: %s" % [name, "; ".join(fails)])
@@ -369,16 +412,18 @@ func _lus(t, d: int) -> String:
 		# De route van S8 (W38: vóór `BOSS_START` en na `BOSS_VERSLAGEN`) is de arena in en de
 		# deur links uit, ± 3 s zonder bouwsteen: daar geen MP-2 en MP-7 (c) per minuut (ook solo
 		# heeft S8 daar geen MP-2, testplan T11 §3; SL-03 meet die tijd). Wel MP-1, MP-7 (b) en (d).
-		var f := _norms(m, true, k != "S8")
+		var f := _norms(m, true, k != "S8", k != "Boss")
 		t.check(f.is_empty(), "%s: %s haalt niet: %s" % [name, k, "; ".join(f)])
 		var solo_t: int = int(_solo.get("per", {}).get(k, 0)) if d == 60 else 0
-		per_room.append("%s: %s%s" % [k, _fmt(m), (" · MP-7a %.2f× solo" % (float(m["ticks"]) / solo_t)) if solo_t > 0 else ""])
+		var extra := (" · " + _boss_p2(m)) if k == "Boss" else (" · " + _waits(duo, k))
+		per_room.append("%s: %s%s%s" % [k, _fmt(m), (" · MP-7a %.2f× solo" % (float(m["ticks"]) / solo_t)) if solo_t > 0 else "", extra])
 	var solo_run: int = int(_solo.get("run", 0)) if d == 60 else 0
 	var rep = FlowReport.from_rows(rows, false)
-	t.note("%s: run %d ticks (%.1f s) · %s · MP-3 %.0f %% van %d landingen zonder wachten · MP-4 %.1f %% · MP-7a %s · treffers P1 %d · stuits P2 %d (combo %d) · P2 wipt in de boss %d× · lijnen %s" % [
+	t.note("%s: run %d ticks (%.1f s) · %s · MP-3 %.0f %% van %d landingen zonder wachten · MP-4 %.1f %% · MP-7a %s · treffers P1 %d · stuits P2 %d (combo %d) · %s · %s · lijnen %s" % [
 		name, wijk.run_ticks(), wijk.run_ticks() / 60.0, _fmt(all), rep.landings_without_still * 100.0, rep.landings, mp4 * 100.0,
 		("%.2f× solo (%d/%d)" % [float(wijk.run_ticks()) / solo_run, wijk.run_ticks(), solo_run]) if solo_run > 0 else "— (solo-referentie alleen bij D = 60)",
-		out["hits"].size(), all["stuit_p2"], duo.p2_stuit_combos, duo.fidgets, duo.lines])
+		out["hits"].size(), all["stuit_p2"], duo.p2_stuit_combos, _boss_p2(_measure(rows, segs.get("Boss", [[0, 0]]))),
+		_waits(duo), duo.lines])
 	t.note("%s per kamer (W38) · %s" % [name, " | ".join(per_room)])
 	_save_csv(wijk, "bot_lus_coop_D%d.csv" % d)
 	var csv: String = wijk.meetlog.to_csv()
@@ -439,9 +484,10 @@ func _kamer(t, id: StringName) -> void:
 	var keys: Array = ["Boss"] if id == &"S8" else [String(id)]
 	for k: String in keys:
 		var m := _measure(rows, segs.get(k, [[0, 0]]))
-		var f := _norms(m, true)
+		var f := _norms(m, true, true, k != "Boss")
 		t.check(f.is_empty(), "%s: %s haalt niet: %s" % [name, k, "; ".join(f)])
-		t.note("%s: %s · %s · keerpunten %s" % [name, k, _fmt(m), legs])
+		var extra := _boss_p2(m) if k == "Boss" else _waits(duo, k)
+		t.note("%s: %s · %s · %s · keerpunten %s" % [name, k, _fmt(m), extra, legs])
 	_save_csv(wijk, "bot_kamer_coop_%s_D60.csv" % id)
 	await _free(t, out["parts"])
 
