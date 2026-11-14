@@ -59,6 +59,7 @@ const TEST_SCRIPTS := [
 	"res://tests/test_localization.gd",
 	"res://tests/test_save_slots.gd",
 	"res://tests/test_save_gemaal.gd",
+	"res://tests/test_progress_binding.gd",
 	"res://tests/test_flowtest_duo.gd",
 	"res://tests/test_deck_settings.gd",
 	"res://tests/test_respawn.gd",

@@ -14,7 +14,16 @@ extends "res://scripts/objects/sim_object.gd"
 ## Blijvende stand (R10, LM-12): `opgepakt`, als vlag in de save
 ## (`<gebied>/<kamer>/<pad>`). Na laden is een opgepakt object weg (niet
 ## zichtbaar, meldt niets meer). Het effect zelf (levenspunten, de sokkel)
-## past de gebiedsscène toe op `picked_up`, en na laden op de vlag.
+## past de gebiedsscène toe op `picked_up`.
+##
+## Schema v2 (ontwerp.md §12 punt 2 (b), #83): bij het oppakken schrijft het
+## object ook zelf in `game_state` (gezet door de `AreaLoader`, met `save_id` =
+## zijn vlag): een vaardigheid in `vaardigheden` (`set_vaardigheid`), een
+## lampglas of logbladzijde in `verzamelobjecten` (`add_verzamelobject`). Dat
+## gebeurt vóór `picked_up`, dus wie daarop reageert, leest de nieuwe stand. Na
+## laden lezen gebiedsscènes `vaardigheden` en `verzamelobjecten`, niet de vlag;
+## een save van vóór deze binding (alleen de vlag) vult `Progress` bij het
+## binden aan (`AreaLoader.apply_pickup_fallback`).
 
 const PlayerActor = preload("res://scripts/echo/player_actor.gd")
 
@@ -32,6 +41,11 @@ signal picked_up(tick: int, who: String)
 @export var radius := 12.0
 
 var opgepakt := false
+## Waar het oppakken in de save komt (`GameState`), of null (tests zonder save).
+## Gezet door `AreaLoader` bij het laden van de kamer.
+var game_state: RefCounted = null
+## De vlag van dit object (`AreaLoader.object_flag`): de id in `verzamelobjecten`.
+var save_id: StringName = &""
 ## Tick van het oppakken in deze scène, of -1 (ook -1 als het uit de save al weg was).
 var picked_tick := -1
 
@@ -82,9 +96,42 @@ func sim_update(tick: int, bodies: Array[Node2D]) -> void:
 		if body.global_position.distance_to(global_position) <= radius:
 			opgepakt = true
 			picked_tick = tick
+			if game_state != null:
+				# Atomair (TD-review #285): de vlag samen met de vaardigheid of het verzamelobject.
+				# Anders staat na een herlaad zonder save (debugmenu) het object weer op zijn plek
+				# terwijl het lampglas al meetelt, en geeft opnieuw oppakken 7 van 7.
+				if save_id != &"":
+					game_state.set_flag(save_id)
+				record_in(game_state, save_id)
 			_update_visual()
 			picked_up.emit(tick, "p%d" % body.player_index)
 			return
+
+
+## Wat dit object na het oppakken in `state` zet (schema v2): `V-…` in
+## `vaardigheden`, of `id` met zijn soort in `verzamelobjecten`. Ook de
+## terugval voor een oude save (`AreaLoader.apply_pickup_fallback`). Geeft
+## true als `state` daardoor veranderde.
+func record_in(state: RefCounted, id: StringName) -> bool:
+	if soort == Soort.VAARDIGHEID:
+		if vaardigheid == &"" or state.has_vaardigheid(vaardigheid):
+			return false
+		state.set_vaardigheid(vaardigheid)
+		return true
+	if id == &"" or state.has_verzamelobject(id):
+		return false
+	state.add_verzamelobject(id, verzamel_soort())
+	return true
+
+
+## De soort in `verzamelobjecten` (`GameState.VERZAMEL_SOORTEN`), of &"" voor een vaardigheid.
+func verzamel_soort() -> StringName:
+	match soort:
+		Soort.LAMPGLAS:
+			return &"lampglas"
+		Soort.LOGBLADZIJDE:
+			return &"logbladzijde"
+	return &""
 
 
 func _update_visual() -> void:

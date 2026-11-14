@@ -355,7 +355,44 @@ func apply_flag_renames(state: RefCounted) -> int:
 			state.gemalen[new] = state.gemalen[StringName(old)]
 			state.gemalen.erase(StringName(old))
 			moved += 1
+		# Schema v2: de id van een verzamelobject is zijn vlag (anders telt een lampglas dubbel).
+		if state.verzamelobjecten.has(StringName(old)):
+			state.verzamelobjecten[new] = state.verzamelobjecten[StringName(old)]
+			state.verzamelobjecten.erase(StringName(old))
+			moved += 1
 	return moved
+
+
+## Terugval bij het laden (ontwerp.md §12 punt 2 (b), #83): een save van vóór
+## de binding van schema v2 (v1, of v2 van vóór #83) heeft de vlag van een
+## opgepakte `Pickup` (bv. de Neerslag op de sokkel, het lampglas), maar zijn
+## vaardigheid of verzamelobject niet. Voor elk zo'n object in de inhoud
+## van dit gebied zet dit wat de pick-up nu zelf zou schrijven
+## (`Pickup.record_in`): V-01 in `vaardigheden`, het lampglas in
+## `verzamelobjecten`. Geeft het aantal aanvullingen (0 = niets te doen).
+## Maakt de inhoud van de kamers tijdelijk aan, zoals `known_object_flags`,
+## maar alleen als `state` een vlag van dit gebied heeft.
+func apply_pickup_fallback(state: RefCounted) -> int:
+	var any_own := false
+	for flag in state.vlaggen:
+		if _is_own_flag(String(flag)):
+			any_own = true
+			break
+	if not any_own:
+		return 0
+	var added := 0
+	for id in _order:
+		var kamer: Kamer = kamers[id]
+		if kamer.inhoud == null:
+			continue
+		var root := kamer.inhoud.instantiate()
+		for node in _walk(root):
+			if node.has_method("record_in"):
+				var flag := object_flag(id, root.get_path_to(node), gebied)
+				if state.has_flag(flag) and node.record_in(state, flag):
+					added += 1
+		root.free()
+	return added
 
 
 func _is_own_flag(text: String) -> bool:
@@ -454,6 +491,10 @@ func _attach_objects(kamer: Kamer) -> void:
 			object.remember_start()
 		if game_state != null and object.has_persistent_state():
 			object.set_persistent_state(game_state.has_flag(_flag_of(kamer, object)))
+		# Schema v2 (#83): een `Pickup` schrijft bij het oppakken zelf zijn vaardigheid of verzamelobject.
+		if object.has_method("record_in"):
+			object.game_state = game_state
+			object.save_id = _flag_of(kamer, object)
 		if object is Gemaal:
 			_bind_gemaal(kamer, object)
 		# LM-13(c): een verslagen vijand blijft weg, of komt terug.
