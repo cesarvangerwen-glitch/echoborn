@@ -8,9 +8,10 @@ extends "res://scripts/audio/sim_sfx.gd"
 ## (`SFX`) en `pitch_scale` 1,0, voor iedereen. Gaat de schaduwklep vanzelf
 ## weg (`by` = "tijd"), dan klinkt er niets: niemand brak iets.
 ##
-## Het geluid zelf bestaat nog niet (`data/audio.json`, groep `luik_breekt`,
-## `stream` leeg): tot de Composer/Sound Designer het levert, is de koppeling
-## stil. `sfx` kan in een test of scène ook direct gezet worden.
+## Het geluid: `audio/sfx/omgeving/luik_breekt_placeholder.wav` van de
+## Composer/Sound Designer (`data/audio.json`, groep `luik_breekt`;
+## `slice-audio.md` §1.3). Een leeg of ontbrekend pad = stil, zonder fout.
+## `sfx` kan in een test of scène ook direct gezet worden.
 
 const BUS := &"SFX"
 
