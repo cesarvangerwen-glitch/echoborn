@@ -1,6 +1,6 @@
 # Testplan MT2: mijlpaaltest Kadewijk S1–S9 met de Gemaalmeester (T11, F4, F4b(a) solo)
 
-Versie 0.1.6 · 2026-11-13 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250) (deel van T11, [#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88)) · Lead-review: Executive Producer
+Versie 0.1.7 · 2026-11-14 · Eigenaar: QA Lead (met Lead Game Designer) · Issue: [#250](https://github.com/cesarvangerwen-glitch/echoborn/issues/250) (deel van T11, [#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88)) · Lead-review: Executive Producer
 
 Basis: fasekader v0.4 (`docs/productie/fase-2-kader.md`: §3 F4 en F4b, §4 mijlpaaltest MT2, regel tegen weggooiwerk, T11); besluiten van 2026-11-12 in `docs/beslissingen.md` (D = 60 als werkaanname, fase 2 parallel, **de CEO test alleen bij mijlpalen**, kaart ± 10–15 min); kamerdoc `docs/design/kamers/kadewijk.md` v0.4.4 (§3–§9); `docs/design/gemaalmeester.md` v0.2.2 §8 (GM-a–GM-d); `docs/design/combat/slice-vijanden-en-boss.md` v0.1.4 (§2.6, open punt 15); gdd §3.5 (V-01) en **§5.1** (grens F4b(b)); `docs/audio/bible.md` §9.4 (luistercheck F2); `docs/art/slice-kadewijk.md` §9.7; testplan MT1 v0.1.3 (`docs/qa/testplan-mt1.md`, W25–W30).
 
@@ -178,6 +178,7 @@ Kopieën van de MT1-scripts, die zelf ongewijzigd blijven voor het rapport MT1:
 - **`botlogs.gd`** (van `mt1-meetlogs/botlogs.gd`): loopt de gescripte lus (`kadewijk_bot.gd` met `lus`, in S8 `boss_bot.gd`, zoals `test_kadewijk_lus.gd`) bij D = 60 en, als regressie, 90 / 120 / 180, en schrijft per D `bot_lus_D<D>.csv` (het meetlog) en `hang_lus_D<D>.csv` (per tick `tick,kamer,x,y,vx,vy,vloer,echo,ex,ey` van P1 en de echo). Uit het hanglog telt `rekenen.gd` per keerpunt de hangtijd: de ticks tussen keren en de landing op de echo waarin P1 in de lucht is met |vx| ≤ 0,5 px/tick (W33). Zo wordt RV-1 een getal per D. Een lus zonder echo zit er niet in (de route zonder echo meet `kadewijk.md` §6b/§6c).
 - **Draaien** (vanuit de root, ± 20 s + ± 5 s):
   `godot --headless --path game --fixed-fps 60 -s "$PWD/docs/qa/mt2-meetlogs/botlogs.gd" -- <map>` en daarna `godot --headless --path game -s "$PWD/docs/qa/mt2-meetlogs/rekenen.gd" -- <map>`. Voor de sessie: dezelfde `rekenen.gd` op de map met de CSV's van de CEO (`meetlog_*kadewijk*.csv`; zonder hanglog alleen A–D).
+- **RV-6 zonder pompslag van de echo** (T11 Q-2, `testplan-t11-slice.md` W42): pompte de echo niet bij trap 2 (in de kamer van `TRAP_VOL 2`, bij dat bezoek), dan rekent `rekenen.gd` RV-6 vanaf de laatste `POMP` van P1 en zegt dat in de regel. Dezelfde `rekenen.gd` rekent ook co-op-meetlogs (T11 Q-3); de solo-uitvoer is daardoor niet veranderd.
 - Getoetst: de lus-ticks van `botlogs.gd` zijn gelijk aan `kadewijk.md` §6d (15 504 / 15 392 / 16 838 bij D = 60 / 120 / 180), en `rekenen.gd` geeft de cijfers van §2.2 en §2.4.
 
 ## 5. Sessie met de CEO (solo, ± 15 min)
@@ -270,6 +271,7 @@ D = 60 is een CEO-besluit **als werkaanname** (nog niet gespeeld, `beslissingen.
 
 | Versie | Datum | Wijziging |
 |---|---|---|
+| 0.1.7 | 2026-11-14 | §4.4: RV-6 vanaf de laatste `POMP` van P1 als de echo bij trap 2 niet pompte (T11 Q-2, [#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88)); `rekenen.gd` rekent ook co-op, solo-uitvoer ongewijzigd |
 | 0.1.6 | 2026-11-13 | T11 ([#88](https://github.com/cesarvangerwen-glitch/echoborn/issues/88)): besluit LGD over B-1 nagelopen (vraag 9b en de meting staan sinds 0.1.4); telling naar zes meetvragen (§1), RV-6 ook in §6; RV-6 zonder pompslag van de echo vanaf de laatste `POMP` van P1 (§4.3); verwijzing naar `testplan-t11-slice.md` |
 | 0.1.5 | 2026-11-13 | V-10 ✅ (luisterfragment op `main`, #260), link in de kaart §4; stand op `85c6650`: open alleen V-1 |
 | 0.1.4 | 2026-11-13 | Na Lead-review EP (#261): bot-punt 3 ✅ voor de MT2-norm, B-1 bevinding en geen voorwaarde; besluit LGD over B-1 ([besluit LGD in #83](https://github.com/cesarvangerwen-glitch/echoborn/issues/83#issuecomment-6845655429)): `POMP` van de echo telt voor gaten en rustpunt (niet voor MP-2), `rekenen.gd` aangepast (na trap 2: 1202 ticks, 20,0 s); RV-6 en vraag 9b; V-10 met het luisterfragment uit PR #260 |

@@ -20,7 +20,22 @@ extends SceneTree
 ##   - **gaten en rustpunt** (besluit LGD over B-1, #83): daar telt ook een
 ##     `POMP` van de echo als echo-moment; MP-2 blijft zonder `POMP` (gdd §4.5).
 ##     Plus het gat van de laatste pompslag van de echo bij trap 2 tot de
-##     eerste echo-actie in S9 (de wandeling na trap 2, kaart vraag 9b).
+##     eerste echo-actie in S9 (de wandeling na trap 2, kaart vraag 9b, RV-6);
+##     pompte de echo bij trap 2 niet (in de kamer van `TRAP_VOL 2`, bij dat
+##     bezoek), dan vanaf de laatste `POMP` van P1 (T11 Q-2).
+##
+## Co-op (T11 Q-3, `docs/qa/testplan-t11-slice.md` §4.1): een meetlog met bron
+## `p2` is co-op. P2 is dan het tweede lichaam: de `POMP` van P2 telt voor de
+## gaten en RV-6 (W39), LP met bron `_p2` of uit een samenwerkingsactie
+## (`springplank`, `bounce`, `lancering`, `vangen`, `ontploffing`) telt als LP
+## met het tweede lichaam (MP-6, F4b(b) (3)), en MP-4 vervalt (geen echo).
+## Extra: per kamer MP-7 (a)–(d) (W38), met MP-1 van P2 uit `STIL_EIND` bron
+## `p2` en de tijd dat P2 opgelost is uit `P2_OPGELOST` … `P2_TERUG`/`DROP_OUT`.
+## MP-7 (a) per kamer tegen de solo-lus van dezelfde D in dezelfde map
+## (`bot_*lus*.csv` zonder bron `p2`), alleen voor een lus. Zelfde
+## rekenregels als `game/tests/test_kadewijk_coop.gd`, behalve MP-1 per kamer:
+## hier het deel van een stilstand dat in de kamer valt (zoals Q-1), daar de
+## stilstand die in de kamer eindigt.
 ##
 ## Draaien vanuit de root van de repo (Godot 4.6.3):
 ##   godot --headless --path game -s "$PWD/docs/qa/mt2-meetlogs/rekenen.gd" -- <map met CSV's>
@@ -43,10 +58,16 @@ const HANG_VX := 0.5
 const KANAAL := [4960.0, 5120.0]
 const S9_RUST := 720
 const S9_GAT := 600
+## LP-bronnen van een samenwerkingsactie (co-op, MP-6; zoals `test_kadewijk_coop.gd`).
+const COOP_LP := ["springplank", "bounce", "lancering", "vangen", "ontploffing"]
+
+## Co-op (Q-3): kamertijden van de solo-lus per D, voor MP-7 (a).
+var solo_ref := {}
 
 
 func _init() -> void:
 	var dirs := OS.get_cmdline_user_args()
+	var todo: Array = []
 	for dir_path: String in dirs:
 		var names := Array(DirAccess.get_files_at(dir_path))
 		names.sort()
@@ -58,8 +79,43 @@ func _init() -> void:
 				var hang: Array = []
 				if file_name.begins_with("bot_") and FileAccess.file_exists(hang_path):
 					hang = _read(hang_path, 10)
-				_report(file_name, _read(dir_path.path_join(file_name), 7), hang)
+				todo.append([file_name, _read(dir_path.path_join(file_name), 7), hang])
+	# Eerst de solo-lussen van de bot als referentie voor MP-7 (a) (Q-3).
+	for item: Array in todo:
+		var rows: Array = item[1]
+		if item[0].begins_with("bot_") and item[0].contains("lus") and not _is_coop(rows):
+			var d := _d_of(item[0], rows)
+			if not solo_ref.has(d):
+				var segs := _room_segs(rows, _first(rows, "RUN_START"), maxi(_first(rows, "RUN_EIND"), int(rows[rows.size() - 1][0])),
+					_first(rows, "BOSS_START"), _first(rows, "BOSS_VERSLAGEN"))
+				var ticks := {}
+				for k: String in segs:
+					ticks[k] = _seg_ticks(segs[k])
+				solo_ref[d] = ticks
+	for item: Array in todo:
+		_report(item[0], item[1], item[2])
 	quit()
+
+
+func _is_coop(rows: Array) -> bool:
+	for r: Array in rows:
+		if r[4] == "p2":
+			return true
+	return false
+
+
+## LP met het tweede lichaam: solo de echo (bron `_echo`), co-op P2 of een
+## samenwerkingsactie (MP-6, F4b(b) (3)).
+func _lp_second(src: String, coop: bool) -> bool:
+	if not coop:
+		return src.ends_with("_echo")
+	var parts := src.rsplit("_", true, 1)
+	return parts[parts.size() - 1] == "p2" or parts[0] in COOP_LP
+
+
+## De bron van het tweede lichaam: de echo, of in co-op P2.
+func _second(coop: bool) -> String:
+	return "p2" if coop else "echo"
 
 
 func _read(path: String, cols: int) -> Array:
@@ -109,11 +165,11 @@ func _actions(rows: Array) -> Array:
 
 
 ## Echo-momenten voor de gaten en het rustpunt (LGD, B-1): de MP-2-acties plus
-## elke `POMP` van de echo.
-func _moments(rows: Array, acts: Array) -> Array:
+## elke `POMP` van de echo (co-op: van P2, W39).
+func _moments(rows: Array, acts: Array, coop: bool) -> Array:
 	var out: Array = acts.duplicate()
 	for r: Array in rows:
-		if r[2] == "POMP" and r[4] == "echo":
+		if r[2] == "POMP" and r[4] == _second(coop):
 			out.append([int(r[0]), r[1], "POMP"])
 	out.sort_custom(func(a, b) -> bool: return a[0] < b[0])
 	return out
@@ -127,9 +183,10 @@ func _report(file_name: String, rows: Array, hang: Array) -> void:
 	var boss_a := _first(rows, "BOSS_START")
 	var boss_b := _first(rows, "BOSS_VERSLAGEN")
 	var in_boss := func(t: int) -> bool: return boss_a >= 0 and t >= boss_a and (boss_b < 0 or t <= boss_b)
+	var coop := _is_coop(rows)
 	var acts := _actions(rows)
-	var moments := _moments(rows, acts)
-	print("\n=== %s (D = %d) ===" % [file_name, d])
+	var moments := _moments(rows, acts, coop)
+	print("\n=== %s (D = %d%s) ===" % [file_name, d, ", co-op: P1 + P2, P2 als tweede lichaam" if coop else ""])
 	print("runtijd %d ticks (%.1f s), SLICE_EIND %s, BOSS %d → %d (%.1f s)" % [end - start, (end - start) / 60.0,
 		_first(rows, "SLICE_EIND"), boss_a, boss_b, (boss_b - boss_a) / 60.0 if boss_a >= 0 and boss_b >= 0 else 0.0])
 
@@ -166,7 +223,7 @@ func _report(file_name: String, rows: Array, hang: Array) -> void:
 		var ok := gaps.size() > 0 and gaps[0] <= S9_RUST
 		for i in range(1, gaps.size()):
 			ok = ok and gaps[i] <= S9_GAT
-		print("  S9 gaten vanaf binnenkomst %d (met POMP van de echo): %s · rustpunt ≤ %d, daarna ≤ %d: %s" % [s9_in, gaps, S9_RUST, S9_GAT, "ja" if ok else "NEE"])
+		print("  S9 gaten vanaf binnenkomst %d (met POMP van %s): %s · rustpunt ≤ %d, daarna ≤ %d: %s" % [s9_in, "P2" if coop else "de echo", gaps, S9_RUST, S9_GAT, "ja" if ok else "NEE"])
 	# Langste gat zonder echo-moment (met POMP van de echo), naast MP-2.
 	var gap_m := 0
 	var gap_at := start
@@ -176,30 +233,63 @@ func _report(file_name: String, rows: Array, hang: Array) -> void:
 			gap_m = a[0] - prev
 			gap_at = prev
 		prev = a[0]
-	print("  langste gat zonder echo-moment (met POMP van de echo): %d ticks (%.1f s) vanaf tick %d" % [gap_m, gap_m / 60.0, gap_at])
-	# Na trap 2: laatste POMP van de echo vóór TRAP_VOL 2 (en erna) → eerste echo-actie in S9.
+	print("  langste gat zonder echo-moment (met POMP van %s): %d ticks (%.1f s) vanaf tick %d" % ["P2" if coop else "de echo", gap_m, gap_m / 60.0, gap_at])
+	# Na trap 2 (RV-6): laatste POMP van de echo (co-op: P2) bij trap 2 → eerste echo-actie in S9.
+	# "Bij trap 2" = in de kamer van TRAP_VOL 2, vanaf de laatste binnenkomst daar tot 120
+	# ticks na TRAP_VOL. Pompte de echo daar niet, dan vanaf de laatste POMP van P1 (Q-2).
 	var trap2 := -1
+	var trap2_room := ""
 	for r: Array in rows:
 		if r[2] == "TRAP_VOL" and r[3] == "2":
 			trap2 = int(r[0])
+			trap2_room = r[1]
 	if trap2 >= 0:
+		var visit := start
+		for r: Array in rows:
+			if int(r[0]) > trap2:
+				break
+			if r[2] == "KAMER" and r[4] == trap2_room:
+				visit = int(r[0])
+		var who := "de echo" if not coop else "P2"
 		var last_pomp := -1
 		for r: Array in rows:
-			if r[2] == "POMP" and r[4] == "echo" and int(r[0]) <= trap2 + 120:
+			if r[2] == "POMP" and r[4] == _second(coop) and int(r[0]) >= visit and int(r[0]) <= trap2 + 120:
 				last_pomp = int(r[0])
+		if last_pomp < 0:
+			who = "P1 (%s pompte niet bij trap 2, Q-2)" % who
+			for r: Array in rows:
+				if r[2] == "POMP" and r[4] == "p1" and int(r[0]) >= visit and int(r[0]) <= trap2 + 120:
+					last_pomp = int(r[0])
 		var first_s9 := -1
 		for a: Array in acts:
 			if a[0] > last_pomp and a[1] == "S9":
 				first_s9 = a[0]
 				break
-		print("  na trap 2: laatste pompslag van de echo %d → eerste echo-actie in S9 %d: %d ticks (%.1f s; rustpunt ± 12 s, gat < 40 s)" % [
-			last_pomp, first_s9, first_s9 - last_pomp, (first_s9 - last_pomp) / 60.0])
+		print("  na trap 2 (RV-6): laatste pompslag van %s %d → eerste echo-actie in S9 %d: %d ticks (%.1f s; rustpunt ± 12 s, gat < 40 s)" % [
+			who, last_pomp, first_s9, first_s9 - last_pomp, (first_s9 - last_pomp) / 60.0])
 
 	# --- punt 4: MP-3, MP-4, MP-6 ---
-	print("MP-3 %.0f %% van %d landingen zonder stilstand · MP-4 echo Leeg %.1f %% · MP-6 %.0f %% van %d LP met de echo, %d pompslagen van de echo · BREEK %d · RESPAWN %d · DEBUG %d" % [
-		rep.landings_without_still * 100.0, rep.landings, rep.echo_empty_share * 100.0, rep.lp_echo_share * 100.0,
-		rep.lp_total, rep.echo_pumps, rep.breaks, rows.filter(func(r) -> bool: return r[2] == "RESPAWN").size(),
-		rows.filter(func(r) -> bool: return r[2] == "DEBUG").size()])
+	if coop:
+		var lp_t := 0
+		var lp_s := 0
+		var pumps_p2 := 0
+		for r: Array in rows:
+			if r[2] == "LP":
+				var n := int(str(r[3]).trim_prefix("+"))
+				lp_t += n
+				if _lp_second(str(r[4]), true):
+					lp_s += n
+			elif r[2] == "POMP" and r[4] == "p2":
+				pumps_p2 += 1
+		print("MP-3 %.0f %% van %d landingen zonder stilstand van de springer · MP-4 — (co-op: geen echo; zie MP-7 (d)) · MP-6 %.0f %% van %d LP met P2 of samen, %d pompslagen van P2 · SL-01 %d LP vóór de eerste pompslag · BREEK %d · RESPAWN %d · DEBUG %d" % [
+			rep.landings_without_still * 100.0, rep.landings, 100.0 * lp_s / maxf(lp_t, 1.0), lp_t, pumps_p2, _lp_before_pump(rows),
+			rep.breaks, rows.filter(func(r) -> bool: return r[2] == "RESPAWN").size(),
+			rows.filter(func(r) -> bool: return r[2] == "DEBUG").size()])
+	else:
+		print("MP-3 %.0f %% van %d landingen zonder stilstand · MP-4 echo Leeg %.1f %% · MP-6 %.0f %% van %d LP met de echo, %d pompslagen van de echo · BREEK %d · RESPAWN %d · DEBUG %d" % [
+			rep.landings_without_still * 100.0, rep.landings, rep.echo_empty_share * 100.0, rep.lp_echo_share * 100.0,
+			rep.lp_total, rep.echo_pumps, rep.breaks, rows.filter(func(r) -> bool: return r[2] == "RESPAWN").size(),
+			rows.filter(func(r) -> bool: return r[2] == "DEBUG").size()])
 
 	# --- punt 9: F4b(b), route-tijd zonder de arena (gdd §5.1) ---
 	var route := float(end - start)
@@ -229,19 +319,21 @@ func _report(file_name: String, rows: Array, hang: Array) -> void:
 			"LP":
 				var n := int(str(r[3]).trim_prefix("+"))
 				lp_all += n
-				if str(r[4]).ends_with("_echo"):
+				if _lp_second(str(r[4]), coop):
 					lp_echo += n
 	var mins := maxf(route, 1.0) / MINUTE
 	var f1 := n_act / mins
 	var f2a := n_plank / mins
 	var f2b := n_boom / mins
 	var f3 := float(lp_echo) / maxf(lp_all, 1.0)
-	print("F4b(b) route-tijd %.1f s: (1) %.2f echo-acties/min (≥ 2,0) · (2) springplank %.2f/min (≥ 1,0), ontploffingen %.2f/min (≥ 0,5) · (3) %.0f %% van %d LP met de echo (≥ 30 %%) → %s" % [
-		route / 60.0, f1, f2a, f2b, f3 * 100.0, lp_all,
+	print("F4b(b) route-tijd %.1f s: (1) %.2f echo-acties/min (≥ 2,0) · (2) springplank %.2f/min (≥ 1,0), ontploffingen %.2f/min (≥ 0,5) · (3) %.0f %% van %d LP met %s (≥ 30 %%) → %s" % [
+		route / 60.0, f1, f2a, f2b, f3 * 100.0, lp_all, "P2 of samen" if coop else "de echo",
 		"positief" if f1 >= 2.0 and f2a >= 1.0 and f2b >= 0.5 and f3 >= 0.3 else "NEGATIEF"])
 
 	# --- Q-1 (T11 §6): MP-1, MP-2, MP-4 en F4b(b) per kamer, de boss apart (W38) ---
-	_per_room(rows, rep, start, end, boss_a, boss_b, acts)
+	_per_room(rows, rep, start, end, boss_a, boss_b, acts, coop)
+	if coop:
+		_per_room_coop(file_name, d, rows, rep, start, end, boss_a, boss_b, acts)
 
 	# --- echo-acties per soort en per kamer (pitch §5, tabel voor de LGD) ---
 	var kinds := {}
@@ -294,34 +386,17 @@ func _report(file_name: String, rows: Array, hang: Array) -> void:
 ## de echo Leeg is (vanaf `RUN_START` tot de eerste `ECHO_LEEG_EIND`, en elke
 ## `ECHO_LEEG_START` … `ECHO_LEEG_EIND`) gedeeld door de kamertijd; F4b(b)
 ## zoals de regel F4b(b) hierboven, met de kamertijd als route-tijd.
-func _per_room(rows: Array, rep, start: int, end: int, boss_a: int, boss_b: int, acts: Array) -> void:
-	var segs := {}
-	var room_now := ""
-	var since := start
-	for r: Array in rows:
-		match r[2]:
-			"RUN_START":
-				room_now = r[1]
-				since = int(r[0])
-			"KAMER":
-				_add_seg(segs, room_now, since, int(r[0]))
-				room_now = r[4]
-				since = int(r[0])
-	_add_seg(segs, room_now, since, end)
+func _per_room(rows: Array, rep, start: int, end: int, boss_a: int, boss_b: int, acts: Array, coop: bool) -> void:
+	var segs := _room_segs(rows, start, end, boss_a, boss_b)
 	var has_boss := boss_a >= 0 and boss_b >= 0
 	# Per rij: "alles" = F4 en F4b(b); "f4" = alleen F4; "f4b" = alleen F4b(b).
 	var mode := {}
-	if has_boss:
-		for k: String in segs.keys():
-			if k == "S8":
-				mode["S8"] = "f4"
-				segs["S8 route"] = _minus(segs["S8"], boss_a, boss_b)
-				mode["S8 route"] = "f4b"
-			else:
-				segs[k] = _minus(segs[k], boss_a, boss_b)
-	# De echo Leeg: [begin, eind) zoals FlowReport.
+	if has_boss and segs.has("S8"):
+		mode["S8"] = "f4"
+		mode["S8 route"] = "f4b"
+	# De echo Leeg: [begin, eind) zoals FlowReport. Co-op: geen echo, MP-4 vervalt.
 	var empty: Array = []
-	var empty_since := start
+	var empty_since := start if not coop else -1
 	for r: Array in rows:
 		match r[2]:
 			"ECHO_LEEG_START":
@@ -337,12 +412,11 @@ func _per_room(rows: Array, rep, start: int, end: int, boss_a: int, boss_b: int,
 	for room in Layout.ORDER:
 		order.append(String(room))
 	if has_boss:
-		segs["boss"] = [[boss_a, boss_b]]
 		mode["boss"] = "boss"
 		order.insert(order.find("S8") + 1, "S8 route")
 		order.insert(order.find("S8") + 2, "boss")
 	var lines := PackedStringArray()
-	lines.append("| kamer | tijd (s) | MP-1 (≤ 300) | MP-2 /min (≥ 3,0) | MP-4 Leeg (≤ 40 %) | F4b(b) (1) acties/min (≥ 2,0) | (2) plank · ontploffing /min (≥ 1,0 · ≥ 0,5) | (3) LP met de echo (≥ 30 %) | F4b(b) |")
+	lines.append("| kamer | tijd (s) | MP-1 (≤ 300) | MP-2 /min (≥ 3,0) | MP-4 Leeg (≤ 40 %%) | F4b(b) (1) acties/min (≥ 2,0) | (2) plank · ontploffing /min (≥ 1,0 · ≥ 0,5) | (3) LP met %s (≥ 30 %%) | F4b(b) |" % ("P2 of samen" if coop else "de echo"))
 	lines.append("|---|---|---|---|---|---|---|---|---|")
 	for k: String in order:
 		if not segs.has(k):
@@ -386,7 +460,7 @@ func _per_room(rows: Array, rep, start: int, end: int, boss_a: int, boss_b: int,
 				"LP":
 					var n := int(str(r[3]).trim_prefix("+"))
 					lp_all += n
-					if str(r[4]).ends_with("_echo"):
+					if _lp_second(str(r[4]), coop):
 						lp_echo += n
 		var f1 := n_act / mins
 		var f2a := n_plank / mins
@@ -407,8 +481,8 @@ func _per_room(rows: Array, rep, start: int, end: int, boss_a: int, boss_b: int,
 			if lp_all > 0 and float(lp_echo) / lp_all < 0.3:
 				miss.append("(3)")
 			verdict = "positief" if miss.is_empty() else "mist " + ", ".join(miss)
-		var f4 := "%d%s | %.1f%s | %.1f %%" % [still, "" if still <= 300 else " **> 300**", f1,
-			"" if f1 >= 3.0 else " **< 3,0**", 100.0 * leeg / t]
+		var f4 := "%d%s | %.1f%s | %s" % [still, "" if still <= 300 else " **> 300**", f1,
+			"" if f1 >= 3.0 else " **< 3,0**", "%.1f %%" % (100.0 * leeg / t) if not coop else "— (co-op)"]
 		if m == "f4b":
 			f4 = "— | — | —"
 		elif m == "boss":
@@ -418,6 +492,154 @@ func _per_room(rows: Array, rep, start: int, end: int, boss_a: int, boss_b: int,
 			f4b = "— | — | —"
 		lines.append("| %s | %.1f | %s | %s | %s |" % [k, t / 60.0, f4, f4b, verdict])
 	print("per kamer (Q-1; F4 met S8 mét de boss, testplan-mt2 §3; F4b(b) met de S8-route, W38; boss = informatie):\n%s" % "\n".join(lines))
+
+
+## De stukken per kamer (W38): `KAMER` tot `KAMER` (ook een tweede bezoek), half
+## open. Met een boss: "S8" mét de boss, "S8 route" zonder, "boss" apart, en de
+## andere kamers zonder de boss-ticks.
+func _room_segs(rows: Array, start: int, end: int, boss_a: int, boss_b: int) -> Dictionary:
+	var segs := {}
+	var room_now := ""
+	var since := start
+	for r: Array in rows:
+		match r[2]:
+			"RUN_START":
+				room_now = r[1]
+				since = int(r[0])
+			"KAMER":
+				_add_seg(segs, room_now, since, int(r[0]))
+				room_now = r[4]
+				since = int(r[0])
+	_add_seg(segs, room_now, since, end)
+	if boss_a >= 0 and boss_b >= 0:
+		for k: String in segs.keys():
+			if k == "S8":
+				segs["S8 route"] = _minus(segs["S8"], boss_a, boss_b)
+			else:
+				segs[k] = _minus(segs[k], boss_a, boss_b)
+		segs["boss"] = [[boss_a, boss_b]]
+	return segs
+
+
+func _seg_ticks(s: Array) -> int:
+	var t := 0
+	for seg: Array in s:
+		t += seg[1] - seg[0]
+	return t
+
+
+## SL-01 (L-14 c): LP van `RUN_START` tot de eerste pompslag (van wie ook).
+func _lp_before_pump(rows: Array) -> int:
+	var n := 0
+	for r: Array in rows:
+		if r[2] == "POMP":
+			return n
+		if r[2] == "LP":
+			n += int(str(r[3]).trim_prefix("+"))
+	return n
+
+
+## Q-3 (testplan T11 §4.1): MP-7 (a)–(d) per kamer in co-op, de boss apart (W38).
+## (a) tijd co-op / tijd solo-lus van dezelfde D (≥ 0,5; alleen voor een lus);
+## (b) MP-1 van P1 én P2 ≤ 300 (deel van een stilstand in de kamer, zoals Q-1);
+## (c) samenwerkingsacties per minuut ≥ 1,0 (de MP-2-acties: elke actie is er
+## een van beide spelers); (d) de tijd dat P2 opgelost is ≤ 10 %. Plus MP-6
+## (LP met P2 of samen). "S8 route" (arena in en uit) zonder (c), zoals de test.
+func _per_room_coop(file_name: String, d: int, rows: Array, rep, start: int, end: int, boss_a: int, boss_b: int, acts: Array) -> void:
+	var segs := _room_segs(rows, start, end, boss_a, boss_b)
+	var ref: Dictionary = solo_ref.get(d, {}) if file_name.contains("lus") else {}
+	# P2 opgelost: [P2_OPGELOST, P2_TERUG of DROP_OUT).
+	var gone: Array = []
+	var gone_since := -1
+	for r: Array in rows:
+		match r[2]:
+			"P2_OPGELOST":
+				if gone_since < 0:
+					gone_since = int(r[0])
+			"P2_TERUG", "DROP_OUT":
+				if gone_since >= 0:
+					gone.append([gone_since, int(r[0])])
+					gone_since = -1
+	if gone_since >= 0:
+		gone.append([gone_since, end])
+	var order: Array = []
+	for room in Layout.ORDER:
+		order.append(String(room))
+	if segs.has("boss"):
+		order.insert(order.find("S8") + 1, "S8 route")
+		order.insert(order.find("S8") + 2, "boss")
+	segs["doorloop"] = [[start, end]]
+	order.append("doorloop")
+	if segs.has("boss"):
+		segs["route"] = _minus([[start, end]], boss_a, boss_b)
+		order.append("route")
+	var lines := PackedStringArray()
+	lines.append("| kamer | tijd co-op (s) | (a) co-op / solo (≥ 0,5) | MP-1 P1 (≤ 300) | (b) MP-1 P2 (≤ 300) | (c) samen /min (≥ 1,0) | (d) P2 opgelost (≤ 10 %) | MP-6 LP met P2 of samen | MP-7 |")
+	lines.append("|---|---|---|---|---|---|---|---|---|")
+	for k: String in order:
+		if not segs.has(k):
+			continue
+		var s: Array = segs[k]
+		var t := _seg_ticks(s)
+		if t <= 0:
+			continue
+		var p1 := 0
+		for run: Array in rep.still_runs:
+			for seg: Array in s:
+				p1 = maxi(p1, mini(int(run[1]) + 1, seg[1]) - maxi(int(run[0]), seg[0]))
+		var p2 := 0
+		for run: Array in rep.still_runs_p2:
+			for seg: Array in s:
+				p2 = maxi(p2, mini(int(run[1]) + 1, seg[1]) - maxi(int(run[0]), seg[0]))
+		var n := 0
+		for a: Array in acts:
+			if _in_segs(s, a[0]):
+				n += 1
+		var off := 0
+		for g: Array in gone:
+			for seg: Array in s:
+				off += maxi(0, mini(g[1], seg[1]) - maxi(g[0], seg[0]))
+		var lp_all := 0
+		var lp_s := 0
+		for r: Array in rows:
+			if r[2] == "LP" and _in_segs(s, int(r[0])):
+				var v := int(str(r[3]).trim_prefix("+"))
+				lp_all += v
+				if _lp_second(str(r[4]), true):
+					lp_s += v
+		var key := "S8" if k == "doorloop" else k
+		var ratio := "—"
+		var ratio_v := -1.0
+		if k == "doorloop" and not ref.is_empty():
+			var tot := 0
+			for rk: String in ref:
+				if rk != "S8 route" and rk != "boss":
+					tot += int(ref[rk])
+			ratio_v = float(t) / maxf(tot, 1.0)
+		elif k != "route" and ref.has(key) and k != "doorloop":
+			ratio_v = float(t) / maxf(float(ref[key]), 1.0)
+		if ratio_v >= 0.0:
+			ratio = "%.2f×" % ratio_v
+		var c := n * MINUTE / t
+		var miss := PackedStringArray()
+		if ratio_v >= 0.0 and ratio_v < 0.5:
+			miss.append("(a)")
+		if p1 > 300:
+			miss.append("MP-1 P1")
+		if p2 > 300:
+			miss.append("(b)")
+		if c < 1.0 and k != "S8 route":
+			miss.append("(c)")
+		if float(off) / t > 0.10:
+			miss.append("(d)")
+		var c_txt := "%.1f" % c if k != "S8 route" else "(%.1f)" % c
+		lines.append("| %s | %.1f | %s | %d%s | %d%s | %s%s | %.1f %% | %s | %s |" % [k, t / 60.0, ratio,
+			p1, "" if p1 <= 300 else " **> 300**", p2, "" if p2 <= 300 else " **> 300**", c_txt,
+			" **< 1,0**" if c < 1.0 and k != "S8 route" else "", 100.0 * off / t,
+			"%.0f %% van %d" % [100.0 * lp_s / lp_all, lp_all] if lp_all > 0 else "geen LP",
+			"gehaald" if miss.is_empty() else "mist " + ", ".join(miss)])
+	print("co-op per kamer (Q-3; MP-7 (a)–(d), W38; S8 route zonder (c); solo-referentie %s):\n%s" % [
+		"D = %d" % d if not ref.is_empty() else "geen", "\n".join(lines)])
 
 
 func _add_seg(segs: Dictionary, room: String, a: int, b: int) -> void:
