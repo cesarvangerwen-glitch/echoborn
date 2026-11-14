@@ -14,6 +14,7 @@ extends Node
 ##
 ## Gebruik in een gebiedsscène, ná `loader.collect` en vóór `loader.start`:
 ##   Progress.bind_area_loader(loader, &"polderwijk")
+##   Progress.bind_player(p1)
 ##   Progress.bind_meter(meter)
 ##   Progress.bind_gemaal(gemaal, &"gemaal_k3")
 ##   Progress.bind_sim(sim)
@@ -41,6 +42,8 @@ var slot := -1
 
 var _loader: Node = null
 var _meter: RefCounted = null
+## P1 (`bind_player`): zijn levenspunten gaan in `store_world` naar `state`.
+var _player: Node = null
 ## {gemaal_id: Gemaal-node}, in de volgorde van binden.
 var _gemalen: Dictionary = {}
 
@@ -51,6 +54,7 @@ func adopt(p_state: GameState, p_slot: int) -> void:
 	slot = p_slot
 	_loader = null
 	_meter = null
+	_player = null
 	_gemalen.clear()
 	state_replaced.emit(slot)
 
@@ -65,9 +69,17 @@ func clear() -> void:
 ## loader toe (`flag_renames`) en geeft dan de vlaggen van dit gebied die
 ## bij geen object in de inhoud horen (`AreaLoader.unknown_flags`); die
 ## worden ook als waarschuwing gelogd. Leeg = in orde.
+##
+## Daarna de terugval van schema v2 (ontwerp.md §12 punt 2 (b), #83): een
+## save van vóór de binding (v1, of v2 van vóór #83) heeft alleen de vlag van
+## een opgepakte `Pickup`; `AreaLoader.apply_pickup_fallback` zet dan de
+## vaardigheid (sokkel → `V-01`) of het verzamelobject (→ `lampglas`) erbij.
+## Zo'n save schreef de levenspunten nooit uit het spel (ze laadden altijd
+## vol), dus dan gelden ze als vol: `max_levenspunten()`, met het lampglas 6.
 func bind_area_loader(loader: Node, gebied: StringName) -> PackedStringArray:
 	_loader = loader
 	_meter = null
+	_player = null
 	_gemalen.clear()
 	# `state.gebied` blijft het gebied van het checkpoint (reach_checkpoint):
 	# afsluiten in een nieuw gebied vóór zijn eerste checkpoint laadt op het
@@ -77,10 +89,24 @@ func bind_area_loader(loader: Node, gebied: StringName) -> PackedStringArray:
 	if "progress" in loader:
 		loader.progress = self
 	loader.apply_flag_renames(state)
+	if loader.has_method("apply_pickup_fallback") and loader.apply_pickup_fallback(state) > 0:
+		state.levenspunten = state.max_levenspunten()
 	var unknown: PackedStringArray = loader.unknown_flags(state)
 	for flag in unknown:
 		push_warning("Progress: vlag of gemaal-id '%s' hoort bij geen object in gebied '%s' (hernoemd zonder flag_renames?)" % [flag, gebied])
 	return unknown
+
+
+## P1 (ontwerp.md §12 punt 2 (a), LM-07, #83): krijgt meteen het maximum uit
+## de save (`state.max_levenspunten()`: 5 plus 1 per lampglas, hooguit 9) en
+## `state.levenspunten`, geklemd op 1 … dat maximum; 0 geldt als vol (een
+## save tussen de laatste treffer en de respawntick, §7). `store_world`
+## schrijft zijn levenspunten terug. Na `bind_area_loader` (de terugval).
+func bind_player(p1: Node) -> void:
+	_player = p1
+	var top := state.max_levenspunten()
+	p1.max_health = top
+	p1.health = top if state.levenspunten <= 0 else clampi(state.levenspunten, 1, top)
 
 
 ## De lichtmeter (LM-01): krijgt meteen `state.lichtmeter` en schrijft zijn
@@ -154,13 +180,15 @@ func has_checkpoint_in_area() -> bool:
 
 
 ## Schrijft de stand van de wereld naar `state`: de objecten in de geladen
-## kamers (`AreaLoader.store_objects`), de lichtmeter en de gemalen (met de
-## waterstand van hun wijk). Levenspunten, vaardigheden en verzamelobjecten
-## (schema v2) bindt de Gameplay Programmer nog (ontwerp.md §12).
-## `SaveService` roept dit vlak vóór elke save aan.
+## kamers (`AreaLoader.store_objects`), de levenspunten van P1
+## (`bind_player`), de lichtmeter en de gemalen (met de waterstand van hun
+## wijk). Vaardigheden en verzamelobjecten schrijft een `Pickup` al bij het
+## oppakken (#83). `SaveService` roept dit vlak vóór elke save aan.
 func store_world() -> void:
 	if is_instance_valid(_loader):
 		_loader.store_objects()
+	if is_instance_valid(_player):
+		state.levenspunten = int(_player.health)
 	if _meter != null:
 		state.lichtmeter = int(_meter.value)
 	for id in _gemalen:

@@ -106,9 +106,13 @@ const BOSS_START_INSET := 24.0
 ## Objecten met een blijvende stand die deze scène ook leest als hun kamer niet
 ## geladen is (in de save: `<gebied>/<kamer>/<pad>`, `AreaLoader.object_flag`).
 const BOSS_FLAG := [&"S8", ^"BossVerslagen"]
+## Het lampglas (S5): na laden telt `verzamelobjecten` (schema v2, #83); de vlag zegt alleen dat
+## het object weg is (oude saves: terugval in `Progress.bind_area_loader`).
 const LAMPGLAS_FLAG := [&"S5", ^"Lampglas"]
-## De Neerslag op de sokkel (S7): de vlag is de vaardigheid V-01 (besluit LGD in #252).
+## De Neerslag op de sokkel (S7). De vaardigheid zelf is `NEERSLAG` in `vaardigheden` (V-01,
+## besluit LGD in #252; schema v2, #83); de vlag zegt alleen dat de sokkel leeg is.
 const NEERSLAG_FLAG := [&"S7", ^"Neerslag"]
+const NEERSLAG := &"V-01"
 ## Het gemaal van de wijk (S6), zoals in `state.gemalen`.
 const GEMAAL_PATH := [&"S6", ^"Gemaal"]
 
@@ -231,17 +235,18 @@ func _ready() -> void:
 	loader.kamer_gewisseld.connect(_on_room_changed)
 	if progress != null:
 		start_errors.append_array(progress.bind_area_loader(loader, GEBIED))
+		# LM-07, schema v2 (#83): levenspunten en maximum (het lampglas) uit de save.
+		progress.bind_player(p1)
 		progress.bind_meter(meter)
 	sim.room_bottom = Layout.AREA_BOTTOM + 40.0
 	start_errors.append_array(loader.start(sim.tick, p1.position))
 	room = loader.huidige
 	respawn = Respawn.new(p1, func() -> Vector2: return Layout.ROOM_START.get(loader.huidige, Layout.RUN_START), progress)
-	# Uit de save (LM-12): de Neerslag (V-01; zonder is AANVAL + DOWN een gewone aanval), het lampglas
-	# (WS-08 a) en de waterstand (LM-10).
-	sim.neerslag_unlocked = _saved_flag(NEERSLAG_FLAG)
-	if _saved_flag(LAMPGLAS_FLAG):
-		p1.max_health = mini(p1.max_health + 1, PlayerActor.HEALTH_CAP)
-		p1.health = p1.max_health
+	# Uit de save (LM-12, schema v2, #83): de Neerslag uit `vaardigheden` (V-01; zonder is AANVAL +
+	# DOWN een gewone aanval), het lampglas via `Progress.bind_player` hierboven (WS-08 a), en de
+	# waterstand (LM-10). Een save van vóór de binding (alleen de vlag van de sokkel of het lampglas)
+	# vult `Progress.bind_area_loader` aan.
+	sim.neerslag_unlocked = has_neerslag()
 	if _saved_vulstand() >= 2 * Gemaal.MAX:
 		hoogwater_open_tick = 0
 		_update_hoogwater(sim.tick)
@@ -457,15 +462,24 @@ func is_boss_defeated() -> bool:
 	return _saved_flag(BOSS_FLAG)
 
 
-## De vlag van de Neerslag in de save (V-01): wie in S8 of S9 begint (tests, het debugmenu), zet
-## hem in zijn opzet, want de sokkel staat in S7 (besluit LGD in #252).
+## De vlag van de Neerslag op de sokkel in de save (S7): de sokkel is leeg. Wie in S8 of S9 begint
+## (tests, het debugmenu), zet hem in zijn opzet met `give_neerslag`, want de sokkel staat in S7
+## (besluit LGD in #252).
 static func neerslag_flag() -> StringName:
 	return AreaLoader.object_flag(NEERSLAG_FLAG[0], NEERSLAG_FLAG[1], GEBIED)
 
 
-## Zet de Neerslag in `state` (een `GameState`), zoals na de pick-up.
+## Zet de Neerslag in `state` (een `GameState`), zoals na de pick-up: V-01 in `vaardigheden` en
+## de vlag van de sokkel (schema v2, #83).
 static func give_neerslag(state: RefCounted) -> void:
 	state.set_flag(neerslag_flag())
+	state.set_vaardigheid(NEERSLAG)
+
+
+## Heeft P1 de Neerslag (V-01)? Uit `vaardigheden` in de save (schema v2, #83); zonder `Progress`
+## niet. In deze scène zet de pick-up `sim.neerslag_unlocked` ook meteen.
+func has_neerslag() -> bool:
+	return progress != null and progress.state.has_vaardigheid(NEERSLAG)
 
 
 ## Een node in de inhoud van een geladen kamer (`[kamer, pad]`), of null.
