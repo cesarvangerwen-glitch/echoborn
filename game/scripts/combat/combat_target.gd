@@ -177,6 +177,19 @@ func is_markable() -> bool:
 	return alive and kind != Kind.DUMMY
 
 
+## Zet een treffer van een speler met middelpunt `from` (wereld) hier een merk (als het doel
+## `Merkbaar` is en er nog geen merk op ligt)? Standaard ja; de Gemaalmeester beperkt het in
+## co-op tot de doelhelft (GMB-14 c).
+func allows_mark(_tick: int, _from: Vector2) -> bool:
+	return true
+
+
+## Laat een treffer van het andere lichaam met middelpunt `from` het merk `mark` knallen (C-12 b)?
+## Standaard ja; de Gemaalmeester alleen vanaf de andere helft dan waar het merk gezet is (GMB-14 c).
+func allows_detonate(_tick: int, _from: Vector2, _mark: RefCounted) -> bool:
+	return true
+
+
 ## Wordt dit doel geraakt door een aanvalsvlak `box` (in wereldcoördinaten)
 ## van een lichaam op laag `attacker_layer` (E-06)?
 func is_hit_by(box: Rect2, attacker_layer: int) -> bool:

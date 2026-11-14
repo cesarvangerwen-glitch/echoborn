@@ -15,6 +15,13 @@ extends RefCounted
 ## bot als inputbron, meetlog met `watch_boss`. De run duurt van BOSS_START tot BOSS_VERSLAGEN; de
 ## duur per deel komt in de note (tabel voor de Combat Designer, §3.9). Een run duurt langer dan de
 ## standaardgrens van de runner (7200 frames): `MAX_FRAMES` zet per test een eigen grens.
+##
+## B-14 (G-2, v0.1.6.1 §3.10, §6; #190): in co-op heeft P2 in elke fase een taak (de wissel in fase 1,
+## de rolwissel in fase 2, `boss_bot.gd`). (c) Solo geeft dezelfde ticks als v0.1.5 (D = 60: 5875);
+## (e) `mp1_p2` ≤ 300 bij 60 / 90 / 120 (180 als note), met in de note de langste stilstand en het
+## wachten (MP-7 (e)) van P1 en P2 per deel; (f) bij D = 60 zet P2 in fase 1 merken vanaf beide
+## helften en springt hij er niet; (b) de note-run "P2 blijft als ontsteker op één plek"; (h) de
+## C-16-run zonder schotbreuk; (i) MP-7 (a) en de co-op-duur blijven checks.
 
 const Fx = preload("res://tests/echo_fixture.gd")
 const BossBot = preload("res://tests/boss_bot.gd")
@@ -27,6 +34,7 @@ const FlowReport = preload("res://levels/flowkamer/flow_report.gd")
 const LightMeter = preload("res://scripts/light/light_meter.gd")
 const Layers = preload("res://scripts/world/layers.gd")
 const Tuning = preload("res://scripts/echo/tuning.gd")
+const InputBits = preload("res://scripts/input/input_bits.gd")
 
 ## Een run duurt bij D = 180 langer dan 2 minuten speltijd; de grens is ruim, de run zelf stopt bij
 ## BOSS_VERSLAGEN of op `RUN_LIMIT`.
@@ -38,7 +46,14 @@ const MAX_FRAMES := {
 	"test_b9_drop_out_wankel": 22000, "test_b9_c16_solo_echo_off": 13000,
 	"test_b9_c16_coop_p2_never_hits": 13000, "test_b9_one_strike_per_bounce": 22000,
 	"test_b10_meetlog_events": 22000, "test_b9b_realistic_solo_d60": 22000,
+	"test_b14_note_p2_one_place": 22000,
 }
+## B-14 (c): de solo-run bij D = 60 in ticks van v0.1.5 (de wissel geldt solo niet).
+const SOLO_D60_TICKS := 5875
+## B-14 (e): de verwachting van §3.10 voor de langste stilstand van P2 per deel (ticks).
+const EXPECTED_P2 := {"fase 1": "± 90", "fasewissel": "≤ 60", "fase 2": "± 90", "wankel+finisher": "± 100"}
+## B-14 (b): schotbreuken per maat van fase 1 in de gewone co-op-run bij D = 60.
+static var _coop_breaks_per_beat := -1.0
 ## B-9b: totale duur (ticks) van de solo-run per D, voor MP-7 in de co-op-run.
 static var _solo_ticks := {}
 ## v0.1.5 (#247, LGD-besluit in #247): de normen van de solo-run bij D = 60, in seconden.
@@ -84,6 +99,24 @@ func _arena(t, d: int, coop: bool, echo_on := true) -> Dictionary:
 	var run := {"sim": sim, "boss": boss, "bot": bot, "p1": p1, "p2": p2, "echo": echo, "log": log,
 		"hits": [], "breaks": 0, "d": d, "coop": coop}
 	boss.hit_player.connect(func(tick: int, _who: Node2D) -> void: run["hits"].append(tick))
+	# B-14 (f): merken van P2 in fase 1 per helft, en de JUMP-flanken van P2 in fase 1.
+	run["p2_marks"] = {-1: 0, 1: 0}
+	run["p2_jumps"] = 0
+	run["beats1"] = 0
+	sim.combat.mark_set.connect(func(_tick: int, mark) -> void:
+		if mark.setter == "p2" and mark.target == boss.ketel and boss.phase == Gemaalmeester.Phase.ONE:
+			run["p2_marks"][boss.half_of(mark.set_at)] += 1)
+	boss.beat.connect(func(_tick: int, _n: int) -> void:
+		if boss.phase == Gemaalmeester.Phase.ONE:
+			run["beats1"] += 1)
+	if p2 != null:
+		var prev := {"j": false}
+		sim.tick_finished.connect(func(_tick: int) -> void:
+			var partner: PlayerActor = sim.get_player(2)
+			var down := partner != null and partner.last_input & InputBits.JUMP != 0
+			if down and not prev["j"] and boss.phase == Gemaalmeester.Phase.ONE and boss.state == boss.State.FIGHT:
+				run["p2_jumps"] += 1
+			prev["j"] = down)
 	if echo != null:
 		echo.broke.connect(func(_tick: int, _at: Vector2) -> void: run["breaks"] += 1)
 	return run
@@ -134,7 +167,8 @@ func _measure(run: Dictionary) -> Dictionary:
 		"mp1_p2": rep.longest_still_p2, "hits": run["hits"].size(), "breaks": run["breaks"],
 		"defeated": run["boss"].is_defeated(), "health": run["p1"].health,
 		"respawns": run["log"].count("RESPAWN"), "waits": run["bot"].waits, "jl": run["bot"].jl,
-		"closed": run["bot"].closed}
+		"closed": run["bot"].closed, "rows": rows, "swaps": run["bot"].swaps.size(),
+		"breaks_total": run["log"].count("SCHOT_BREUK")}
 	if at.has("start") and at.has("verslagen"):
 		m["total"] = int(at["verslagen"]) - int(at["start"])
 	# Treffers op P1 per deel (de bot ontwijkt alleen de pompslag van fase 1).
@@ -204,6 +238,9 @@ func _solo(t, d: int) -> void:
 		t.check(int(m["turns"].get("tijd", 0)) <= 1, "%s: %d keer RAD_DRAAI reden tijd (≤ 1)" % [name, m["turns"].get("tijd", 0)])
 	if d == 60:
 		_check_duration(t, name, m)
+		# B-14 (c): de wissel geldt solo niet, dus dezelfde ticks als v0.1.5.
+		t.check(int(m.get("total", 0)) == SOLO_D60_TICKS, "%s: %s ticks (v0.1.5: %d; B-14 (c))" % [name,
+			m.get("total", "?"), SOLO_D60_TICKS])
 	await t.cleanup()
 
 
@@ -250,7 +287,82 @@ func _coop(t, d: int) -> void:
 		t.check(mp7 >= 0.5 and mp7 <= 1.0, "%s: MP-7 %.2f (0,5 … 1,0; solo %d ticks)" % [name, mp7, solo])
 	elif mp7 < 0.5 or mp7 > 1.0:
 		t.note("%s: MP-7 %.2f buiten 0,5 … 1,0 (D = 180, regressie, geen eis)" % [name, mp7])
+	# B-14 (e): MP-7 (b) voor P2 in de boss; de note per deel (stilstand en wachten, P1 en P2).
+	t.note("%s: %s" % [name, _per_part_text(m)])
+	if d <= 120:
+		t.check(int(m["mp1_p2"]) <= 300, "%s: MP-7 (b) P2 %d > 300 (B-14 (e))" % [name, m["mp1_p2"]])
+	elif int(m["mp1_p2"]) > 300:
+		t.note("%s: MP-7 (b) P2 %d > 300 (D = 180, geen eis)" % [name, m["mp1_p2"]])
+	if d == 60:
+		# B-14 (f): P2 zet in fase 1 merken vanaf beide helften (≥ 2 per helft) en springt er niet.
+		var marks: Dictionary = run["p2_marks"]
+		t.check(int(marks[-1]) >= 2 and int(marks[1]) >= 2 and int(run["p2_jumps"]) == 0,
+			"%s: fase 1 merken van P2 links %d / rechts %d (≥ 2), JUMP-flanken P2 %d (0)" % [name, marks[-1], marks[1],
+				run["p2_jumps"]])
+		_coop_breaks_per_beat = float(m["breaks_total"]) / maxf(float(run["beats1"]), 1.0)
+		t.note("%s: fase 1 %d schotbreuken in %d maten (%.2f per maat); merken van P2 links %d / rechts %d; rolwissels fase 2 %d" % [
+			name, m["breaks_total"], run["beats1"], _coop_breaks_per_beat, marks[-1], marks[1], m["swaps"]])
 	await t.cleanup()
+
+
+## B-14 (e): de delen van de run (BOSS_FASE-ticks), als [naam, van, tot).
+func _parts(m: Dictionary) -> Array:
+	var at: Dictionary = m["at"]
+	var end := int(at.get("verslagen", 1 << 40)) + 1
+	return [["fase 1", int(at.get("start", 0)), int(at.get("wissel", end))],
+		["fasewissel", int(at.get("wissel", end)), int(at.get("2", end))],
+		["fase 2", int(at.get("2", end)), int(at.get("wankel", end))],
+		["wankel+finisher", int(at.get("wankel", end)), end]]
+
+
+## B-14 (e): per deel de langste stilstand (MP-1, `STIL_EIND` met bron p1/p2, geknipt op het deel) en
+## het wachten (MP-7 (e), `WACHT_START`/`WACHT_EIND`: langste periode en aandeel van het deel; twee
+## perioden die overlappen tellen als één), voor P1 en P2, naast de verwachting van §3.10 voor P2.
+## Let op: deze arena heeft geen lichtmeter, dus geen `LP`-regels; slaan en ontsteken tellen hier niet
+## als eigen actie (MP-7 (e)) en het wachten valt hoger uit dan in de Kadewijk-arena, waar de
+## merk-combo's LP geven (`test_kadewijk_coop.gd`, S8 los: de boss).
+func _per_part_text(m: Dictionary) -> String:
+	var still := {"p1": [], "p2": []}
+	var waits := {"p1": [], "p2": []}
+	var wait_from := {}
+	for row in m["rows"]:
+		var tick := int(row[0])
+		match row[2]:
+			"STIL_EIND":
+				if still.has(row[4]):
+					still[row[4]].append([tick - int(row[3]), tick])
+			"WACHT_START":
+				wait_from[row[4]] = int(row[3])
+			"WACHT_EIND":
+				if wait_from.has(row[4]):
+					waits[row[4]].append([int(wait_from[row[4]]), int(wait_from[row[4]]) + int(row[3])])
+					wait_from.erase(row[4])
+	var out := PackedStringArray()
+	for part: Array in _parts(m):
+		var a: int = part[1]
+		var b: int = part[2]
+		var cells := PackedStringArray()
+		for who: String in ["p1", "p2"]:
+			var longest_still := 0
+			for w: Array in still[who]:
+				longest_still = maxi(longest_still, mini(int(w[1]), b) - maxi(int(w[0]), a))
+			var merged: Array = []
+			for w: Array in waits[who]:
+				if not merged.is_empty() and int(w[0]) <= int(merged[-1][1]):
+					merged[-1][1] = maxi(int(merged[-1][1]), int(w[1]))
+				else:
+					merged.append([int(w[0]), int(w[1])])
+			var longest_wait := 0
+			var total := 0
+			for w: Array in merged:
+				var n := mini(int(w[1]), b) - maxi(int(w[0]), a)
+				if n > 0:
+					longest_wait = maxi(longest_wait, n)
+					total += n
+			cells.append("%s stil %d, wacht langste %d (%.1f %%)" % [who.to_upper(), longest_still, longest_wait,
+				100.0 * total / maxf(float(b - a), 1.0)])
+		out.append("%s (%d ticks): %s; verwacht P2 %s" % [part[0], b - a, " / ".join(cells), EXPECTED_P2[part[0]]])
+	return "per deel (wachten zonder LP-regels, zie `_per_part_text`): " + " · ".join(out)
 
 
 func test_b9_solo_d60(t) -> void:
@@ -377,6 +489,52 @@ func test_b9_c16_coop_p2_never_hits(t) -> void:
 	run["log"].finish()
 	t.check(run["log"].count("FINISHER_START") == 0 and not boss.is_defeated() and boss.se == EnemyData.ticks("gemaalmeester", "se"),
 		"P2 slaat nooit: finisher %d, %d SE" % [run["log"].count("FINISHER_START"), boss.se])
+	# B-14 (h): ook geen schotbreuk (zonder P2 knalt niemand het merk van P1, C-16 b).
+	t.check(run["log"].count("SCHOT_BREUK") == 0, "P2 slaat nooit: %d keer SCHOT_BREUK" % run["log"].count("SCHOT_BREUK"))
+	await t.cleanup()
+
+
+## B-14 (b), note-run: "P2 blijft als ontsteker op één plek" (D = 60): de oude co-op-bot (P1 links van
+## de ketel, slaat om de 20 ticks; P2 rechts, zet geen merken en ontsteekt alleen van zijn plek). Met
+## de wissel knalt P2 het merk van P1 alleen als P1 het van de doelhelft (links) zette, dus alleen in
+## de maten met de doelhelft links (check: elke schotbreuk komt van zo'n merk). De verhouding
+## schotbreuken per maat van fase 1 tegen de gewone co-op-run staat in de note, met de grens ½ van
+## §6 B-14 (b). Die grens is hier geen check: fase 1 heeft in beide runs precies `openingen` (7)
+## schotbreuken (één per opening), dus de verhouding is die van het aantal maten, en een opening van
+## de kern duurt ± een maat (zie de PR; vraag aan de Combat Designer). Hooguit 6000 ticks; P1 heeft
+## genoeg levens (alleen de schotbreuken tellen).
+func test_b14_note_p2_one_place(t) -> void:
+	if _coop_breaks_per_beat < 0.0:
+		var normal := _arena(t, 60, true)
+		var mn := await _play_run(t, normal)
+		_coop_breaks_per_beat = float(mn["breaks_total"]) / maxf(float(normal["beats1"]), 1.0)
+		await t.cleanup()
+	var run := _arena(t, 60, true)
+	run["bot"].p2_fixed = true
+	run["p1"].health = 1000
+	var sim = run["sim"]
+	var boss: Gemaalmeester = run["boss"]
+	# Welk merk brak het schot: wie zette het, vanaf welke helft, en was dat de doelhelft?
+	var last := {"mark": null}
+	var marks_half := {}
+	sim.combat.mark_set.connect(func(tick: int, mark) -> void:
+		marks_half[mark.id] = [mark.setter, boss.half_of(mark.set_at), boss.doelhelft(tick)])
+	sim.combat.mark_exploded.connect(func(_tick: int, mark, _link: int) -> void: last["mark"] = mark)
+	var from := []
+	boss.shot_broken.connect(func(_tick: int) -> void:
+		from.append(marks_half.get(last["mark"].id, []) if last["mark"] != null else []))
+	await _run_until(t, sim, func() -> bool: return boss.phase != Gemaalmeester.Phase.ONE, 6000)
+	run["log"].finish()
+	var breaks: int = run["log"].count("SCHOT_BREUK")
+	var per_beat := float(breaks) / maxf(float(run["beats1"]), 1.0)
+	t.note("P2 als ontsteker op één plek (D = 60): %d schotbreuken in %d maten van fase 1 (%.2f per maat; gewone co-op-run %.2f), fase 1 %s" % [
+		breaks, run["beats1"], per_beat, _coop_breaks_per_beat,
+		"klaar op tick %d" % sim.tick if boss.phase != Gemaalmeester.Phase.ONE else "niet klaar in 6000 ticks"])
+	t.check(breaks > 0 and from.size() == breaks and from.all(func(f: Array) -> bool: return f == ["p1", -1, -1]),
+		"P2 op één plek: schotbreuken van merken [zetter, helft, doelhelft] %s (verwacht alleen [p1, links, links])" % [from])
+	var ratio := per_beat / _coop_breaks_per_beat if _coop_breaks_per_beat > 0.0 else -1.0
+	t.note("P2 op één plek: verhouding schotbreuken per maat %.2f tegen de gewone co-op-run (grens §6 B-14 (b): ≤ 0,50; %s; geen check, zie de kop)" % [
+		ratio, "gehaald" if ratio >= 0.0 and ratio <= 0.5 else "niet gehaald"])
 	await t.cleanup()
 
 

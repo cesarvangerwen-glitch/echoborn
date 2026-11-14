@@ -22,6 +22,8 @@ extends RefCounted
 ##
 ## Elke test maakt een eigen `Progress`; de autoloads en `user://saves` blijven onaangeroerd.
 
+## B-14 (c) (#190): de solo-run bij D = 60 van BOSS_START tot BOSS_VERSLAGEN in ticks van v0.1.5.
+const SOLO_D60_TICKS := 5853
 const Scene := preload("res://levels/kadewijk/kadewijk.tscn")
 const KadeBot = preload("res://levels/kadewijk/kadewijk_bot.gd")
 const BossBot = preload("res://tests/boss_bot.gd")
@@ -383,6 +385,8 @@ func _solo(t, d: int) -> void:
 		var f1 := float(int(at.get("wissel", -1)) - int(at.get("start", 0))) / 60.0 if at.has("wissel") else -1.0
 		var f2 := float(int(at.get("wankel", -1)) - int(at.get("2", 0))) / 60.0 if at.has("wankel") and at.has("2") else INF
 		t.check(f1 >= 24.0 and f2 <= 65.0, "%s: fase 1 %.1f s (≥ 24), fase 2 %.1f s (≤ 65)" % [name, f1, f2])
+		# B-14 (c) (#190): de co-op-wissel geldt solo niet, dus dezelfde ticks als v0.1.5 (97,5 s).
+		t.check(total == SOLO_D60_TICKS, "%s: %d ticks (verwacht %d, v0.1.5; B-14 (c))" % [name, total, SOLO_D60_TICKS])
 	# Kadewijk: deuren, licht, binnen de arena.
 	t.check(door["start_closed"], "%s: DeurRechts ging niet dicht bij BOSS_START" % name)
 	t.check(not _door_closed(wijk, "DeurLinks") and wijk.boss_defeated_tick >= 0, "%s: DeurLinks niet open na BOSS_VERSLAGEN" % name)

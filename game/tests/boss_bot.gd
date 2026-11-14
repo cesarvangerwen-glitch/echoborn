@@ -8,10 +8,17 @@ extends RefCounted
 ## rad); dezelfde D en dezelfde start geven dus dezelfde input. `recorded` houdt de bits per stoel bij.
 ##
 ## Werkaanname (Gameplay Programmer, kader §5): de "scripted geoefende run" is deze bot.
-## - **Fase 1** (§3.4): P1 staat links van de ketel (kijkt naar rechts) en slaat om de 20 ticks (de
-##   AANVAL-cooldown); solo knalt de echo het merk, in co-op slaat P2 rechts van de ketel 10 ticks
-##   later (merk-combo). P1 springt over elke pompslag (afzet 16 ticks vóór het actieve vlak) en slaat
-##   een add die vlak achter hem staat.
+## - **Fase 1 solo** (§3.4): P1 staat links van de ketel (kijkt naar rechts) en slaat om de 20 ticks
+##   (de AANVAL-cooldown); de echo knalt het merk. P1 springt over elke pompslag (afzet 16 ticks vóór
+##   het actieve vlak) en slaat een add die vlak achter hem staat.
+## - **Fase 1 co-op, de wissel** (GMB-14, B-14 (3); v0.1.6.1 §3.10): P2 loopt elke maat naar de
+##   doelhelft (`Gemaalmeester.doelhelft`, `KETEL_OFFSET` px van het midden, kijkt naar de ketel) en
+##   zet daar het merk (op schot of kern); P1 staat op de andere, veilige helft (waar de stang net
+##   sloeg) en ontsteekt het merk, en op de open kern slaat hij gewoon (10 SE). Zo kruisen ze elkaar
+##   elke maat door het lichaam. Staat P1 toch in een vlak, dan springt hij over de pompslag zoals
+##   solo. Geen sprongen of stappen zonder taak. Met `p2_fixed` (note-run (b)) de oude co-op-bot: P1
+##   links zoals solo, P2 rechts op één plek, die 10 ticks na P1 slaat.
+## - **Fasewissel co-op**: P2 loopt al naar de kant van het rad (GMB-12: waar P1 niet is).
 ## - **Fase 2 solo** (§3.5): keren tegen de muur aan de kant van het rad en bouncen op de echo; bij
 ##   de bounce één slag als het aanvalsvlak boven 100 px is (`strikes_per_bounce`, §3.5: "1 treffer
 ##   per bounce"). Vóór elke keer een aanloop van `2D + 24` px naar de muur (D + 12 ticks), zodat
@@ -29,6 +36,10 @@ extends RefCounted
 ##   raakt (afzet `DODGE_LEAD` ticks vóór het actieve vlak, met de looprichting erbij); te vroeg = heen
 ##   en weer in de aanloopstrook (`hold`). In co-op springt P1 pas op P2 als (b) geldt voor zijn
 ##   opstap en val, en springt hij over de pompslag op de vloer; P2 blijft onder het rad.
+## - **Rolwissel in fase 2 co-op** (GMB-15 (b), B-14 (4)): ligt de vroegste afzet van P1 op P2 bij
+##   aankomst onder het rad meer dan `SWAP_WAIT` ticks verder, dan wisselen ze voor één bounce: P1
+##   gaat onder het midden van het rad op de vloer staan (en springt over een pompslag die hem raakt),
+##   P2 springt op hem, bouncet en slaat 2×; daarna weer de gewone rollen. Eén keer per kant.
 ## - **Realistische speler** (`realistic`): geen dash in fase 2 en `HESITATE` ticks aarzeling (stil)
 ##   vóór elke oversteek naar de andere muur.
 ## - **Meten** (B-9b, rapport): per keer-run het lopend wachten in `hold` (`waits`) en de afzet en de
@@ -53,6 +64,9 @@ const ATTACK_COOLDOWN := 20
 ## Fase 1: P1 en P2 staan zo ver van het midden van de ketel (aanvalsvlak 8–28 px vóór het lichaam).
 const KETEL_OFFSET := 36.0
 const KETEL_WINDOW := 6.0
+## Fase 1 co-op: een smaller venster, zodat de wissel ± 72 px door de machine is (± 36 px aan elke
+## kant van het midden, GMB-14 d) en niet 60 px tot de binnenrand van `KETEL_WINDOW`.
+const COOP_WINDOW := 2.0
 ## Pompslag fase 1 ontwijken: afzet zo veel ticks vóór het actieve vlak (voeten > 24 px op 6–34
 ## ticks na de afzet; §3.4: venster 24 ticks).
 const DODGE_LEAD := 16
@@ -77,6 +91,10 @@ const COOP_JUMP_PX := 56.0
 const LAND_AFTER_J := 33
 ## B-9b, co-op: de landing op P2 ligt zo veel ticks na de afzet (gemeten: 32).
 const LAND_ON_P2 := 32
+## GMB-15 (b): rolwissel als P1 bij aankomst langer dan zo veel ticks op zijn afzet moet wachten.
+const SWAP_WAIT := 60
+## GMB-15 (b): P2 staat voor zijn sprong op P1 zo ver van het midden van het rad, aan de muurkant.
+const SWAP_P2_OFFSET := 36.0
 ## B-9b: veiligheidsmarge in ticks op de vensters van (b) en (c).
 const PLAN_MARGIN := 2
 ## B-9b: zo ver vooruit zoekt `_plan` een keertick.
@@ -117,6 +135,11 @@ var strikes_per_bounce := 2
 var use_launch := false
 ## C-16 (2): P2 slaat nooit.
 var p2_strikes := true
+## B-14 (b), note-run: P2 blijft als ontsteker op één plek (rechts van de ketel) en zet geen merken;
+## P1 speelt fase 1 zoals de oude co-op-bot (links, slaan om de 20 ticks, springen).
+var p2_fixed := false
+## GMB-15 (b), rapport: de tick van elke rolwissel.
+var swaps: Array[int] = []
 ## Fase 1 en 2: over de pompslag springen; fase 2 ook de keer-runs op de maat plannen (B-9b).
 var dodge := true
 ## B-9b: realistische speler (geen dash in fase 2, `HESITATE` ticks aarzelen vóór elke oversteek).
@@ -155,6 +178,10 @@ var _hold_ticks := 0
 var _turn_tick := -1
 var _jump_tick := -1
 var _hesitate_left := -1
+## GMB-15 (b): de rolwissel van nu ("" = geen; "go": P1 naar het midden, P2 opzij; "air", "bounce":
+## P2 springt op P1 en slaat), en voor welke kant (`rad_since`) P1 al gekeken heeft.
+var _swap := ""
+var _swap_checked := -1
 
 
 func _init(sim: Node, boss: Gemaalmeester) -> void:
@@ -247,6 +274,8 @@ func _decide_p1() -> int:
 	if _boss.is_wankel() or _boss.is_finisher_running():
 		return _wankel_p1(p)
 	if _boss.phase == Gemaalmeester.Phase.ONE:
+		if _coop() and not p2_fixed:
+			return _phase1_coop_p1(p)
 		return _phase1_p1(p)
 	if _coop():
 		return _phase2_coop_p1(p)
@@ -286,6 +315,40 @@ func _phase1_p1(p: CharacterBody2D) -> int:
 	return bits
 
 
+## Fase 1 co-op (GMB-14 d): P1 op de veilige helft (niet de doelhelft), kijkt naar de ketel en
+## ontsteekt het merk van P2 (alleen van de andere helft dan waar het staat); op de open kern slaat
+## hij ook zonder merk (10 SE, zet geen merk). Een add vlak achter hem: omdraaien en slaan.
+func _phase1_coop_p1(p: CharacterBody2D) -> int:
+	var x := _ax(p)
+	var mid := _boss.middle()
+	var here := -1 if x < mid else 1
+	var target: int = _boss.doelhelft(_tick)
+	var safe := -target if target != 0 else here
+	# Ligt er een merk van P2, dan naar de helft waar hij het kan ontsteken (de andere dan waar het
+	# gezet is); na de omslag van de doelhelft is dat de kant van de volgende slag (springen).
+	var mark = _sim.combat.mark_on(_boss.ketel)
+	if mark != null and mark.setter == "p2":
+		safe = -_boss.half_of(mark.set_at)
+	var face := -safe
+	# Een add vlak achter hem slaat hij als er geen merk van P2 te ontsteken is, of als de add
+	# aanloopt (een treffer zet hem stil, VJ-04).
+	var to_detonate: bool = mark != null and mark.setter == "p2"
+	for add in _boss.adds:
+		if (not to_detonate or add.is_telling()) and add.alive and absf(_ax(add) - x) <= 34.0 and signf(_ax(add) - x) != float(face):
+			face = -1 if _ax(add) < x else 1
+	var bits := _approach(p, mid + safe * KETEL_OFFSET, face, COOP_WINDOW)
+	if bits == 0 and _attack_ready(1) and _on_floor(p):
+		if face != -safe:
+			bits |= A
+		elif mark != null and mark.setter == "p2" and _boss.half_of(mark.set_at) != here:
+			bits |= A
+		elif mark == null and _boss.core_open:
+			bits |= A
+	if dodge and _should_dodge(p):
+		bits |= _tap(1, J)
+	return bits
+
+
 ## #247, D = 90: sprong P1 op zijn plek, dan landde hij op zijn echo (die staat op de landingstick
 ## waar P1 D ticks eerder stond), en tilde de echo hem bij de volgende pompslag op en zakte hij er
 ## met hem in. Dan springt hij nu naar de andere staplek (20 px verder, naar de ketel; links komen
@@ -304,16 +367,16 @@ func _choose_landing(x: float, mid: float) -> void:
 
 ## Naar `stand` ± KETEL_WINDOW met de kijkrichting `face`; 0 = staat goed. Een stap om te draaien
 ## blijft binnen het venster (anders eerst een stap terug), zodat het niet heen en weer gaat.
-func _approach(p: CharacterBody2D, stand: float, face: int) -> int:
+func _approach(p: CharacterBody2D, stand: float, face: int, window := KETEL_WINDOW) -> int:
 	var x := _ax(p)
-	if x < stand - KETEL_WINDOW:
+	if x < stand - window:
 		return R
-	if x > stand + KETEL_WINDOW:
+	if x > stand + window:
 		return L
 	if p.motor.facing == face:
 		return 0
 	var step := 2.0 * face
-	if absf(x + step - stand) <= KETEL_WINDOW:
+	if absf(x + step - stand) <= window:
 		return _walk(face)
 	return _walk(-face)
 
@@ -793,6 +856,17 @@ func _phase2_coop_p1(p: CharacterBody2D) -> int:
 			# B-9b: pas op P2 springen als de zwiep zijn opstap en val niet raakt en de pompslag te
 			# ontwijken is (`_maat_ok` met J = nu); over de pompslag op de vloer springen.
 			var jump_ok := not dodge or _maat_ok(_tick, _boss.phase2_beats(_tick + 200), false)
+			# GMB-15 (b): bij aankomst (naast P2, die klaarstaat) één keer per kant kijken hoe lang P1
+			# op zijn afzet moet wachten; langer dan `SWAP_WAIT` ticks: de rollen wisselen.
+			var spot0 := rad_cx + 40.0 * (1.0 if rad_cx < _boss.middle() else -1.0)
+			if ready and not p2_fixed and p2_strikes and _swap_checked != _boss.rad_since() \
+					and absf(x - spot0) <= 30.0:
+				_swap_checked = _boss.rad_since()
+				if _earliest_coop_jump() - _tick > SWAP_WAIT:
+					_swap = "go"
+					swaps.append(_tick)
+					sub = "c_swap"
+					return _phase2_coop_p1(p)
 			if ready and jump_ok and absf(x - x2) <= COOP_JUMP_PX and absf(x - x2) >= 2.0:
 				sub = "c_air"
 				_plank_ticks = 0
@@ -803,6 +877,18 @@ func _phase2_coop_p1(p: CharacterBody2D) -> int:
 			if dodge and _should_dodge(p):
 				walk |= _tap(1, J)
 			return walk
+		"c_swap":
+			# GMB-15 (b): onder het midden van het rad op de vloer staan; P2 springt op hem. Over een
+			# pompslag die hem raakt springt hij (C-10: P2 gaat mee).
+			if _swap == "":
+				sub = "c_go"
+				return 0
+			var bits := 0
+			if not _on_floor(p) or absf(x - rad_cx) > 2.0:
+				bits = _steer(p, rad_cx)
+			if dodge and _should_dodge(p):
+				bits |= _tap(1, J)
+			return bits
 		"c_air":
 			if _on_plank(p):
 				if _plank_ticks < bounce_delay:
@@ -847,6 +933,17 @@ func _phase2_coop_p1(p: CharacterBody2D) -> int:
 	return 0
 
 
+## GMB-15 (b): de vroegste afzet van P1 op P2 vanaf nu die B-9b (3) toelaat (`_maat_ok`, co-op).
+func _earliest_coop_jump() -> int:
+	if not dodge:
+		return _tick
+	var beats := _boss.phase2_beats(_tick + PLAN_HORIZON + 200)
+	for at in range(_tick, _tick + PLAN_HORIZON):
+		if _maat_ok(at, beats, false):
+			return at
+	return _tick + PLAN_HORIZON
+
+
 ## Co-op: van P2 af stappen tegen zijn looprichting in (staat hij stil: naar het midden).
 func _off_p2_dir(p2: CharacterBody2D) -> int:
 	if absf(p2.motor.velocity.x) > 0.1:
@@ -873,19 +970,95 @@ func _decide_p2() -> int:
 	var x := _ax(p2)
 	if _boss.state == _boss.State.IDLE:
 		return _walk(1)
-	if _boss.phase == Gemaalmeester.Phase.TWO and not (_boss.is_wankel() or _boss.is_finisher_running()):
-		# Onder het midden van het rad gaan staan (drager, §3.5).
+	var p2_phase := _boss.phase != Gemaalmeester.Phase.ONE and not p2_fixed
+	if (p2_phase or _boss.phase == Gemaalmeester.Phase.TWO) and not (_boss.is_wankel() or _boss.is_finisher_running()):
+		if _swap != "":
+			return _swap_p2(p2)
+		# Onder het midden van het rad gaan staan (drager, §3.5); in de fasewissel al naar zijn kant.
 		var target := _boss.rad_x(_target_side())
 		if absf(target - x) <= 1.0:
 			return 0
 		return _walk(1 if target > x else -1)
-	# Fase 1 en Wankel: rechts van de ketel, kijkt naar links, slaat 10 ticks na P1.
+	if _boss.phase == Gemaalmeester.Phase.ONE and not p2_fixed:
+		return _phase1_coop_p2(p2)
+	# Wankel (en de note-run `p2_fixed`): rechts van de ketel, kijkt naar links, slaat 10 ticks na P1.
 	var stand := _boss.middle() + KETEL_OFFSET
 	var move := _approach(p2, stand, -1)
 	if move != 0:
 		return move
 	if not p2_strikes or not _attack_ready(2):
 		return 0
-	if _boss.is_wankel():
+	if _boss.is_wankel() or p2_fixed:
 		return A if _ketel_mark_by("p1") else 0
 	return A if _tick - int(_last_attack[1]) == ATTACK_COOLDOWN / 2 else 0
+
+
+## Fase 1 co-op (GMB-14 d): naar de doelhelft, `KETEL_OFFSET` px van het midden, kijkt naar de
+## ketel; daar het merk zetten (schot of kern), of een merk van P1 van de andere helft ontsteken.
+func _phase1_coop_p2(p2: CharacterBody2D) -> int:
+	var target: int = _boss.doelhelft(_tick)
+	if target == 0:
+		target = -1 if _ax(p2) < _boss.middle() else 1
+	var move := _approach(p2, _boss.middle() + target * KETEL_OFFSET, -target, COOP_WINDOW)
+	if move != 0:
+		return move
+	if not p2_strikes or not _attack_ready(2) or not _on_floor(p2):
+		return 0
+	var mark = _sim.combat.mark_on(_boss.ketel)
+	if mark == null or (mark.setter == "p1" and _boss.half_of(mark.set_at) != target):
+		return A
+	return 0
+
+
+## GMB-15 (b), P2 in de rolwissel: opzij aan de muurkant tot P1 onder het rad staat, dan op hem
+## springen, bouncen en 2× slaan; terug op de vloer (of op P1) is de wissel voorbij.
+func _swap_p2(p2: CharacterBody2D) -> int:
+	var p1 := _p(1)
+	var side := _target_side()
+	var rad_cx := _boss.rad_x(side)
+	var x := _ax(p2)
+	var half := EnemyData.value(_boss.data_group, "rad_breedte") * 0.5
+	if not _boss.is_rad_hittable() or _boss.rad_side_hits >= EnemyData.ticks(_boss.data_group, "kant_treffers"):
+		_end_swap()
+		return 0
+	match _swap:
+		"go":
+			var spot := rad_cx + side * SWAP_P2_OFFSET
+			if absf(x - spot) > 2.0 or not _on_floor(p2):
+				return _steer(p2, spot)
+			if _on_floor(p1) and absf(_ax(p1) - rad_cx) <= 2.0 and p1.motor.velocity.x == 0.0:
+				_swap = "air"
+				return _tap(2, J) | _steer(p2, _ax(p1))
+			return 0
+		"air":
+			if _on_plank(p2):
+				_swap = "bounce"
+				_strikes_air = 0
+				return _tap(2, J)
+			if _on_floor(p2):
+				_swap = "go"
+				return 0
+			return _steer(p2, _ax(p1))
+		"bounce":
+			if _on_floor(p2) or _on_plank(p2):
+				_end_swap()
+				return 0
+			var face: int = p2.motor.facing
+			var bits := _steer(p2, rad_cx)
+			var box_x: float = x + face * 18.0
+			if absf(box_x - rad_cx) > half + 2.0:
+				face = 1 if rad_cx > x else -1
+				bits = _walk(face)
+				box_x = x + face * 18.0
+			if _feet(p2) >= STRIKE_FEET and absf(box_x - rad_cx) <= half + 2.0 and _strikes_air < strikes_per_bounce \
+					and _attack_ready(2):
+				_strikes_air += 1
+				bits |= A
+			return bits
+	return 0
+
+
+func _end_swap() -> void:
+	_swap = ""
+	if sub == "c_swap":
+		sub = "c_go"
